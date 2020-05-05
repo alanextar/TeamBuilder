@@ -2,6 +2,7 @@
   "name": "teambuilder",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://alanextar.github.io/teambuilder/",
   "main": "index.js",
   "dependencies": {
     "@vkontakte/icons": "^1.18.2",
@@ -29,15 +30,16 @@
   "devDependencies": {
     "ajv": "^6.9.1",
     "cross-env": "^5.2.0",
-    "react-hot-loader": "^4.9.0",
-    "react-scripts": "^3.4.1",
-    "typescript": "^3.7.5",
     "eslint": "^6.8.0",
     "eslint-config-react-app": "^5.2.0",
     "eslint-plugin-flowtype": "^4.6.0",
     "eslint-plugin-import": "^2.20.1",
     "eslint-plugin-jsx-a11y": "^6.2.3",
-    "eslint-plugin-react": "^7.18.3"
+    "eslint-plugin-react": "^7.18.3",
+    "gh-pages": "^2.2.0",
+    "react-hot-loader": "^4.9.0",
+    "react-scripts": "^3.4.1",
+    "typescript": "^3.7.5"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -46,7 +48,7 @@
     "start": "cross-env PORT=10888 HTTPS=true react-scripts start",
     "build": "react-scripts build",
     "predeploy": "npm run build",
-    "deploy": "vk-miniapps-deploy",
+    "deploy": "gh-pages -d build",
     "test": "cross-env CI=true react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "lint": "eslint ./src/"
