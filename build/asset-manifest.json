@@ -1,25 +1,25 @@
 {
   "files": {
-    "main.css": "/teambuilder/static/css/main.439b4a20.chunk.css",
-    "main.js": "/teambuilder/static/js/main.1ba5fe4b.chunk.js",
-    "main.js.map": "/teambuilder/static/js/main.1ba5fe4b.chunk.js.map",
-    "runtime-main.js": "/teambuilder/static/js/runtime-main.79a37389.js",
-    "runtime-main.js.map": "/teambuilder/static/js/runtime-main.79a37389.js.map",
-    "static/css/2.86df01db.chunk.css": "/teambuilder/static/css/2.86df01db.chunk.css",
-    "static/js/2.0deec4b0.chunk.js": "/teambuilder/static/js/2.0deec4b0.chunk.js",
-    "static/js/2.0deec4b0.chunk.js.map": "/teambuilder/static/js/2.0deec4b0.chunk.js.map",
-    "index.html": "/teambuilder/index.html",
-    "precache-manifest.33f0750706189a26a5532e8cdfdb9cd7.js": "/teambuilder/precache-manifest.33f0750706189a26a5532e8cdfdb9cd7.js",
-    "service-worker.js": "/teambuilder/service-worker.js",
-    "static/css/2.86df01db.chunk.css.map": "/teambuilder/static/css/2.86df01db.chunk.css.map",
-    "static/css/main.439b4a20.chunk.css.map": "/teambuilder/static/css/main.439b4a20.chunk.css.map",
-    "static/js/2.0deec4b0.chunk.js.LICENSE.txt": "/teambuilder/static/js/2.0deec4b0.chunk.js.LICENSE.txt",
-    "static/media/persik.png": "/teambuilder/static/media/persik.4e1ec840.png"
+    "main.css": "/TeamBuilder/static/css/main.439b4a20.chunk.css",
+    "main.js": "/TeamBuilder/static/js/main.1ba5fe4b.chunk.js",
+    "main.js.map": "/TeamBuilder/static/js/main.1ba5fe4b.chunk.js.map",
+    "runtime-main.js": "/TeamBuilder/static/js/runtime-main.87a89fe2.js",
+    "runtime-main.js.map": "/TeamBuilder/static/js/runtime-main.87a89fe2.js.map",
+    "static/css/2.86df01db.chunk.css": "/TeamBuilder/static/css/2.86df01db.chunk.css",
+    "static/js/2.f2a5815f.chunk.js": "/TeamBuilder/static/js/2.f2a5815f.chunk.js",
+    "static/js/2.f2a5815f.chunk.js.map": "/TeamBuilder/static/js/2.f2a5815f.chunk.js.map",
+    "index.html": "/TeamBuilder/index.html",
+    "precache-manifest.fa922c492e02840817f3497e6329db08.js": "/TeamBuilder/precache-manifest.fa922c492e02840817f3497e6329db08.js",
+    "service-worker.js": "/TeamBuilder/service-worker.js",
+    "static/css/2.86df01db.chunk.css.map": "/TeamBuilder/static/css/2.86df01db.chunk.css.map",
+    "static/css/main.439b4a20.chunk.css.map": "/TeamBuilder/static/css/main.439b4a20.chunk.css.map",
+    "static/js/2.f2a5815f.chunk.js.LICENSE.txt": "/TeamBuilder/static/js/2.f2a5815f.chunk.js.LICENSE.txt",
+    "static/media/persik.png": "/TeamBuilder/static/media/persik.4e1ec840.png"
   },
   "entrypoints": [
-    "static/js/runtime-main.79a37389.js",
+    "static/js/runtime-main.87a89fe2.js",
     "static/css/2.86df01db.chunk.css",
-    "static/js/2.0deec4b0.chunk.js",
+    "static/js/2.f2a5815f.chunk.js",
     "static/css/main.439b4a20.chunk.css",
     "static/js/main.1ba5fe4b.chunk.js"
   ]
