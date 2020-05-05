@@ -1,22 +1,44 @@
-import React, { Component } from 'react';
-import { Route } from 'react-router';
-import { Layout } from './components/Layout';
-import { Home } from './components/Home';
-import { FetchData } from './components/FetchData';
-import { Counter } from './components/Counter';
+import React, { useState, useEffect } from 'react';
+import bridge from '@vkontakte/vk-bridge';
+import View from '@vkontakte/vkui/dist/components/View/View';
+import ScreenSpinner from '@vkontakte/vkui/dist/components/ScreenSpinner/ScreenSpinner';
+import '@vkontakte/vkui/dist/vkui.css';
 
-import './custom.css'
+import Home from './panels/Home';
+import Persik from './panels/Persik';
 
-export default class App extends Component {
-  static displayName = App.name;
+const App = () => {
+	const [activePanel, setActivePanel] = useState('home');
+	const [fetchedUser, setUser] = useState(null);
+	const [popout, setPopout] = useState(null);
 
-  render () {
-    return (
-      <Layout>
-        <Route exact path='/' component={Home} />
-        <Route path='/counter' component={Counter} />
-        <Route path='/fetch-data' component={FetchData} />
-      </Layout>
-    );
-  }
+	useEffect(() => {
+		bridge.subscribe(({ detail: { type, data }}) => {
+			if (type === 'VKWebAppUpdateConfig') {
+				const schemeAttribute = document.createAttribute('scheme');
+				schemeAttribute.value = data.scheme ? data.scheme : 'client_light';
+				document.body.attributes.setNamedItem(schemeAttribute);
+			}
+		});
+		async function fetchData() {
+			const user = await bridge.send('VKWebAppGetUserInfo');
+			setUser(user);
+			setPopout(null);
+		}
+		fetchData();
+	}, []);
+
+	const go = e => {
+		setActivePanel(e.currentTarget.dataset.to);
+	};
+
+	return (
+		<View activePanel={activePanel} popout={popout}>
+			<Home id='home' fetchedUser={fetchedUser} go={go} />
+			<Persik id='persik' go={go} />
+		</View>
+	);
 }
+
+export default App;
+
