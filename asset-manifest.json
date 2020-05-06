@@ -1,26 +1,25 @@
 {
   "files": {
-    "main.css": "/TeamBuilder/static/css/main.439b4a20.chunk.css",
-    "main.js": "/TeamBuilder/static/js/main.f5f71f7f.chunk.js",
-    "main.js.map": "/TeamBuilder/static/js/main.f5f71f7f.chunk.js.map",
+    "main.css": "/TeamBuilder/static/css/main.6636e503.chunk.css",
+    "main.js": "/TeamBuilder/static/js/main.24c354f5.chunk.js",
+    "main.js.map": "/TeamBuilder/static/js/main.24c354f5.chunk.js.map",
     "runtime-main.js": "/TeamBuilder/static/js/runtime-main.fd291090.js",
     "runtime-main.js.map": "/TeamBuilder/static/js/runtime-main.fd291090.js.map",
-    "static/css/2.b09f2111.chunk.css": "/TeamBuilder/static/css/2.b09f2111.chunk.css",
-    "static/js/2.ed020b19.chunk.js": "/TeamBuilder/static/js/2.ed020b19.chunk.js",
-    "static/js/2.ed020b19.chunk.js.map": "/TeamBuilder/static/js/2.ed020b19.chunk.js.map",
+    "static/css/2.c6250e3a.chunk.css": "/TeamBuilder/static/css/2.c6250e3a.chunk.css",
+    "static/js/2.6271521c.chunk.js": "/TeamBuilder/static/js/2.6271521c.chunk.js",
+    "static/js/2.6271521c.chunk.js.map": "/TeamBuilder/static/js/2.6271521c.chunk.js.map",
     "index.html": "/TeamBuilder/index.html",
-    "precache-manifest.49ff2a4fce2bb7097daf9db50fe58abe.js": "/TeamBuilder/precache-manifest.49ff2a4fce2bb7097daf9db50fe58abe.js",
+    "precache-manifest.b0e71cf8595a8e4ef5a146a0b1f44b90.js": "/TeamBuilder/precache-manifest.b0e71cf8595a8e4ef5a146a0b1f44b90.js",
     "service-worker.js": "/TeamBuilder/service-worker.js",
-    "static/css/2.b09f2111.chunk.css.map": "/TeamBuilder/static/css/2.b09f2111.chunk.css.map",
-    "static/css/main.439b4a20.chunk.css.map": "/TeamBuilder/static/css/main.439b4a20.chunk.css.map",
-    "static/js/2.ed020b19.chunk.js.LICENSE.txt": "/TeamBuilder/static/js/2.ed020b19.chunk.js.LICENSE.txt",
-    "static/media/persik.png": "/TeamBuilder/static/media/persik.4e1ec840.png"
+    "static/css/2.c6250e3a.chunk.css.map": "/TeamBuilder/static/css/2.c6250e3a.chunk.css.map",
+    "static/css/main.6636e503.chunk.css.map": "/TeamBuilder/static/css/main.6636e503.chunk.css.map",
+    "static/js/2.6271521c.chunk.js.LICENSE.txt": "/TeamBuilder/static/js/2.6271521c.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.fd291090.js",
-    "static/css/2.b09f2111.chunk.css",
-    "static/js/2.ed020b19.chunk.js",
-    "static/css/main.439b4a20.chunk.css",
-    "static/js/main.f5f71f7f.chunk.js"
+    "static/css/2.c6250e3a.chunk.css",
+    "static/js/2.6271521c.chunk.js",
+    "static/css/main.6636e503.chunk.css",
+    "static/js/main.24c354f5.chunk.js"
   ]
 }
