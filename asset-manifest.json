@@ -1,26 +1,26 @@
 {
   "files": {
     "main.css": "/TeamBuilder/static/css/main.439b4a20.chunk.css",
-    "main.js": "/TeamBuilder/static/js/main.1ba5fe4b.chunk.js",
-    "main.js.map": "/TeamBuilder/static/js/main.1ba5fe4b.chunk.js.map",
-    "runtime-main.js": "/TeamBuilder/static/js/runtime-main.87a89fe2.js",
-    "runtime-main.js.map": "/TeamBuilder/static/js/runtime-main.87a89fe2.js.map",
-    "static/css/2.86df01db.chunk.css": "/TeamBuilder/static/css/2.86df01db.chunk.css",
-    "static/js/2.f2a5815f.chunk.js": "/TeamBuilder/static/js/2.f2a5815f.chunk.js",
-    "static/js/2.f2a5815f.chunk.js.map": "/TeamBuilder/static/js/2.f2a5815f.chunk.js.map",
+    "main.js": "/TeamBuilder/static/js/main.f5f71f7f.chunk.js",
+    "main.js.map": "/TeamBuilder/static/js/main.f5f71f7f.chunk.js.map",
+    "runtime-main.js": "/TeamBuilder/static/js/runtime-main.fd291090.js",
+    "runtime-main.js.map": "/TeamBuilder/static/js/runtime-main.fd291090.js.map",
+    "static/css/2.b09f2111.chunk.css": "/TeamBuilder/static/css/2.b09f2111.chunk.css",
+    "static/js/2.ed020b19.chunk.js": "/TeamBuilder/static/js/2.ed020b19.chunk.js",
+    "static/js/2.ed020b19.chunk.js.map": "/TeamBuilder/static/js/2.ed020b19.chunk.js.map",
     "index.html": "/TeamBuilder/index.html",
-    "precache-manifest.fa922c492e02840817f3497e6329db08.js": "/TeamBuilder/precache-manifest.fa922c492e02840817f3497e6329db08.js",
+    "precache-manifest.49ff2a4fce2bb7097daf9db50fe58abe.js": "/TeamBuilder/precache-manifest.49ff2a4fce2bb7097daf9db50fe58abe.js",
     "service-worker.js": "/TeamBuilder/service-worker.js",
-    "static/css/2.86df01db.chunk.css.map": "/TeamBuilder/static/css/2.86df01db.chunk.css.map",
+    "static/css/2.b09f2111.chunk.css.map": "/TeamBuilder/static/css/2.b09f2111.chunk.css.map",
     "static/css/main.439b4a20.chunk.css.map": "/TeamBuilder/static/css/main.439b4a20.chunk.css.map",
-    "static/js/2.f2a5815f.chunk.js.LICENSE.txt": "/TeamBuilder/static/js/2.f2a5815f.chunk.js.LICENSE.txt",
+    "static/js/2.ed020b19.chunk.js.LICENSE.txt": "/TeamBuilder/static/js/2.ed020b19.chunk.js.LICENSE.txt",
     "static/media/persik.png": "/TeamBuilder/static/media/persik.4e1ec840.png"
   },
   "entrypoints": [
-    "static/js/runtime-main.87a89fe2.js",
-    "static/css/2.86df01db.chunk.css",
-    "static/js/2.f2a5815f.chunk.js",
+    "static/js/runtime-main.fd291090.js",
+    "static/css/2.b09f2111.chunk.css",
+    "static/js/2.ed020b19.chunk.js",
     "static/css/main.439b4a20.chunk.css",
-    "static/js/main.1ba5fe4b.chunk.js"
+    "static/js/main.f5f71f7f.chunk.js"
   ]
 }
