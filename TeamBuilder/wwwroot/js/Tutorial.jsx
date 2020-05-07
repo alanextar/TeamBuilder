@@ -1,9 +1,26 @@
-﻿class CommentBox extends React.Component {
+﻿class Toggle extends React.Component {
+    state = {
+        show: false,
+    }
+
+    toggle = () => this.setState((currentState) => ({ show: !currentState.show }));
+
     render() {
+        const imgStyle = {
+            width: '300',
+        };
+
         return (
-            <div className="commentBox">Hello, world! I am a CommentBox.</div>
+            <div className="wrapper">
+                <div>
+                    <button onClick={this.toggle} className="btn-success btn-pineapple">
+                        {this.state.show ? 'Скрыть шишку' : 'Показать шишку'}
+                    </button>
+                </div>
+                {this.state.show && <div><img src="/img/pineapple.png" style={imgStyle} /> </div>}
+            </div>
         );
     }
 }
 
-ReactDOM.render(<CommentBox />, document.getElementById('content'));
+ReactDOM.render(<Toggle />, document.getElementById('app'));
