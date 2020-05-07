@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http;
-using JavaScriptEngineSwitcher.V8;
 using JavaScriptEngineSwitcher.Extensions.MsDependencyInjection;
 using React.AspNet;
+using JavaScriptEngineSwitcher.ChakraCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,8 +31,7 @@ namespace TeamBuilder
 			services.AddReact();
 
 			// Make sure a JS engine is registered, or you will get an error!
-			services.AddJsEngineSwitcher(options => options.DefaultEngineName = V8JsEngine.EngineName)
-			  .AddV8();
+			services.AddJsEngineSwitcher(options => options.DefaultEngineName = ChakraCoreJsEngine.EngineName).AddChakraCore();
 
 			services.AddControllersWithViews();
 		}
