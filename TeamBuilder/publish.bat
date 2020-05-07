@@ -13,3 +13,4 @@ cd .\bin\Release\netcoreapp3.1\publish\
 call heroku container:login
 call heroku container:push web -a vk-team-builder
 call heroku container:release web -a vk-team-builder
+pause
