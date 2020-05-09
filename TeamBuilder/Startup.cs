@@ -33,7 +33,7 @@ namespace TeamBuilder
 			// Make sure a JS engine is registered, or you will get an error!
 			services.AddJsEngineSwitcher(options => options.DefaultEngineName = ChakraCoreJsEngine.EngineName).AddChakraCore();
 
-			services.AddControllersWithViews();
+			services.AddRazorPages();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -71,19 +71,10 @@ namespace TeamBuilder
 				//  .AddScriptWithoutTransform("~/js/bundle.server.js");
 			});
 
-
 			app.UseStaticFiles();
-
 			app.UseRouting();
-
 			app.UseAuthorization();
-
-			app.UseEndpoints(endpoints =>
-			{
-				endpoints.MapControllerRoute(
-					name: "default",
-					pattern: "{controller=Home}/{action=Index}/{id?}");
-			});
+			app.UseEndpoints(endpoints => endpoints.MapRazorPages());
 		}
 	}
 }
