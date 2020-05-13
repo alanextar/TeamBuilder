@@ -1,14 +1,18 @@
 ﻿import React from 'react';
 import ReactDOM from 'react-dom';
-import { View, Panel, PanelHeader, Group, Cell, PanelHeaderBack, Spinner, Avatar, Search, Header, SimpleCell, Div } from '@vkontakte/vkui';
+import { View, Panel, PanelHeader, Group, Cell, PanelHeaderBack, Spinner, Avatar, Search, Button, Div } from '@vkontakte/vkui';
 import { Tabs, TabsItem, Separator, CellButton } from '@vkontakte/vkui';
+import { FormLayout, Checkbox, Link } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
+import '../src/styles/style.css';
 import Icon28UserOutline from '@vkontakte/icons/dist/28/user_outline';
 import Icon28UsersOutline from '@vkontakte/icons/dist/28/users_outline';
 import Icon28MusicOutline from '@vkontakte/icons/dist/28/music_outline';
 import Icon28PhoneOutline from '@vkontakte/icons/dist/28/phone_outline';
+import Icon28ArticleOutline from '@vkontakte/icons/dist/28/article_outline';
+import Icon20HomeOutline from '@vkontakte/icons/dist/20/home_outline';
 import bridge from '@vkontakte/vk-bridge';
-import { getAvatarUrl } from '../src/utils'
+import { getAvatarUrl } from '../src/utils.js';
 
 class Example extends React.Component {
     constructor(props) {
@@ -18,7 +22,8 @@ class Example extends React.Component {
             activePanel: 'panel1',
             fetchedUser: null,
             activeTab1: 'main',
-            activeTab2: 'teams'
+            activeTab2: 'teams',
+            showMain: true
         }
 
         bridge.subscribe((e) => console.log(e));
@@ -36,6 +41,7 @@ class Example extends React.Component {
     }
 
     render() {
+        console.log('--------', 1, this.state.showMain)
         return (
             <View activePanel={this.state.activePanel}>
                 <Panel id="panel1">
@@ -50,18 +56,39 @@ class Example extends React.Component {
                     <Separator />
                     <Tabs>
                         <TabsItem
-                            onClick={() => this.setState({ activeTab1: 'main', showMainContent: true })}
+                            onClick={() => this.setState({ activeTab1: 'main', showMain: true })}
                             selected={this.state.activeTab1 === 'main'}>
                                 Основное
                         </TabsItem>
                         <TabsItem
-                            onClick={() => this.setState({ activeTab1: 'teams', showMainContent: false })}
+                            onClick={() => this.setState({ activeTab1: 'teams', showMain: false })}
                             selected={this.state.activeTab1 === 'teams'}>
                                 Команды
                         </TabsItem>
                     </Tabs>
-                    <Div id="mainContent" style={{ display: this.state.activeTab2 === 'main' ? 'block' : 'none' }}>Контактная информация</Div>
-                    <Div id="teams" style={{ display: !this.state.activeTab2 === 'main' ? 'block' : 'none' }}>Команды</Div>
+                    <Div className="mainContent">
+                        <Div id="main" style={{ display: this.state.showMain ? 'block' : 'none' }}>
+                            Контактная информация
+                            <Cell before={<Icon20HomeOutline height={28} width={28} />}>
+                                город:
+                            </Cell>
+                            <Cell before={<Icon28PhoneOutline/>}>
+                                телефон:
+                            </Cell>
+                            <Cell before={<Icon28ArticleOutline />}>
+                                дополнительно:
+                            </Cell>
+                         </Div>
+                        <Div id="teams" style={{ display: !this.state.showMain ? 'block' : 'none' }}>Команды</Div>
+                        <Div className="profileBottom" >
+                            <FormLayout>
+                                <Checkbox>Ищу команду</Checkbox>
+                            </FormLayout>
+                            <Div>
+                                <Button mode="destructive" size='xl'>Подтвердить профиль</Button>
+                            </Div>
+                        </Div>
+                    </Div>
                 </Panel>
                 <Panel id="panel2">
                     <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => this.setState({ activePanel: 'panel1' })} />}>
