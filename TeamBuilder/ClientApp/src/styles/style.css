@@ -10,3 +10,10 @@
 	position: absolute;
 	bottom: 0;
 }
+.skillsInput {
+	/*background: var(--field_background);*/
+	background: black;
+}
+.rbt-input-multi {
+	background: var(--field_background) !important;
+}

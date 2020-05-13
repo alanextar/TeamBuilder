@@ -2,9 +2,10 @@
 import ReactDOM from 'react-dom';
 import { View, Panel, PanelHeader, Group, Cell, PanelHeaderBack, Spinner, Avatar, Search, Button, Div } from '@vkontakte/vkui';
 import { Tabs, TabsItem, Separator, CellButton } from '@vkontakte/vkui';
-import { FormLayout, Checkbox, Link } from '@vkontakte/vkui';
+import { FormLayout, Checkbox, Link, Select } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import '../src/styles/style.css';
+import 'react-bootstrap-typeahead/css/Typeahead.css';
 import Icon28UserOutline from '@vkontakte/icons/dist/28/user_outline';
 import Icon28UsersOutline from '@vkontakte/icons/dist/28/users_outline';
 import Icon28MusicOutline from '@vkontakte/icons/dist/28/music_outline';
@@ -13,6 +14,8 @@ import Icon28ArticleOutline from '@vkontakte/icons/dist/28/article_outline';
 import Icon20HomeOutline from '@vkontakte/icons/dist/20/home_outline';
 import bridge from '@vkontakte/vk-bridge';
 import { getAvatarUrl } from '../src/utils.js';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { Typeahead } from 'react-bootstrap-typeahead';
 
 class Example extends React.Component {
     constructor(props) {
@@ -21,9 +24,9 @@ class Example extends React.Component {
         this.state = {
             activePanel: 'panel1',
             fetchedUser: null,
-            activeTab1: 'main',
-            activeTab2: 'teams',
-            showMain: true
+            activeTabProfile: 'main',
+            showMain: true,
+            selected: false
         }
 
         bridge.subscribe((e) => console.log(e));
@@ -57,12 +60,12 @@ class Example extends React.Component {
                     <Tabs>
                         <TabsItem
                             onClick={() => this.setState({ activeTab1: 'main', showMain: true })}
-                            selected={this.state.activeTab1 === 'main'}>
+                            selected={this.state.activeTabProfile === 'main'}>
                                 Основное
                         </TabsItem>
                         <TabsItem
                             onClick={() => this.setState({ activeTab1: 'teams', showMain: false })}
-                            selected={this.state.activeTab1 === 'teams'}>
+                            selected={this.state.activeTabProfile === 'teams'}>
                                 Команды
                         </TabsItem>
                     </Tabs>
@@ -78,6 +81,29 @@ class Example extends React.Component {
                             <Cell before={<Icon28ArticleOutline />}>
                                 дополнительно:
                             </Cell>
+                            <FormLayout>
+                                <Select top="Обычный Select" placeholder="Выберите пол">
+                                    <option value="m">Мужской</option>
+                                    <option value="f">Женский</option>
+                                </Select>
+                            </FormLayout>
+                            <FormLayout>
+                                <Div>
+                                    <Typeahead
+                                        onChange={(selected) => {
+                                            // Handle selections...
+                                        }}
+                                        options={[
+                                            'John',
+                                            'Miles',
+                                            'Charles',
+                                            'Herbie'
+                                        ]}
+                                        multiple
+                                        className="Select__el skillsInput"
+                                    />
+                                </Div>
+                            </FormLayout>
                          </Div>
                         <Div id="teams" style={{ display: !this.state.showMain ? 'block' : 'none' }}>Команды</Div>
                         <Div className="profileBottom" >
