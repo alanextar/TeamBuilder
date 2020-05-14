@@ -1,7 +1,7 @@
 ﻿import React from 'react';
 import ReactDOM from 'react-dom';
 import { View, Panel, PanelHeader, Group, Cell, PanelHeaderBack, Spinner, Avatar, Search, Button, Div } from '@vkontakte/vkui';
-import { Tabs, TabsItem, Separator, CellButton, FormLayout, Checkbox, Link, Select } from '@vkontakte/vkui';
+import { Tabs, TabsItem, Separator, CellButton, FormLayout, Checkbox, Link, Select, Title } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import '../../src/styles/style.css';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
@@ -9,7 +9,7 @@ import Icon28PhoneOutline from '@vkontakte/icons/dist/28/phone_outline';
 import Icon28ArticleOutline from '@vkontakte/icons/dist/28/article_outline';
 import Icon20HomeOutline from '@vkontakte/icons/dist/20/home_outline';
 import bridge from '@vkontakte/vk-bridge';
-//import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import { Typeahead } from 'react-bootstrap-typeahead';
 
 class Profile extends React.Component {
@@ -72,10 +72,9 @@ class Profile extends React.Component {
                                 <option value="m">М</option>
                                 <option value="f">Ж</option>
                             </Select>
-                        </FormLayout>
-                        <FormLayout>
                             <Div>
-                                <Typeahead
+                                <Title level="3" weight="regular" style={{ marginBottom: 16 }}>Скиллы:</Title>
+                                <Typeahead id="skills"
                                     onChange={(selected) => {
                                         // Handle selections...
                                     }}
@@ -85,13 +84,14 @@ class Profile extends React.Component {
                                         'Charles',
                                         'Herbie'
                                     ]}
+                                    top="Skills"
                                     multiple
                                     className="Select__el skillsInput"
                                 />
                             </Div>
                         </FormLayout>
                     </Div>
-                    <Div style={{ display: !this.state.showMain ? 'block' : 'none' }}>�������</Div>
+                    <Div style={{ display: !this.state.showMain ? 'block' : 'none' }}>Команды</Div>
                     <Div className="profileBottom" >
                         <FormLayout>
                             <Checkbox>в поиске команды</Checkbox>

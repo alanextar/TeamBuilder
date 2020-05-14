@@ -8,12 +8,15 @@
 }
 .profileBottom {
 	position: absolute;
-	bottom: 0;
+	bottom: 48px;
 }
 .skillsInput {
 	/*background: var(--field_background);*/
-	background: black;
 }
 .rbt-input-multi {
 	background: var(--field_background) !important;
+	border-radius: 10px !important;
+}
+.form-control {
+	height: 44px !important;
 }
