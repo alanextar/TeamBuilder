@@ -7,6 +7,7 @@ import Team_info from './team_info'
 
 import { getRandomInt, getRandomUser } from '../utils';
 
+
 class Teams extends React.Component {
     constructor(props) {
         super(props);
@@ -18,7 +19,16 @@ class Teams extends React.Component {
         }
 
         this.state = {
-            teams: null,
+            teams: [{
+                'description': "команда из екб",
+                'finishDate': null,
+                'id': 1,
+                'link': null,
+                'name': "Na’Vi Natus Vincere",
+                'startDate': null,
+                'teamEvents': null,
+                'userTeams': null
+            },],
             page_id: props.id,
             go: props.go,
             items: items,
@@ -34,6 +44,9 @@ class Teams extends React.Component {
                     fetching: false
                 });
             }, getRandomInt(600, 2000));
+
+            //let data = this.componentDidMount();
+            //this.setState({ teams: data });
         }
     }
 
@@ -42,14 +55,17 @@ class Teams extends React.Component {
     }
 
     componentDidMount() {
-        this.populateTeamData();
+        return this.populateTeamData();
     }
 
     async populateTeamData() {
-        const response = await fetch('/team/getall');
-        const data = await response.json();
-        this.setState({ teams: data });
+        let response = await fetch('/team/getall');
+        let data = await response.json();
+        console.log(data)
+        this.setState({ teams: data })
+        //return data;
     }
+
 
     render() {
         return (
@@ -57,12 +73,12 @@ class Teams extends React.Component {
                 <PanelHeader right={<PanelHeaderButton><Icon28AddOutline /></PanelHeaderButton>}>Команды</PanelHeader>
                 <Search />
                 <PullToRefresh onRefresh={this.onRefresh} isFetching={this.state.fetching}>
-                    <Group id="2">
+                    <Group>
                         <List>
-                            {this.state.items.map(({ id, name, photo_100 }, i) => {
+                            {this.state.teams.map(({ id, name }, i) => {
                                 return (
                                     <RichCell
-                                        before={<Avatar src={photo_100} />}
+                                        before={<Avatar />}
                                         onClick={this.state.go} data-to='panel2'
                                         text="Мероприятия"
                                         caption="Навыки"
