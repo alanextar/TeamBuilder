@@ -1,10 +1,15 @@
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Npgsql;
+using React.AspNet;
 
 namespace TeamBuilder
 {
@@ -20,6 +25,10 @@ namespace TeamBuilder
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
+			services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(GetConnectionString()));
+
+			services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+			services.AddReact();
 
 			services.AddControllersWithViews();
 
@@ -66,6 +75,26 @@ namespace TeamBuilder
 					spa.UseReactDevelopmentServer(npmScript: "start");
 				}
 			});
+		}
+
+		private string GetConnectionString()
+		{
+			var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+			if (databaseUrl is null)
+				return Configuration.GetConnectionString("DefaultConnection");
+
+			var databaseUri = new Uri(databaseUrl);
+			var userInfo = databaseUri.UserInfo.Split(':');
+
+			var builder = new NpgsqlConnectionStringBuilder
+			{
+				Host = databaseUri.Host,
+				Port = databaseUri.Port,
+				Username = userInfo[0],
+				Password = userInfo[1],
+				Database = databaseUri.LocalPath.TrimStart('/')
+			};
+			return builder.ToString();
 		}
 	}
 }
