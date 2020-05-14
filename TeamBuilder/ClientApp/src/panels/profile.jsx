@@ -11,6 +11,8 @@ import Icon20HomeOutline from '@vkontakte/icons/dist/20/home_outline';
 import bridge from '@vkontakte/vk-bridge';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Typeahead } from 'react-bootstrap-typeahead';
+import TeamSet from '../panels/profileTeams'
+import { teams } from '../demo_dataset/teams';
 
 class Profile extends React.Component {
     constructor(props) {
@@ -31,7 +33,7 @@ class Profile extends React.Component {
     //}
 
     render() {
-        //console.log('--------', 1, this.state.showMain)
+        console.log('--------', 1, teams)
         return (
             <Panel id="profile">
                 <PanelHeader>Профиль</PanelHeader>
@@ -53,7 +55,7 @@ class Profile extends React.Component {
                         onClick={() => this.setState({ activeTabProfile: 'teams', showMain: false })}
                         selected={this.state.activeTabProfile === 'teams'}>
                         Команды
-                        </TabsItem>
+                    </TabsItem>
                 </Tabs>
                 <Div className="mainContent">
                     <Div id="main" style={{ display: this.state.showMain ? 'block' : 'none' }}>
@@ -82,7 +84,16 @@ class Profile extends React.Component {
                                         'John',
                                         'Miles',
                                         'Charles',
-                                        'Herbie'
+                                        'Herbie1',
+                                        'John1',
+                                        'Miles1',
+                                        'Charles2',
+                                        'John2',
+                                        'Miles2',
+                                        'Charles3',
+                                        'John3',
+                                        'Miles3',
+                                        'Charles4'
                                     ]}
                                     top="Skills"
                                     multiple
@@ -91,14 +102,14 @@ class Profile extends React.Component {
                             </Div>
                         </FormLayout>
                     </Div>
-                    <Div style={{ display: !this.state.showMain ? 'block' : 'none' }}>Команды</Div>
+                    <Div style={{ display: !this.state.showMain ? 'block' : 'none' }}>
+                        <TeamSet teams={teams} />
+                    </Div>
                     <Div className="profileBottom" >
                         <FormLayout>
                             <Checkbox>в поиске команды</Checkbox>
-                        </FormLayout>
-                        <Div>
                             <Button mode="destructive" size='xl'>Подтвердить</Button>
-                        </Div>
+                        </FormLayout>
                     </Div>
                 </Div>
             </Panel>
