@@ -18,6 +18,7 @@ class Teams extends React.Component {
         }
 
         this.state = {
+            teams: null,
             page_id: props.id,
             go: props.go,
             items: items,
@@ -38,6 +39,16 @@ class Teams extends React.Component {
 
     getNewItem() {
         return getRandomUser();
+    }
+
+    componentDidMount() {
+        this.populateTeamData();
+    }
+
+    async populateTeamData() {
+        const response = await fetch('/team/getall');
+        const data = await response.json();
+        this.setState({ teams: data });
     }
 
     render() {
@@ -70,3 +81,10 @@ class Teams extends React.Component {
 };
 
 export default Teams;
+
+//{
+//    this.thematics.length > 0 &&
+//    <List>
+//        {this.thematics.map(thematic => <Cell key={thematic.id}>{thematic.name}</Cell>)}
+//    </List>
+//}
