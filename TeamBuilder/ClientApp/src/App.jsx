@@ -12,6 +12,7 @@ import Panel1 from './panels/panel1'
 import Panel2 from './panels/panel2'
 import Panel3 from './panels/panel3'
 import Teams from './panels/teams'
+import Profile from './panels/profile'
 
 const App = () => {
 
@@ -67,8 +68,8 @@ const App = () => {
                 ><Icon28FavoriteOutline /></TabbarItem>
                 <TabbarItem
                     onClick={go_foot}
-                    selected={activeStory === 'panel3'}
-                    data-story="panel3"
+                    selected={activeStory === 'profile'}
+                    data-story="profile"
                     text="Профиль"
                 ><Icon28Profile /></TabbarItem>
             </Tabbar>
@@ -76,8 +77,8 @@ const App = () => {
             <View id='teams' activePanel='teams' go={go}>
                 <Teams id='teams' go={go} />
             </View>
-            <View id='panel1' activePanel='panel1' go={go}>
-                <Panel1 id='panel1' fetchedUser={fetchedUser} go={go} />
+            <View id='profile' activePanel='profile' go={go}>
+                <Profile id='profile' fetchedUser={fetchedUser} go={go} />
             </View>
             <View id='panel2' activePanel='panel2' go={go}>
                 <Panel2 id='panel2' go={go} />
