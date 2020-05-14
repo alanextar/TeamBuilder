@@ -103,7 +103,7 @@ class Profile extends React.Component {
                         </FormLayout>
                     </Div>
                     <Div style={{ display: !this.state.showMain ? 'block' : 'none' }}>
-                        <TeamSet teams={teams} />
+                        <TeamSet/>
                     </Div>
                     <Div className="profileBottom" >
                         <FormLayout>

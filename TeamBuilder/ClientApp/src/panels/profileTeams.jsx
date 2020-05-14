@@ -8,19 +8,27 @@ class TeamsSet extends React.Component {
         super(props);
 
         this.state = {
-            teams: props.teams
+            teams: null
         }
     }
 
+    componentDidMount() {
+        this.populateTeamData();
+    }
+
+    async populateTeamData() {
+        const response = await fetch('/team/getall');
+        const data = await response.json();
+        console.log('--------', 2, data);
+        this.setState({ teams: data });
+    }
+
     render() {
-        console.log('--------', 2, this.state.teams)
-
         return (
-
             <List>
-                {this.state.teams.Teams.map(function (team, index) {
-                    return <Cell>{team.Name}</Cell>;
-                })}
+                {this.state.teams ? this.state.teams.map(function (team, index) {
+                    return <Cell>{team.name}</Cell>;
+                }) : <Cell/> }
             </List>
         )
     }
