@@ -42,7 +42,7 @@ const App = () => {
     };
 
     const go_foot = e => {
-        setActiveStore(e.currentTarget.dataset.story)
+        setActiveStore(e.currentTarget.dataset.story);
     }
 
 	return (
