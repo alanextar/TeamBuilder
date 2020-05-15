@@ -34,6 +34,9 @@ class Teams extends React.Component {
     async populateTeamData() {
         const response = await fetch('/team/getall');
         const data = await response.json();
+        for (let i = 0; i < data.length; i++) {
+            data[i].go = this.state.go
+        }
         this.setState({ teams: data });
     }
     render() {
@@ -49,16 +52,16 @@ class Teams extends React.Component {
                                     this.state.teams.map(function (team, index) {
                                         return (
                                             <RichCell key={index}
-                                                expandable
-                                                //onClick={this.state.go}
-                                                //data-to='teaminfo'
+                                                onClick={team.go}
+                                                data-to='teaminfo'
                                                 text="Мероприятия"
                                                 caption="Навыки"
-                                                after="1/3">
-                                                {team.name} 
-                                        </RichCell>
-                                    )
-                                })}
+                                                after="1/3"
+                                            >
+                                                {team.name}
+                                            </RichCell>
+                                        )
+                                    }) : <RichCell />} 
                         </List>
                     </Group>
                 </PullToRefresh>
