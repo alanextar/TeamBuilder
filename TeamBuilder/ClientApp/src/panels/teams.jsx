@@ -13,7 +13,7 @@ class Teams extends React.Component {
             go: props.go,
             page_id: props.id,
             fetching: false,
-        }
+        };
 
         this.onRefresh = () => {
             this.setState({ fetching: true });
@@ -24,7 +24,7 @@ class Teams extends React.Component {
                 fetching: false
             });
 
-        }
+        };
     }
 
     componentDidMount() {
@@ -58,13 +58,12 @@ class Teams extends React.Component {
                                                 {team.name} 
                                         </RichCell>
                                     )
-                                }) : <RichCell />
-                            }
+                                })}
                         </List>
                     </Group>
                 </PullToRefresh>
             </Panel>
-        )
+        );
     }
 };
 
