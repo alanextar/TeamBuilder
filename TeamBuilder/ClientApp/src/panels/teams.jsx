@@ -54,6 +54,7 @@ class Teams extends React.Component {
                                             <RichCell key={index}
                                                 onClick={team.go}
                                                 data-to='teaminfo'
+                                                data-id={team.id}
                                                 text="Мероприятия"
                                                 caption="Навыки"
                                                 after="1/3"

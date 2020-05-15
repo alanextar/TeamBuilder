@@ -7,17 +7,28 @@ class Teaminfo extends React.Component {
         super(props);
 
         this.state = {
+            team: null,
+            team_id: props.team_id,
             go: props.go,
             id: props.id,
         };
     };
 
+    componentDidMount() {
+        this.populateTeamData();
+    };
+
+    async populateTeamData() {
+        const response = await fetch(`/team/get/${this.state.team_id}`);
+        const data = await response.json();
+        this.setState({ team: data });
+    }
 
     render() {
         return (
             <Panel id={this.state.id}>
                 <PanelHeader separator={false} left={<PanelHeaderBack onClick={this.state.go} data-to='teams' />}>
-                    Команда
+                    {this.state.team && this.state.team.name}
                 </PanelHeader>
             </Panel>
     );

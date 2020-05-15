@@ -40,11 +40,12 @@ const App = () => {
 	}, []);
 
 	const go = e => {
-		setActivePanel(e.currentTarget.dataset.to);
+        setActivePanel(e.currentTarget.dataset.to);
+        setActiveTeam(e.currentTarget.dataset.id);
     };
 
     const goTeam = e => {
-        setActiveTeam(e.currentTarget.dataset.to);
+        setActiveTeam(e.currentTarget.dataset.id);
     };
 
     const goP = e => {
@@ -84,9 +85,9 @@ const App = () => {
                 ><Icon28Profile /></TabbarItem>
             </Tabbar>
         }>
-            <View id='teams' activePanel={ activeTeam } >
-                <Teams id='teams' go={goTeam} />
-                <Teaminfo id='teaminfo' go={goTeam} />
+            <View id='teams' activePanel={ activePanel } >
+                <Teams id='teams' go={go} />
+                <Teaminfo id='teaminfo' go={go} teamId={ activeTeam } />
             </View>
             <View id='panel1' activePanel={ activeP }>
                 <Panel1 id='panel1' fetchedUser={fetchedUser} go={goP} />
