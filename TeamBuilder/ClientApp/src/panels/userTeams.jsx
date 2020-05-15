@@ -4,7 +4,7 @@ import { Panel, PanelHeader, Group, Search, List, RichCell, Avatar, PullToRefres
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import '@vkontakte/vkui/dist/vkui.css';
 
-class TeamsSet extends React.Component {
+class UserTeams extends React.Component {
     constructor(props) {
         super(props);
 
@@ -65,4 +65,4 @@ class TeamsSet extends React.Component {
 
 }
 
-export default TeamsSet;
+export default UserTeams;

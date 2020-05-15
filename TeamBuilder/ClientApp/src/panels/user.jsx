@@ -11,14 +11,15 @@ import Icon20HomeOutline from '@vkontakte/icons/dist/20/home_outline';
 import bridge from '@vkontakte/vk-bridge';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Typeahead } from 'react-bootstrap-typeahead';
-import TeamSet from '../panels/profileTeams'
+import TeamSet from './userTeams'
 import { teams } from '../demo_dataset/teams';
 
-class Profile extends React.Component {
+class User extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
+            skills: null,
             fetchedUser: props.fetchedUser,
             activeTabProfile: 'main',
             showMain: true,
@@ -26,11 +27,15 @@ class Profile extends React.Component {
         }
     }
 
-    //async componentDidMount() {
-    //    const user = await bridge.send('VKWebAppGetUserInfo');
-    //    this.setState({ fetchedUser: user });
-    //    console.log(JSON.stringify(user));
-    //}
+    componentDidMount() {
+        this.populateSkillsData();
+    }
+
+    async populateSkillsData() {
+        const response = await fetch('/user/getSkills');
+        const data = await response.json();
+        this.setState({ skills: data });
+    }
 
     render() {
         console.log('--------', 1, teams)
@@ -74,32 +79,7 @@ class Profile extends React.Component {
                                 <option value="m">М</option>
                                 <option value="f">Ж</option>
                             </Select>
-                            <Div>
-                                <Title level="3" weight="regular" style={{ marginBottom: 16 }}>Скиллы:</Title>
-                                <Typeahead id="skills"
-                                    onChange={(selected) => {
-                                        // Handle selections...
-                                    }}
-                                    options={[
-                                        'John',
-                                        'Miles',
-                                        'Charles',
-                                        'Herbie1',
-                                        'John1',
-                                        'Miles1',
-                                        'Charles2',
-                                        'John2',
-                                        'Miles2',
-                                        'Charles3',
-                                        'John3',
-                                        'Miles3',
-                                        'Charles4'
-                                    ]}
-                                    top="Skills"
-                                    multiple
-                                    className="Select__el skillsInput"
-                                />
-                            </Div>
+                            
                         </FormLayout>
                     </Div>
                     <Div style={{ display: !this.state.showMain ? 'block' : 'none' }}>
@@ -117,4 +97,4 @@ class Profile extends React.Component {
     }
 }
 
-export default Profile;
+export default User;
