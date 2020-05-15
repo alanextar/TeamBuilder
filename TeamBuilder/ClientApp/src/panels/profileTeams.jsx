@@ -1,6 +1,7 @@
 ﻿import React from 'react';
 import ReactDOM from 'react-dom';
-import { List, Cell, PullToRefresh } from '@vkontakte/vkui';
+import { Panel, PanelHeader, Group, Search, List, RichCell, Avatar, PullToRefresh, PanelHeaderButton, Cell } from '@vkontakte/vkui';
+import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import '@vkontakte/vkui/dist/vkui.css';
 
 class TeamsSet extends React.Component {
@@ -37,14 +38,28 @@ class TeamsSet extends React.Component {
     }
 
     render() {
-    return (
+        return (
             <PullToRefresh onRefresh={this.onRefresh} isFetching={this.state.fetching}>
-                <List>
-                    {this.state.teams ? this.state.teams.map(function (team, index) {
-                        return <Cell>{team.name}</Cell>;
-                    }) : <Cell/> }
-                </List>
-            </PullToRefresh>
+                <Group>
+                    <List>
+                        {
+                            this.state.teams &&
+                            this.state.teams.map(({ id, name, description, go }, i) => {
+                                return (
+                                    <RichCell key={i}
+                                        text={description}
+                                        caption="Навыки"
+                                        after="1/3"
+                                        onClick={go}
+                                        data-to='teaminfo'
+                                        data-id={id}>
+                                        {name}
+                                    </RichCell>
+                                )
+                            })}
+                    </List>
+                </Group>
+        </PullToRefresh>
         )
     }
 
