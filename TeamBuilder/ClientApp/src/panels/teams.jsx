@@ -29,13 +29,13 @@ class Teams extends React.Component {
 
     componentDidMount() {
         this.populateTeamData();
-    };
+    }
 
     async populateTeamData() {
         const response = await fetch('/team/getall');
         const data = await response.json();
         for (let i = 0; i < data.length; i++) {
-            data[i].go = this.state.go
+            data[i].go = this.state.go;
         }
         this.setState({ teams: data });
     }
@@ -48,21 +48,20 @@ class Teams extends React.Component {
                     <Group>
                         <List>
                             {
-                                this.state.teams ?
-                                    this.state.teams.map(function (team, index) {
-                                        return (
-                                            <RichCell key={index}
-                                                onClick={team.go}
-                                                data-to='teaminfo'
-                                                data-id={team.id}
-                                                text="Мероприятия"
-                                                caption="Навыки"
-                                                after="1/3"
-                                            >
-                                                {team.name}
-                                            </RichCell>
-                                        )
-                                    }) : <RichCell />} 
+                                this.state.teams &&
+                                this.state.teams.map(({ id, name, description, go }, i) => {
+                                    return (
+                                        <RichCell key={i}
+                                            text={description}
+                                            caption="Навыки"
+                                            after="1/3"
+                                            onClick={go}
+                                            data-to='teaminfo'
+                                            data-id={id}>
+                                            {name}
+                                        </RichCell>
+                                    )
+                                })}
                         </List>
                     </Group>
                 </PullToRefresh>

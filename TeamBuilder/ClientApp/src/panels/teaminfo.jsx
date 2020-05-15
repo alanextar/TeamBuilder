@@ -8,7 +8,6 @@ class Teaminfo extends React.Component {
 
         this.state = {
             team: null,
-            team_id: props.team_id,
             go: props.go,
             id: props.id,
         };
@@ -19,7 +18,7 @@ class Teaminfo extends React.Component {
     };
 
     async populateTeamData() {
-        const response = await fetch(`/team/get/${this.state.team_id}`);
+        const response = await fetch(`/team/get/${this.props.teamId}`);
         const data = await response.json();
         this.setState({ team: data });
     }
