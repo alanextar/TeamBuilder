@@ -12,13 +12,16 @@ import Panel1 from './panels/panel1'
 import Panel2 from './panels/panel2'
 import Panel3 from './panels/panel3'
 import Teams from './panels/teams'
+import Teaminfo from './panels/teaminfo'
 
 const App = () => {
 
     const [activePanel, setActivePanel] = useState('teams');
-    const [activeStory, setActiveStore] = useState('teams')
+    const [activeStory, setActiveStore] = useState('teams');
 	const [fetchedUser, setUser] = useState(null);
-	const [popout, setPopout] = useState(null);
+    const [activeP, setActiveP] = useState('panel1');
+    const [activeTeam, setActiveTeam] = useState('teams');
+
 
 	useEffect(() => {
 		bridge.subscribe(({ detail: { type, data } }) => {
@@ -31,13 +34,21 @@ const App = () => {
 		async function fetchData() {
 			const user = await bridge.send('VKWebAppGetUserInfo');
 			setUser(user);
-			setPopout(null);
+			
 		}
 		fetchData();
 	}, []);
 
 	const go = e => {
 		setActivePanel(e.currentTarget.dataset.to);
+    };
+
+    const goTeam = e => {
+        setActiveTeam(e.currentTarget.dataset.to);
+    };
+
+    const goP = e => {
+        setActiveP(e.currentTarget.dataset.to);
     };
 
     const go_foot = e => {
@@ -73,16 +84,18 @@ const App = () => {
                 ><Icon28Profile /></TabbarItem>
             </Tabbar>
         }>
-            <View id='teams' activePanel='teams' go={go}>
-                <Teams id='teams' go={go} />
+            <View id='teams' activePanel={ activeTeam } >
+                <Teams id='teams' go={goTeam} />
+                <Teaminfo id='teaminfo' go={goTeam} />
             </View>
-            <View id='panel1' activePanel='panel1' go={go}>
-                <Panel1 id='panel1' fetchedUser={fetchedUser} go={go} />
+            <View id='panel1' activePanel={ activeP }>
+                <Panel1 id='panel1' fetchedUser={fetchedUser} go={goP} />
+                <Panel2 id='panel2' go={goP} />
             </View>
-            <View id='panel2' activePanel='panel2' go={go}>
+            <View id='panel2' activePanel='panel2'>
                 <Panel2 id='panel2' go={go} />
             </View>
-            <View id='panel3' activePanel='panel3' go={go}>
+            <View id='panel3' activePanel='panel3'>
                 <Panel3 id='panel3' go={go} />
             </View>
         </Epic>

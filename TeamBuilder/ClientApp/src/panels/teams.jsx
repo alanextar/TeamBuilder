@@ -1,9 +1,7 @@
 ﻿import React from 'react';
-import { Panel, PanelHeader, Group, Search, List, RichCell, Avatar, PullToRefresh, PanelHeaderButton } from '@vkontakte/vkui';
+import { Panel, PanelHeader, Group, Search, List, RichCell, Avatar, PullToRefresh, PanelHeaderButton, Cell } from '@vkontakte/vkui';
 
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
-
-import Team_info from './team_info'
 
 
 class Teams extends React.Component {
@@ -13,6 +11,7 @@ class Teams extends React.Component {
         this.state = {
             teams: null,
             go: props.go,
+            page_id: props.id,
             fetching: false,
         }
 
@@ -30,12 +29,11 @@ class Teams extends React.Component {
 
     componentDidMount() {
         this.populateTeamData();
-    }
+    };
 
     async populateTeamData() {
         const response = await fetch('/team/getall');
         const data = await response.json();
-        console.log('--------', 2, data);
         this.setState({ teams: data });
     }
     render() {
@@ -46,18 +44,22 @@ class Teams extends React.Component {
                 <PullToRefresh onRefresh={this.onRefresh} isFetching={this.state.fetching}>
                     <Group>
                         <List>
-                            {this.state.teams ?
-                                this.state.teams.map(function (team, index) {
-                                    return (
-                                        <RichCell
-                                            text="Мероприятия"
-                                            caption="Навыки"
-                                            after="1/3"
-                                        >
-                                            {team.name}
-                                         </RichCell>
+                            {
+                                this.state.teams ?
+                                    this.state.teams.map(function (team, index) {
+                                        return (
+                                            <RichCell key={index}
+                                                expandable
+                                                //onClick={this.state.go}
+                                                //data-to='teaminfo'
+                                                text="Мероприятия"
+                                                caption="Навыки"
+                                                after="1/3">
+                                                {team.name} 
+                                        </RichCell>
                                     )
-                                }) : <RichCell />}
+                                }) : <RichCell />
+                            }
                         </List>
                     </Group>
                 </PullToRefresh>
@@ -74,3 +76,6 @@ export default Teams;
 //        {this.thematics.map(thematic => <Cell key={thematic.id}>{thematic.name}</Cell>)}
 //    </List>
 //}
+
+
+
