@@ -1,6 +1,6 @@
 ﻿import React from 'react';
 import ReactDOM from 'react-dom';
-import { List, Cell } from '@vkontakte/vkui';
+import { List, Cell, PullToRefresh } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 
 class TeamsSet extends React.Component {
@@ -8,7 +8,20 @@ class TeamsSet extends React.Component {
         super(props);
 
         this.state = {
-            teams: null
+            teams: null,
+            go: props.go,
+            fetching: false,
+        }
+
+        this.onRefresh = () => {
+            this.setState({
+                fetching: true
+            });
+
+            this.populateTeamData()
+            this.setState({
+                fetching: false
+            });
         }
     }
 
@@ -24,12 +37,14 @@ class TeamsSet extends React.Component {
     }
 
     render() {
-        return (
-            <List>
-                {this.state.teams ? this.state.teams.map(function (team, index) {
-                    return <Cell>{team.name}</Cell>;
-                }) : <Cell/> }
-            </List>
+    return (
+            <PullToRefresh onRefresh={this.onRefresh} isFetching={this.state.fetching}>
+                <List>
+                    {this.state.teams ? this.state.teams.map(function (team, index) {
+                        return <Cell>{team.name}</Cell>;
+                    }) : <Cell/> }
+                </List>
+            </PullToRefresh>
         )
     }
 
