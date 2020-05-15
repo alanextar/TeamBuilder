@@ -5,68 +5,39 @@ import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 
 import Team_info from './team_info'
 
-import { getRandomInt, getRandomUser } from '../utils';
-
 
 class Teams extends React.Component {
     constructor(props) {
         super(props);
 
-        let items = [];
-
-        for (let i = 0; i < 10; i++) {
-            items.push(this.getNewItem())
-        }
-
         this.state = {
-            teams: [{
-                'description': "команда из екб",
-                'finishDate': null,
-                'id': 1,
-                'link': null,
-                'name': "Na’Vi Natus Vincere",
-                'startDate': null,
-                'teamEvents': null,
-                'userTeams': null
-            },],
-            page_id: props.id,
+            teams: null,
             go: props.go,
-            items: items,
-            fetching: false
+            fetching: false,
         }
 
         this.onRefresh = () => {
             this.setState({ fetching: true });
 
-            setTimeout(() => {
-                this.setState({
-                    items: [this.getNewItem(), ...this.state.items],
-                    fetching: false
-                });
-            }, getRandomInt(600, 2000));
+            this.populateTeamData();
 
-            //let data = this.componentDidMount();
-            //this.setState({ teams: data });
+            this.setState({
+                fetching: false
+            });
+
         }
     }
 
-    getNewItem() {
-        return getRandomUser();
-    }
-
     componentDidMount() {
-        return this.populateTeamData();
+        this.populateTeamData();
     }
 
     async populateTeamData() {
-        let response = await fetch('/team/getall');
-        let data = await response.json();
-        console.log(data)
-        this.setState({ teams: data })
-        //return data;
+        const response = await fetch('/team/getall');
+        const data = await response.json();
+        console.log('--------', 2, data);
+        this.setState({ teams: data });
     }
-
-
     render() {
         return (
             <Panel id={this.state.page_id}>
@@ -75,19 +46,18 @@ class Teams extends React.Component {
                 <PullToRefresh onRefresh={this.onRefresh} isFetching={this.state.fetching}>
                     <Group>
                         <List>
-                            {this.state.teams.map(({ id, name }, i) => {
-                                return (
-                                    <RichCell
-                                        before={<Avatar />}
-                                        onClick={this.state.go} data-to='panel2'
-                                        text="Мероприятия"
-                                        caption="Навыки"
-                                        after="1/3"
-                                    >
-                                        {name}
-                                     </RichCell>
-                                )
-                            })}
+                            {this.state.teams ?
+                                this.state.teams.map(function (team, index) {
+                                    return (
+                                        <RichCell
+                                            text="Мероприятия"
+                                            caption="Навыки"
+                                            after="1/3"
+                                        >
+                                            {team.name}
+                                         </RichCell>
+                                    )
+                                }) : <RichCell />}
                         </List>
                     </Group>
                 </PullToRefresh>
