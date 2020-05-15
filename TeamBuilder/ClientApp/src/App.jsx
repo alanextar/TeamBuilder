@@ -15,10 +15,10 @@ import Teams from './panels/teams'
 
 const App = () => {
 
-    const [activePanel, setActivePanel] = useState('teams');
-    const [activeStory, setActiveStore] = useState('teams')
+    const [, setActivePanel] = useState('teams');
+    const [activeStory, setActiveStore] = useState('teams');
 	const [fetchedUser, setUser] = useState(null);
-	const [popout, setPopout] = useState(null);
+	const [, setPopout] = useState(null);
 
 	useEffect(() => {
 		bridge.subscribe(({ detail: { type, data } }) => {
