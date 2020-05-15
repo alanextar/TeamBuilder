@@ -25,10 +25,18 @@ class User extends React.Component {
             showMain: true,
             selected: false
         }
+
+        this.confirmUser = this.confirmUser.bind(this);
     }
 
     componentDidMount() {
-        this.populateSkillsData();
+        //this.populateSkillsData();
+    }
+
+    async confirmUser(vkId) {
+        const response = await fetch(`/user/confirm?vkid=${vkId}`);
+        const data = await response.json();
+        console.log(777, '--------', "Confirmed!!!");
     }
 
     async populateSkillsData() {
@@ -38,7 +46,7 @@ class User extends React.Component {
     }
 
     render() {
-        console.log('--------', 1, teams)
+        console.log('--------', 9999, this.state.fetchedUser.id && this.state.fetchedUser.id)
         return (
             <Panel id="profile">
                 <PanelHeader>Профиль</PanelHeader>
@@ -88,7 +96,7 @@ class User extends React.Component {
                     <Div className="profileBottom" >
                         <FormLayout>
                             <Checkbox>в поиске команды</Checkbox>
-                            <Button mode="destructive" size='xl'>Подтвердить</Button>
+                            <Button mode="destructive" size='xl' onClick={() => this.confirmUser(this.state.fetchedUser.id)}>Подтвердить</Button>
                         </FormLayout>
                     </Div>
                 </Div>

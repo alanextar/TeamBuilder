@@ -31,7 +31,7 @@ class UserSkills extends React.Component {
     }
 
     async populateSkillsData() {
-        const response = await fetch('/user/getSkills');
+        const response = await fetch($`/user/getskills`);
         const data = await response.json();
         console.log('--------', 2, data);
         this.setState({ skills: data });

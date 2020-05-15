@@ -19,6 +19,17 @@ namespace TeamBuilder.Controllers
 			_logger = logger;
 		}
 
+		public IActionResult Confirm(long vkId)
+		{
+			_logger.LogInformation("Request ConfirmUser");
+
+			var user = new User(vkId);
+			context.Users.Add(user);
+			context.SaveChanges();
+
+			return Ok("Confirmed");
+		}
+
 		public async Task<User> GetSkills(long vkId)
 		{
 			_logger.LogInformation("Request GETALL");
