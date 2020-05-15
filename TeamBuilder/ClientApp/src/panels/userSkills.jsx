@@ -1,14 +1,17 @@
 ﻿import React from 'react';
 import ReactDOM from 'react-dom';
 import { Panel, PanelHeader, Group, Search, List, RichCell, Avatar, PullToRefresh, PanelHeaderButton, Cell } from '@vkontakte/vkui';
+import { Div,Title, } from '@vkontakte/vkui';
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import '@vkontakte/vkui/dist/vkui.css';
+import { Typeahead } from 'react-bootstrap-typeahead';
 
 class UserSkills extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
+            id: props.id,
             skills: null,
             go: props.go,
             fetching: false,
@@ -27,11 +30,11 @@ class UserSkills extends React.Component {
     }
 
     componentDidMount() {
-        this.populateTeamData();
+        this.populateSkillsData(this.state.id);
     }
 
-    async populateSkillsData() {
-        const response = await fetch($`/user/getskills`);
+    async populateSkillsData(id) {
+        const response = await fetch(`/user/getskills?vkId=${id}`);
         const data = await response.json();
         console.log('--------', 2, data);
         this.setState({ skills: data });
@@ -70,4 +73,4 @@ class UserSkills extends React.Component {
 
 }
 
-export default TeamsSet;
+export default UserSkills;

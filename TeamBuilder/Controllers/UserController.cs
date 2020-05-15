@@ -30,11 +30,11 @@ namespace TeamBuilder.Controllers
 			return Ok("Confirmed");
 		}
 
-		public async Task<User> GetSkills(long vkId)
+		public async Task<User> GetSkills(long id)
 		{
 			_logger.LogInformation("Request GETALL");
 
-			var user = context.Users.Include(x => x.UserSkills).FirstOrDefault(x => x.Id == vkId);
+			var user = context.Users.Include(x => x.UserSkills).FirstOrDefault(x => x.Id == id);
 
 			return user;
 		}

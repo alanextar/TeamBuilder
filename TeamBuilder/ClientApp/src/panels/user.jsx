@@ -10,8 +10,8 @@ import Icon28ArticleOutline from '@vkontakte/icons/dist/28/article_outline';
 import Icon20HomeOutline from '@vkontakte/icons/dist/20/home_outline';
 import bridge from '@vkontakte/vk-bridge';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Typeahead } from 'react-bootstrap-typeahead';
 import TeamSet from './userTeams'
+import UserSkills from './userSkills'
 import { teams } from '../demo_dataset/teams';
 
 class User extends React.Component {
@@ -37,12 +37,6 @@ class User extends React.Component {
         const response = await fetch(`/user/confirm?vkid=${vkId}`);
         const data = await response.json();
         console.log(777, '--------', "Confirmed!!!");
-    }
-
-    async populateSkillsData() {
-        const response = await fetch('/user/getSkills');
-        const data = await response.json();
-        this.setState({ skills: data });
     }
 
     render() {
@@ -87,7 +81,7 @@ class User extends React.Component {
                                 <option value="m">М</option>
                                 <option value="f">Ж</option>
                             </Select>
-                            
+                            <UserSkills id={this.state.fetchedUser.id} />
                         </FormLayout>
                     </Div>
                     <Div style={{ display: !this.state.showMain ? 'block' : 'none' }}>
