@@ -1,9 +1,7 @@
 ﻿import React from 'react';
-import { Panel, PanelHeader, Group, Search, List, RichCell, Avatar, PullToRefresh, PanelHeaderButton } from '@vkontakte/vkui';
+import { Panel, PanelHeader, Group, Search, List, RichCell, PullToRefresh, PanelHeaderButton } from '@vkontakte/vkui';
 
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
-
-import Team_info from './team_info'
 
 
 class Teams extends React.Component {
@@ -14,7 +12,7 @@ class Teams extends React.Component {
             teams: null,
             go: props.go,
             fetching: false,
-        }
+        };
 
         this.onRefresh = () => {
             this.setState({ fetching: true });
@@ -25,7 +23,7 @@ class Teams extends React.Component {
                 fetching: false
             });
 
-        }
+        };
     }
 
     componentDidMount() {
@@ -46,23 +44,23 @@ class Teams extends React.Component {
                 <PullToRefresh onRefresh={this.onRefresh} isFetching={this.state.fetching}>
                     <Group>
                         <List>
-                            {this.state.teams ?
-                                this.state.teams.map(function (team, index) {
+                            {this.state.teams &&
+                                this.state.teams.map(function (team, i) {
                                     return (
                                         <RichCell
-                                            text="Мероприятия"
+                                            key={i}
+                                            text={team.description}
                                             caption="Навыки"
-                                            after="1/3"
-                                        >
+                                            after="1/3">
                                             {team.name}
-                                         </RichCell>
+                                        </RichCell>
                                     )
-                                }) : <RichCell />}
+                                })}
                         </List>
                     </Group>
                 </PullToRefresh>
             </Panel>
-        )
+        );
     }
 };
 
