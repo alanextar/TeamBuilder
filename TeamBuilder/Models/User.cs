@@ -7,7 +7,18 @@ namespace TeamBuilder.Models
 {
 	public class User
 	{
+		public User()
+		{
+
+		}
+
+		public User(long vkId)
+		{
+			VkId = vkId;
+		}
+
 		public long Id { get; set; }
+		public long VkId { get; set; }
 		public string FirstName { get; set; }
 		public string SecondName { get; set; }
 		public string LastName { get; set; }

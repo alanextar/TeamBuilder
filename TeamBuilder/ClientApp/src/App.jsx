@@ -13,6 +13,7 @@ import Panel2 from './panels/panel2'
 import Panel3 from './panels/panel3'
 import Teams from './panels/teams'
 import Teaminfo from './panels/teaminfo'
+import User from './panels/user'
 
 const App = () => {
     const [activeTeamPanel, setActiveTeamPanel] = useState('teams');
@@ -20,11 +21,12 @@ const App = () => {
     const [teamHref, setTeamNextHref] = useState(null);
     const [activePanel, setActivePanel] = useState('teams');
     const [activeStory, setActiveStore] = useState('teams');
-    const [fetchedUser, setUser] = useState(null);
+	const [fetchedUser, setUser] = useState(null);
     const [activeP, setActiveP] = useState('panel1');
+    const [activeTeam, setActiveTeam] = useState('teams');
 
 
-    useEffect(() => {
+	useEffect(() => {
         bridge.subscribe(({ detail: { type, data } }) => {
             if (type === 'VKWebAppUpdateConfig') {
                 const schemeAttribute = document.createAttribute('scheme');
@@ -49,43 +51,43 @@ const App = () => {
         console.log(`dataset.href: ${e.currentTarget.dataset.href}`);
     };
 
-    const go = e => {
-        setActivePanel(e.currentTarget.dataset.to);
+    const goTeam = e => {
+        setActiveTeam(e.currentTarget.dataset.id);
     };
 
     const goP = e => {
         setActiveP(e.currentTarget.dataset.to);
     };
 
-    const goFoot = e => {
+    const go_foot = e => {
         setActiveStore(e.currentTarget.dataset.story);
     }
 
-    return (
+	return (
         <Epic activeStory={activeStory} tabbar={
             <Tabbar>
                 <TabbarItem
-                    onClick={goFoot}
+                    onClick={go_foot}
                     selected={activeStory === 'teams'}
                     data-story="teams"
                     text="Команды"
                 ><Icon28Users3Outline /></TabbarItem>
                 <TabbarItem
-                    onClick={goFoot}
+                    onClick={go_foot}
                     selected={activeStory === 'panel1'}
                     data-story="panel1"
                     text="Участники"
                 ><Icon28Users /></TabbarItem>
                 <TabbarItem
-                    onClick={goFoot}
+                    onClick={go_foot}
                     selected={activeStory === 'panel2'}
                     data-story="panel2"
                     text="События"
                 ><Icon28FavoriteOutline /></TabbarItem>
                 <TabbarItem
-                    onClick={goFoot}
-                    selected={activeStory === 'panel3'}
-                    data-story="panel3"
+                    onClick={go_foot}
+                    selected={activeStory === 'user'}
+                    data-story="user"
                     text="Профиль"
                 ><Icon28Profile /></TabbarItem>
             </Tabbar>}>
@@ -93,9 +95,8 @@ const App = () => {
                 <Teams id='teams' go={goTeam} href={teamHref} />
                 <Teaminfo id='teaminfo' go={goTeam} teamId={activeTeam} />
             </View>
-            <View id='panel1' activePanel={activeP}>
-                <Panel1 id='panel1' fetchedUser={fetchedUser} go={goP} />
-                <Panel2 id='panel2' go={goP} />
+            <View id='user' activePanel='user' go={go}>
+                <User id='user' fetchedUser={fetchedUser} go={go} />
             </View>
             <View id='panel2' activePanel='panel2'>
                 <Panel2 id='panel2' go={go} />
