@@ -9,13 +9,13 @@ class Teaminfo extends React.Component {
         this.state = {
             team: null,
             go: props.go,
-            id: props.id,
+            id: props.id
         };
-    };
+    }
 
     componentDidMount() {
         this.populateTeamData();
-    };
+    }
 
     async populateTeamData() {
         const response = await fetch(`/teams/get/${this.props.teamId}`);
@@ -31,7 +31,7 @@ class Teaminfo extends React.Component {
                 </PanelHeader>
             </Panel>
     );
-    };
+    }
 
 };
 
