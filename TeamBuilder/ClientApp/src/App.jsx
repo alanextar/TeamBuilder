@@ -17,7 +17,7 @@ import Teaminfo from './panels/teaminfo'
 const App = () => {
     const [activeTeamPanel, setActiveTeamPanel] = useState('teams');
     const [activeTeam, setActiveTeam] = useState(null);
-    const [teamNextHref, setTeamNextHref] = useState(null);
+    const [teamHref, setTeamNextHref] = useState(null);
     const [activePanel, setActivePanel] = useState('teams');
     const [activeStory, setActiveStore] = useState('teams');
     const [fetchedUser, setUser] = useState(null);
@@ -25,26 +25,28 @@ const App = () => {
 
 
     useEffect(() => {
-		bridge.subscribe(({ detail: { type, data } }) => {
-			if (type === 'VKWebAppUpdateConfig') {
-				const schemeAttribute = document.createAttribute('scheme');
-				schemeAttribute.value = data.scheme ? data.scheme : 'client_light';
-				document.body.attributes.setNamedItem(schemeAttribute);
-			}
-		});
-		async function fetchData() {
-			const user = await bridge.send('VKWebAppGetUserInfo');
-			setUser(user);
-			
-		}
-		fetchData();
-	}, []);
+        bridge.subscribe(({ detail: { type, data } }) => {
+            if (type === 'VKWebAppUpdateConfig') {
+                const schemeAttribute = document.createAttribute('scheme');
+                schemeAttribute.value = data.scheme ? data.scheme : 'client_light';
+                document.body.attributes.setNamedItem(schemeAttribute);
+            }
+        });
+        async function fetchData() {
+            const user = await bridge.send('VKWebAppGetUserInfo');
+            setUser(user);
 
-	const goTeam = e => {
+        }
+        fetchData();
+    }, []);
+
+    const goTeam = e => {
         setActiveTeamPanel(e.currentTarget.dataset.to);
-        if (e.currentTarget.dataset.nextHref)
-            setTeamNextHref(e.currentTarget.dataset.nextHref);
+        if (e.currentTarget.dataset.href)
+            setTeamNextHref(e.currentTarget.dataset.href);
         setActiveTeam(e.currentTarget.dataset.id);
+
+        console.log(`dataset.href: ${e.currentTarget.dataset.href}`);
     };
 
     const go = e => {
@@ -87,11 +89,11 @@ const App = () => {
                     text="Профиль"
                 ><Icon28Profile /></TabbarItem>
             </Tabbar>}>
-            <View id='teams' activePanel={ activeTeamPanel } >
-                <Teams id='teams' go={goTeam} nextHref={teamNextHref}/>
-                <Teaminfo id='teaminfo' go={goTeam} teamId={ activeTeam } />
+            <View id='teams' activePanel={activeTeamPanel} >
+                <Teams id='teams' go={goTeam} href={teamHref} />
+                <Teaminfo id='teaminfo' go={goTeam} teamId={activeTeam} />
             </View>
-            <View id='panel1' activePanel={ activeP }>
+            <View id='panel1' activePanel={activeP}>
                 <Panel1 id='panel1' fetchedUser={fetchedUser} go={goP} />
                 <Panel2 id='panel2' go={goP} />
             </View>

@@ -8,6 +8,7 @@ import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 
 const api = {
     baseUrl: '',
+    getTeams: '/teams/getpage'
 };
 
 class Teams extends React.Component {
@@ -16,14 +17,16 @@ class Teams extends React.Component {
 
         this.state = {
             hasMoreItems: true,
-            nextHref: this.props.nextHref,
+            href: this.props.href,
+            nextHref: null,
             teams: [],
             go: props.go,
             page_id: props.id,
-            fetching: false,
+            fetching: false
         };
 
-        console.log(`.ctr.Href: ${this.state.nextHref}`)
+        console.log(`.ctr.Href: ${this.state.href}`);
+        console.log(`.ctr.nextHref: ${this.state.nextHref}`);
 
         this.onRefresh = () => {
             this.setState({ fetching: true });
@@ -35,16 +38,15 @@ class Teams extends React.Component {
         };
     }
 
-    //componentDidMount() {
-    //    this.populateTeamData();
-    //}
+    componentDidMount() {
+        //this.populateTeamData();
+        window.scrollTo(0, 0);
+    }
 
     async populateTeamData() {
         var self = this;
 
-        var url = api.baseUrl + '/teams/getpage';
-
-        console.log(`populateTeamData.href: ${url}`)
+        var url = api.baseUrl + api.getTeams;
 
         qwest.get(url, {
             pageSize: 20
@@ -61,6 +63,7 @@ class Teams extends React.Component {
                     if (resp.nextHref) {
                         self.setState({
                             teams: teamsT,
+                            href: url,
                             nextHref: resp.nextHref
                         });
                     } else {
@@ -73,14 +76,18 @@ class Teams extends React.Component {
     }
 
     loadItems(page) {
+        window.scrollTo(0, 0);
         var self = this;
-
-        var url = api.baseUrl + '/teams/getpage';
+        
+        var url = api.baseUrl + api.getTeams;
+        //if (this.state.href) {
+        //    url = this.state.href;
+        //}
         if (this.state.nextHref) {
             url = this.state.nextHref;
         }
 
-        console.log(`loadItems.href: ${url}`)
+        console.log(`loadItems.Url: ${url}`);
 
         qwest.get(url, {
             pageSize: 20
@@ -97,6 +104,7 @@ class Teams extends React.Component {
                     if (resp.nextHref) {
                         self.setState({
                             teams: teamsT,
+                            href: url,
                             nextHref: resp.nextHref
                         });
                     } else {
@@ -110,8 +118,7 @@ class Teams extends React.Component {
 
     render() {
         var self = this;
-        var href = self.state.nextHref
-        console.log(`Render.href: ${href}`)
+        //var href = self.state.href === api.baseUrl + api.getTeams ? self.state.href : self.state.href + '&prev=true';
         const loader = <div className="loader">Loading ...</div>;
 
         var items = [];
@@ -124,7 +131,7 @@ class Teams extends React.Component {
                     after="1/3"
                     onClick={self.state.go}
                     data-to='teaminfo'
-                    data-next-href={href}
+                    //data-href={href}
                     data-id={team.id}>
                     {team.name} - {team.id}
                 </RichCell>
