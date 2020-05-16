@@ -19,7 +19,8 @@ namespace TeamBuilder.Controllers
 			_logger = logger;
 		}
 
-		public IActionResult Confirm(long vkId)
+		[HttpPost]
+		public IActionResult Confirm(long vkId, List<long> skillIds)
 		{
 			_logger.LogInformation("Request ConfirmUser");
 
@@ -30,13 +31,16 @@ namespace TeamBuilder.Controllers
 			return Ok("Confirmed");
 		}
 
-		public async Task<User> GetSkills(long id)
+		public List<Skill> GetSkills(long vkId)
 		{
-			_logger.LogInformation("Request GETALL");
+			_logger.LogInformation("Request GETSKILLS");
 
-			var user = context.Users.Include(x => x.UserSkills).FirstOrDefault(x => x.Id == id);
+			var userSkills = context.Users.Include(x => x.UserSkills)
+				.ThenInclude(y => y.Skill)
+				.FirstOrDefault(x => x.VkId == vkId)
+				.UserSkills.Select(x => x.Skill).ToList();
 
-			return user;
+			return userSkills;
 		}
 
 		public async Task<User> GetTeams(long vkId)

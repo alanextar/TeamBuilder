@@ -20,10 +20,12 @@ class User extends React.Component {
 
         this.state = {
             skills: null,
+            skillIds: null,
             fetchedUser: props.fetchedUser,
             activeTabProfile: 'main',
             showMain: true,
-            selected: false
+            selected: false,
+            selectedSkills: null
         }
 
         this.confirmUser = this.confirmUser.bind(this);
@@ -33,14 +35,30 @@ class User extends React.Component {
         //this.populateSkillsData();
     }
 
-    async confirmUser(vkId) {
-        const response = await fetch(`/user/confirm?vkid=${vkId}`);
-        const data = await response.json();
-        console.log(777, '--------', "Confirmed!!!");
+    async confirmUser(vkId, skillIds) {
+        
+        console.log('in confirm user', skillIds);
+
+        let response = await fetch('/user/confirm', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json;charset=utf-8'
+            },
+            body: { vkId, skillIds }
+        });
+
+        let result = await response.json();
     }
 
+    handleClick(event, selectedSkills) {
+        this.setState({skillIds: selectedSkills.map(function(s,i) {
+            return s.id;
+        })})
+        //event.preventDefault();
+    };
+
     render() {
-        console.log('--------', 9999, this.state.fetchedUser.id && this.state.fetchedUser.id)
+        console.log('--------', 9999, this.state.fetchedUser && this.state.fetchedUser.id)
         return (
             <Panel id="profile">
                 <PanelHeader>Профиль</PanelHeader>
@@ -65,32 +83,37 @@ class User extends React.Component {
                     </TabsItem>
                 </Tabs>
                 <Div className="mainContent">
-                    <Div id="main" style={{ display: this.state.showMain ? 'block' : 'none' }}>
-                        Информация о профиле участника
+                    {
+                        this.state.activeTabProfile === 'main' ?
+                        <Div id="main">
+                            Информация о профиле участника
                             <Cell before={<Icon20HomeOutline height={28} width={28} />}>
-                            город:
+                                город:
                             </Cell>
-                        <Cell before={<Icon28PhoneOutline />}>
-                            тел.:
+                            <Cell before={<Icon28PhoneOutline />}>
+                                тел.:
                             </Cell>
-                        <Cell before={<Icon28ArticleOutline />}>
-                            дополнительно:
+                            <Cell before={<Icon28ArticleOutline />}>
+                                дополнительно:
                             </Cell>
-                        <FormLayout>
+                            <Cell>
+                                <UserSkills handleClick={this.handleClick.bind(this, this.state.selectedSkills)} skills={this.state.skills} id={this.state.fetchedUser && this.state.fetchedUser.id} />
+                            </Cell>
+                            {/* <FormLayout>
                             <Select top="Обычный Select" placeholder="выберите пол">
                                 <option value="m">М</option>
                                 <option value="f">Ж</option>
-                            </Select>
-                            <UserSkills id={this.state.fetchedUser.id} />
-                        </FormLayout>
-                    </Div>
-                    <Div style={{ display: !this.state.showMain ? 'block' : 'none' }}>
-                        <TeamSet/>
-                    </Div>
+                            </Select> 
+                            </FormLayout> */}
+                        </Div> :
+                        <Div style={{ display: !this.state.showMain ? 'block' : 'none' }}>
+                            <TeamSet />
+                        </Div>
+                    }
                     <Div className="profileBottom" >
                         <FormLayout>
                             <Checkbox>в поиске команды</Checkbox>
-                            <Button mode="destructive" size='xl' onClick={() => this.confirmUser(this.state.fetchedUser.id)}>Подтвердить</Button>
+                            <Button mode="destructive" size='xl' onClick={() => this.confirmUser(this.state.fetchedUser && this.state.fetchedUser.id, this.state.skillIds)}>Подтвердить</Button>
                         </FormLayout>
                     </Div>
                 </Div>
