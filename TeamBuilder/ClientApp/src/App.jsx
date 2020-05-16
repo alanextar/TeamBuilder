@@ -16,7 +16,8 @@ import Teaminfo from './panels/teaminfo'
 
 const App = () => {
     const [activeTeamPanel, setActiveTeamPanel] = useState('teams');
-    const [activeTeam, setActiveTeam] = useState('teams');
+    const [activeTeam, setActiveTeam] = useState(null);
+    const [teamNextHref, setTeamNextHref] = useState(null);
     const [activePanel, setActivePanel] = useState('teams');
     const [activeStory, setActiveStore] = useState('teams');
     const [fetchedUser, setUser] = useState(null);
@@ -41,6 +42,8 @@ const App = () => {
 
 	const goTeam = e => {
         setActiveTeamPanel(e.currentTarget.dataset.to);
+        if (e.currentTarget.dataset.nextHref)
+            setTeamNextHref(e.currentTarget.dataset.nextHref);
         setActiveTeam(e.currentTarget.dataset.id);
     };
 
@@ -85,7 +88,7 @@ const App = () => {
                 ><Icon28Profile /></TabbarItem>
             </Tabbar>}>
             <View id='teams' activePanel={ activeTeamPanel } >
-                <Teams id='teams' go={goTeam} />
+                <Teams id='teams' go={goTeam} nextHref={teamNextHref}/>
                 <Teaminfo id='teaminfo' go={goTeam} teamId={ activeTeam } />
             </View>
             <View id='panel1' activePanel={ activeP }>
