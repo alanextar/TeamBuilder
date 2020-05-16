@@ -10,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using React.AspNet;
+using Newtonsoft.Json;
 
 namespace TeamBuilder
 {
@@ -30,7 +31,10 @@ namespace TeamBuilder
 			services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 			services.AddReact();
 
-			services.AddControllersWithViews();
+			services.AddControllersWithViews()
+				.AddNewtonsoftJson(options =>
+				options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+			);
 
 			// In production, the React files will be served from this directory
 			services.AddSpaStaticFiles(configuration =>
