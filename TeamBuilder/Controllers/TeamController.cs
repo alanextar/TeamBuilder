@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
 using TeamBuilder.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace TeamBuilder.Controllers
 {
@@ -43,9 +44,15 @@ namespace TeamBuilder.Controllers
 		public Team Get(int id)
 		{
 			_logger.LogInformation($"Request teams/GET?id={id}");
-			var teams = context.Teams.ToList();
-			return teams.FirstOrDefault(t => t.Id == id);
+
+			var team = context.Teams.Include(x => x.TeamEvents)
+				.ThenInclude(x => x.Event).FirstOrDefault(t => t.Id == id);
+
+			return team;
 		}
+
+		
+				 
 
 		private async Task Initialize()
 		{

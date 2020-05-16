@@ -1,6 +1,6 @@
 ﻿import React from 'react';
 
-import { Panel, PanelHeader, Group, Search, List, Cell, Avatar, PanelHeaderBack } from '@vkontakte/vkui';
+import { Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell, InfoRow } from '@vkontakte/vkui';
 
 class Teaminfo extends React.Component {
     constructor(props) {
@@ -9,7 +9,8 @@ class Teaminfo extends React.Component {
         this.state = {
             team: null,
             go: props.go,
-            id: props.id
+            id: props.id,
+            activeTab: 'teamDescription'
         };
     }
 
@@ -29,6 +30,44 @@ class Teaminfo extends React.Component {
                 <PanelHeader separator={false} left={<PanelHeaderBack onClick={this.state.go} data-to='teams' />}>
                     {this.state.team && this.state.team.name}
                 </PanelHeader>
+                <Tabs>
+                    <TabsItem
+                        onClick={() => {
+                            this.setState({ activeTab: 'teamDescription' })
+                        }}
+                        selected={this.state.activeTab === 'teamDescription'}
+                    >
+                        Описание
+                    </TabsItem>
+                    <TabsItem
+                        onClick={() => {
+                            this.setState({ activeTab: 'teamUsers' })
+                        }}
+                        selected={this.state.activeTab === 'teamUsers'}
+                    >
+                        Участники
+                    </TabsItem>
+                </Tabs>
+                <Group>
+                    {this.state.team && this.state.activeTab === 'teamDescription' ?
+                        <Cell>
+                            <InfoRow header='Описаноие команды'>
+                                {this.state.team.description}    
+                            </InfoRow>
+                        </ Cell>
+                        : 
+                        <Cell>
+                            <InfoRow header='События'>
+                                {this.state.team && this.state.team.teamEvents &&
+                                    this.state.team.TeamEvents.map((ev, i) =>
+                                    {
+                                        console.log('1111122222222', ev.name);
+                                        return ev.name;
+                                    }
+                                )}
+                            </InfoRow>
+                        </ Cell>}
+                </ Group>
             </Panel>
     );
     }
