@@ -1,14 +1,22 @@
 ﻿import React from 'react';
-import { Panel, PanelHeader, Group, Search, List, RichCell, Avatar, PullToRefresh, PanelHeaderButton, Cell } from '@vkontakte/vkui';
+import { Panel, PanelHeader, Group, Search, List, RichCell, Avatar, PullToRefresh, PanelHeaderButton } from '@vkontakte/vkui';
+import InfiniteScroll from 'react-infinite-scroller';
+import qwest from 'qwest';
 
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 
+
+const api = {
+    baseUrl: '',
+};
 
 class Teams extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
+            hasMoreItems: true,
+            nextHref: null,
             teams: null,
             go: props.go,
             page_id: props.id,
@@ -32,37 +40,81 @@ class Teams extends React.Component {
     }
 
     async populateTeamData() {
-        const response = await fetch('/team/getall');
+        const response = await fetch('/teams/getpage');
         const data = await response.json();
         for (let i = 0; i < data.length; i++) {
             data[i].go = this.state.go;
         }
         this.setState({ teams: data });
     }
+
+    loadItems(page) {
+        var self = this;
+
+        var url = api.baseUrl + '/teams/getpage';
+        if (this.state.nextHref) {
+            url = this.state.nextHref;
+        }
+
+        qwest.get(url, {
+            pageSize: 10
+        }, {
+            cache: true
+        })
+            .then(function (xhr, resp) {
+                if (resp) {
+                    var teams = self.state.teams;
+                    resp.collection.map((team) => {
+                        teams.push(team);
+                    });
+
+                    if (resp.nextHref) {
+                        self.setState({
+                            teams: teams,
+                            nextHref: resp.next_href
+                        });
+                    } else {
+                        self.setState({
+                            hasMoreItems: false
+                        });
+                    }
+                }
+            });
+    }
+
     render() {
+        const loader = <div className="loader">Loading ...</div>;
+
+        var items = [];
+        this.state.teams.map(({ id, name, description, go }, i) => {
+            items.push(
+                <RichCell key={i}
+                    text={description}
+                    caption="Навыки"
+                    after="1/3"
+                    onClick={go}
+                    data-to='teaminfo'
+                    data-id={id}>
+                    {name}
+                </RichCell>
+            );
+        });
+
         return (
             <Panel id={this.state.page_id}>
-                <PanelHeader right={<PanelHeaderButton><Icon28AddOutline /></PanelHeaderButton>}>Команды</PanelHeader>
+                <PanelHeader left={<PanelHeaderButton><Icon28AddOutline /></PanelHeaderButton>}>Команды</PanelHeader>
                 <Search />
                 <PullToRefresh onRefresh={this.onRefresh} isFetching={this.state.fetching}>
                     <Group>
-                        <List>
-                            {
-                                this.state.teams &&
-                                this.state.teams.map(({ id, name, description, go }, i) => {
-                                    return (
-                                        <RichCell key={i}
-                                            text={description}
-                                            caption="Навыки"
-                                            after="1/3"
-                                            onClick={go}
-                                            data-to='teaminfo'
-                                            data-id={id}>
-                                            {name}
-                                        </RichCell>
-                                    )
-                                })}
-                        </List>
+                        <InfiniteScroll
+                            pageStart={0}
+                            loadMore={this.loadItems.bind(this)}
+                            hasMore={this.state.hasMoreItems}
+                            loader={loader}>
+                                <List >
+                                    {items}
+                                </List>
+                        </InfiniteScroll>
                     </Group>
                 </PullToRefresh>
             </Panel>
@@ -71,13 +123,3 @@ class Teams extends React.Component {
 };
 
 export default Teams;
-
-//{
-//    this.thematics.length > 0 &&
-//    <List>
-//        {this.thematics.map(thematic => <Cell key={thematic.id}>{thematic.name}</Cell>)}
-//    </List>
-//}
-
-
-
