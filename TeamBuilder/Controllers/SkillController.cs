@@ -10,9 +10,9 @@ namespace TeamBuilder.Controllers
 	public class SkillController : ControllerBase
 	{
 		private readonly ApplicationContext context;
-		private readonly ILogger<WeatherForecastController> _logger;
+		private readonly ILogger<SkillController> _logger;
 
-		public SkillController(ApplicationContext context, ILogger<WeatherForecastController> logger)
+		public SkillController(ApplicationContext context, ILogger<SkillController> logger)
 		{
 			this.context = context;
 			_logger = logger;
