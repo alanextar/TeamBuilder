@@ -7,45 +7,114 @@ using TeamBuilder.Models;
 
 namespace TeamBuilder.Controllers
 {
-	public class TeamController : ControllerBase
+	public class TeamsController : ControllerBase
 	{
 		private readonly ApplicationContext context;
-		private readonly ILogger<WeatherForecastController> _logger;
+		private readonly ILogger<TeamsController> _logger;
 
-		public TeamController(ApplicationContext context, ILogger<WeatherForecastController> logger)
+		public TeamsController(ApplicationContext context, ILogger<TeamsController> logger)
 		{
 			this.context = context;
 			_logger = logger;
 		}
 
-		public async Task<IEnumerable<Team>> GetAll()
+		public async Task<Page<Team>> GetPage(int pageSize, int page = 0)
 		{
-			_logger.LogInformation("Request GETALL");
+			_logger.LogInformation($"Request teams/GetPage?pageSize={pageSize}&pageNumber={page}");
+
 			if (!context.Teams.Any())
 				await Initialize();
-			return context.Teams.ToList();
+
+			var teams = context.Teams.Skip(page * pageSize).Take(pageSize).ToList();
+			var nextHref = $"teams/getall?pageSize={pageSize}&page={++page}";
+
+			return new Page<Team>(teams, nextHref);
 		}
 
 		public Team Get(int id)
 		{
-			_logger.LogInformation($"Request GET?id={id}");
+			_logger.LogInformation($"Request teams/GET?id={id}");
 			var teams = context.Teams.ToList();
 			return teams.FirstOrDefault(t => t.Id == id);
 		}
 
 		private async Task Initialize()
 		{
-			var team1 = new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"};
-			var team2 = new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"};
-			var team3 = new Team {Name = "Lions MAD Lions", Description = "команда из екб"};
-			var team4 = new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"};
-			var team5 = new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"};
-			var team6 = new Team {Name = "Lions MAD Lions", Description = "команда из екб"};
-			var team7 = new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"};
-			var team8 = new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"};
+			var teams = new List<Team>
+			{
+				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
+				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
+				new Team {Name = "Lions MAD Lions", Description = "команда из екб"},
+				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
+				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
+				new Team {Name = "Lions MAD Lions", Description = "команда из екб"},
+				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
+				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
+				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
+				new Team {Name = "Lions MAD Lions", Description = "команда из екб"},
+				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
+				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
+				new Team {Name = "Lions MAD Lions", Description = "команда из екб"},
+				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
+				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
+				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
+				new Team {Name = "Lions MAD Lions", Description = "команда из екб"},
+				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
+				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
+				new Team {Name = "Lions MAD Lions", Description = "команда из екб"},
+				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
+				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
+				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
+				new Team {Name = "Lions MAD Lions", Description = "команда из екб"},
+				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
+				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
+				new Team {Name = "Lions MAD Lions", Description = "команда из екб"},
+				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
+				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
+				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
+				new Team {Name = "Lions MAD Lions", Description = "команда из екб"},
+				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
+				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
+				new Team {Name = "Lions MAD Lions", Description = "команда из екб"},
+				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
+				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
+				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
+				new Team {Name = "Lions MAD Lions", Description = "команда из екб"},
+				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
+				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
+				new Team {Name = "Lions MAD Lions", Description = "команда из екб"},
+				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
+				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
+				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
+				new Team {Name = "Lions MAD Lions", Description = "команда из екб"},
+				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
+				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
+				new Team {Name = "Lions MAD Lions", Description = "команда из екб"},
+				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
+				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
+				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
+				new Team {Name = "Lions MAD Lions", Description = "команда из екб"},
+				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
+				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
+				new Team {Name = "Lions MAD Lions", Description = "команда из екб"},
+				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
+				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
+			};
 
-			await context.Teams.AddRangeAsync(team1, team2, team3, team4, team5, team6, team7, team8);
+			await context.Teams.AddRangeAsync(teams);
 			await context.SaveChangesAsync();
 		}
+	}
+
+	public class Page<T>
+	{
+		public Page(IEnumerable<T> collection, string nextHref)
+		{
+			Collection = collection;
+			NextHref = nextHref;
+		}
+
+		public IEnumerable<T> Collection { get; set; }
+		public string NextHref { get; set; }
 	}
 }
