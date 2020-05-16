@@ -9,18 +9,21 @@ class Teaminfo extends React.Component {
         this.state = {
             team: null,
             go: props.go,
-            id: props.id
+            id: props.id,
         };
-    }
+    };
 
     componentDidMount() {
         this.populateTeamData();
-    }
+    };
 
     async populateTeamData() {
-        const response = await fetch(`/team/get/${this.props.teamId}`);
+        const response = await fetch('/team/getall');
         const data = await response.json();
-        this.setState({ team: data });
+        for (let i = 0; i < data.length; i++) {
+            data[i].go = this.state.go;
+        }
+        this.setState({ teams: data });
     }
 
     render() {
@@ -31,7 +34,7 @@ class Teaminfo extends React.Component {
                 </PanelHeader>
             </Panel>
     );
-    }
+    };
 
 };
 
