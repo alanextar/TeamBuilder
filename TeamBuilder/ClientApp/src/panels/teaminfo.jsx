@@ -49,24 +49,25 @@ class Teaminfo extends React.Component {
                     </TabsItem>
                 </Tabs>
                 <Group>
-                    {this.state.team && this.state.activeTab === 'teamDescription' ?
-                        <Cell>
-                            <InfoRow header='Описаноие команды'>
-                                {this.state.team.description}    
-                            </InfoRow>
-                        </ Cell>
-                        : 
-                        <Cell>
-                            <InfoRow header='События'>
-                                {this.state.team && this.state.team.teamEvents &&
-                                    this.state.team.TeamEvents.map((ev, i) =>
-                                    {
-                                        console.log('1111122222222', ev.name);
-                                        return ev.name;
-                                    }
-                                )}
-                            </InfoRow>
-                        </ Cell>}
+                    {this.state.team && (
+                        this.state.activeTab === 'teamDescription' ?
+                            <Cell>
+                                <InfoRow header='Описаноие команды'>
+                                    {this.state.team.description}    
+                                </InfoRow>
+                            </ Cell>
+                            : 
+                            <Cell>
+                                <InfoRow header='События'>
+                                    {this.state.team.teamEvents &&
+                                        this.state.team.TeamEvents.map((ev, i) =>
+                                        {
+                                            console.log('1111122222222', ev);
+                                            //return ev.name;
+                                        }
+                                    )}
+                                </InfoRow>
+                            </ Cell> )}
                 </ Group>
             </Panel>
     );
@@ -75,17 +76,3 @@ class Teaminfo extends React.Component {
 };
 
 export default Teaminfo;
-
-//<PanelHeader separator={false} left={<PanelHeaderBack onClick={go} data-to='teams' />}>
-//    Communities
-//                        </PanelHeader>
-//    <Search />
-//    <Cell description="Humor" before={<Avatar />} onClick={go} data-to='panel3'>
-//        Swipe Right
-//                        </Cell>
-//    <Cell description="Cultural Center" before={<Avatar />} onClick={go} data-to='panel3'>
-//        Out Cinema
-//                        </Cell>
-//    <Cell description="Movies" before={<Avatar />} onClick={go} data-to='panel3'>
-//        #ARTPOKAZ
-//                        </Cell>

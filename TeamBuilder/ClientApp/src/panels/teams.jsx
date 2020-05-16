@@ -140,7 +140,12 @@ class Teams extends React.Component {
 
         return (
             <Panel id={this.state.page_id}>
-                <PanelHeader left={<PanelHeaderButton><Icon28AddOutline /></PanelHeaderButton>}>Команды</PanelHeader>
+                <PanelHeader left={
+                    <PanelHeaderButton>
+                        <Icon28AddOutline onClick={this.state.go} data-to='teamCreate' />
+                    </PanelHeaderButton>}>
+                        Команды
+                </PanelHeader>
                 <Search />
                 <PullToRefresh onRefresh={this.onRefresh} isFetching={this.state.fetching}>
                     <Group>

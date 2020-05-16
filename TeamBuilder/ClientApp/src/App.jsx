@@ -13,6 +13,7 @@ import Panel2 from './panels/panel2'
 import Panel3 from './panels/panel3'
 import Teams from './panels/teams'
 import Teaminfo from './panels/teaminfo'
+import TeamCreate from './panels/teamCreate'
 import User from './panels/user'
 
 const App = () => {
@@ -93,6 +94,7 @@ const App = () => {
             <View id='teams' activePanel={activeTeamPanel} >
                 <Teams id='teams' go={goTeam} href={teamHref} />
                 <Teaminfo id='teaminfo' go={goTeam} teamId={activeTeam} />
+                <TeamCreate id='teamCreate' go={goTeam} />
             </View>
             <View id='user' activePanel='user' go={go}>
                 <User id='user' fetchedUser={fetchedUser} go={go} />
