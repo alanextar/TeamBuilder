@@ -12,19 +12,16 @@ class Teaminfo extends React.Component {
             id: props.id,
             activeTab: 'teamDescription'
         };
-    };
+    }
 
     componentDidMount() {
         this.populateTeamData();
-    };
+    }
 
     async populateTeamData() {
         const response = await fetch(`/teams/get/${this.props.teamId}`);
         const data = await response.json();
-        for (let i = 0; i < data.length; i++) {
-            data[i].go = this.state.go;
-        }
-        this.setState({ teams: data });
+        this.setState({ team: data });
     }
 
     render() {
@@ -73,7 +70,7 @@ class Teaminfo extends React.Component {
                 </ Group>
             </Panel>
     );
-    };
+    }
 
 };
 
