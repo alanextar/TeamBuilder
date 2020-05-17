@@ -11,7 +11,6 @@ using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using React.AspNet;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 namespace TeamBuilder
 {
