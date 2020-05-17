@@ -60,8 +60,9 @@ const App = () => {
     }
 
     const goUserEdit = e => {
+        console.log('goUserEdit to', e.currentTarget.dataset.to);
+        console.log('goUserEdit', e.currentTarget.dataset.id);
         setActivePanel(e.currentTarget.dataset.to);
-        setActiveUser(e.currentTarget.dataset.id);
     }
 
 	return (
@@ -99,7 +100,7 @@ const App = () => {
             </View>
             <View id='user' activePanel='user'>
                 <User id='user' fetchedUser={fetchedUser} goUserEdit={goUserEdit} />
-                <UserEdit id='userEdit' goUserEdit={goUserEdit} vkId={ activeUser } />
+                <UserEdit id='userEdit' goUserEdit={goUserEdit} fetchedUser={fetchedUser} />
             </View>
             <View id='panel2' activePanel='panel2'>
                 <Panel2 id='panel2' go={go} />

@@ -65,7 +65,7 @@ class User extends React.Component {
 
     render() {
         return (
-            <Panel id="profile">
+            <Panel id="user">
                 <PanelHeader>Профиль</PanelHeader>
                 {this.state.fetchedUser &&
                     <Group title="VK Connect">
@@ -91,14 +91,14 @@ class User extends React.Component {
                     this.state.activeTabProfile === 'main' ?
                         <Group header={<Header mode="secondary">Информация о профиле участника</Header>}>
                             <List>
-                                <Cell before={<Icon20HomeOutline height={28} width={28} />}
-                                    asideContent={
+                                <Cell asideContent=
+                                    {
                                         <Icon24Write onClick={this.state.goUserEdit} data-to='userEdit'
-                                            data-id={this.state.fetchedUser && this.state.fetchedUser.vkId} />
+                                            data-id={this.state.fetchedUser && this.state.fetchedUser.id} />
                                     }>
                                 </Cell>
                                 <Cell before={<Icon20HomeOutline height={28} width={28} />}>
-                                    город: <Input type="text" defaultValue="Екатеринбург" />
+                                    город:
                                 </Cell>
                                 <Cell before={<Icon28PhoneOutline />}>
                                     тел.:

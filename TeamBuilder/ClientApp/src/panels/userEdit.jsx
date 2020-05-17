@@ -16,7 +16,7 @@ class UserEdit extends React.Component {
 
         this.state = {
             goUserEdit: props.goUserEdit,
-            vkId: props.vkId
+            fetchedUser: props.fetchedUser
         }
 
     }
@@ -24,14 +24,14 @@ class UserEdit extends React.Component {
     render() {
         return (
             <Panel id="userEdit">
-                <PanelHeader>Редактирование профиля {this.state.vkId}</PanelHeader>
+                {/* <PanelHeader>Редактирование профиля {this.state.vkId}</PanelHeader>
                 {this.state.fetchedUser &&
                     <Group title="VK Connect">
                         <Cell description={this.state.fetchedUser.city && this.state.fetchedUser.city.title ? this.state.fetchedUser.city.title : ''}
                             before={this.state.fetchedUser.photo_200 ? <Avatar src={this.state.fetchedUser.photo_200} /> : null}>
                             {`${this.state.fetchedUser.first_name} ${this.state.fetchedUser.last_name}`}
                         </Cell>
-                    </Group>}
+                    </Group>} */}
                 <Separator />
                 <FormLayout>
                     <FormLayoutGroup top="Фамилия">
@@ -42,7 +42,7 @@ class UserEdit extends React.Component {
                 </FormLayout>
                 <Div>
                     <Button mode="commerce">Принять</Button>
-                    <Button onClick={this.state.goUserEdit} data-to='user' data-id={this.state.vkId} mode="destructive">Отменить</Button>
+                    <Button onClick={this.state.goUserEdit} data-to='user' data-id={this.state.fetchedUser.id} mode="destructive">Отменить</Button>
                 </Div>
             </Panel>
         )
