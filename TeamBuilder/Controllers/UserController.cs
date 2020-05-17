@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
 using TeamBuilder.Models;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using TeamBuilder.DTO;
 using TeamBuilder.Extensions;
 
@@ -13,18 +14,18 @@ namespace TeamBuilder.Controllers
 	public class UserController : Controller
 	{
 		private readonly ApplicationContext context;
-		private readonly ILogger<WeatherForecastController> _logger;
+		private readonly ILogger<UserController> _logger;
 
-		public UserController(ApplicationContext context, ILogger<WeatherForecastController> logger)
+		public UserController(ApplicationContext context, ILogger<UserController> logger)
 		{
 			this.context = context;
 			_logger = logger;
 		}
 
 		[HttpPost]
-		public IActionResult Confirm([FromBody]ProfileDto userDto)
+		public async Task<IActionResult> Confirm([FromBody]ProfileDto userDto)
 		{
-			_logger.LogInformation("Request ConfirmUser");
+			_logger.LogInformation($"POST Request Confirm. Body: {JsonConvert.SerializeObject(userDto)}");
 
 			var user = context.Users.Include(x => x.UserSkills)
 				.ThenInclude(y => y.Skill).FirstOrDefault(u => u.VkId == userDto.VkId);
@@ -38,7 +39,7 @@ namespace TeamBuilder.Controllers
 					user.UserSkills.Add(new UserSkill() { SkillId = skillId });
 				}
 
-				context.Users.Add(user);
+				await context.Users.AddAsync(user);
 			}
 			else
 			{
@@ -49,7 +50,7 @@ namespace TeamBuilder.Controllers
 				context.Users.Update(user);
 			}
 			
-			context.SaveChanges();
+			await context.SaveChangesAsync();
 
 			return Ok("Confirmed");
 		}
@@ -57,28 +58,30 @@ namespace TeamBuilder.Controllers
 		[HttpGet]
 		public IActionResult CheckConfirmation(long vkId)
 		{
-			_logger.LogInformation("Request CheckConfirmation");
+			_logger.LogInformation($"Request CheckConfirmation/{vkId}");
 
-			bool isConfirmed = context.Users.FirstOrDefault(x => x.VkId == vkId) != null ? true : false;
+			var isConfirmed = context.Users.FirstOrDefault(x => x.VkId == vkId) != null ? true : false;
 
 			return Json(isConfirmed);
 		}
 
 		public List<Skill> GetSkills(long vkId)
 		{
-			_logger.LogInformation("Request GETSKILLS");
+			_logger.LogInformation($"Request GetSkills/{vkId}");
 
 			var userSkills = context.Users.Include(x => x.UserSkills)
 				.ThenInclude(y => y.Skill)
-				.FirstOrDefault(x => x.VkId == vkId)
-				.UserSkills.Select(x => x.Skill).ToList();
+				.FirstOrDefault(x => x.VkId == vkId)?
+				.UserSkills
+				.Select(x => x.Skill)
+				.ToList();
 
 			return userSkills;
 		}
 
-		public async Task<User> GetTeams(long vkId)
+		public User GetTeams(long vkId)
 		{
-			_logger.LogInformation("Request GETALL");
+			_logger.LogInformation($"Request GetTeams/{vkId}");
 
 			var user = context.Users.Include(x => x.UserTeams).FirstOrDefault(x => x.Id == vkId);
 
