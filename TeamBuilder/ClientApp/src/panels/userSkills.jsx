@@ -1,11 +1,9 @@
 ﻿import React from 'react';
 import ReactDOM from 'react-dom';
-import { Panel, PanelHeader, Group, Search, List, RichCell, Avatar, PullToRefresh, PanelHeaderButton, Cell } from '@vkontakte/vkui';
-import { Div,Title, } from '@vkontakte/vkui';
-import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
+import { Div,Title } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import { Typeahead } from 'react-bootstrap-typeahead';
-import { skills } from '../demo_dataset/skills';
 
 class UserSkills extends React.Component {
     constructor(props) {
@@ -13,48 +11,92 @@ class UserSkills extends React.Component {
 
         this.state = {
             id: props.id,
-            skills: null,
             go: props.go,
             fetching: false,
-            options: null
+            userSkills: [],
+            options: []
         }
 
-        this.onRefresh = () => {
-            this.setState({
-                fetching: true
-            });
+        //this.onRefresh = () => {
+        //    this.setState({
+        //        fetching: true
+        //    });
 
-            //this.populateSkillsData()
-            this.setState({
-                fetching: false
-            });
-        }
+        //    //this.populateSkillsData()
+        //    this.setState({
+        //        fetching: false
+        //    });
+        //}
     }
+
 
     componentDidMount() {
-        console.log('--------', 999, this.state.id);
-        this.populateSkillsData(this.state.id);
+        console.log("user skills componentDidMount()");
+        this.populateSkills(this.state.id);
     }
 
-    async populateSkillsData(id) {
-        const response = await fetch(`/user/getskills?vkId=${id}`);
-        const data = await response.json();
-        //console.log('--------', 777, data && data);
-        this.setState({ skills: data });
-        var skillsNames = data && data.map(function (skill) {
+    //componentWillMount() {
+    //    console.log("componentWillMount()");
+    //    this.populateSkills(this.state.id);
+    //}
+
+    //componentWillReceiveProps(nextProps) {
+    //    console.log("componentWillReceiveProps()");
+    //}
+
+    //componentWillUnmount() {
+    //    console.log("componentWillUnmount()");
+    //}
+    //shouldComponentUpdate() {
+    //    console.log("shouldComponentUpdate()");
+    //    return true;
+    //}
+    //componentWillUpdate() {
+    //    console.log("componentWillUpdate()");
+    //}
+    //componentDidUpdate() {
+    //    console.log("componentDidUpdate()");
+    //}
+
+    async populateSkills(id) {
+        console.log("id -------- ", id);
+
+        const getAllResponse = await fetch('skill/getall');
+        const allSkillsData = await getAllResponse.json();
+
+        var options = allSkillsData && allSkillsData.map(function (skill) {
             return { id: skill.id, label: skill.name };
         });
 
-        this.setState({ options: skillsNames });
+        const getSkillsResponse = await fetch(`user/getSkills?vkId=${id}`);
+        const userSkillsData = await getSkillsResponse.json();
+
+        var userSkills = userSkillsData && userSkillsData.map(function (skill) {
+            return { id: skill.id, label: skill.name };
+        });
+
+        this.setState({
+            options: options,
+            userSkills: userSkills
+        });
     }
 
     render() {
+        console.log("user skills render", '##########', this.state.userSkills ? this.state.userSkills : 'no user skills value yet');
         return (
             <Div>
                 <Title level="3" weight="regular" style={{ marginBottom: 16 }}>Скиллы:</Title>
                 <Typeahead id="skills"
-                    onChange={(e) => this.props.handleClick(e)}
-                    options={this.state.options ? this.state.options : 'no skills'}
+                    clearButton
+                    onChange={(e) => {
+                        this.props.handleClick(e)
+                    }}
+                    options={this.state.options}
+                    selected={this.state.userSkills}
+                    //defaultSelected={[{ id: 1, label: 'Jog' }]}
+                    //options={[
+                    //    { id: 1, label: 'Jog' }
+                    //]}
                     top="Skills"
                     multiple
                     className="Select__el skillsInput"
@@ -62,7 +104,6 @@ class UserSkills extends React.Component {
             </Div>
         )
     }
-
 }
 
 export default UserSkills;

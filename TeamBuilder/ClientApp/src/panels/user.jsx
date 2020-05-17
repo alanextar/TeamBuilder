@@ -1,18 +1,15 @@
 ﻿import React from 'react';
 import ReactDOM from 'react-dom';
-import { View, Panel, PanelHeader, Group, Cell, PanelHeaderBack, Spinner, Avatar, Search, Button, Div } from '@vkontakte/vkui';
-import { Tabs, TabsItem, Separator, CellButton, FormLayout, Checkbox, Link, Select, Title } from '@vkontakte/vkui';
+import { Panel, PanelHeader, Group, Cell, Avatar, Search, Button, Div } from '@vkontakte/vkui';
+import { Tabs, TabsItem, Separator,  Checkbox, List, Header } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import '../../src/styles/style.css';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import Icon28PhoneOutline from '@vkontakte/icons/dist/28/phone_outline';
 import Icon28ArticleOutline from '@vkontakte/icons/dist/28/article_outline';
 import Icon20HomeOutline from '@vkontakte/icons/dist/20/home_outline';
-import bridge from '@vkontakte/vk-bridge';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import TeamSet from './userTeams'
 import UserSkills from './userSkills'
-import { teams } from '../demo_dataset/teams';
 
 class User extends React.Component {
     constructor(props) {
@@ -20,6 +17,7 @@ class User extends React.Component {
 
         this.state = {
             skills: null,
+            userSkills: null,
             skillIds: null,
             fetchedUser: props.fetchedUser,
             activeTabProfile: 'main',
@@ -29,10 +27,6 @@ class User extends React.Component {
         }
 
         this.confirmUser = this.confirmUser.bind(this);
-    }
-
-    componentDidMount() {
-        //this.populateSkillsData();
     }
 
     async confirmUser(vkId, skillIds) {
@@ -51,14 +45,19 @@ class User extends React.Component {
     }
 
     handleClick(event, selectedSkills) {
+
         this.setState({skillIds: selectedSkills.map(function(s,i) {
             return s.id;
         })})
         //event.preventDefault();
     };
 
+    componentDidMount() {
+        console.log("user componentDidMount()");
+    }
+
     render() {
-        console.log('--------', 9999, this.state.fetchedUser && this.state.fetchedUser.id)
+        console.log("user render");
         return (
             <Panel id="profile">
                 <PanelHeader>Профиль</PanelHeader>
@@ -82,40 +81,31 @@ class User extends React.Component {
                         Команды
                     </TabsItem>
                 </Tabs>
-                <Div className="mainContent">
                     {
-                        this.state.activeTabProfile === 'main' ?
-                        <Div id="main">
-                            Информация о профиле участника
-                            <Cell before={<Icon20HomeOutline height={28} width={28} />}>
-                                город:
-                            </Cell>
-                            <Cell before={<Icon28PhoneOutline />}>
-                                тел.:
-                            </Cell>
-                            <Cell before={<Icon28ArticleOutline />}>
-                                дополнительно:
-                            </Cell>
-                            <Cell>
-                                <UserSkills handleClick={this.handleClick.bind(this, this.state.selectedSkills)} skills={this.state.skills} id={this.state.fetchedUser && this.state.fetchedUser.id} />
-                            </Cell>
-                            {/* <FormLayout>
-                            <Select top="Обычный Select" placeholder="выберите пол">
-                                <option value="m">М</option>
-                                <option value="f">Ж</option>
-                            </Select> 
-                            </FormLayout> */}
-                        </Div> :
-                        <Div style={{ display: !this.state.showMain ? 'block' : 'none' }}>
+                    this.state.activeTabProfile === 'main' ?
+                        <Group header={<Header mode="secondary">Информация о профиле участника</Header>}>
+                            <List>
+                                <Cell expandable before={<Icon20HomeOutline height={28} width={28} />}>
+                                    город:
+                                </Cell>
+                                <Cell expandable before={<Icon28PhoneOutline />}>
+                                        тел.:
+                                </Cell>
+                                <Cell expandable before={<Icon28ArticleOutline />}>
+                                        дополнительно:
+                                </Cell>
+                            </List>
+                            <UserSkills handleClick={this.handleClick.bind(this, this.state.selectedSkills)} id={this.state.fetchedUser && this.state.fetchedUser.id} />
+                        </Group> :
+                        <Group>
                             <TeamSet />
-                        </Div>
-                    }
-                    <Div className="profileBottom" >
-                        <FormLayout>
-                            <Checkbox>в поиске команды</Checkbox>
-                            <Button mode="destructive" size='xl' onClick={() => this.confirmUser(this.state.fetchedUser && this.state.fetchedUser.id, this.state.skillIds)}>Подтвердить</Button>
-                        </FormLayout>
-                    </Div>
+                        </Group>
+                }
+                <Div>
+                    <Checkbox>в поиске команды</Checkbox>
+                    <Button mode="destructive" size='xl' onClick={() => this.confirmUser(this.state.fetchedUser && this.state.fetchedUser.id, this.state.skillIds)}>
+                        Подтвердить
+                    </Button>
                 </Div>
             </Panel>
         )
