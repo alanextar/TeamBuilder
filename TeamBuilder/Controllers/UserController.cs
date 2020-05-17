@@ -5,10 +5,12 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
 using TeamBuilder.Models;
 using Microsoft.EntityFrameworkCore;
+using TeamBuilder.DTO;
+using TeamBuilder.Extensions;
 
 namespace TeamBuilder.Controllers
 {
-	public class UserController : ControllerBase
+	public class UserController : Controller
 	{
 		private readonly ApplicationContext context;
 		private readonly ILogger<WeatherForecastController> _logger;
@@ -20,15 +22,46 @@ namespace TeamBuilder.Controllers
 		}
 
 		[HttpPost]
-		public IActionResult Confirm(long vkId, List<long> skillIds)
+		public IActionResult Confirm([FromBody]ProfileDto userDto)
 		{
 			_logger.LogInformation("Request ConfirmUser");
 
-			var user = new User(vkId);
-			context.Users.Add(user);
+			var user = context.Users.Include(x => x.UserSkills)
+				.ThenInclude(y => y.Skill).FirstOrDefault(u => u.VkId == userDto.VkId);
+
+			if (user == null)
+			{
+				user = new User(userDto.VkId);
+				user.UserSkills = new List<UserSkill>();
+				foreach (var skillId in userDto.SkillsIds)
+				{
+					user.UserSkills.Add(new UserSkill() { SkillId = skillId });
+				}
+
+				context.Users.Add(user);
+			}
+			else
+			{
+				var dbUserSkills = user.UserSkills;
+				var userSkillsDto = userDto.SkillsIds.Select(s => new UserSkill { UserId = user.Id, SkillId = s }).ToList();
+				context.TryUpdateManyToMany(dbUserSkills, userSkillsDto, x => new { x.SkillId });
+
+				context.Users.Update(user);
+			}
+			
 			context.SaveChanges();
 
 			return Ok("Confirmed");
+		}
+
+		[HttpGet]
+		public IActionResult CheckConfirmation(long vkId)
+		{
+			_logger.LogInformation("Request CheckConfirmation");
+
+			bool isConfirmed = context.Users.FirstOrDefault(x => x.VkId == vkId) != null ? true : false;
+
+			return Json(isConfirmed);
 		}
 
 		public List<Skill> GetSkills(long vkId)
