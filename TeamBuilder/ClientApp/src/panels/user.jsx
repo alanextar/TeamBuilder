@@ -23,7 +23,8 @@ class User extends React.Component {
             activeTabProfile: 'main',
             selected: false,
             selectedSkills: null,
-            isConfirmed: false
+            isConfirmed: false,
+            goUserEdit: props.goUserEdit
         }
 
         this.confirmUser = this.confirmUser.bind(this);
@@ -90,24 +91,21 @@ class User extends React.Component {
                     this.state.activeTabProfile === 'main' ?
                         <Group header={<Header mode="secondary">Информация о профиле участника</Header>}>
                             <List>
-                                <Cell before={<Icon20HomeOutline height={28} width={28} />} asideContent={<Icon24Write />}>
+                                <Cell before={<Icon20HomeOutline height={28} width={28} />}
+                                    asideContent={
+                                        <Icon24Write onClick={this.state.goUserEdit} data-to='userEdit'
+                                            data-id={this.state.fetchedUser && this.state.fetchedUser.vkId} />
+                                    }>
+                                </Cell>
+                                <Cell before={<Icon20HomeOutline height={28} width={28} />}>
                                     город: <Input type="text" defaultValue="Екатеринбург" />
                                 </Cell>
-                                <Cell before={<Icon28PhoneOutline />} asideContent={
-                                    <Icon24Write />
-                                }>
+                                <Cell before={<Icon28PhoneOutline />}>
                                     тел.:
                                 </Cell>
-                                <Cell before={<Icon28ArticleOutline />} asideContent={<Icon24Write />}>
+                                <Cell before={<Icon28ArticleOutline />}>
                                     дополнительно:
                                 </Cell>
-                                {/* <RichCell
-                                    before={<Icon28PhoneOutline />}
-                                    text="город:"
-                                    after={<Icon24Write />}
-                                >
-                                    Михаил Лихачев
-                                </RichCell> */}
                             </List>
                             <UserSkills userSkills={this.state.userSkills}
                                 handleClick={this.handleClick.bind(this, this.state.selectedSkills)}

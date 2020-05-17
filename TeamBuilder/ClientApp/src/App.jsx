@@ -14,6 +14,7 @@ import Panel3 from './panels/panel3'
 import Teams from './panels/teams'
 import Teaminfo from './panels/teaminfo'
 import User from './panels/user'
+import UserEdit from './panels/userEdit'
 
 const App = () => {
 
@@ -22,6 +23,7 @@ const App = () => {
 	const [fetchedUser, setUser] = useState(null);
     const [activeP, setActiveP] = useState('panel1');
     const [activeTeam, setActiveTeam] = useState('teams');
+    const [activeUser, setActiveUser] = useState('user');
 
 
 	useEffect(() => {
@@ -57,6 +59,11 @@ const App = () => {
         setActiveStore(e.currentTarget.dataset.story);
     }
 
+    const goUserEdit = e => {
+        setActivePanel(e.currentTarget.dataset.to);
+        setActiveUser(e.currentTarget.dataset.id);
+    }
+
 	return (
         <Epic activeStory={activeStory} tabbar={
             <Tabbar>
@@ -90,8 +97,9 @@ const App = () => {
                 <Teams id='teams' go={go} />
                 <Teaminfo id='teaminfo' go={go} teamId={ activeTeam } />
             </View>
-            <View id='user' activePanel='user' go={go}>
-                <User id='user' fetchedUser={fetchedUser} go={go} />
+            <View id='user' activePanel='user'>
+                <User id='user' fetchedUser={fetchedUser} goUserEdit={goUserEdit} />
+                <UserEdit id='userEdit' goUserEdit={goUserEdit} vkId={ activeUser } />
             </View>
             <View id='panel2' activePanel='panel2'>
                 <Panel2 id='panel2' go={go} />
