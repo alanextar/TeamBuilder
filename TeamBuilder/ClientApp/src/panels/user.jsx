@@ -1,13 +1,14 @@
 ﻿import React from 'react';
 import ReactDOM from 'react-dom';
-import { Panel, PanelHeader, Group, Cell, Avatar, Search, Button, Div } from '@vkontakte/vkui';
-import { Tabs, TabsItem, Separator, Checkbox, List, Header, FormLayout, Select } from '@vkontakte/vkui';
+import { Panel, PanelHeader, Group, Cell, Avatar, Search, Button, Div, Input } from '@vkontakte/vkui';
+import { Tabs, TabsItem, Separator, Checkbox, List, Header, FormLayout, Select, RichCell } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import '../../src/styles/style.css';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import Icon28PhoneOutline from '@vkontakte/icons/dist/28/phone_outline';
 import Icon28ArticleOutline from '@vkontakte/icons/dist/28/article_outline';
 import Icon20HomeOutline from '@vkontakte/icons/dist/20/home_outline';
+import Icon24Write from '@vkontakte/icons/dist/24/write';
 import TeamSet from './userTeams'
 import UserSkills from './userSkills'
 
@@ -33,7 +34,10 @@ class User extends React.Component {
     }
 
     isUserConfirmed(vkId) {
-        fetch(`/user/checkconfirmation?vkId=${vkId}`).then((response) => console.log('confirmation status ', response.status));
+        fetch(`/user/checkconfirmation?vkId=${vkId}`)
+            .then((response) => /*console.log('confirmation status ', response)*/
+                this.setState({ isConfirmed: response })
+            );
 	}
 
     async confirmUser(vkId, userSkills) {
@@ -86,17 +90,28 @@ class User extends React.Component {
                     this.state.activeTabProfile === 'main' ?
                         <Group header={<Header mode="secondary">Информация о профиле участника</Header>}>
                             <List>
-                                <Cell expandable before={<Icon20HomeOutline height={28} width={28} />}>
-                                    город:
+                                <Cell before={<Icon20HomeOutline height={28} width={28} />} asideContent={<Icon24Write />}>
+                                    город: <Input type="text" defaultValue="Екатеринбург" />
                                 </Cell>
-                                <Cell expandable before={<Icon28PhoneOutline />}>
-                                        тел.:
+                                <Cell before={<Icon28PhoneOutline />} asideContent={
+                                    <Icon24Write />
+                                }>
+                                    тел.:
                                 </Cell>
-                                <Cell expandable before={<Icon28ArticleOutline />}>
-                                        дополнительно:
+                                <Cell before={<Icon28ArticleOutline />} asideContent={<Icon24Write />}>
+                                    дополнительно:
                                 </Cell>
+                                {/* <RichCell
+                                    before={<Icon28PhoneOutline />}
+                                    text="город:"
+                                    after={<Icon24Write />}
+                                >
+                                    Михаил Лихачев
+                                </RichCell> */}
                             </List>
-                            <UserSkills userSkills={this.state.userSkills} handleClick={this.handleClick.bind(this, this.state.selectedSkills)} id={this.state.fetchedUser && this.state.fetchedUser.id} />
+                            <UserSkills userSkills={this.state.userSkills}
+                                handleClick={this.handleClick.bind(this, this.state.selectedSkills)}
+                                id={this.state.fetchedUser && this.state.fetchedUser.id} />
                         </Group> :
                         <Group>
                             <TeamSet />
@@ -104,7 +119,8 @@ class User extends React.Component {
                 }
                 <Div>
                     <Checkbox>в поиске команды</Checkbox>
-                    <Button mode={this.state.isConfirmed ? "primary" : "destructive"} size='xl' onClick={() => this.confirmUser(this.state.fetchedUser && this.state.fetchedUser.id, this.state.userSkills)}>
+                    <Button mode={this.state.isConfirmed ? "primary" : "destructive"} size='xl'
+                        onClick={() => this.confirmUser(this.state.fetchedUser && this.state.fetchedUser.id, this.state.userSkills)}>
                         {this.state.isConfirmed ? "Сохранить" : "Подтвердить"}
                     </Button>
                 </Div>
