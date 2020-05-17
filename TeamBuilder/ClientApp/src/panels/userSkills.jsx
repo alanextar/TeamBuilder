@@ -9,8 +9,6 @@ class UserSkills extends React.Component {
     constructor(props) {
         super(props);
 
-        console.log("into userSkills constructor");
-
         this.state = {
             id: props.id,
             go: props.go,
@@ -19,67 +17,23 @@ class UserSkills extends React.Component {
             options: []
         }
 
-        //this.onRefresh = () => {
-        //    this.setState({
-        //        fetching: true
-        //    });
-
-        //    //this.populateSkillsData()
-        //    this.setState({
-        //        fetching: false
-        //    });
-        //}
     }
 
 
     componentDidMount() {
-        console.log("user skills componentDidMount()");
         this.populateSkills(this.state.id);
     }
 
     componentDidUpdate(prevProps, prevState) {
-        //if (this.state.userSkills !== prevState.userSkills) {
-        //    console.log('userId changed ');
-        //}
-        //this.setState({
-        //    userSkills: this.props.userSkills
-        //});
+
         if (this.props.userSkills && (this.state.userSkills !== this.props.userSkills)) {
-            console.log('userSkills changed ');
             this.setState({
                 userSkills: this.props.userSkills
             });
         }
-        console.log('into componentDidUpdate()', '#######', this.props.userSkills);
-        console.log('into componentDidUpdate()', '#######', prevProps);
-        console.log('into componentDidUpdate()', '#######', prevState);
     }
 
-    //componentWillMount() {
-    //    console.log("componentWillMount()");
-    //    this.populateSkills(this.state.id);
-    //}
-
-    //componentWillReceiveProps(nextProps) {
-    //    console.log("componentWillReceiveProps()");
-    //}
-
-    //componentWillUnmount() {
-    //    console.log("componentWillUnmount()");
-    //}
-    //shouldComponentUpdate() {
-    //    console.log("shouldComponentUpdate()");
-    //    return true;
-    //}
-    //componentWillUpdate() {
-    //    console.log("componentWillUpdate()");
-    //}
-    //componentDidUpdate() {
-    //    console.log("componentDidUpdate()");
-    //}
-
     async populateSkills(id) {
-        console.log("id -------- ", id);
 
         if (this.props.userSkills === null) {
             const getAllResponse = await fetch('skill/getall');
@@ -110,7 +64,6 @@ class UserSkills extends React.Component {
     }
 
     render() {
-        console.log("user skills render", '##########', this.state.userSkills ? this.state.userSkills : 'no user skills value yet');
         return (
             <Div>
                 <Title level="3" weight="regular" style={{ marginBottom: 16 }}>Скиллы:</Title>
@@ -121,10 +74,6 @@ class UserSkills extends React.Component {
                     }}
                     options={this.state.options}
                     selected={this.state.userSkills}
-                    //defaultSelected={[{ id: 1, label: 'Jog' }]}
-                    //options={[
-                    //    { id: 1, label: 'Jog' }
-                    //]}
                     top="Skills"
                     multiple
                     className="Select__el skillsInput"

@@ -31,15 +31,12 @@ class User extends React.Component {
     async confirmUser(vkId, userSkills) {
 
         var skillsIds = userSkills.map((s, i) => s.id);
-        var data = { vkId, skillsIds };
-
-        console.log('into Confirm() ------ params', vkId, skillsIds);
+        var userDto = { vkId, skillsIds };
 
         let response = await fetch('/user/confirm', {
-            method: 'POST',
-            body: JSON.stringify(data),
-            //body: { vkId: vkId, skill: 1 },
-            headers: { 'Content-type': 'application/json' }
+            method: 'post',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(userDto),
         });
 
         let result = await response.json();
@@ -53,12 +50,7 @@ class User extends React.Component {
         //event.preventDefault();
     };
 
-    componentDidMount() {
-        console.log("user componentDidMount()");
-    }
-
     render() {
-        console.log("user render");
         return (
             <Panel id="profile">
                 <PanelHeader>Профиль</PanelHeader>
@@ -97,12 +89,6 @@ class User extends React.Component {
                                 </Cell>
                             </List>
                             <UserSkills userSkills={this.state.userSkills} handleClick={this.handleClick.bind(this, this.state.selectedSkills)} id={this.state.fetchedUser && this.state.fetchedUser.id} />
-                            {/* <FormLayout>
-                                <Select multiple={true} top="Обычный Select" placeholder="Выберите пол">
-                                    <option selected value="m">Мужской</option>
-                                    <option selected value="f">Женский</option>
-                                </Select>
-                            </FormLayout> */}
                         </Group> :
                         <Group>
                             <TeamSet />
