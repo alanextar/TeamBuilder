@@ -20,9 +20,9 @@ class User extends React.Component {
             userSkills: null,
             fetchedUser: props.fetchedUser,
             activeTabProfile: 'main',
-            showMain: true,
             selected: false,
-            selectedSkills: null
+            selectedSkills: null,
+            isConfirmed: false
         }
 
         this.confirmUser = this.confirmUser.bind(this);
@@ -39,7 +39,7 @@ class User extends React.Component {
             body: JSON.stringify(userDto),
         });
 
-        let result = await response.json();
+        this.setState({ isConfirmed: true });
     }
 
     handleClick(event, selectedSkills) {
@@ -96,8 +96,8 @@ class User extends React.Component {
                 }
                 <Div>
                     <Checkbox>в поиске команды</Checkbox>
-                    <Button mode="destructive" size='xl' onClick={() => this.confirmUser(this.state.fetchedUser && this.state.fetchedUser.id, this.state.userSkills)}>
-                        Подтвердить
+                    <Button mode={this.state.isConfirmed ? "primary" : "destructive"} size='xl' onClick={() => this.confirmUser(this.state.fetchedUser && this.state.fetchedUser.id, this.state.userSkills)}>
+                        {this.state.isConfirmed ? "Сохранить" : "Подтвердить"}
                     </Button>
                 </Div>
             </Panel>
