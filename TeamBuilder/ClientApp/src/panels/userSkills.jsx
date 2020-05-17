@@ -9,11 +9,13 @@ class UserSkills extends React.Component {
     constructor(props) {
         super(props);
 
+        console.log("into userSkills constructor");
+
         this.state = {
             id: props.id,
             go: props.go,
             fetching: false,
-            userSkills: [],
+            userSkills: props.userSkills ? props.userSkills : [],
             options: []
         }
 
@@ -33,6 +35,24 @@ class UserSkills extends React.Component {
     componentDidMount() {
         console.log("user skills componentDidMount()");
         this.populateSkills(this.state.id);
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        //if (this.state.userSkills !== prevState.userSkills) {
+        //    console.log('userId changed ');
+        //}
+        //this.setState({
+        //    userSkills: this.props.userSkills
+        //});
+        if (this.props.userSkills && (this.state.userSkills !== this.props.userSkills)) {
+            console.log('userSkills changed ');
+            this.setState({
+                userSkills: this.props.userSkills
+            });
+        }
+        console.log('into componentDidUpdate()', '#######', this.props.userSkills);
+        console.log('into componentDidUpdate()', '#######', prevProps);
+        console.log('into componentDidUpdate()', '#######', prevState);
     }
 
     //componentWillMount() {
@@ -61,24 +81,32 @@ class UserSkills extends React.Component {
     async populateSkills(id) {
         console.log("id -------- ", id);
 
-        const getAllResponse = await fetch('skill/getall');
-        const allSkillsData = await getAllResponse.json();
+        if (this.props.userSkills === null) {
+            const getAllResponse = await fetch('skill/getall');
+            const allSkillsData = await getAllResponse.json();
 
-        var options = allSkillsData && allSkillsData.map(function (skill) {
-            return { id: skill.id, label: skill.name };
-        });
+            var options = allSkillsData && allSkillsData.map(function (skill) {
+                return { id: skill.id, label: skill.name };
+            });
 
-        const getSkillsResponse = await fetch(`user/getSkills?vkId=${id}`);
-        const userSkillsData = await getSkillsResponse.json();
+            const getSkillsResponse = await fetch(`user/getSkills?vkId=${id}`);
+            const userSkillsData = await getSkillsResponse.json();
 
-        var userSkills = userSkillsData && userSkillsData.map(function (skill) {
-            return { id: skill.id, label: skill.name };
-        });
+            var userSkills = userSkillsData && userSkillsData.map(function (skill) {
+                return { id: skill.id, label: skill.name };
+            });
 
-        this.setState({
-            options: options,
-            userSkills: userSkills
-        });
+            this.setState({
+                options: options,
+                userSkills: userSkills
+            });
+		}
+		else {
+            this.setState({
+                userSkills: this.props.userSkills
+            });
+		}
+        
     }
 
     render() {

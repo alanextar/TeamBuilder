@@ -1,7 +1,7 @@
 ﻿import React from 'react';
 import ReactDOM from 'react-dom';
 import { Panel, PanelHeader, Group, Cell, Avatar, Search, Button, Div } from '@vkontakte/vkui';
-import { Tabs, TabsItem, Separator,  Checkbox, List, Header } from '@vkontakte/vkui';
+import { Tabs, TabsItem, Separator, Checkbox, List, Header, FormLayout, Select } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import '../../src/styles/style.css';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
@@ -18,7 +18,6 @@ class User extends React.Component {
         this.state = {
             skills: null,
             userSkills: null,
-            skillIds: null,
             fetchedUser: props.fetchedUser,
             activeTabProfile: 'main',
             showMain: true,
@@ -29,26 +28,28 @@ class User extends React.Component {
         this.confirmUser = this.confirmUser.bind(this);
     }
 
-    async confirmUser(vkId, skillIds) {
-        
-        console.log('in confirm user', skillIds);
+    async confirmUser(vkId, userSkills) {
+
+        var skillsIds = userSkills.map((s, i) => s.id);
+        var data = { vkId, skillsIds };
+
+        console.log('into Confirm() ------ params', vkId, skillsIds);
 
         let response = await fetch('/user/confirm', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json;charset=utf-8'
-            },
-            body: { vkId, skillIds }
+            body: JSON.stringify(data),
+            //body: { vkId: vkId, skill: 1 },
+            headers: { 'Content-type': 'application/json' }
         });
 
         let result = await response.json();
     }
 
     handleClick(event, selectedSkills) {
-
-        this.setState({skillIds: selectedSkills.map(function(s,i) {
-            return s.id;
-        })})
+        console.log(selectedSkills);
+        this.setState({
+            userSkills: selectedSkills
+        })
         //event.preventDefault();
     };
 
@@ -95,7 +96,13 @@ class User extends React.Component {
                                         дополнительно:
                                 </Cell>
                             </List>
-                            <UserSkills handleClick={this.handleClick.bind(this, this.state.selectedSkills)} id={this.state.fetchedUser && this.state.fetchedUser.id} />
+                            <UserSkills userSkills={this.state.userSkills} handleClick={this.handleClick.bind(this, this.state.selectedSkills)} id={this.state.fetchedUser && this.state.fetchedUser.id} />
+                            {/* <FormLayout>
+                                <Select multiple={true} top="Обычный Select" placeholder="Выберите пол">
+                                    <option selected value="m">Мужской</option>
+                                    <option selected value="f">Женский</option>
+                                </Select>
+                            </FormLayout> */}
                         </Group> :
                         <Group>
                             <TeamSet />
@@ -103,7 +110,7 @@ class User extends React.Component {
                 }
                 <Div>
                     <Checkbox>в поиске команды</Checkbox>
-                    <Button mode="destructive" size='xl' onClick={() => this.confirmUser(this.state.fetchedUser && this.state.fetchedUser.id, this.state.skillIds)}>
+                    <Button mode="destructive" size='xl' onClick={() => this.confirmUser(this.state.fetchedUser && this.state.fetchedUser.id, this.state.userSkills)}>
                         Подтвердить
                     </Button>
                 </Div>

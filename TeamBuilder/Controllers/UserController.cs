@@ -20,11 +20,14 @@ namespace TeamBuilder.Controllers
 		}
 
 		[HttpPost]
-		public IActionResult Confirm(long vkId, List<long> skillIds)
+		public IActionResult Confirm([FromBody]object data)
 		{
 			_logger.LogInformation("Request ConfirmUser");
 
-			var user = new User(vkId);
+			var vkId = Newtonsoft.Json.Linq.JObject.Parse(data.ToString())["vkid"];
+			var userSkills = Newtonsoft.Json.Linq.JObject.Parse(data.ToString())["skillsids"];
+
+			var user = new User(1111);
 			context.Users.Add(user);
 			context.SaveChanges();
 
