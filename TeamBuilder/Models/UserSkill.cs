@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -10,6 +11,7 @@ namespace TeamBuilder.Models
 	{
 		public long UserId { get; set; }
 		[ForeignKey(nameof(UserId))]
+		[JsonIgnore]
 		public User User { get; set; }
 		public long SkillId { get; set; }
 		[ForeignKey(nameof(SkillId))]
