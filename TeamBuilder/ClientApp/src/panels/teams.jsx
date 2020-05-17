@@ -125,13 +125,12 @@ class Teams extends React.Component {
         this.state.teams && this.state.teams.map((team, i) => {
             items.push(
                 <RichCell
-                    key={i}
+                    key={team.id}
                     text={team.description}
                     caption="Навыки"
                     after="1/3"
                     onClick={self.state.go}
                     data-to='teaminfo'
-                    //data-href={href}
                     data-id={team.id}>
                     {team.name} - {team.id}
                 </RichCell>

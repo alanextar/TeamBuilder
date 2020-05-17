@@ -59,11 +59,12 @@ class Teaminfo extends React.Component {
                             : 
                             <Cell>
                                 <InfoRow header='События'>
+                                    {console.log('ttteams ', this.state.team.teamEvents)}
                                     {this.state.team.teamEvents &&
-                                        this.state.team.TeamEvents.map((ev, i) =>
-                                        {
-                                            console.log('1111122222222', ev);
-                                            //return ev.name;
+                                        this.state.team.teamEvents.map((ev, i) => {
+                                            return(<p>
+                                                {ev.event.name}
+                                            </p>)
                                         }
                                     )}
                                 </InfoRow>
