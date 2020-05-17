@@ -28,6 +28,14 @@ class User extends React.Component {
         this.confirmUser = this.confirmUser.bind(this);
     }
 
+    componentDidMount() {
+        this.isUserConfirmed(this.state.fetchedUser.id);
+    }
+
+    isUserConfirmed(vkId) {
+        fetch(`/user/checkconfirmation?vkId=${vkId}`).then((response) => console.log('confirmation status ', response.status));
+	}
+
     async confirmUser(vkId, userSkills) {
 
         var skillsIds = userSkills.map((s, i) => s.id);

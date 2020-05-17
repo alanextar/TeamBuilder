@@ -10,7 +10,7 @@ using TeamBuilder.Extensions;
 
 namespace TeamBuilder.Controllers
 {
-	public class UserController : ControllerBase
+	public class UserController : Controller
 	{
 		private readonly ApplicationContext context;
 		private readonly ILogger<WeatherForecastController> _logger;
@@ -52,6 +52,16 @@ namespace TeamBuilder.Controllers
 			context.SaveChanges();
 
 			return Ok("Confirmed");
+		}
+
+		[HttpGet]
+		public IActionResult CheckConfirmation(long vkId)
+		{
+			_logger.LogInformation("Request CheckConfirmation");
+
+			bool isConfirmed = context.Users.FirstOrDefault(x => x.VkId == vkId) != null ? true : false;
+
+			return Json(isConfirmed);
 		}
 
 		public List<Skill> GetSkills(long vkId)
