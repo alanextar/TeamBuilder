@@ -13,9 +13,9 @@ namespace TeamBuilder.Controllers
 	public class UserController : Controller
 	{
 		private readonly ApplicationContext context;
-		private readonly ILogger<WeatherForecastController> _logger;
+		private readonly ILogger<UserController> _logger;
 
-		public UserController(ApplicationContext context, ILogger<WeatherForecastController> logger)
+		public UserController(ApplicationContext context, ILogger<UserController> logger)
 		{
 			this.context = context;
 			_logger = logger;

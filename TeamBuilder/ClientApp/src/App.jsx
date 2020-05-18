@@ -55,7 +55,7 @@ const App = () => {
         setActiveP(e.currentTarget.dataset.to);
     };
 
-    const go_foot = e => {
+    const goFoot = e => {
         setActiveStore(e.currentTarget.dataset.story);
     }
 
@@ -69,25 +69,25 @@ const App = () => {
         <Epic activeStory={activeStory} tabbar={
             <Tabbar>
                 <TabbarItem
-                    onClick={go_foot}
+                    onClick={goFoot}
                     selected={activeStory === 'teams'}
                     data-story="teams"
                     text="Команды"
                 ><Icon28Users3Outline /></TabbarItem>
                 <TabbarItem
-                    onClick={go_foot}
+                    onClick={goFoot}
                     selected={activeStory === 'panel1'}
                     data-story="panel1"
                     text="Участники"
                 ><Icon28Users /></TabbarItem>
                 <TabbarItem
-                    onClick={go_foot}
+                    onClick={goFoot}
                     selected={activeStory === 'panel2'}
                     data-story="panel2"
                     text="События"
                 ><Icon28FavoriteOutline /></TabbarItem>
                 <TabbarItem
-                    onClick={go_foot}
+                    onClick={goFoot}
                     selected={activeStory === 'user'}
                     data-story="user"
                     text="Профиль"
