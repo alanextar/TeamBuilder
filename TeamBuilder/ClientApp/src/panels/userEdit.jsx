@@ -15,7 +15,7 @@ class UserEdit extends React.Component {
         super(props);
 
         this.state = {
-            goUser: props.goUser,
+            goUserEdit: props.goUserEdit,
             fetchedUser: props.fetchedUser,
             user: props.user
         }
@@ -75,10 +75,10 @@ class UserEdit extends React.Component {
                     </FormLayoutGroup>
                 </FormLayout>
                 <Div>
-                    <Button onClick={(e) => { this.postEdit(); this.state.goUser(e) }}
+                    <Button onClick={(e) => { this.postEdit(); this.state.goUserEdit(e) }}
                         data-user={JSON.stringify(this.state.user)} data-to='user'
                         data-id={this.state.fetchedUser.id} mode="commerce">Принять</Button>
-                    <Button onClick={this.state.goUser} data-to='user'
+                    <Button onClick={this.state.goUserEdit} data-to='user'
                         data-user={JSON.stringify(this.state.user)}
                         data-id={this.state.fetchedUser.id} mode="destructive">Отменить</Button>
                 </Div>
