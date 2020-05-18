@@ -46,7 +46,6 @@ const App = () => {
 	}, []);
 
     const go = e => {
-        console.log('into go', e.currentTarget.dataset.to, e.currentTarget.dataset.id);
         setActivePanel(e.currentTarget.dataset.to);
         setActiveTeam(e.currentTarget.dataset.id);
     };
@@ -64,7 +63,9 @@ const App = () => {
     }
 
     const goUserEdit = e => {
-        let user = JSON.parse(e.currentTarget.dataset.user);
+        console.log('into go', e.currentTarget.dataset.to, e.currentTarget.dataset.id);
+        let user = e.currentTarget.dataset.user && JSON.parse(e.currentTarget.dataset.user);
+        setActiveTeam(e.currentTarget.dataset.id);
         setActiveUserPanel(e.currentTarget.dataset.to);
         setActiveUser(user);
     }
@@ -100,11 +101,12 @@ const App = () => {
         }>
             <View id='teams' activePanel={ activePanel } >
                 <Teams id='teams' go={go} />
-                <Teaminfo id='teaminfo' go={go} teamId={ activeTeam } />
+                <Teaminfo id='teaminfo' go={go} teamId={activeTeam} return='teams' />
             </View>
             <View id='user' activePanel={activeUserPanel}>
                 <User id='user' fetchedUser={fetchedUser} goUserEdit={goUserEdit} />
                 <UserEdit id='userEdit' goUserEdit={goUserEdit} fetchedUser={fetchedUser} user={activeUser} />
+                <Teaminfo id='teaminfo' go={goUserEdit} teamId={activeTeam} return='user' />
             </View>
             <View id='panel2' activePanel='panel2'>
                 <Panel2 id='panel2' go={go} />

@@ -10,7 +10,7 @@ class UserTeams extends React.Component {
 
         this.state = {
             userTeams: props.userTeams,
-            go: props.go,
+            goUserEdit: props.goUserEdit,
             fetching: false,
         }
 
@@ -50,7 +50,7 @@ class UserTeams extends React.Component {
                                     text={userTeam.team.description}
                                     caption="Команда"
                                     after="1/3"
-                                    onClick={this.state.go}
+                                    onClick={this.state.goUserEdit}
                                     data-to='teaminfo'
                                     data-id={userTeam.team.id}>
                                     {userTeam.team.name}

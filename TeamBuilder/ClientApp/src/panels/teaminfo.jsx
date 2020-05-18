@@ -10,7 +10,8 @@ class Teaminfo extends React.Component {
             team: null,
             go: props.go,
             id: props.id,
-            activeTab: 'teamDescription'
+            activeTab: 'teamDescription',
+            return: props.return
         };
     }
 
@@ -27,7 +28,7 @@ class Teaminfo extends React.Component {
     render() {
         return (
             <Panel id={this.state.id}>
-                <PanelHeader separator={false} left={<PanelHeaderBack onClick={this.state.go} data-to='teams' />}>
+                <PanelHeader separator={false} left={<PanelHeaderBack onClick={this.state.go} data-to={this.state.return} />}>
                     {this.state.team && this.state.team.name}
                 </PanelHeader>
                 <Tabs>

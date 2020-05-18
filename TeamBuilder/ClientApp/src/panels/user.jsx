@@ -25,7 +25,6 @@ class User extends React.Component {
             selectedSkills: null,
             isConfirmed: false,
             goUserEdit: props.goUserEdit,
-            go: props.go,
             user: null
         }
 
@@ -122,7 +121,7 @@ class User extends React.Component {
                                 id={this.state.fetchedUser && this.state.fetchedUser.id} />
                         </Group> :
                         <Group>
-                            <UserTeams userTeams={this.state.user.userTeams} go={this.state.go} />
+                            <UserTeams userTeams={this.state.user.userTeams} goUserEdit={this.state.goUserEdit} />
                         </Group>
                 }
                 <Div>
