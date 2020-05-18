@@ -26,9 +26,11 @@ class UserEdit extends React.Component {
     }
 
     handleAboutChange(event) {
+        console.log('original', this.state.user);
         var user = { ...this.state.user }
+        console.log('spread ', user);
         user.about = event.target.value;
-        this.setState({ user })
+        this.setState({ user });
     }
 
     handleCityChange(event) {
@@ -76,7 +78,9 @@ class UserEdit extends React.Component {
                     <Button onClick={(e) => { this.postEdit(); this.state.goUserEdit(e) }}
                         data-user={JSON.stringify(this.state.user)} data-to='user'
                         data-id={this.state.fetchedUser.id} mode="commerce">Принять</Button>
-                    <Button onClick={this.state.goUserEdit} data-to='user' data-id={this.state.fetchedUser.id} mode="destructive">Отменить</Button>
+                    <Button onClick={this.state.goUserEdit} data-to='user'
+                        data-user={JSON.stringify(this.state.user)}
+                        data-id={this.state.fetchedUser.id} mode="destructive">Отменить</Button>
                 </Div>
             </Panel>
         )
