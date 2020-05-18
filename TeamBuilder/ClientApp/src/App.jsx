@@ -14,6 +14,7 @@ import Panel3 from './panels/panel3'
 import Teams from './panels/teams'
 import Teaminfo from './panels/teaminfo' 
 import TeamCreate from './panels/teamCreate'
+import TeamEdit from './panels/teamEdit'
 import User from './panels/user'
 import UserEdit from './panels/userEdit'
 

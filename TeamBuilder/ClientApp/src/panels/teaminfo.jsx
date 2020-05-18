@@ -58,8 +58,12 @@ class Teaminfo extends React.Component {
                     {this.state.team && (
                         this.state.activeTab === 'teamDescription' ?
                             <Cell>
+                                {console.log('==== ', this.state.team)}
                                 <InfoRow header='Описаноие команды'>
                                     {this.state.team.description}    
+                                </InfoRow>
+                                <InfoRow header='Участвуем в '>
+                                    {this.state.team.events.name}
                                 </InfoRow>
                             </ Cell>
                             : 
