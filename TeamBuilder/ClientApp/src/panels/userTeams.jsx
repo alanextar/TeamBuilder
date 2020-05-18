@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom';
 import { Panel, PanelHeader, Group, Search, List, RichCell, Avatar, PullToRefresh, PanelHeaderButton, Cell } from '@vkontakte/vkui';
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import '@vkontakte/vkui/dist/vkui.css';
+import Icon28CheckCircleOutline from '@vkontakte/icons/dist/28/check_circle_outline';
+import Icon28InfoOutline from '@vkontakte/icons/dist/28/info_outline';
 
 class UserTeams extends React.Component {
     constructor(props) {
@@ -49,7 +51,7 @@ class UserTeams extends React.Component {
                                 <RichCell key={userTeam.team.id}
                                     text={userTeam.team.description}
                                     caption="Команда"
-                                    after="1/3"
+                                    after={userTeam.isConfirmed ? <Icon28CheckCircleOutline /> : <Icon28InfoOutline/>}
                                     onClick={this.state.goUserEdit}
                                     data-to='teaminfo'
                                     data-id={userTeam.team.id}>

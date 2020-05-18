@@ -69,6 +69,13 @@ class User extends React.Component {
         //event.preventDefault();
     };
 
+    checkSearch(event) {
+        console.log('checkbox clicked value', event.target.value);
+        var user = { ...this.state.user }
+        user.isSearchable = event.target.value;
+        this.setState({ user })
+    };
+
     render() {
         console.log('render user', this.state.user);
         return (
@@ -125,7 +132,7 @@ class User extends React.Component {
                         </Group>
                 }
                 <Div>
-                    <Checkbox>в поиске команды</Checkbox>
+                    <Checkbox onClick={checkSearch} checked={this.state.user && this.state.user.isSearchable ? 'checked' : ''}>в поиске команды</Checkbox>
                     <Button mode={this.state.isConfirmed ? "primary" : "destructive"} size='xl'
                         onClick={() => this.confirmUser(this.state.fetchedUser && this.state.fetchedUser.id, this.state.userSkills)}>
                         {this.state.isConfirmed ? "Сохранить" : "Подтвердить"}
