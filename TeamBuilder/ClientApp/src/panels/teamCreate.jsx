@@ -2,7 +2,7 @@
 
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell,
-    Div, Button, Textarea, FormLayout, Select, Search
+    Div, Button, Textarea, FormLayout, Select, Input, Slider
 } from '@vkontakte/vkui';
 
 class TeamCreate extends React.Component {
@@ -10,7 +10,9 @@ class TeamCreate extends React.Component {
         super(props);
 
         this.state = {
-            events: '',
+            events: null,
+            check: null,
+            usersNumber: 2,
             go: props.go,
             id: props.id,
             activeTab: 'teamDescription'
@@ -24,18 +26,19 @@ class TeamCreate extends React.Component {
     }
 
     async populateTeamData() {
-        const response = await fetch(`/event/getall`);
+        const response = await fetch(`/api/event/getall`);
         const data = await response.json();
         this.setState({ events: data });
+        console.log('events ', data)
     }
 
     onChange(e) {
-        const { events, value } = e.currentTarget;
-        this.setState({ events: value });
+        const { check, value } = e.currentTarget;
+        this.setState({ check: value });
     }
 
     render() {
-        const events = this.state.events;
+        const check = this.state.check;
         return (
             <Panel id={this.state.id}>
                 <PanelHeader separator={false} left={<PanelHeaderBack onClick={this.state.go} data-to='teams' />}>
@@ -61,16 +64,18 @@ class TeamCreate extends React.Component {
                 </Tabs>
                 <Group>
                     {this.state.activeTab === 'teamDescription' ?
-                        <FormLayout>
+                        <FormLayout >
+                            <Input top="Название команды" type="text" defaultValue="DreamTeam" />
+
                             <Textarea top="Описание команды" />
                             <Select
                                 top="Выберете событие"
                                 placeholder="Событие"
-                                status={events ? 'valid' : 'error'}
-                                bottom={events ? '' : 'Пожалуйста, выберете или создайте событие'}
+                                status={check ? 'valid' : 'error'}
+                                bottom={check ? '' : 'Пожалуйста, выберете или создайте событие'}
                                 onChange={this.onChange}
-                                value={events}
-                                name="events"
+                                value={check}
+                                name="check"
                             >
                                 {this.state.events && this.state.events.map((ev, i) => {
                                     return (
@@ -81,14 +86,26 @@ class TeamCreate extends React.Component {
                                 })}
 
                             </Select>
+                            <Button mode="destructive">Создать Событие</Button>
                         </ FormLayout>
                         :
                         <Cell>
-
+                            <FormLayout >
+                                <Slider
+                                    step={1}
+                                    min={2}
+                                    max={10}
+                                    value={Number(this.state.usersNumber)}
+                                    onChange={usersNumber => this.setState({ usersNumber })}
+                                    top="Количество участников в команде"
+                                />
+                                <Input value={String(this.state.usersNumber)} onChange={e => this.setState({ usersNumber: e.target.value })} type="number" />
+                                <Textarea top="Описание участников и их задач" />
+                            </ FormLayout>
                         </ Cell>}
                 </ Group>
                 <Div>
-                    <Button mode="destructive">Создать</Button>
+                    <Button mode="destructive">Создать Команду</Button>
                 </Div>
             </Panel>
         );
