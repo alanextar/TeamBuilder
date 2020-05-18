@@ -10,9 +10,6 @@ namespace TeamBuilder.Models
 		public long Id { get; set; }
 		public string Name { get; set; }
 		public string Description { get; set; }
-		public string Link { get; set; }
-		public DateTime? StartDate { get; set; }
-		public DateTime? FinishDate { get; set; }
 		public Event Event { get; set; }
 		public List<UserTeam> UserTeams { get; set; }
 	}
