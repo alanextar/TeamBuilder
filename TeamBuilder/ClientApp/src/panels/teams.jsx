@@ -1,5 +1,8 @@
 ﻿import React from 'react';
-import { Panel, PanelHeader, Group, Search, List, RichCell, Avatar, PullToRefresh, PanelHeaderButton } from '@vkontakte/vkui';
+import {
+    Panel, PanelHeader, Group, Search, List, RichCell, PullToRefresh,
+    PanelHeaderButton, CardGrid, Card
+} from '@vkontakte/vkui';
 import InfiniteScroll from 'react-infinite-scroller';
 import qwest from 'qwest';
 
@@ -124,16 +127,21 @@ class Teams extends React.Component {
         var items = [];
         this.state.teams && this.state.teams.map((team, i) => {
             items.push(
-                <RichCell
-                    key={team.id}
-                    text={team.description}
-                    caption="Навыки"
-                    after="1/3"
-                    onClick={self.state.go}
-                    data-to='teaminfo'
-                    data-id={team.id}>
-                    {team.name} - {team.id}
-                </RichCell>
+                <CardGrid>
+                    <Card size="l" mode="shadow">
+                        <RichCell
+                            key={team.id}
+                            text={team.description}
+                            caption="Навыки"
+                            after="1/3"
+                            onClick={self.state.go}
+                            data-to='teaminfo'
+                            data-id={team.id}>
+                                {team.name} - {team.id}
+                        </RichCell>
+
+                    </Card>
+                </CardGrid>
             );
         });
 

@@ -45,8 +45,9 @@ namespace TeamBuilder.Controllers
 		{
 			_logger.LogInformation($"Request teams/GET?id={id}");
 
-			var team = context.Teams.Include(x => x.TeamEvents)
-				.ThenInclude(x => x.Event).FirstOrDefault(t => t.Id == id);
+			var team = context.Teams.Include(x => x.TeamEvents).ThenInclude(x => x.Event)
+				.Include(x => x.UserTeams).ThenInclude(x => x.User)
+				.FirstOrDefault(t => t.Id == id);
 
 			return team;
 		}
