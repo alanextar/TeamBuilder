@@ -9,6 +9,5 @@ namespace TeamBuilder.DTO
 	{
 		public long VkId { get; set; }
 		public List<long> SkillsIds { get; set; }
-		public int MyProperty { get; set; }
 	}
 }
