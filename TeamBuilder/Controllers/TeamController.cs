@@ -61,8 +61,7 @@ namespace TeamBuilder.Controllers
 		{
 			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
 
-			var team = context.Teams
-				.Include(x => x.TeamEvents).ThenInclude(x => x.Event)
+			var team = context.Teams.Include(x => x.Event)
 				.Include(x => x.UserTeams).ThenInclude(x => x.User)
 				.FirstOrDefault(t => t.Id == id);
 
