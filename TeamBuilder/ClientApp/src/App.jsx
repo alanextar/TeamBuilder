@@ -109,7 +109,7 @@ const App = () => {
         }>
             <View id='teams' activePanel={activeTeamPanel} >
                 <Teams id='teams' go={goTeam} href={teamHref} />
-                <Teaminfo id='teaminfo' go={goTeam} teamId={activeTeam} />
+                <Teaminfo id='teaminfo' go={goTeam} teamId={activeTeam} return='teams' />
                 <TeamCreate id='teamCreate' go={goTeam} />
             </View>
             <View id='user' activePanel={activeUserPanel}>
