@@ -132,7 +132,7 @@ class User extends React.Component {
                         </Group>
                 }
                 <Div>
-                    <Checkbox onClick={checkSearch} checked={this.state.user && this.state.user.isSearchable ? 'checked' : ''}>в поиске команды</Checkbox>
+                    <Checkbox onClick={(e) => this.checkSearch(e)} checked={this.state.user && this.state.user.isSearchable ? 'checked' : ''}>в поиске команды</Checkbox>
                     <Button mode={this.state.isConfirmed ? "primary" : "destructive"} size='xl'
                         onClick={() => this.confirmUser(this.state.fetchedUser && this.state.fetchedUser.id, this.state.userSkills)}>
                         {this.state.isConfirmed ? "Сохранить" : "Подтвердить"}
