@@ -12,6 +12,5 @@ namespace TeamBuilder.Models
 		public string DescriptionRequiredMembers { get; set; }
 		public Event Event { get; set; }
 		public List<UserTeam> UserTeams { get; set; }
-		public User Owner { get; set; }
 	}
 }
