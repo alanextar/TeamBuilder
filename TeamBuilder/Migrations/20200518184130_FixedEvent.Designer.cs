@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TeamBuilder;
@@ -9,9 +10,10 @@ using TeamBuilder;
 namespace TeamBuilder.Migrations
 {
     [DbContext(typeof(ApplicationContext))]
-    partial class ApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20200518184130_FixedEvent")]
+    partial class FixedEvent
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,15 +40,10 @@ namespace TeamBuilder.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
-                    b.Property<long?>("OwnerId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("StartDate")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("OwnerId");
 
                     b.ToTable("Events");
                 });
@@ -79,20 +76,11 @@ namespace TeamBuilder.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<string>("DescriptionRequiredMembers")
-                        .HasColumnType("text");
-
                     b.Property<long?>("EventId")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("Link")
-                        .HasColumnType("text");
-
                     b.Property<string>("Name")
                         .HasColumnType("text");
-
-                    b.Property<int>("NumberRequiredMembers")
-                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -160,21 +148,11 @@ namespace TeamBuilder.Migrations
                     b.Property<bool?>("IsConfirmed")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("IsOwner")
-                        .HasColumnType("boolean");
-
                     b.HasKey("UserId", "TeamId");
 
                     b.HasIndex("TeamId");
 
                     b.ToTable("UserTeams");
-                });
-
-            modelBuilder.Entity("TeamBuilder.Models.Event", b =>
-                {
-                    b.HasOne("TeamBuilder.Models.User", "Owner")
-                        .WithMany("OwnEvents")
-                        .HasForeignKey("OwnerId");
                 });
 
             modelBuilder.Entity("TeamBuilder.Models.Team", b =>

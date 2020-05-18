@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
 using TeamBuilder.Models;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace TeamBuilder.Controllers
 {
@@ -17,6 +19,17 @@ namespace TeamBuilder.Controllers
 		{
 			this.context = context;
 			this.logger = logger;
+		}
+
+		public IEnumerable<Team> GetAll()
+		{
+			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
+
+			var teams = context.Teams.ToList();
+
+			logger.LogInformation($"Response TeamsCount:{teams.Count}");
+
+			return teams;
 		}
 
 		public async Task<Page<Team>> GetPage(int pageSize, int page = 0, bool prev = false)
@@ -53,6 +66,36 @@ namespace TeamBuilder.Controllers
 				.FirstOrDefault(t => t.Id == id);
 
 			return team;
+		}
+
+		[HttpPost]
+		public async Task<long> Create([FromBody]CreateTeamViewModel createTeamViewModel)
+		{
+			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(createTeamViewModel)}");
+
+			var config = new MapperConfiguration(cfg => cfg.CreateMap<CreateTeamViewModel,Team>());
+			var mapper = new Mapper(config);
+			var team = mapper.Map<CreateTeamViewModel, Team>(createTeamViewModel);
+
+			var newTeam = await context.Teams.AddAsync(team);
+			await context.SaveChangesAsync();
+
+			return newTeam.Entity.Id;
+		}
+
+		[HttpPost]
+		public async Task<long> Edit([FromBody]EditTeamViewModel editTeamViewModel)
+		{
+			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(editTeamViewModel)}");
+
+			var config = new MapperConfiguration(cfg => cfg.CreateMap<EditTeamViewModel, Team>());
+			var mapper = new Mapper(config);
+			var team = mapper.Map<EditTeamViewModel, Team>(editTeamViewModel);
+
+			var editTeam = context.Teams.Update(team);
+			await context.SaveChangesAsync();
+
+			return editTeam.Entity.Id;
 		}
 
 		private async Task Initialize()
@@ -121,6 +164,27 @@ namespace TeamBuilder.Controllers
 			await context.Teams.AddRangeAsync(teams);
 			await context.SaveChangesAsync();
 		}
+	}
+
+	public class CreateTeamViewModel
+	{
+		public string Name { get; set; }
+		public string Description { get; set; }
+		public int EventId { get; set; }
+
+		public int NumberRequiredMembers { get; set; }
+		public string DescriptionRequiredMembers { get; set; }
+	}
+
+	public class EditTeamViewModel
+	{
+		public long Id { get; set; }
+		public string Name { get; set; }
+		public string Description { get; set; }
+		public int EventId { get; set; }
+
+		public int NumberRequiredMembers { get; set; }
+		public string DescriptionRequiredMembers { get; set; }
 	}
 
 	public class Page<T>
