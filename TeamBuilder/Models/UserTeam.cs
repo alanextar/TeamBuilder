@@ -15,5 +15,6 @@ namespace TeamBuilder.Models
 		[ForeignKey(nameof(TeamId))]
 		public Team Team { get; set; }
 		public bool? IsConfirmed { get; set; }
+		public bool IsOwner { get; set; }
 	}
 }
