@@ -50,8 +50,8 @@ class User extends React.Component {
 
 	}
 
-    async confirmUser(vkId, userSkills) {
-        console.log('into confirm user', this.state.user);
+    async confirmUser(vkId) {
+        console.log('into confirm user', this.state.user.isSearchable);
         let skillsIds;
 
         if (this.state.userSkills == null) {
@@ -59,9 +59,10 @@ class User extends React.Component {
         }
 		else {
             skillsIds = this.state.userSkills.map((s, i) => s.id);
-		}
-        
-        var userDto = { vkId, skillsIds };
+        }
+
+        var isSearchable = this.state.user.isSearchable;
+        var userDto = { vkId, skillsIds, isSearchable };
 
         let response = await fetch('/api/user/confirm', {
             method: 'post',
@@ -80,7 +81,7 @@ class User extends React.Component {
     };
 
     handleCheckboxClick(event) {
-        //console.log('checkbox clicked value', event.target.checked);
+        console.log('checkbox clicked value', event.target.checked);
         var user = { ...this.state.user }
         user.isSearchable = event.target.checked;
         this.setState({ user });

@@ -49,6 +49,8 @@ namespace TeamBuilder.Controllers
 
 				context.Users.Update(user);
 			}
+
+			user.IsSearchable = userDto.IsSearchable;
 			
 			await context.SaveChangesAsync();
 
