@@ -35,8 +35,8 @@ namespace TeamBuilder
 
 		public async Task InvokeAsync(HttpContext context)
 		{
-			
 			var launchParams = context.Request.Headers["Launch-Params"].ToString();
+
 			if (!Check(launchParams))
 			{
 				context.Response.StatusCode = 403;
@@ -53,7 +53,7 @@ namespace TeamBuilder
 			if (env.IsDevelopment() && string.IsNullOrEmpty(launchParams)) //TODO убрать 2ое условие после того как проверю что всё работает
 				return true;
 
-			var queryNvc = HttpUtility.ParseQueryString(new Uri(launchParams).Query);
+			var queryNvc = HttpUtility.ParseQueryString(new Uri($"http://localhost/{launchParams}").Query);
 			var query = queryNvc.AllKeys.ToDictionary(k => k, k => queryNvc[k]);
 			var secret = "LcONGCzY9tjwmWqvYQxB";
 			var checkedQuery = query
