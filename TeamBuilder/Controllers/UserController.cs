@@ -95,6 +95,8 @@ namespace TeamBuilder.Controllers
 
 			var user = context.Users.Include(x => x.UserTeams)
 				.ThenInclude(y => y.Team)
+				.Include(x => x.UserSkills)
+				.ThenInclude(y => y.Skill)
 				.FirstOrDefault(u => u.VkId == vkId);
 
 			return Json(user);

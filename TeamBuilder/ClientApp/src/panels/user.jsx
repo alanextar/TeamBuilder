@@ -51,8 +51,16 @@ class User extends React.Component {
 	}
 
     async confirmUser(vkId, userSkills) {
+        console.log('into confirm user', this.state.user);
+        let skillsIds;
 
-        var skillsIds = userSkills.map((s, i) => s.id);
+        if (this.state.userSkills == null) {
+            skillsIds = this.state.user.userSkills.map((s, i) => s.skillId);
+        }
+		else {
+            skillsIds = this.state.userSkills.map((s, i) => s.id);
+		}
+        
         var userDto = { vkId, skillsIds };
 
         let response = await fetch('/api/user/confirm', {
