@@ -1,18 +1,16 @@
 ﻿import React from 'react';
 import ReactDOM from 'react-dom';
-import { View, Panel, PanelHeader, Group, Cell, PanelHeaderBack, Spinner, Avatar, Search, Button, Div } from '@vkontakte/vkui';
-import { Tabs, TabsItem, Separator, CellButton, FormLayout, Checkbox, Link, Select, Title } from '@vkontakte/vkui';
+import { Panel, PanelHeader, Group, Cell, Avatar, Search, Button, Div, Input } from '@vkontakte/vkui';
+import { Tabs, TabsItem, Separator, Checkbox, List, Header, FormLayout, Select, RichCell } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import '../../src/styles/style.css';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import Icon28PhoneOutline from '@vkontakte/icons/dist/28/phone_outline';
 import Icon28ArticleOutline from '@vkontakte/icons/dist/28/article_outline';
 import Icon20HomeOutline from '@vkontakte/icons/dist/20/home_outline';
-import bridge from '@vkontakte/vk-bridge';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import TeamSet from './userTeams'
+import Icon24Write from '@vkontakte/icons/dist/24/write';
+import UserTeams from './userTeams'
 import UserSkills from './userSkills'
-import { teams } from '../demo_dataset/teams';
 
 class User extends React.Component {
     constructor(props) {
@@ -20,47 +18,70 @@ class User extends React.Component {
 
         this.state = {
             skills: null,
-            skillIds: null,
+            userSkills: null,
             fetchedUser: props.fetchedUser,
             activeTabProfile: 'main',
-            showMain: true,
             selected: false,
-            selectedSkills: null
+            selectedSkills: null,
+            isConfirmed: false,
+            goUserEdit: props.goUserEdit,
+            user: null
         }
 
         this.confirmUser = this.confirmUser.bind(this);
     }
 
     componentDidMount() {
-        //this.populateSkillsData();
+        this.isUserConfirmed(this.state.fetchedUser.id);
     }
 
-    async confirmUser(vkId, skillIds) {
-        
-        console.log('in confirm user', skillIds);
+    isUserConfirmed(vkId) {
+        fetch(`/api/user/checkconfirmation?vkId=${vkId}`)
+            .then((response) => {
+                this.setState({ isConfirmed: response })
+
+                console.log('before user fetch', vkId);
+
+                fetch(`/api/user/get?vkId=${vkId}`)
+                    .then(response => response.json())
+                    .then(data => this.setState({ user: data }));
+            } 
+        );
+
+	}
+
+    async confirmUser(vkId, userSkills) {
+
+        var skillsIds = userSkills.map((s, i) => s.id);
+        var userDto = { vkId, skillsIds };
 
         let response = await fetch('/api/user/confirm', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json;charset=utf-8'
-            },
-            body: { vkId, skillIds }
+            method: 'post',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(userDto),
         });
 
-        let result = await response.json();
+        this.setState({ isConfirmed: true });
     }
 
     handleClick(event, selectedSkills) {
-        this.setState({skillIds: selectedSkills.map(function(s,i) {
-            return s.id;
-        })})
+        this.setState({
+            userSkills: selectedSkills
+        })
         //event.preventDefault();
     };
 
+    handleCheckboxClick(event) {
+        //console.log('checkbox clicked value', event.target.checked);
+        var user = { ...this.state.user }
+        user.isSearchable = event.target.checked;
+        this.setState({ user });
+    };
+
     render() {
-        console.log('--------', 9999, this.state.fetchedUser && this.state.fetchedUser.id)
+        console.log('render user', this.state.user);
         return (
-            <Panel id="profile">
+            <Panel id="user">
                 <PanelHeader>Профиль</PanelHeader>
                 {this.state.fetchedUser &&
                     <Group title="VK Connect">
@@ -82,40 +103,42 @@ class User extends React.Component {
                         Команды
                     </TabsItem>
                 </Tabs>
-                <Div className="mainContent">
                     {
-                        this.state.activeTabProfile === 'main' ?
-                        <Div id="main">
-                            Информация о профиле участника
-                            <Cell before={<Icon20HomeOutline height={28} width={28} />}>
-                                город:
-                            </Cell>
-                            <Cell before={<Icon28PhoneOutline />}>
-                                тел.:
-                            </Cell>
-                            <Cell before={<Icon28ArticleOutline />}>
-                                дополнительно:
-                            </Cell>
-                            <Cell>
-                                <UserSkills handleClick={this.handleClick.bind(this, this.state.selectedSkills)} skills={this.state.skills} id={this.state.fetchedUser && this.state.fetchedUser.id} />
-                            </Cell>
-                            {/* <FormLayout>
-                            <Select top="Обычный Select" placeholder="выберите пол">
-                                <option value="m">М</option>
-                                <option value="f">Ж</option>
-                            </Select> 
-                            </FormLayout> */}
-                        </Div> :
-                        <Div style={{ display: !this.state.showMain ? 'block' : 'none' }}>
-                            <TeamSet />
-                        </Div>
-                    }
-                    <Div className="profileBottom" >
-                        <FormLayout>
-                            <Checkbox>в поиске команды</Checkbox>
-                            <Button mode="destructive" size='xl' onClick={() => this.confirmUser(this.state.fetchedUser && this.state.fetchedUser.id, this.state.skillIds)}>Подтвердить</Button>
-                        </FormLayout>
-                    </Div>
+                    this.state.activeTabProfile === 'main' ?
+                        <Group header={<Header mode="secondary">Информация о профиле участника</Header>}>
+                            <List>
+                                <Cell asideContent=
+                                    {
+                                    <Icon24Write onClick={this.state.goUserEdit}
+                                        data-to='userEdit'
+                                        data-id={this.state.fetchedUser && this.state.fetchedUser.id}
+                                        data-user={JSON.stringify(this.state.user)} /> 
+                                    }>
+                                </Cell>
+                                <Cell before={<Icon20HomeOutline height={28} width={28} />}>
+                                    город: {this.state.user && this.state.user.city}
+                                </Cell>
+                                <Cell before={<Icon28PhoneOutline />}>
+                                    тел.:
+                                </Cell>
+                                <Cell before={<Icon28ArticleOutline />}>
+                                    дополнительно: {this.state.user && this.state.user.about}
+                                </Cell>
+                            </List>
+                            <UserSkills userSkills={this.state.userSkills}
+                                handleClick={this.handleClick.bind(this, this.state.selectedSkills)}
+                                id={this.state.fetchedUser && this.state.fetchedUser.id} />
+                        </Group> :
+                        <Group>
+                            <UserTeams userTeams={this.state.user && this.state.user.userTeams} goUserEdit={this.state.goUserEdit} />
+                        </Group>
+                }
+                <Div>
+                    <Checkbox onChange={(e) => this.handleCheckboxClick(e)} checked={this.state.user && this.state.user.isSearchable ? 'checked' : ''}>в поиске команды</Checkbox>
+                    <Button mode={this.state.isConfirmed ? "primary" : "destructive"} size='xl'
+                        onClick={() => this.confirmUser(this.state.fetchedUser && this.state.fetchedUser.id, this.state.userSkills)}>
+                        {this.state.isConfirmed ? "Сохранить" : "Подтвердить"}
+                    </Button>
                 </Div>
             </Panel>
         )

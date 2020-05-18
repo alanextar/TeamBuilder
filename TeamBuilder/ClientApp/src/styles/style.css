@@ -8,7 +8,7 @@
 }
 .profileBottom {
 	position: absolute;
-	bottom: 48px;
+	/*bottom: 48px;*/
 }
 .skillsInput {
 	/*background: var(--field_background);*/
@@ -19,4 +19,11 @@
 }
 .form-control {
 	height: 44px !important;
+}
+.Cell--ios .Cell__before-in > .Icon {
+	padding: 4px 38px 10px 0 !important;
+}
+
+.Button + .Button {
+	margin-left: 12px;
 }
