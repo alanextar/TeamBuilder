@@ -8,7 +8,7 @@ import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 
 const api = {
     baseUrl: '',
-    getTeams: '/teams/getpage'
+    getTeams: '/api/teams/getpage'
 };
 
 class Teams extends React.Component {

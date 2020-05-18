@@ -39,7 +39,7 @@ class User extends React.Component {
         
         console.log('in confirm user', skillIds);
 
-        let response = await fetch('/user/confirm', {
+        let response = await fetch('/api/user/confirm', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json;charset=utf-8'
