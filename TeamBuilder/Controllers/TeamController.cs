@@ -21,7 +21,7 @@ namespace TeamBuilder.Controllers
 
 		public async Task<Page<Team>> GetPage(int pageSize, int page = 0, bool prev = false)
 		{
-			logger.LogInformation($"Request teams/GetPage?pageSize={pageSize}&page={page}");
+			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
 
 			if (!context.Teams.Any())
 				await Initialize();
@@ -36,7 +36,7 @@ namespace TeamBuilder.Controllers
 			var teams = context.Teams.Skip(countSkip).Take(++countTake).OrderBy(t => t.Id).ToList();
 			if (teams.Count == countTake)
 			{
-				nextHref = $"teams/GetPage?pageSize={pageSize}&page={++page}";
+				nextHref = $"{HttpContext.Request.Path}?pageSize={pageSize}&page={++page}";
 				teams = teams.SkipLast(1).ToList();
 			}
 
@@ -46,7 +46,7 @@ namespace TeamBuilder.Controllers
 		
 		public Team Get(int id)
 		{
-			logger.LogInformation($"Request teams/GET?id={id}");
+			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
 
 			var team = context.Teams.Include(x => x.TeamEvents)
 				.ThenInclude(x => x.Event).FirstOrDefault(t => t.Id == id);
