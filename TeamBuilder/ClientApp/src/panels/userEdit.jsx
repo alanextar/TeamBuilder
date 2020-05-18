@@ -46,7 +46,7 @@ class UserEdit extends React.Component {
         let about = this.state.user.about;
         var user = { vkId, city, about };
 
-        let response = await fetch('/user/edit', {
+        let response = await fetch('/api/user/edit', {
             method: 'post',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(user)

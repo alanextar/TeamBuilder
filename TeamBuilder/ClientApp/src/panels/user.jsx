@@ -36,11 +36,13 @@ class User extends React.Component {
     }
 
     isUserConfirmed(vkId) {
-        fetch(`/user/checkconfirmation?vkId=${vkId}`)
+        fetch(`/api/user/checkconfirmation?vkId=${vkId}`)
             .then((response) => {
                 this.setState({ isConfirmed: response })
 
-                fetch(`/user/get?vkId=${vkId}`)
+                console.log('before user fetch', vkId);
+
+                fetch(`/api/user/get?vkId=${vkId}`)
                     .then(response => response.json())
                     .then(data => this.setState({ user: data }));
             } 
@@ -53,7 +55,7 @@ class User extends React.Component {
         var skillsIds = userSkills.map((s, i) => s.id);
         var userDto = { vkId, skillsIds };
 
-        let response = await fetch('/user/confirm', {
+        let response = await fetch('/api/user/confirm', {
             method: 'post',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(userDto),
@@ -132,7 +134,7 @@ class User extends React.Component {
                         </Group>
                 }
                 <Div>
-                    <Checkbox onClick={(e) => this.handleCheckboxClick(e)} checked={this.state.user && this.state.user.isSearchable ? 'checked' : ''}>в поиске команды</Checkbox>
+                    <Checkbox onChange={(e) => this.handleCheckboxClick(e)} checked={this.state.user && this.state.user.isSearchable ? 'checked' : ''}>в поиске команды</Checkbox>
                     <Button mode={this.state.isConfirmed ? "primary" : "destructive"} size='xl'
                         onClick={() => this.confirmUser(this.state.fetchedUser && this.state.fetchedUser.id, this.state.userSkills)}>
                         {this.state.isConfirmed ? "Сохранить" : "Подтвердить"}
