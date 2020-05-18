@@ -14,5 +14,6 @@ namespace TeamBuilder.Models
 		public string FinishDate { get; set; }
 		public string Link { get; set; }
 		public List<Team> Teams { get; set; }
+		public User Owner { get; set; }
 	}
 }

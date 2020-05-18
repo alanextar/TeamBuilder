@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using TeamBuilder.DTO;
+﻿using System.Collections.Generic;
 
 namespace TeamBuilder.Models
 {
@@ -30,5 +26,6 @@ namespace TeamBuilder.Models
 		//public bool IsConfirmed { get; set; }
 		public List<UserTeam> UserTeams { get; set; }
 		public List<UserSkill> UserSkills { get; set; }
+		public List<Event> OwnEvents { get; set; }
 	}
 }
