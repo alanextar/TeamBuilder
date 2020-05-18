@@ -93,7 +93,9 @@ namespace TeamBuilder.Controllers
 		{
 			_logger.LogInformation("Request ConfirmUser");
 
-			var user = context.Users.FirstOrDefault(u => u.VkId == vkId);
+			var user = context.Users.Include(x => x.UserTeams)
+				.ThenInclude(y => y.Team)
+				.FirstOrDefault(u => u.VkId == vkId);
 
 			return Json(user);
 		}
