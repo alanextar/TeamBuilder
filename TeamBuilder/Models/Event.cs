@@ -10,6 +10,6 @@ namespace TeamBuilder.Models
 		public long Id { get; set; }
 		public string Name { get; set; }
 		public string Description { get; set; }
-		public List<TeamEvent> TeamEvents { get; set; }
+		public List<Team> Teams { get; set; }
 	}
 }

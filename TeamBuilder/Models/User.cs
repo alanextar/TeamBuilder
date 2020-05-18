@@ -28,7 +28,6 @@ namespace TeamBuilder.Models
 		public string FullName => FirstName + " " + SecondName + " " + LastName;
 		public bool IsSearchable { get; set; }
 		//public bool IsConfirmed { get; set; }
-		//public bool IsConfirmed { get; set; }
 		public List<UserTeam> UserTeams { get; set; }
 		public List<UserSkill> UserSkills { get; set; }
 	}

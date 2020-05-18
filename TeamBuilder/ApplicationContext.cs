@@ -15,7 +15,6 @@ namespace TeamBuilder
         public DbSet<UserSkill> UserSkills { get; set; }
         public DbSet<Team> Teams { get; set; }
         public DbSet<Event> Events { get; set; }
-        public DbSet<TeamEvent> TeamEvents { get; set; }
         public ApplicationContext(DbContextOptions<ApplicationContext> options)
             : base(options)
         {
@@ -50,18 +49,6 @@ namespace TeamBuilder
                 .WithMany(u => u.UserSkills)
                 .HasForeignKey(us => us.SkillId);
 
-            modelBuilder.Entity<TeamEvent>()
-                .HasKey(t => new { t.TeamId, t.EventId });
-
-            modelBuilder.Entity<TeamEvent>()
-                .HasOne(us => us.Team)
-                .WithMany(u => u.TeamEvents)
-                .HasForeignKey(us => us.TeamId);
-
-            modelBuilder.Entity<TeamEvent>()
-                .HasOne(us => us.Event)
-                .WithMany(u => u.TeamEvents)
-                .HasForeignKey(us => us.EventId);
         }
     }
 }
