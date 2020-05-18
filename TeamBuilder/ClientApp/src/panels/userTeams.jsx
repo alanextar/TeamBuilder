@@ -31,7 +31,7 @@ class UserTeams extends React.Component {
     }
 
     async populateTeamData() {
-        const response = await fetch('/team/getall');
+        const response = await fetch('/api/teams/getpage/20');
         const data = await response.json();
         console.log('--------', 2, data);
         this.setState({ teams: data });

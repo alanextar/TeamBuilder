@@ -24,7 +24,7 @@ class Teaminfo extends React.Component {
     }
 
     async populateTeamData() {
-        const response = await fetch(`/teams/get/${this.props.teamId}`);
+        const response = await fetch(`/api/teams/get/${this.props.teamId}`);
         const data = await response.json();
         this.setState({ team: data });
     }

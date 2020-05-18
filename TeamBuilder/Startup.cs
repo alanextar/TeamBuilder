@@ -1,8 +1,11 @@
 using System;
+using System.Diagnostics;
+using System.Globalization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -61,14 +64,19 @@ namespace TeamBuilder
 			app.UseStaticFiles();
 			app.UseSpaStaticFiles();
 
-			app.UseRouting();
-
-			app.UseEndpoints(endpoints =>
-			{
-				endpoints.MapControllerRoute(
-					name: "default",
-					pattern: "{controller}/{action=Index}/{id?}");
-			});
+			app.MapWhen(
+				context => context.Request.Path.StartsWithSegments("/api"),
+				appBuilder =>
+				{
+					appBuilder.UseRouting();
+					appBuilder.UserSignCheck(env);
+					appBuilder.UseEndpoints(endpoints =>
+					{
+						endpoints.MapControllerRoute(
+							name: "api",
+							pattern: "/api/{controller}/{action=Index}/{id?}");
+					});
+				});
 
 			app.UseSpa(spa =>
 			{
