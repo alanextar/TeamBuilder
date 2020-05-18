@@ -19,6 +19,7 @@ import UserEdit from './panels/userEdit'
 const App = () => {
 
     const [activePanel, setActivePanel] = useState('teams');
+    const [activeUserPanel, setActiveUserPanel] = useState('user');
     const [activeStory, setActiveStore] = useState('teams');
 	const [fetchedUser, setUser] = useState(null);
     const [activeP, setActiveP] = useState('panel1');
@@ -42,7 +43,7 @@ const App = () => {
 		fetchData();
 	}, []);
 
-	const go = e => {
+    const go = e => {
         setActivePanel(e.currentTarget.dataset.to);
         setActiveTeam(e.currentTarget.dataset.id);
     };
@@ -60,9 +61,7 @@ const App = () => {
     }
 
     const goUserEdit = e => {
-        console.log('goUserEdit to', e.currentTarget.dataset.to);
-        console.log('goUserEdit', e.currentTarget.dataset.id);
-        setActivePanel(e.currentTarget.dataset.to);
+        setActiveUserPanel(e.currentTarget.dataset.to);
     }
 
 	return (
@@ -98,7 +97,7 @@ const App = () => {
                 <Teams id='teams' go={go} />
                 <Teaminfo id='teaminfo' go={go} teamId={ activeTeam } />
             </View>
-            <View id='user' activePanel='user'>
+            <View id='user' activePanel={activeUserPanel}>
                 <User id='user' fetchedUser={fetchedUser} goUserEdit={goUserEdit} />
                 <UserEdit id='userEdit' goUserEdit={goUserEdit} fetchedUser={fetchedUser} />
             </View>

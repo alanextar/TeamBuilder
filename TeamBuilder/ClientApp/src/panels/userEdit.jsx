@@ -24,19 +24,19 @@ class UserEdit extends React.Component {
     render() {
         return (
             <Panel id="userEdit">
-                {/* <PanelHeader>Редактирование профиля {this.state.vkId}</PanelHeader>
+                <PanelHeader>Профиль</PanelHeader>
                 {this.state.fetchedUser &&
                     <Group title="VK Connect">
                         <Cell description={this.state.fetchedUser.city && this.state.fetchedUser.city.title ? this.state.fetchedUser.city.title : ''}
                             before={this.state.fetchedUser.photo_200 ? <Avatar src={this.state.fetchedUser.photo_200} /> : null}>
                             {`${this.state.fetchedUser.first_name} ${this.state.fetchedUser.last_name}`}
                         </Cell>
-                    </Group>} */}
+                    </Group>}
                 <Separator />
                 <FormLayout>
-                    <FormLayoutGroup top="Фамилия">
-                        <Input top="город" type="text" />
-                        <Input top="телефон" type="text" />
+                    <FormLayoutGroup top="Редактирование">
+                        <Input top="город" />
+                        <Input top="телефон" />
                         <Input top="дополнительно" />
                     </FormLayoutGroup>
                 </FormLayout>
