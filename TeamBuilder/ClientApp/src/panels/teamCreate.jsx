@@ -2,7 +2,7 @@
 
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell,
-    Div, Button, Textarea, FormLayout, Select
+    Div, Button, Textarea, FormLayout, Select, Search
 } from '@vkontakte/vkui';
 
 class TeamCreate extends React.Component {
@@ -10,7 +10,7 @@ class TeamCreate extends React.Component {
         super(props);
 
         this.state = {
-            evenName: '',
+            events: '',
             go: props.go,
             id: props.id,
             activeTab: 'teamDescription'
@@ -19,23 +19,23 @@ class TeamCreate extends React.Component {
         this.onChange = this.onChange.bind(this);
     }
 
-    //componentDidMount() {
-    //    this.populateTeamData();
-    //}
+    componentDidMount() {
+        this.populateTeamData();
+    }
 
-    //async populateTeamData() {
-    //    const response = await fetch(`/teams/get/${this.props.teamId}`);
-    //    const data = await response.json();
-    //    this.setState({ team: data });
-    //}
+    async populateTeamData() {
+        const response = await fetch(`/event/getall`);
+        const data = await response.json();
+        this.setState({ events: data });
+    }
 
     onChange(e) {
-        const { evenName, value } = e.currentTarget;
-        this.setState({ evenName: value });
+        const { events, value } = e.currentTarget;
+        this.setState({ events: value });
     }
 
     render() {
-        const evenName = this.state.evenName;
+        const events = this.state.events;
         return (
             <Panel id={this.state.id}>
                 <PanelHeader separator={false} left={<PanelHeaderBack onClick={this.state.go} data-to='teams' />}>
@@ -66,15 +66,20 @@ class TeamCreate extends React.Component {
                             <Select
                                 top="Выберете событие"
                                 placeholder="Событие"
-                                status={evenName ? 'valid' : 'error'}
-                                bottom={evenName ? '' : 'Пожалуйста, выберете или создайте событие'}
+                                status={events ? 'valid' : 'error'}
+                                bottom={events ? '' : 'Пожалуйста, выберете или создайте событие'}
                                 onChange={this.onChange}
-                                value={evenName}
-                                name="evenName"
+                                value={events}
+                                name="events"
                             >
-                                <option value="0">Бизнес или работа</option>
-                                <option value="1">Индивидуальный туризм</option>
-                                <option value="2">Посещение близких родственников</option>
+                                {this.state.events && this.state.events.map((ev, i) => {
+                                    return (
+                                        <option value={i}>
+                                            {ev.name}
+                                        </ option>
+                                    )
+                                })}
+
                             </Select>
                         </ FormLayout>
                         :
