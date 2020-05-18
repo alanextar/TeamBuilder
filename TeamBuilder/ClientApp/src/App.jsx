@@ -24,7 +24,9 @@ const App = () => {
 	const [fetchedUser, setUser] = useState(null);
     const [activeP, setActiveP] = useState('panel1');
     const [activeTeam, setActiveTeam] = useState('teams');
-    const [activeUser, setActiveUser] = useState('user');
+    const [activeUser, setActiveUser] = useState(null);
+    const [city, setCity] = useState(null);
+    const [about, setAbout] = useState(null);
 
 
 	useEffect(() => {
@@ -61,7 +63,12 @@ const App = () => {
     }
 
     const goUserEdit = e => {
+        //var user = JSON.stringify(e.currentTarget.dataset.user);
+        //console.log('goUserEdit user', user);
+        //console.log('goUserEdit user city', e.currentTarget.dataset.city);
         setActiveUserPanel(e.currentTarget.dataset.to);
+        setCity(e.currentTarget.dataset.city);
+        setAbout(e.currentTarget.dataset.about);
     }
 
 	return (
@@ -99,7 +106,7 @@ const App = () => {
             </View>
             <View id='user' activePanel={activeUserPanel}>
                 <User id='user' fetchedUser={fetchedUser} goUserEdit={goUserEdit} />
-                <UserEdit id='userEdit' goUserEdit={goUserEdit} fetchedUser={fetchedUser} />
+                <UserEdit id='userEdit' goUserEdit={goUserEdit} fetchedUser={fetchedUser} user={activeUser} city={city} about={about} />
             </View>
             <View id='panel2' activePanel='panel2'>
                 <Panel2 id='panel2' go={go} />

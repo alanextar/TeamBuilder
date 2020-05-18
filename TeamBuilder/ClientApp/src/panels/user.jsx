@@ -24,7 +24,8 @@ class User extends React.Component {
             selected: false,
             selectedSkills: null,
             isConfirmed: false,
-            goUserEdit: props.goUserEdit
+            goUserEdit: props.goUserEdit,
+            user: null
         }
 
         this.confirmUser = this.confirmUser.bind(this);
@@ -36,9 +37,15 @@ class User extends React.Component {
 
     isUserConfirmed(vkId) {
         fetch(`/user/checkconfirmation?vkId=${vkId}`)
-            .then((response) => /*console.log('confirmation status ', response)*/
+            .then((response) => {
                 this.setState({ isConfirmed: response })
-            );
+
+                fetch(`/user/get?vkId=${vkId}`)
+                    .then(response => response.json())
+                    .then(data => this.setState({ user: data }));
+            } 
+        );
+
 	}
 
     async confirmUser(vkId, userSkills) {
@@ -56,7 +63,6 @@ class User extends React.Component {
     }
 
     handleClick(event, selectedSkills) {
-        console.log(selectedSkills);
         this.setState({
             userSkills: selectedSkills
         })
@@ -64,6 +70,7 @@ class User extends React.Component {
     };
 
     render() {
+        console.log('render user', this.state.user);
         return (
             <Panel id="user">
                 <PanelHeader>Профиль</PanelHeader>
@@ -93,18 +100,21 @@ class User extends React.Component {
                             <List>
                                 <Cell asideContent=
                                     {
-                                        <Icon24Write onClick={this.state.goUserEdit} data-to='userEdit'
-                                            data-id={this.state.fetchedUser && this.state.fetchedUser.id} />
+                                    <Icon24Write onClick={this.state.goUserEdit}
+                                        data-to='userEdit'
+                                        data-id={this.state.fetchedUser && this.state.fetchedUser.id}
+                                        data-city={this.state.user && this.state.user.city}
+                                        data-about={this.state.user && this.state.user.about} />
                                     }>
                                 </Cell>
                                 <Cell before={<Icon20HomeOutline height={28} width={28} />}>
-                                    город:
+                                    город: {this.state.user && this.state.user.city}
                                 </Cell>
                                 <Cell before={<Icon28PhoneOutline />}>
                                     тел.:
                                 </Cell>
                                 <Cell before={<Icon28ArticleOutline />}>
-                                    дополнительно:
+                                    дополнительно: {this.state.user && this.state.user.about}
                                 </Cell>
                             </List>
                             <UserSkills userSkills={this.state.userSkills}

@@ -84,5 +84,30 @@ namespace TeamBuilder.Controllers
 
 			return user;
 		}
+
+		[HttpGet]
+		public IActionResult Get(long vkId)
+		{
+			_logger.LogInformation("Request ConfirmUser");
+
+			var user = context.Users.FirstOrDefault(u => u.VkId == vkId);
+
+			return Json(user);
+		}
+
+		[HttpPost]
+		public IActionResult Edit([FromBody]User user)
+		{
+			_logger.LogInformation("Request ConfirmUser");
+
+			var dbUser = context.Users.FirstOrDefault(u => u.VkId == user.VkId);
+			dbUser.City = user.City;
+			dbUser.About = user.About;
+
+			context.Update(dbUser);
+			context.SaveChanges();
+
+			return Ok("Saved");
+		}
 	}
 }

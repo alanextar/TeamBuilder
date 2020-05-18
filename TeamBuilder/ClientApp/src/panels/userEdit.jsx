@@ -1,6 +1,6 @@
 ﻿import React from 'react';
 import ReactDOM from 'react-dom';
-import { Panel, PanelHeader, Group, Cell, Avatar, Search, Button, Div, Input, FormLayoutGroup } from '@vkontakte/vkui';
+import { Panel, PanelHeader, Group, Cell, Avatar, Search, Button, Div, Input, FormLayoutGroup, Textarea } from '@vkontakte/vkui';
 import { Tabs, TabsItem, Separator, Checkbox, List, Header, FormLayout, Select, RichCell } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import '../../src/styles/style.css';
@@ -16,12 +16,46 @@ class UserEdit extends React.Component {
 
         this.state = {
             goUserEdit: props.goUserEdit,
-            fetchedUser: props.fetchedUser
+            fetchedUser: props.fetchedUser,
+            //about: props.user.about,
+            //city: props.user.city,
+            about: props.about,
+            city: props.city,
+            user: props.user
         }
+
+        this.handleAboutChange = this.handleAboutChange.bind(this);
+        this.handleCityChange = this.handleCityChange.bind(this);
+        this.postEdit = this.postEdit.bind(this);
+    }
+
+    handleAboutChange(event) {
+        this.setState({ about: event.target.value });
+    }
+
+    handleCityChange(event) {
+        this.setState({ city: event.target.value });
+    }
+
+    async postEdit() {
+        //console.log('city ', this.state.user.city);
+        //let city = this.state.city;
+        //let vkId = this.state.fetchedUser.id;
+        let vkId = this.state.fetchedUser.id;
+        let city = this.state.city;
+        let about = this.state.about;
+        var user = { vkId, city, about };
+
+        let response = await fetch('/user/edit', {
+            method: 'post',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(user)
+        });
 
     }
 
     render() {
+        console.log(this.state.fetchedUser);
         return (
             <Panel id="userEdit">
                 <PanelHeader>Профиль</PanelHeader>
@@ -35,13 +69,12 @@ class UserEdit extends React.Component {
                 <Separator />
                 <FormLayout>
                     <FormLayoutGroup top="Редактирование">
-                        <Input top="город" />
-                        <Input top="телефон" />
-                        <Input top="дополнительно" />
+                        <Input value={this.state.city} onChange={this.handleCityChange} type="text" top="город" />
+                        <Textarea value={this.state.about} onChange={this.handleAboutChange} top="Дополнительно" placeholder="О себе" />
                     </FormLayoutGroup>
                 </FormLayout>
                 <Div>
-                    <Button mode="commerce">Принять</Button>
+                    <Button onClick={(e) => { this.postEdit(); this.state.goUserEdit(e) }} data-to='user' data-id={this.state.fetchedUser.id} mode="commerce">Принять</Button>
                     <Button onClick={this.state.goUserEdit} data-to='user' data-id={this.state.fetchedUser.id} mode="destructive">Отменить</Button>
                 </Div>
             </Panel>
