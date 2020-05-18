@@ -17,10 +17,6 @@ class UserEdit extends React.Component {
         this.state = {
             goUserEdit: props.goUserEdit,
             fetchedUser: props.fetchedUser,
-            //about: props.user.about,
-            //city: props.user.city,
-            about: props.about,
-            city: props.city,
             user: props.user
         }
 
@@ -30,20 +26,22 @@ class UserEdit extends React.Component {
     }
 
     handleAboutChange(event) {
-        this.setState({ about: event.target.value });
+        var user = { ...this.state.user }
+        user.about = event.target.value;
+        this.setState({ user })
     }
 
     handleCityChange(event) {
         this.setState({ city: event.target.value });
+        var user = { ...this.state.user }
+        user.city = event.target.value;
+        this.setState({ user })
     }
 
     async postEdit() {
-        //console.log('city ', this.state.user.city);
-        //let city = this.state.city;
-        //let vkId = this.state.fetchedUser.id;
         let vkId = this.state.fetchedUser.id;
-        let city = this.state.city;
-        let about = this.state.about;
+        let city = this.state.user.city;
+        let about = this.state.user.about;
         var user = { vkId, city, about };
 
         let response = await fetch('/user/edit', {
@@ -56,6 +54,7 @@ class UserEdit extends React.Component {
 
     render() {
         console.log(this.state.fetchedUser);
+        console.log('userEdit render', this.state.user);
         return (
             <Panel id="userEdit">
                 <PanelHeader>Профиль</PanelHeader>
@@ -69,12 +68,14 @@ class UserEdit extends React.Component {
                 <Separator />
                 <FormLayout>
                     <FormLayoutGroup top="Редактирование">
-                        <Input value={this.state.city} onChange={this.handleCityChange} type="text" top="город" />
-                        <Textarea value={this.state.about} onChange={this.handleAboutChange} top="Дополнительно" placeholder="О себе" />
+                        <Input value={this.state.user && this.state.user.city} onChange={this.handleCityChange} type="text" top="город" />
+                        <Textarea value={this.state.user && this.state.user.about} onChange={this.handleAboutChange} top="Дополнительно" placeholder="О себе" />
                     </FormLayoutGroup>
                 </FormLayout>
                 <Div>
-                    <Button onClick={(e) => { this.postEdit(); this.state.goUserEdit(e) }} data-to='user' data-id={this.state.fetchedUser.id} mode="commerce">Принять</Button>
+                    <Button onClick={(e) => { this.postEdit(); this.state.goUserEdit(e) }}
+                        data-user={JSON.stringify(this.state.user)} data-to='user'
+                        data-id={this.state.fetchedUser.id} mode="commerce">Принять</Button>
                     <Button onClick={this.state.goUserEdit} data-to='user' data-id={this.state.fetchedUser.id} mode="destructive">Отменить</Button>
                 </Div>
             </Panel>

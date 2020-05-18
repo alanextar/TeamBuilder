@@ -103,8 +103,7 @@ class User extends React.Component {
                                     <Icon24Write onClick={this.state.goUserEdit}
                                         data-to='userEdit'
                                         data-id={this.state.fetchedUser && this.state.fetchedUser.id}
-                                        data-city={this.state.user && this.state.user.city}
-                                        data-about={this.state.user && this.state.user.about} />
+                                        data-user={JSON.stringify(this.state.user)} /> 
                                     }>
                                 </Cell>
                                 <Cell before={<Icon20HomeOutline height={28} width={28} />}>

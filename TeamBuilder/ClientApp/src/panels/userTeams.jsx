@@ -33,7 +33,6 @@ class UserTeams extends React.Component {
     async populateTeamData() {
         const response = await fetch('/team/getall');
         const data = await response.json();
-        console.log('--------', 2, data);
         this.setState({ teams: data });
     }
 
