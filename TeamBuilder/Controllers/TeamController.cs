@@ -40,7 +40,7 @@ namespace TeamBuilder.Controllers
 				await Initialize();
 
 			if (pageSize == 0)
-				return null;
+				return new Page<Team>(new List<Team>(), null);
 
 			var countTake = prev ? (page + 1) * pageSize : pageSize ;
 			var countSkip = prev ? 0 : page * pageSize;
@@ -69,33 +69,62 @@ namespace TeamBuilder.Controllers
 		}
 
 		[HttpPost]
-		public async Task<long> Create([FromBody]CreateTeamViewModel createTeamViewModel)
+		public async Task<IActionResult> Create([FromBody]CreateTeamViewModel createTeamViewModel)
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(createTeamViewModel)}");
 
-			var config = new MapperConfiguration(cfg => cfg.CreateMap<CreateTeamViewModel,Team>());
+			var @event = await context.Events.FirstOrDefaultAsync(e => e.Id == createTeamViewModel.EventId);
+			if (@event == null)
+				return NotFound($"Event '{createTeamViewModel.EventId}' not found");
+
+			var config = new MapperConfiguration(cfg => cfg.CreateMap<CreateTeamViewModel,Team>()
+				.ForMember("Event", opt => opt.MapFrom(_ => @event)));
 			var mapper = new Mapper(config);
 			var team = mapper.Map<CreateTeamViewModel, Team>(createTeamViewModel);
 
-			var newTeam = await context.Teams.AddAsync(team);
+			await context.Teams.AddAsync(team);
 			await context.SaveChangesAsync();
 
-			return newTeam.Entity.Id;
+			return Ok("Created");
 		}
 
 		[HttpPost]
-		public async Task<long> Edit([FromBody]EditTeamViewModel editTeamViewModel)
+		public async Task<IActionResult> Edit([FromBody]EditTeamViewModel editTeamViewModel)
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(editTeamViewModel)}");
 
-			var config = new MapperConfiguration(cfg => cfg.CreateMap<EditTeamViewModel, Team>());
-			var mapper = new Mapper(config);
-			var team = mapper.Map<EditTeamViewModel, Team>(editTeamViewModel);
+			var team = await context.Teams.FirstOrDefaultAsync(t => t.Id == editTeamViewModel.Id);
+			if (team == null)
+				return NotFound($"Team '{editTeamViewModel.Id}' not found");
 
-			var editTeam = context.Teams.Update(team);
+			var @event = await context.Events.FirstOrDefaultAsync(e => e.Id == editTeamViewModel.EventId);
+			if (@event == null)
+				return NotFound($"Event '{editTeamViewModel.EventId}' not found");
+
+			var config = new MapperConfiguration(cfg => cfg.CreateMap<EditTeamViewModel, Team>()
+				.ForMember("Event", opt => opt.MapFrom(_ => @event)));
+			var mapper = new Mapper(config);
+			var newTeam = mapper.Map<EditTeamViewModel, Team>(editTeamViewModel);
+
+			context.Teams.Update(newTeam);
 			await context.SaveChangesAsync();
 
-			return editTeam.Entity.Id;
+			return Ok("Updated");
+		}
+
+		[HttpDelete]
+		public async Task<IActionResult> Delete(long id)
+		{
+			logger.LogInformation($"DELETE Request {HttpContext.Request.Headers[":path"]}.");
+
+			var team = await context.Teams.FirstOrDefaultAsync(t => t.Id == id);
+			if (team == null)
+				return NotFound($"Team '{id}' not found");
+
+			context.Teams.Remove(team);
+			await context.SaveChangesAsync();
+
+			return Ok("Deleted");
 		}
 
 		private async Task Initialize()
