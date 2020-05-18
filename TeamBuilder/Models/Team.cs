@@ -13,7 +13,7 @@ namespace TeamBuilder.Models
 		public string Link { get; set; }
 		public DateTime? StartDate { get; set; }
 		public DateTime? FinishDate { get; set; }
+		public Event Event { get; set; }
 		public List<UserTeam> UserTeams { get; set; }
-		public List<TeamEvent> TeamEvents { get; set; }
 	}
 }

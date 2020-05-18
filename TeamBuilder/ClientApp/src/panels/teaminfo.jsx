@@ -1,6 +1,11 @@
 ﻿import React from 'react';
 
-import { Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell, InfoRow } from '@vkontakte/vkui';
+import {
+    Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell, InfoRow,
+    SimpleCell, Avatar
+} from '@vkontakte/vkui';
+
+import Icon28MessageOutline from '@vkontakte/icons/dist/28/message_outline';
 
 class Teaminfo extends React.Component {
     constructor(props) {
@@ -20,7 +25,7 @@ class Teaminfo extends React.Component {
     }
 
     async populateTeamData() {
-        const response = await fetch(`/teams/get/${this.props.teamId}`);
+        const response = await fetch(`/api/teams/get/${this.props.teamId}`);
         const data = await response.json();
         this.setState({ team: data });
     }
@@ -59,14 +64,17 @@ class Teaminfo extends React.Component {
                             </ Cell>
                             : 
                             <Cell>
-                                <InfoRow header='События'>
-                                    {console.log('ttteams ', this.state.team.teamEvents)}
-                                    {this.state.team.teamEvents &&
-                                        this.state.team.teamEvents.map((ev, i) => {
-                                            return(<p>
-                                                {ev.event.name}
-                                            </p>)
-                                        }
+                                <InfoRow header='Участники'>
+                                    {console.log('ttteams ', this.state.team.userTeams)}
+                                    {this.state.team.userTeams &&
+                                        this.state.team.userTeams.map((members, i) => {
+                                            return (
+                                                <SimpleCell
+                                                    before={<Avatar size={48} />}
+                                                    after={<Icon28MessageOutline />}>
+                                                    {members.user.firstName, members.user.fullName}
+                                                </SimpleCell>
+                                        )}
                                     )}
                                 </InfoRow>
                             </ Cell> )}

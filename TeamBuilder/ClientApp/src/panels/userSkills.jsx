@@ -36,14 +36,14 @@ class UserSkills extends React.Component {
     async populateSkills(id) {
 
         if (this.props.userSkills === null) {
-            const getAllResponse = await fetch('skill/getall');
+            const getAllResponse = await fetch('/api/skill/getall');
             const allSkillsData = await getAllResponse.json();
 
             var options = allSkillsData && allSkillsData.map(function (skill) {
                 return { id: skill.id, label: skill.name };
             });
 
-            const getSkillsResponse = await fetch(`user/getSkills?vkId=${id}`);
+            const getSkillsResponse = await fetch(`/api/user/getSkills?vkId=${id}`);
             const userSkillsData = await getSkillsResponse.json();
 
             var userSkills = userSkillsData && userSkillsData.map(function (skill) {

@@ -12,18 +12,21 @@ import Panel1 from './panels/panel1'
 import Panel2 from './panels/panel2'
 import Panel3 from './panels/panel3'
 import Teams from './panels/teams'
-import Teaminfo from './panels/teaminfo'
+import Teaminfo from './panels/teaminfo' 
+import TeamCreate from './panels/teamCreate'
 import User from './panels/user'
 import UserEdit from './panels/userEdit'
 
 const App = () => {
+    const [activeTeamPanel, setActiveTeamPanel] = useState('teams');
+    const [activeTeam, setActiveTeam] = useState(null);
+    const [teamHref, setTeamNextHref] = useState(null);
 
     const [activePanel, setActivePanel] = useState('teams');
     const [activeUserPanel, setActiveUserPanel] = useState('user');
     const [activeStory, setActiveStore] = useState('teams');
 	const [fetchedUser, setUser] = useState(null);
     const [activeP, setActiveP] = useState('panel1');
-    const [activeTeam, setActiveTeam] = useState('teams');
     const [activeUser, setActiveUser] = useState(null);
     const [city, setCity] = useState(null);
     const [about, setAbout] = useState(null);
@@ -51,7 +54,12 @@ const App = () => {
     };
 
     const goTeam = e => {
+        setActiveTeamPanel(e.currentTarget.dataset.to);
+        if (e.currentTarget.dataset.href)
+            setTeamNextHref(e.currentTarget.dataset.href);
         setActiveTeam(e.currentTarget.dataset.id);
+
+        console.log(`dataset.href: ${e.currentTarget.dataset.href}`);
     };
 
     const goP = e => {
@@ -99,9 +107,10 @@ const App = () => {
                 ><Icon28Profile /></TabbarItem>
             </Tabbar>
         }>
-            <View id='teams' activePanel={ activePanel } >
-                <Teams id='teams' go={go} />
-                <Teaminfo id='teaminfo' go={go} teamId={activeTeam} return='teams' />
+            <View id='teams' activePanel={activeTeamPanel} >
+                <Teams id='teams' go={goTeam} href={teamHref} />
+                <Teaminfo id='teaminfo' go={goTeam} teamId={activeTeam} />
+                <TeamCreate id='teamCreate' go={goTeam} />
             </View>
             <View id='user' activePanel={activeUserPanel}>
                 <User id='user' fetchedUser={fetchedUser} goUserEdit={goUserEdit} />
