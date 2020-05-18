@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using TeamBuilder.Models;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using TeamBuilder.Dto;
 
 namespace TeamBuilder.Controllers
 {
@@ -193,27 +194,6 @@ namespace TeamBuilder.Controllers
 			await context.Teams.AddRangeAsync(teams);
 			await context.SaveChangesAsync();
 		}
-	}
-
-	public class CreateTeamViewModel
-	{
-		public string Name { get; set; }
-		public string Description { get; set; }
-		public int EventId { get; set; }
-
-		public int NumberRequiredMembers { get; set; }
-		public string DescriptionRequiredMembers { get; set; }
-	}
-
-	public class EditTeamViewModel
-	{
-		public long Id { get; set; }
-		public string Name { get; set; }
-		public string Description { get; set; }
-		public int EventId { get; set; }
-
-		public int NumberRequiredMembers { get; set; }
-		public string DescriptionRequiredMembers { get; set; }
 	}
 
 	public class Page<T>
