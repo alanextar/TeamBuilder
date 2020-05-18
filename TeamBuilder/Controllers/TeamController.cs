@@ -4,38 +4,55 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
 using TeamBuilder.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace TeamBuilder.Controllers
 {
 	public class TeamsController : ControllerBase
 	{
 		private readonly ApplicationContext context;
-		private readonly ILogger<TeamsController> _logger;
+		private readonly ILogger<TeamsController> logger;
 
 		public TeamsController(ApplicationContext context, ILogger<TeamsController> logger)
 		{
 			this.context = context;
-			_logger = logger;
+			this.logger = logger;
 		}
 
-		public async Task<Page<Team>> GetPage(int pageSize, int page = 0)
+		public async Task<Page<Team>> GetPage(int pageSize, int page = 0, bool prev = false)
 		{
-			_logger.LogInformation($"Request teams/GetPage?pageSize={pageSize}&pageNumber={page}");
+			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
 
 			if (!context.Teams.Any())
 				await Initialize();
 
-			var teams = context.Teams.Skip(page * pageSize).Take(pageSize).ToList();
-			var nextHref = $"teams/getall?pageSize={pageSize}&page={++page}";
+			if (pageSize == 0)
+				return null;
 
+			var countTake = prev ? (page + 1) * pageSize : pageSize ;
+			var countSkip = prev ? 0 : page * pageSize;
+
+			string nextHref = null;
+			var teams = context.Teams.Skip(countSkip).Take(++countTake).OrderBy(t => t.Id).ToList();
+			if (teams.Count == countTake)
+			{
+				nextHref = $"{HttpContext.Request.Path}?pageSize={pageSize}&page={++page}";
+				teams = teams.SkipLast(1).ToList();
+			}
+
+			logger.LogInformation($"Response TeamsCount:{teams.Count} / from:{teams.First().Id} / to:{teams.Last().Id} / NextHref:{nextHref}");
 			return new Page<Team>(teams, nextHref);
 		}
-
+		
 		public Team Get(int id)
 		{
-			_logger.LogInformation($"Request teams/GET?id={id}");
-			var teams = context.Teams.ToList();
-			return teams.FirstOrDefault(t => t.Id == id);
+			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
+
+			var team = context.Teams.Include(x => x.TeamEvents).ThenInclude(x => x.Event)
+				.Include(x => x.UserTeams).ThenInclude(x => x.User)
+				.FirstOrDefault(t => t.Id == id);
+
+			return team;
 		}
 
 		private async Task Initialize()

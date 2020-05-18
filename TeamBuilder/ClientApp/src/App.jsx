@@ -13,82 +13,88 @@ import Panel2 from './panels/panel2'
 import Panel3 from './panels/panel3'
 import Teams from './panels/teams'
 import Teaminfo from './panels/teaminfo'
+import TeamCreate from './panels/teamCreate'
 import User from './panels/user'
 
 const App = () => {
-
+    const [activeTeamPanel, setActiveTeamPanel] = useState('teams');
+    const [activeTeam, setActiveTeam] = useState(null);
+    const [teamHref, setTeamNextHref] = useState(null);
     const [activePanel, setActivePanel] = useState('teams');
     const [activeStory, setActiveStore] = useState('teams');
-	const [fetchedUser, setUser] = useState(null);
+    const [fetchedUser, setUser] = useState(null);
     const [activeP, setActiveP] = useState('panel1');
-    const [activeTeam, setActiveTeam] = useState('teams');
 
 
-	useEffect(() => {
-		bridge.subscribe(({ detail: { type, data } }) => {
-			if (type === 'VKWebAppUpdateConfig') {
-				const schemeAttribute = document.createAttribute('scheme');
-				schemeAttribute.value = data.scheme ? data.scheme : 'client_light';
-				document.body.attributes.setNamedItem(schemeAttribute);
-			}
-		});
-		async function fetchData() {
-			const user = await bridge.send('VKWebAppGetUserInfo');
-			setUser(user);
-			
-		}
-		fetchData();
-	}, []);
+    useEffect(() => {
+        bridge.subscribe(({ detail: { type, data } }) => {
+            if (type === 'VKWebAppUpdateConfig') {
+                const schemeAttribute = document.createAttribute('scheme');
+                schemeAttribute.value = data.scheme ? data.scheme : 'client_light';
+                document.body.attributes.setNamedItem(schemeAttribute);
+            }
+        });
+        async function fetchData() {
+            const user = await bridge.send('VKWebAppGetUserInfo');
+            setUser(user);
 
-	const go = e => {
-        setActivePanel(e.currentTarget.dataset.to);
-        setActiveTeam(e.currentTarget.dataset.id);
-    };
+        }
+        fetchData();
+    }, []);
 
     const goTeam = e => {
+        setActiveTeamPanel(e.currentTarget.dataset.to);
+        if (e.currentTarget.dataset.href)
+            setTeamNextHref(e.currentTarget.dataset.href);
         setActiveTeam(e.currentTarget.dataset.id);
+
+        console.log(`dataset.href: ${e.currentTarget.dataset.href}`);
+    };
+
+    const go = e => {
+        setActivePanel(e.currentTarget.dataset.to);
     };
 
     const goP = e => {
         setActiveP(e.currentTarget.dataset.to);
     };
 
-    const go_foot = e => {
+    const goFoot = e => {
         setActiveStore(e.currentTarget.dataset.story);
     }
 
-	return (
+    return (
         <Epic activeStory={activeStory} tabbar={
             <Tabbar>
                 <TabbarItem
-                    onClick={go_foot}
+                    onClick={goFoot}
                     selected={activeStory === 'teams'}
                     data-story="teams"
                     text="Команды"
                 ><Icon28Users3Outline /></TabbarItem>
                 <TabbarItem
-                    onClick={go_foot}
+                    onClick={goFoot}
                     selected={activeStory === 'panel1'}
                     data-story="panel1"
                     text="Участники"
                 ><Icon28Users /></TabbarItem>
                 <TabbarItem
-                    onClick={go_foot}
+                    onClick={goFoot}
                     selected={activeStory === 'panel2'}
                     data-story="panel2"
                     text="События"
                 ><Icon28FavoriteOutline /></TabbarItem>
                 <TabbarItem
-                    onClick={go_foot}
-                    selected={activeStory === 'user'}
-                    data-story="user"
+                    onClick={goFoot}
+                    selected={activeStory === 'panel3'}
+                    data-story="panel3"
                     text="Профиль"
                 ><Icon28Profile /></TabbarItem>
-            </Tabbar>
-        }>
-            <View id='teams' activePanel={ activePanel } >
-                <Teams id='teams' go={go} />
-                <Teaminfo id='teaminfo' go={go} teamId={ activeTeam } />
+            </Tabbar>}>
+            <View id='teams' activePanel={activeTeamPanel} >
+                <Teams id='teams' go={goTeam} href={teamHref} />
+                <Teaminfo id='teaminfo' go={goTeam} teamId={activeTeam} />
+                <TeamCreate id='teamCreate' go={goTeam} />
             </View>
             <View id='user' activePanel='user' go={go}>
                 <User id='user' fetchedUser={fetchedUser} go={go} />
