@@ -11,5 +11,6 @@ namespace TeamBuilder.Models
 		public string Name { get; set; }
 		public string Description { get; set; }
 		public List<Team> Teams { get; set; }
+		public User Owner { get; set; }
 	}
 }

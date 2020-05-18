@@ -30,5 +30,8 @@ namespace TeamBuilder.Models
 		//public bool IsConfirmed { get; set; }
 		public List<UserTeam> UserTeams { get; set; }
 		public List<UserSkill> UserSkills { get; set; }
+
+		public List<Team> OwnTeams { get; set; }
+		public List<Event> OwnEvents { get; set; }
 	}
 }
