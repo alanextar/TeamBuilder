@@ -9,7 +9,7 @@ import Icon28PhoneOutline from '@vkontakte/icons/dist/28/phone_outline';
 import Icon28ArticleOutline from '@vkontakte/icons/dist/28/article_outline';
 import Icon20HomeOutline from '@vkontakte/icons/dist/20/home_outline';
 import Icon24Write from '@vkontakte/icons/dist/24/write';
-import TeamSet from './userTeams'
+import UserTeams from './userTeams'
 import UserSkills from './userSkills'
 
 class User extends React.Component {
@@ -25,6 +25,7 @@ class User extends React.Component {
             selectedSkills: null,
             isConfirmed: false,
             goUserEdit: props.goUserEdit,
+            go: props.go,
             user: null
         }
 
@@ -121,7 +122,7 @@ class User extends React.Component {
                                 id={this.state.fetchedUser && this.state.fetchedUser.id} />
                         </Group> :
                         <Group>
-                            <TeamSet />
+                            <UserTeams userTeams={this.state.user.userTeams} go={this.state.go} />
                         </Group>
                 }
                 <Div>

@@ -46,6 +46,7 @@ const App = () => {
 	}, []);
 
     const go = e => {
+        console.log('into go', e.currentTarget.dataset.to, e.currentTarget.dataset.id);
         setActivePanel(e.currentTarget.dataset.to);
         setActiveTeam(e.currentTarget.dataset.id);
     };

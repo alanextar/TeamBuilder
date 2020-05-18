@@ -9,25 +9,25 @@ class UserTeams extends React.Component {
         super(props);
 
         this.state = {
-            teams: null,
+            userTeams: props.userTeams,
             go: props.go,
             fetching: false,
         }
 
-        this.onRefresh = () => {
-            this.setState({
-                fetching: true
-            });
+        //this.onRefresh = () => {
+        //    this.setState({
+        //        fetching: true
+        //    });
 
-            this.populateTeamData()
-            this.setState({
-                fetching: false
-            });
-        }
+        //    this.populateTeamData()
+        //    this.setState({
+        //        fetching: false
+        //    });
+        //}
     }
 
     componentDidMount() {
-        this.populateTeamData();
+        //this.populateTeamData();
     }
 
     async populateTeamData() {
@@ -37,30 +37,56 @@ class UserTeams extends React.Component {
     }
 
     render() {
+        console.log('into userTeams','------------', this.state.userTeams)
         return (
-            <PullToRefresh onRefresh={this.onRefresh} isFetching={this.state.fetching}>
-                <Group>
-                    <List>
-                        {
-                            this.state.teams &&
-                            this.state.teams.map(({ id, name, description, go }, i) => {
-                                return (
-                                    <RichCell key={i}
-                                        text={description}
-                                        caption="Навыки"
-                                        after="1/3"
-                                        onClick={go}
-                                        data-to='teaminfo'
-                                        data-id={id}>
-                                        {name}
-                                    </RichCell>
-                                )
-                            })}
-                    </List>
-                </Group>
-        </PullToRefresh>
+            <Group>
+                <List>
+                    {
+                        this.state.userTeams &&
+                        this.state.userTeams.map((userTeam, i) => {
+                            console.log('team params', userTeam.team.id);
+                            return (
+                                <RichCell key={userTeam.team.id}
+                                    text={userTeam.team.description}
+                                    caption="Команда"
+                                    after="1/3"
+                                    onClick={this.state.go}
+                                    data-to='teaminfo'
+                                    data-id={userTeam.team.id}>
+                                    {userTeam.team.name}
+                                </RichCell>
+                            )
+                        })}
+                </List>
+            </Group>
         )
     }
+
+    //render() {
+    //    var self = this;
+
+    //    var items = [];
+    //    this.state.userTeams && this.state.userTeams.map((userTeam, i) => {
+    //        items.push(
+    //            <RichCell
+    //                key={userTeam.team.id}
+    //                text={userTeam.team.description}
+    //                caption="Навыки"
+    //                after="1/3"
+    //                onClick={self.state.go}
+    //                data-to='teaminfo'
+    //                data-id={userTeam.team.id}>
+    //                {userTeam.team.name} - {userTeam.team.id}
+    //            </RichCell>
+    //        );
+    //    });
+
+    //    return (
+    //        <List>
+    //            {items}
+    //        </List>
+    //    );
+    //}
 
 }
 
