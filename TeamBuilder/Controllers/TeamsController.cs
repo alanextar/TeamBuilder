@@ -47,7 +47,7 @@ namespace TeamBuilder.Controllers
 			var countSkip = prev ? 0 : page * pageSize;
 
 			string nextHref = null;
-			var teams = context.Teams.Skip(countSkip).Take(++countTake).OrderBy(t => t.Id).ToList();
+			var teams = context.Teams.Include(x => x.UserTeams).Skip(countSkip).Take(++countTake).OrderBy(t => t.Id).ToList();
 			if (teams.Count == countTake)
 			{
 				nextHref = $"{HttpContext.Request.Path}?pageSize={pageSize}&page={++page}";

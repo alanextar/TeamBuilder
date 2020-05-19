@@ -129,11 +129,12 @@ class Teams extends React.Component {
             items.push(
                 <CardGrid>
                     <Card size="l" mode="shadow">
+                        {console.log('team', team.userTeams)}
                         <RichCell
                             key={team.id}
                             text={team.description}
                             caption="Навыки"
-                            after="1/3"
+                            after={team.userTeams.length + '/' + team.numberRequiredMembers}
                             onClick={self.state.go}
                             data-to='teaminfo'
                             data-id={team.id}>
