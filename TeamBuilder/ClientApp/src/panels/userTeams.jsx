@@ -1,6 +1,6 @@
 ﻿import React from 'react';
 import ReactDOM from 'react-dom';
-import { Panel, PanelHeader, Group, Search, List, RichCell, Avatar, PullToRefresh, PanelHeaderButton, Cell } from '@vkontakte/vkui';
+import { Panel, PanelHeader, Group, Search, List, RichCell, Avatar, PullToRefresh, PanelHeaderButton, Cell, CardGrid, Card } from '@vkontakte/vkui';
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import '@vkontakte/vkui/dist/vkui.css';
 import Icon28CheckCircleOutline from '@vkontakte/icons/dist/28/check_circle_outline';
@@ -48,17 +48,22 @@ class UserTeams extends React.Component {
                         this.state.userTeams.map((userTeam, i) => {
                             console.log('team params', userTeam.team.id);
                             return (
-                                <RichCell key={userTeam.team.id}
-                                    text={userTeam.team.description}
-                                    caption="Команда"
-                                    after={userTeam.isConfirmed ? <Icon28CheckCircleOutline /> : <Icon28InfoOutline/>}
-                                    onClick={this.state.goUserEdit}
-                                    data-to='teaminfo'
-                                    data-id={userTeam.team.id}>
-                                    {userTeam.team.name}
-                                </RichCell>
+                                <CardGrid>
+                                    <Card size="l" mode="shadow">
+                                        <RichCell key={userTeam.team.id}
+                                            text={userTeam.team.description}
+                                            caption="Команда"
+                                            after={userTeam.isConfirmed ? <Icon28CheckCircleOutline /> : <Icon28InfoOutline />}
+                                            onClick={this.state.goUserEdit}
+                                            data-to='teaminfo'
+                                            data-id={userTeam.team.id}>
+                                            {userTeam.team.name}
+                                        </RichCell>
+                                    </Card>
+                                </CardGrid>
                             )
-                        })}
+                        })
+                    }
                 </List>
             </Group>
         )
