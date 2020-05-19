@@ -131,7 +131,27 @@ namespace TeamBuilder.Controllers
 			context.Update(dbUser);
 			context.SaveChanges();
 
-			return Ok("Saved");
+			return Json(dbUser);
+		}
+
+		[HttpPost]
+		public IActionResult DeclineTeam(long vkId, long teamId)
+		{
+			_logger.LogInformation("Request JoinTeamm");
+
+			var dbUser = context.Users
+				.Include(x => x.UserTeams)
+				.ThenInclude(x => x.Team);
+
+			var userTeamToDelete = dbUser
+				.SelectMany(x => x.UserTeams)
+				.First(y => y.TeamId == teamId && y.User.VkId == vkId);
+
+
+			context.UserTeams.Remove(userTeamToDelete);
+			context.SaveChanges();
+
+			return Json(dbUser);
 		}
 	}
 }

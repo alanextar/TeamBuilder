@@ -18,17 +18,6 @@ class UserTeams extends React.Component {
             goUserEdit: props.goUserEdit,
             fetching: false,
         }
-
-        //this.onRefresh = () => {
-        //    this.setState({
-        //        fetching: true
-        //    });
-
-        //    this.populateTeamData()
-        //    this.setState({
-        //        fetching: false
-        //    });
-        //}
     }
 
     componentDidMount() {
@@ -41,9 +30,20 @@ class UserTeams extends React.Component {
         this.setState({ teams: data });
     }
 
+    async handleJoin(userTeam) {
+        const response = await fetch(`/api/user/joinTeam/?vkId=${vkId}&&teamId=${teamId}`);
+        const data = await response.json();
+        this.setState({ userTeams: data });
+    }
+
+    async handleQuitOrDecline(userTeam) {
+        const response = await fetch(`/api/user/quitOrDecline/?vkId=${vkId}&&teamId=${teamId}`);
+        const data = await response.json();
+        this.setState({ userTeams: data });
+    }
+
     render() {
         console.log('into userTeams', '------------', this.state.userTeams)
-        var teamText = "заявка на рассмотрении";
         return (
             <Group>
                 <List>
@@ -57,15 +57,19 @@ class UserTeams extends React.Component {
                                         <RichCell key={userTeam.team.id}
                                             text={userTeam.team.description}
                                             caption="Команда"
-                                            after={userTeam.isConfirmed ? 'заявка на рассмотрении'  < Icon28CheckCircleOutline />  : <Icon28InfoOutline />}
+                                            after={userTeam.userAction === 3 ? < Icon28CheckCircleOutline /> :
+                                                (userTeam.userAction === 1 && <Icon28InfoOutline />)}
                                             onClick={this.state.goUserEdit}
                                             data-to='teaminfo'
                                             data-id={userTeam.team.id}
-                                            actions={
+                                            actions={userTeam.userAction === 6 ?
                                                 <React.Fragment>
-                                                    <Button>Принять</Button>
-                                                    <Button mode="secondary">Отклонить</Button>
-                                                </React.Fragment>
+                                                    <Button onClick={() => this.handleJoin(userTeam)}>Принять</Button>
+                                                    <Button onClick={() => this.handleQuitOrDecline(userTeam)} mode="secondary">Отклонить</Button>
+                                                </React.Fragment> :
+                                                (userTeam.userAction === 3 && <React.Fragment>
+                                                    <Button onClick={() => this.handleQuitOrDecline(userTeam)} mode="secondary">Выйти</Button>
+                                                </React.Fragment>)
                                             }>
                                             {userTeam.team.name}
                                         </RichCell>
@@ -78,32 +82,6 @@ class UserTeams extends React.Component {
             </Group>
         )
     }
-
-    //render() {
-    //    var self = this;
-
-    //    var items = [];
-    //    this.state.userTeams && this.state.userTeams.map((userTeam, i) => {
-    //        items.push(
-    //            <RichCell
-    //                key={userTeam.team.id}
-    //                text={userTeam.team.description}
-    //                caption="Навыки"
-    //                after="1/3"
-    //                onClick={self.state.go}
-    //                data-to='teaminfo'
-    //                data-id={userTeam.team.id}>
-    //                {userTeam.team.name} - {userTeam.team.id}
-    //            </RichCell>
-    //        );
-    //    });
-
-    //    return (
-    //        <List>
-    //            {items}
-    //        </List>
-    //    );
-    //}
 
 }
 

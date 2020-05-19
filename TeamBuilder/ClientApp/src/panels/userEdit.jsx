@@ -7,10 +7,6 @@ import {
 import '@vkontakte/vkui/dist/vkui.css';
 import '../../src/styles/style.css';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
-import Icon28PhoneOutline from '@vkontakte/icons/dist/28/phone_outline';
-import Icon28ArticleOutline from '@vkontakte/icons/dist/28/article_outline';
-import Icon20HomeOutline from '@vkontakte/icons/dist/20/home_outline';
-import Icon24Write from '@vkontakte/icons/dist/24/write';
 
 class UserEdit extends React.Component {
     constructor(props) {
