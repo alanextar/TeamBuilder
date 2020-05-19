@@ -117,15 +117,13 @@ class Teams extends React.Component {
     render() {
         var self = this;
         //var href = self.state.href === api.baseUrl + api.getTeams ? self.state.href : self.state.href + '&prev=true';
-        const loader = <div className="loader">Loading ...</div>;
+        const loader = <div key={0}>Loading ...</div>;
 
         var items = [];
         this.state.teams && this.state.teams.map((team, i) => {
             items.push(
-                <CardGrid>
-                    <Card size="l" mode="shadow">
+                    <Card size="l" mode="shadow" key={team.id}>
                         <RichCell
-                            key={team.id}
                             text={team.description}
                             caption="Навыки"
                             after="1/3"
@@ -135,7 +133,6 @@ class Teams extends React.Component {
                                 {team.name} - {team.id}
                         </RichCell>
                     </Card>
-                </CardGrid>
             );
         });
 
@@ -149,17 +146,16 @@ class Teams extends React.Component {
                 </PanelHeader>
                 <Search />
                 <PullToRefresh onRefresh={this.onRefresh} isFetching={this.state.fetching}>
-                    <Group>
+
                         <InfiniteScroll
                             pageStart={0}
                             loadMore={this.loadItems.bind(this)}
                             hasMore={this.state.hasMoreItems}
                             loader={loader}>
-                            <List>
+                            <CardGrid style={{ marginBottom: 10 }}>
                                 {items}
-                            </List>
+                            </CardGrid>
                         </InfiniteScroll>
-                    </Group>
                 </PullToRefresh>
             </Panel>
         );
