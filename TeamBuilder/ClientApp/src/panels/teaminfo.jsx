@@ -1,4 +1,6 @@
 ﻿import React from 'react';
+import qwest from 'qwest';
+import { Api } from './../api'
 
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell, InfoRow,
@@ -25,9 +27,21 @@ class Teaminfo extends React.Component {
     }
 
     async populateTeamData() {
-        const response = await fetch(`/api/teams/get/${this.props.teamId}`);
-        const data = await response.json();
-        this.setState({ team: data });
+        var self = this;
+        qwest.get(Api.Teams.Get,
+            {
+                id: self.props.teamId
+            },
+            {
+                cache: true
+            })
+            .then((xhr, resp) => {
+                if (resp) {
+                    self.setState({ team: resp});
+                }
+            })
+            .catch((error) => 
+                console.log(`Error for get team id:${self.props.teamId}. Details: ${error}`));
     }
 
     render() {
@@ -59,10 +73,10 @@ class Teaminfo extends React.Component {
                         this.state.activeTab === 'teamDescription' ?
                             <Cell>
                                 <InfoRow header='Описаноие команды'>
-                                    {this.state.team.description}    
+                                    {this.state.team.description}
                                 </InfoRow>
                             </ Cell>
-                            : 
+                            :
                             <Cell>
                                 <InfoRow header='Участники'>
                                     {console.log('ttteams ', this.state.team.userTeams)}
@@ -75,12 +89,12 @@ class Teaminfo extends React.Component {
                                                     {members.user.firstName, members.user.fullName}
                                                 </SimpleCell>
                                         )}
-                                    )}
+                                        )}
                                 </InfoRow>
-                            </ Cell> )}
+                            </ Cell>)}
                 </ Group>
             </Panel>
-    );
+        );
     }
 
 };
