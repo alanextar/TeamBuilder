@@ -3,7 +3,7 @@
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell,
     Div, Button, Textarea, FormLayout, Select, Input, Slider, InfoRow, Avatar,
-    SimpleCell
+    SimpleCell, FixedLayout
 } from '@vkontakte/vkui';
 
 import Icon24DismissDark from '@vkontakte/icons/dist/24/dismiss_dark';
@@ -26,14 +26,17 @@ class TeamEdit extends React.Component {
     }
 
     componentDidMount() {
-        this.populateTeamData();
         this.populateEventsData();
+        this.populateTeamData();
     }
 
     async populateEventsData() {
         const response = await fetch(`/api/event/getall`);
         const data = await response.json();
-        this.setState({ events: data });
+        console.log('event from teamEdit', data)
+        this.setState({
+            events: data,
+        });
     }
 
     async populateTeamData() {
@@ -42,7 +45,8 @@ class TeamEdit extends React.Component {
         console.log('data from teamEdit', data)
         this.setState({
             team: data,
-            usersNumber: data.userTeams.length
+            usersNumber: data.numberRequiredMembers,
+            check: data.event.id
         });
     }
 
@@ -95,14 +99,14 @@ class TeamEdit extends React.Component {
                                 >
                                     {this.state.events && this.state.events.map((ev, i) => {
                                         return (
-                                            <option value={i}>
+                                            <option value={ev.id}>
                                                 {ev.name}
                                             </ option>
                                         )
                                     })}
 
                                 </Select>
-                                <Button mode="destructive">Создать Событие</Button>
+                                <Button>Создать Событие</Button>
                             </ FormLayout>
                             :
                             <Cell>
@@ -116,7 +120,7 @@ class TeamEdit extends React.Component {
                                         top="Количество участников в команде"
                                     />
                                     <Input value={String(this.state.usersNumber)} onChange={e => this.setState({ usersNumber: e.target.value })} type="number" />
-                                    <Textarea top="Описание участников и их задач" defaultValue="" />
+                                    <Textarea top="Описание участников и их задач" defaultValue={this.state.team.descriptionRequiredMembers} />
                                 </ FormLayout>
 
                                 <InfoRow header='Участники'>
@@ -137,9 +141,11 @@ class TeamEdit extends React.Component {
                             </ Cell>
                     )}
                 </ Group>
-                <Div>
-                    <Button mode="destructive">Применить Изменения</Button>
-                </Div>
+                <FixedLayout vertical="bottom">
+                    <Div>
+                        <Button stretched={true}>Применить Изменения</Button>
+                    </Div>
+                </ FixedLayout>
             </Panel>
         );
     }

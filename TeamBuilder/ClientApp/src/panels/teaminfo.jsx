@@ -20,7 +20,7 @@ class Teaminfo extends React.Component {
             id: props.id,
             activeTab: 'teamDescription',
             return: props.return,
-            edit: false,
+            edit: true,
         };
     }
 
@@ -89,20 +89,27 @@ class Teaminfo extends React.Component {
                             </ Cell>
                             :
                             <Cell>
-                                <InfoRow header='Участники'>
-                                    {console.log('userTeams ', this.state.team.userTeams)}
-                                    {this.state.team.userTeams &&
-                                        this.state.team.userTeams.map((members, i) => {
-                                            { members.isOwner && self.setState({ edit: true}) }
-                                            return (
-                                                <SimpleCell
-                                                    before={<Avatar size={48} />}
-                                                    after={<Icon28MessageOutline />}>
-                                                    {members.user.firstName, members.user.fullName}
-                                                </SimpleCell>
-                                        )}
-                                        )}
-                                </InfoRow>
+                                <Div>
+                                    <InfoRow header='Участники'>
+                                        {console.log('userTeams ', this.state.team.userTeams)}
+                                        {this.state.team.userTeams &&
+                                            this.state.team.userTeams.map((members, i) => {
+                                                { members.isOwner && self.setState({ edit: true}) }
+                                                return (
+                                                    <SimpleCell
+                                                        before={<Avatar size={48} />}
+                                                        after={<Icon28MessageOutline />}>
+                                                        {members.user.firstName, members.user.fullName}
+                                                    </SimpleCell>
+                                            )}
+                                            )}
+                                    </InfoRow>
+                                </ Div>
+                                <Div>
+                                    <InfoRow header='Описание задач'>
+                                        {this.state.team.descriptionRequiredMembers}
+                                    </ InfoRow>
+                                </ Div>
                             </ Cell>)}
                     {this.state.team && this.state.edit &&
                         <FixedLayout vertical="bottom" >
