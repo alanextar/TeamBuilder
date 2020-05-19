@@ -139,7 +139,6 @@ class Teams extends React.Component {
                             data-id={team.id}>
                                 {team.name} - {team.id}
                         </RichCell>
-
                     </Card>
                 </CardGrid>
             );

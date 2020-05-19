@@ -4,7 +4,7 @@ import { Api } from './../api'
 
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell, InfoRow,
-    SimpleCell, Avatar
+    SimpleCell, Avatar, Div, Button
 } from '@vkontakte/vkui';
 
 import Icon28MessageOutline from '@vkontakte/icons/dist/28/message_outline';
@@ -72,14 +72,22 @@ class Teaminfo extends React.Component {
                     {this.state.team && (
                         this.state.activeTab === 'teamDescription' ?
                             <Cell>
-                                <InfoRow header='Описаноие команды'>
-                                    {this.state.team.description}
-                                </InfoRow>
+                                {console.log('==== ', this.state.team)}
+                                <SimpleCell>
+                                    <InfoRow header='Описаноие команды'>
+                                        {this.state.team.description}    
+                                    </InfoRow>
+                                </ SimpleCell>
+                                <SimpleCell>
+                                    <InfoRow header='Участвуем в '>
+                                        {this.state.team.event && this.state.team.event.name}
+                                    </InfoRow>
+                                </ SimpleCell>
                             </ Cell>
                             :
                             <Cell>
                                 <InfoRow header='Участники'>
-                                    {console.log('ttteams ', this.state.team.userTeams)}
+                                    {console.log('userTeams ', this.state.team.userTeams)}
                                     {this.state.team.userTeams &&
                                         this.state.team.userTeams.map((members, i) => {
                                             return (
@@ -92,6 +100,17 @@ class Teaminfo extends React.Component {
                                         )}
                                 </InfoRow>
                             </ Cell>)}
+                    <Div>
+                        {/* add check on owner */}
+                        {this.state.team &&
+                        <Button
+                            mode="destructive"
+                            onClick={this.state.go}
+                            data-to='teamEdit'
+                            data-id={this.state.team.id} >
+                            Редактировать Команду
+                        </Button>}
+                    </Div>
                 </ Group>
             </Panel>
         );
