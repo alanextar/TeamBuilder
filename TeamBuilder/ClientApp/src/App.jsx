@@ -115,7 +115,7 @@ const App = () => {
                 <Teaminfo id='teaminfo' go={goTeam} teamId={activeTeam} return='teams' />
                 <TeamCreate id='teamCreate' go={goTeam} />
                 <TeamEdit id='teamEdit' go={goTeam} teamId={activeTeam} />
-                <User id='user' fetchedUser={fetchedUser} goUserEdit={goTeam} activeStory={activeStory} return='teams' />
+                <User id='user' fetchedUser={fetchedUser} goUserEdit={goTeam} activeStory={activeStory} return='teaminfo' />
             </View>
             <View id='user' activePanel={activeUserPanel}>
                 <User id='user' fetchedUser={fetchedUser} goUserEdit={goUserEdit} activeStory={activeStory} />

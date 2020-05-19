@@ -96,7 +96,9 @@ class User extends React.Component {
         console.log('render user readOnlyMode', this.props.activeStory != 'user');
         return (
             <Panel id="user">
-                <PanelHeader separator={false} left={this.state.readOnlyMode && <PanelHeaderBack onClick={this.state.goUserEdit} data-to={this.props.return} />}>Профиль</PanelHeader>
+                <PanelHeader separator={false} left={this.state.readOnlyMode &&
+                    <PanelHeaderBack onClick={this.state.goUserEdit}
+                    data-to={this.props.return} />}>Профиль</PanelHeader>
                 {this.state.fetchedUser &&
                     <Group title="VK Connect">
                         <Cell description={this.state.fetchedUser.city && this.state.fetchedUser.city.title ? this.state.fetchedUser.city.title : ''}
@@ -121,7 +123,7 @@ class User extends React.Component {
                     this.state.activeTabProfile === 'main' ?
                         <Group header={<Header mode="secondary">Информация о профиле участника</Header>}>
                             <List>
-                                {this.state.readOnlyMode && <Cell asideContent=
+                                {!this.state.readOnlyMode && <Cell asideContent=
                                     {
                                         <Icon24Write onClick={this.state.goUserEdit}
                                             data-to='userEdit'
@@ -139,17 +141,19 @@ class User extends React.Component {
                                     дополнительно: {this.state.user && this.state.user.about}
                                 </Cell>
                             </List>
-                            <UserSkills userSkills={this.state.userSkills}
+                            <UserSkills userSkills={this.state.userSkills} readOnlyMode={this.state.readOnlyMode}
                                 handleClick={this.handleClick.bind(this, this.state.selectedSkills)}
                                 id={this.state.fetchedUser && this.state.fetchedUser.id} />
                         </Group> :
                         <Group>
-                            <UserTeams userTeams={this.state.user && this.state.user.userTeams} goUserEdit={this.state.goUserEdit} isOwner={this.state.readOnlyMode} />
+                            <UserTeams userTeams={this.state.user && this.state.user.userTeams}
+                                goUserEdit={this.state.goUserEdit} readOnlyMode={this.state.readOnlyMode} />
                         </Group>
                 }
                 <Div>
-                    <Checkbox disabled={!this.state.readOnlyMode} onChange={(e) => this.handleCheckboxClick(e)} checked={this.state.user && this.state.user.isSearchable ? 'checked' : ''}>в поиске команды</Checkbox>
-                    {this.state.readOnlyMode && <Button mode={this.state.isConfirmed ? "primary" : "destructive"} size='xl'
+                    <Checkbox disabled={this.state.readOnlyMode} onChange={(e) => this.handleCheckboxClick(e)}
+                        checked={this.state.user && this.state.user.isSearchable ? 'checked' : ''}>в поиске команды</Checkbox>
+                    {!this.state.readOnlyMode && <Button mode={this.state.isConfirmed ? "primary" : "destructive"} size='xl'
                         onClick={() => this.confirmUser(this.state.fetchedUser && this.state.fetchedUser.id, this.state.userSkills)}>
                         {this.state.isConfirmed ? "Сохранить" : "Подтвердить"}
                     </Button>}

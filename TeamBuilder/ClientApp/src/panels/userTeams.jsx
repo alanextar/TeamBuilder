@@ -63,7 +63,7 @@ class UserTeams extends React.Component {
                                             onClick={this.state.goUserEdit}
                                             data-to='teaminfo'
                                             data-id={userTeam.team.id}
-                                            actions={userTeam.userAction === 6 ?
+                                            actions={!this.props.readOnlyMode && (userTeam.userAction === 6 ?
                                                 <React.Fragment>
                                                     <Button onClick={(e) => this.handleJoin(e,userTeam)}>Принять</Button>
                                                     <Button onClick={(e) => this.handleQuitOrDecline(e, userTeam)}
@@ -75,7 +75,7 @@ class UserTeams extends React.Component {
                                                             (userTeam.userAction === 2 ? "Отозвать заявку" : '')}
                                                     </Button>
                                                 </React.Fragment>
-                                            )}>
+                                            ))}>
                                             {userTeam.team.name}
                                         </RichCell>
                                     </Card>
