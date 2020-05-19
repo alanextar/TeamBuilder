@@ -2,14 +2,18 @@
 
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell,
-    Div, Button, Textarea, FormLayout, Select, Input, Slider
+    Div, Button, Textarea, FormLayout, Select, Input, Slider, InfoRow, Avatar,
+    SimpleCell
 } from '@vkontakte/vkui';
+
+import Icon24DismissDark from '@vkontakte/icons/dist/24/dismiss_dark';
 
 class TeamEdit extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
+            team: null,
             events: null,
             check: null,
             usersNumber: 2,
@@ -23,13 +27,23 @@ class TeamEdit extends React.Component {
 
     componentDidMount() {
         this.populateTeamData();
+        this.populateEventsData();
     }
 
-    async populateTeamData() {
+    async populateEventsData() {
         const response = await fetch(`/api/event/getall`);
         const data = await response.json();
         this.setState({ events: data });
-        console.log('events ', data)
+    }
+
+    async populateTeamData() {
+        const response = await fetch(`/api/teams/get/${this.props.teamId}`);
+        const data = await response.json();
+        console.log('data from teamEdit', data)
+        this.setState({
+            team: data,
+            usersNumber: data.userTeams.length
+        });
     }
 
     onChange(e) {
@@ -42,7 +56,7 @@ class TeamEdit extends React.Component {
         return (
             <Panel id={this.state.id}>
                 <PanelHeader separator={false} left={<PanelHeaderBack onClick={this.state.go} data-to='teams' />}>
-                    Новая команда
+                    {this.state.team && this.state.team.name}
                 </PanelHeader>
                 <Tabs>
                     <TabsItem
@@ -63,49 +77,68 @@ class TeamEdit extends React.Component {
                     </TabsItem>
                 </Tabs>
                 <Group>
-                    {this.state.activeTab === 'teamDescription' ?
-                        <FormLayout >
-                            <Input top="Название команды" type="text" defaultValue="DreamTeam" />
-
-                            <Textarea top="Описание команды" />
-                            <Select
-                                top="Выберете событие"
-                                placeholder="Событие"
-                                status={check ? 'valid' : 'error'}
-                                bottom={check ? '' : 'Пожалуйста, выберете или создайте событие'}
-                                onChange={this.onChange}
-                                value={check}
-                                name="check"
-                            >
-                                {this.state.events && this.state.events.map((ev, i) => {
-                                    return (
-                                        <option value={i}>
-                                            {ev.name}
-                                        </ option>
-                                    )
-                                })}
-
-                            </Select>
-                            <Button mode="destructive">Создать Событие</Button>
-                        </ FormLayout>
-                        :
-                        <Cell>
+                    {this.state.team && (
+                        this.state.activeTab === 'teamDescription' ?
                             <FormLayout >
-                                <Slider
-                                    step={1}
-                                    min={2}
-                                    max={10}
-                                    value={Number(this.state.usersNumber)}
-                                    onChange={usersNumber => this.setState({ usersNumber })}
-                                    top="Количество участников в команде"
-                                />
-                                <Input value={String(this.state.usersNumber)} onChange={e => this.setState({ usersNumber: e.target.value })} type="number" />
-                                <Textarea top="Описание участников и их задач" />
+                                <Input top="Название команды" type="text" defaultValue={this.state.team.name} />
+
+                                <Textarea top="Описание команды" defaultValue={this.state.team.description} />
+                                <Select
+                                    top="Выберете событие"
+                                    placeholder="Событие"
+                                    defaultValue={this.state.team.events && this.state.team.events}
+                                    status={check ? 'valid' : 'error'}
+                                    bottom={check ? '' : 'Пожалуйста, выберете или создайте событие'}
+                                    onChange={this.onChange}
+                                    value={check}
+                                    name="check"
+                                >
+                                    {this.state.events && this.state.events.map((ev, i) => {
+                                        return (
+                                            <option value={i}>
+                                                {ev.name}
+                                            </ option>
+                                        )
+                                    })}
+
+                                </Select>
+                                <Button mode="destructive">Создать Событие</Button>
                             </ FormLayout>
-                        </ Cell>}
+                            :
+                            <Cell>
+                                <FormLayout >
+                                    <Slider
+                                        step={1}
+                                        min={2}
+                                        max={10}
+                                        value={Number(this.state.usersNumber)}
+                                        onChange={usersNumber => this.setState({ usersNumber })}
+                                        top="Количество участников в команде"
+                                    />
+                                    <Input value={String(this.state.usersNumber)} onChange={e => this.setState({ usersNumber: e.target.value })} type="number" />
+                                    <Textarea top="Описание участников и их задач" defaultValue="" />
+                                </ FormLayout>
+
+                                <InfoRow header='Участники'>
+                                    {console.log('userTeams ', this.state.team.userTeams)}
+                                    {this.state.team.userTeams &&
+                                        this.state.team.userTeams.map((members, i) => {
+                                            return (
+                                                <SimpleCell
+                                                    before={<Avatar size={48} />}
+                                                    after={<Icon24DismissDark />}>
+                                                    {members.user.firstName, members.user.fullName}
+                                                </SimpleCell>
+                                            )
+                                        }
+                                        )}
+                                </InfoRow>
+
+                            </ Cell>
+                    )}
                 </ Group>
                 <Div>
-                    <Button mode="destructive">Создать Команду</Button>
+                    <Button mode="destructive">Применить Изменения</Button>
                 </Div>
             </Panel>
         );

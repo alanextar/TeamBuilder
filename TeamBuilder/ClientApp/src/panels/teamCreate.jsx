@@ -65,7 +65,7 @@ class TeamCreate extends React.Component {
                 <Group>
                     {this.state.activeTab === 'teamDescription' ?
                         <FormLayout >
-                            <Input top="Название команды" type="text" defaultValue="DreamTeam" />
+                            <Input top="Название команды" type="text" placeholder="DreamTeam" />
 
                             <Textarea top="Описание команды" />
                             <Select
