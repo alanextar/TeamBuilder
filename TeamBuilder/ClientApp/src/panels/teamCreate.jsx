@@ -2,15 +2,19 @@
 
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell,
-    Div, Button, Textarea, FormLayout, Select
+    Div, Button, Textarea, FormLayout, Select, Input, Slider
 } from '@vkontakte/vkui';
+import qwest from 'qwest';
+import { Api } from './../api';
 
 class TeamCreate extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            evenName: '',
+            events: null,
+            check: null,
+            usersNumber: 2,
             go: props.go,
             id: props.id,
             activeTab: 'teamDescription'
@@ -19,23 +23,33 @@ class TeamCreate extends React.Component {
         this.onChange = this.onChange.bind(this);
     }
 
-    //componentDidMount() {
-    //    this.populateTeamData();
-    //}
+    componentDidMount() {
+        this.populateTeamData();
+    }
 
-    //async populateTeamData() {
-    //    const response = await fetch(`/teams/get/${this.props.teamId}`);
-    //    const data = await response.json();
-    //    this.setState({ team: data });
-    //}
+    async populateTeamData() {
+        var self = this;
+        qwest.get(Api.Events.GetEventsAll,
+            {},
+            {
+                cache: true
+            })
+            .then((xhr, resp) => {
+                if (resp) {
+                    self.setState({ events: resp });
+                }
+            })
+            .catch((error) =>
+                console.log(`Error for get all events: Details: ${error}`));
+    }
 
     onChange(e) {
-        const { evenName, value } = e.currentTarget;
-        this.setState({ evenName: value });
+        const { check, value } = e.currentTarget;
+        this.setState({ check: value });
     }
 
     render() {
-        const evenName = this.state.evenName;
+        const check = this.state.check;
         return (
             <Panel id={this.state.id}>
                 <PanelHeader separator={false} left={<PanelHeaderBack onClick={this.state.go} data-to='teams' />}>
@@ -61,29 +75,48 @@ class TeamCreate extends React.Component {
                 </Tabs>
                 <Group>
                     {this.state.activeTab === 'teamDescription' ?
-                        <FormLayout>
+                        <FormLayout >
+                            <Input top="Название команды" type="text" placeholder="DreamTeam" />
+
                             <Textarea top="Описание команды" />
                             <Select
                                 top="Выберете событие"
                                 placeholder="Событие"
-                                status={evenName ? 'valid' : 'error'}
-                                bottom={evenName ? '' : 'Пожалуйста, выберете или создайте событие'}
+                                status={check ? 'valid' : 'error'}
+                                bottom={check ? '' : 'Пожалуйста, выберете или создайте событие'}
                                 onChange={this.onChange}
-                                value={evenName}
-                                name="evenName"
+                                value={check}
+                                name="check"
                             >
-                                <option value="0">Бизнес или работа</option>
-                                <option value="1">Индивидуальный туризм</option>
-                                <option value="2">Посещение близких родственников</option>
+                                {this.state.events && this.state.events.map((ev, i) => {
+                                    return (
+                                        <option value={i}>
+                                            {ev.name}
+                                        </ option>
+                                    )
+                                })}
+
                             </Select>
+                            <Button mode="destructive">Создать Событие</Button>
                         </ FormLayout>
                         :
                         <Cell>
-
+                            <FormLayout >
+                                <Slider
+                                    step={1}
+                                    min={2}
+                                    max={10}
+                                    value={Number(this.state.usersNumber)}
+                                    onChange={usersNumber => this.setState({ usersNumber })}
+                                    top="Количество участников в команде"
+                                />
+                                <Input value={String(this.state.usersNumber)} onChange={e => this.setState({ usersNumber: e.target.value })} type="number" />
+                                <Textarea top="Описание участников и их задач" />
+                            </ FormLayout>
                         </ Cell>}
                 </ Group>
                 <Div>
-                    <Button mode="destructive">Создать</Button>
+                    <Button mode="destructive">Создать Команду</Button>
                 </Div>
             </Panel>
         );

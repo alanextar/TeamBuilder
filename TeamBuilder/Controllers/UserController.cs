@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using TeamBuilder.Models;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using TeamBuilder.DTO;
 using TeamBuilder.Extensions;
+using TeamBuilder.ViewModels;
 
 namespace TeamBuilder.Controllers
 {
@@ -23,18 +23,18 @@ namespace TeamBuilder.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> Confirm([FromBody]ProfileDto userDto)
+		public async Task<IActionResult> Confirm([FromBody]ProfileViewModel userViewModel)
 		{
-			_logger.LogInformation($"POST Request Confirm. Body: {JsonConvert.SerializeObject(userDto)}");
+			_logger.LogInformation($"POST Request Confirm. Body: {JsonConvert.SerializeObject(userViewModel)}");
 
 			var user = context.Users.Include(x => x.UserSkills)
-				.ThenInclude(y => y.Skill).FirstOrDefault(u => u.VkId == userDto.VkId);
+				.ThenInclude(y => y.Skill).FirstOrDefault(u => u.VkId == userViewModel.VkId);
 
 			if (user == null)
 			{
-				user = new User(userDto.VkId);
+				user = new User(userViewModel.VkId);
 				user.UserSkills = new List<UserSkill>();
-				foreach (var skillId in userDto.SkillsIds)
+				foreach (var skillId in userViewModel.SkillsIds)
 				{
 					user.UserSkills.Add(new UserSkill() { SkillId = skillId });
 				}
@@ -44,7 +44,7 @@ namespace TeamBuilder.Controllers
 			else
 			{
 				var dbUserSkills = user.UserSkills;
-				var userSkillsDto = userDto.SkillsIds.Select(s => new UserSkill { UserId = user.Id, SkillId = s }).ToList();
+				var userSkillsDto = userViewModel.SkillsIds.Select(s => new UserSkill { UserId = user.Id, SkillId = s }).ToList();
 				context.TryUpdateManyToMany(dbUserSkills, userSkillsDto, x => new { x.SkillId });
 
 				context.Users.Update(user);

@@ -53,7 +53,7 @@ namespace TeamBuilder
 
 			var queryNvc = HttpUtility.ParseQueryString(new Uri($"http://localhost/{launchParams}").Query);
 			var query = queryNvc.AllKeys.ToDictionary(k => k, k => queryNvc[k]);
-			var secret = "LcONGCzY9tjwmWqvYQxB";
+			var secret = Environment.GetEnvironmentVariable("VK_SECURE_KEY") ?? string.Empty;
 			var checkedQuery = query
 				.Where(q => q.Key.StartsWith("vk_"))
 				.OrderBy(q => q.Key)
