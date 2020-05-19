@@ -13,6 +13,11 @@
         Edit: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/edit`
     }
     static Events = {
-        GetEventsAll: `${this.baseUrl}/${this.prefix}/${this.eventStr}/getall`,
+        Get: `${this.baseUrl}/${this.prefix}/${this.eventStr}/get`,
+        GetAll: `${this.baseUrl}/${this.prefix}/${this.eventStr}/getall`,
+        GetPage: `${this.baseUrl}/${this.prefix}/${this.eventStr}/getPage`,
+        Create: `${this.baseUrl}/${this.prefix}/${this.eventStr}/create`,
+        Delete: `${this.baseUrl}/${this.prefix}/${this.eventStr}/delete`,
+        Edit: `${this.baseUrl}/${this.prefix}/${this.eventStr}/edit`
     }
 }
