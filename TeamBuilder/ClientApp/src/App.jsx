@@ -8,7 +8,9 @@ import Icon28Profile from '@vkontakte/icons/dist/28/profile';
 import Icon28Users3Outline from '@vkontakte/icons/dist/28/users_3_outline';
 import Icon28FavoriteOutline from '@vkontakte/icons/dist/28/favorite_outline';
 
-import Panel1 from './panels/panel1'
+import Events from './panels/events'
+import EventCreate from './panels/eventCreate'
+import EventInfo from './panels/eventInfo'
 import Panel2 from './panels/panel2'
 import Panel3 from './panels/panel3'
 
@@ -21,16 +23,19 @@ import User from './panels/user'
 import UserEdit from './panels/userEdit'
 
 const App = () => {
+    const [activeStory, setActiveStore] = useState('events');
+    const [back, setBack] = useState(null);
+
     const [activeTeamPanel, setActiveTeamPanel] = useState('teams');
     const [activeTeam, setActiveTeam] = useState(null);
     const [teamHref, setTeamNextHref] = useState(null);
 
-    const [activePanel, setActivePanel] = useState('teams');
     const [activeUserPanel, setActiveUserPanel] = useState('user');
-    const [activeStory, setActiveStore] = useState('teams');
-	const [fetchedUser, setUser] = useState(null);
-    const [activeP, setActiveP] = useState('panel1');
+    const [fetchedUser, setUser] = useState(null);
     const [activeUser, setActiveUser] = useState(null);
+
+    const [activeEventPanel, setActiveEventPanel] = useState('events');
+
     const [city, setCity] = useState(null);
     const [about, setAbout] = useState(null);
 
@@ -46,15 +51,9 @@ const App = () => {
 		async function fetchData() {
 			const user = await bridge.send('VKWebAppGetUserInfo');
 			setUser(user);
-			
-		}
+        }
 		fetchData();
 	}, []);
-
-    const go = e => {
-        setActivePanel(e.currentTarget.dataset.to);
-        setActiveTeam(e.currentTarget.dataset.id);
-    };
 
     const goTeam = e => {
         setActiveTeamPanel(e.currentTarget.dataset.to);
@@ -65,8 +64,9 @@ const App = () => {
         console.log(`dataset.href: ${e.currentTarget.dataset.href}`);
     };
 
-    const goP = e => {
-        setActiveP(e.currentTarget.dataset.to);
+    const goEvent = e => {
+        setActiveEventPanel(e.currentTarget.dataset.to);
+        setBack(e.currentTarget.dataset.from);
     };
 
     const goFoot = e => {
@@ -92,14 +92,14 @@ const App = () => {
                 ><Icon28Users3Outline /></TabbarItem>
                 <TabbarItem
                     onClick={goFoot}
-                    selected={activeStory === 'panel1'}
-                    data-story="panel1"
+                    selected={activeStory === 'users'}
+                    data-story="users"
                     text="Участники"
                 ><Icon28Users /></TabbarItem>
                 <TabbarItem
                     onClick={goFoot}
-                    selected={activeStory === 'panel2'}
-                    data-story="panel2"
+                    selected={activeStory === 'events'}
+                    data-story="events"
                     text="События"
                 ><Icon28FavoriteOutline /></TabbarItem>
                 <TabbarItem
@@ -116,16 +116,18 @@ const App = () => {
                 <TeamCreate id='teamCreate' go={goTeam} />
                 <TeamEdit id='teamEdit' go={goTeam} teamId={activeTeam} />
             </View>
+            {/*<View id='users' activePanel='panel2'>
+                 <Panel2 id='panel2' go={go}/>
+             </View>*/}
+            <View id='events' activePanel={activeEventPanel}>
+                <Events id='events' go={goEvent}/>
+                <EventCreate id='eventCreate' go={goEvent} back={back}/>
+                <EventInfo id='eventInfo' go={goEvent} back={back}/>
+            </View>
             <View id='user' activePanel={activeUserPanel}>
                 <User id='user' fetchedUser={fetchedUser} goUserEdit={goUserEdit} />
                 <UserEdit id='userEdit' goUserEdit={goUserEdit} fetchedUser={fetchedUser} user={activeUser} />
                 <Teaminfo id='teaminfo' go={goUserEdit} teamId={activeTeam} return='user' />
-            </View>
-            <View id='panel2' activePanel='panel2'>
-                <Panel2 id='panel2' go={go} />
-            </View>
-            <View id='panel3' activePanel='panel3'>
-                <Panel3 id='panel3' go={go} />
             </View>
         </Epic>
 

@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
+using TeamBuilder.Controllers.Paging;
+using TeamBuilder.ViewModels;
 
 namespace TeamBuilder.Extensions
 {
@@ -22,6 +26,28 @@ namespace TeamBuilder.Extensions
                 .SelectMany(t => t.tempItems.DefaultIfEmpty(), (t, temp) => new { t, temp })
                 .Where(t => ReferenceEquals(null, t.temp) || t.temp.Equals(default(T)))
                 .Select(t => t.t.item);
+        }
+
+        public static Page<T> GetPage<T>(this DbSet<T> set, int pageSize, HttpRequest request, int page = 0,
+	        bool prev = false) 
+	        where T: class, IDbItem
+        {
+	        if (pageSize == 0)
+		        return new Page<T>(new List<T>(), null);
+
+	        var countTake = prev ? (page + 1) * pageSize : pageSize ;
+	        var countSkip = prev ? 0 : page * pageSize;
+
+	        string nextHref = null;
+	        var items = set.Skip(countSkip).Take(++countTake).OrderBy(t => t.Id).ToList();
+	        if (items.Count == countTake)
+	        {
+		        nextHref = $"{request.Path}?pageSize={pageSize}&page={++page}";
+		        items = items.SkipLast(1).ToList();
+	        }
+
+	        return new Page<T>(items, nextHref);
+
         }
 
     }
