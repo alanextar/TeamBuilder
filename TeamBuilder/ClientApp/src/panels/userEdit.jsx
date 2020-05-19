@@ -9,7 +9,6 @@ import Icon28PhoneOutline from '@vkontakte/icons/dist/28/phone_outline';
 import Icon28ArticleOutline from '@vkontakte/icons/dist/28/article_outline';
 import Icon20HomeOutline from '@vkontakte/icons/dist/20/home_outline';
 import Icon24Write from '@vkontakte/icons/dist/24/write';
-import qwest from 'qwest';
 
 class UserEdit extends React.Component {
     constructor(props) {
@@ -27,7 +26,9 @@ class UserEdit extends React.Component {
     }
 
     handleAboutChange(event) {
+        console.log('original', this.state.user);
         var user = { ...this.state.user }
+        console.log('spread ', user);
         user.about = event.target.value;
         this.setState({ user });
     }
@@ -44,22 +45,17 @@ class UserEdit extends React.Component {
         let city = this.state.user.city;
         let about = this.state.user.about;
         var user = { vkId, city, about };
-        console.log(JSON.stringify(user));
 
-        qwest.post('/api/user/edit',
-            {
-                user: JSON.stringify(user)
-            },
-            //{
-            //    dataType: 'json',
-            //    //headers: { 'Content-Type' : 'application/json' }
-            //}
-            )
-            .catch((error) =>
-                console.log(`Error while sending Post Edit for user. Details: ${error}`));
+        let response = await fetch('/api/user/edit', {
+            method: 'post',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(user)
+        });
+
     }
 
     render() {
+        console.log(this.state.fetchedUser);
         console.log('userEdit render', this.state.user);
         return (
             <Panel id="userEdit">

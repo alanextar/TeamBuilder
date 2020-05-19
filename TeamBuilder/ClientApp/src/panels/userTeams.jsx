@@ -5,7 +5,6 @@ import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import '@vkontakte/vkui/dist/vkui.css';
 import Icon28CheckCircleOutline from '@vkontakte/icons/dist/28/check_circle_outline';
 import Icon28InfoOutline from '@vkontakte/icons/dist/28/info_outline';
-import qwest from 'qwest';
 
 class UserTeams extends React.Component {
     constructor(props) {
@@ -17,13 +16,30 @@ class UserTeams extends React.Component {
             fetching: false,
         }
 
+        //this.onRefresh = () => {
+        //    this.setState({
+        //        fetching: true
+        //    });
+
+        //    this.populateTeamData()
+        //    this.setState({
+        //        fetching: false
+        //    });
+        //}
     }
 
     componentDidMount() {
+        //this.populateTeamData();
+    }
+
+    async populateTeamData() {
+        const response = await fetch('/api/teams/getpage/20');
+        const data = await response.json();
+        this.setState({ teams: data });
     }
 
     render() {
-        console.log('into userTeams render','------------', this.state.userTeams)
+        console.log('into userTeams','------------', this.state.userTeams)
         return (
             <Group>
                 <List>
@@ -47,6 +63,32 @@ class UserTeams extends React.Component {
             </Group>
         )
     }
+
+    //render() {
+    //    var self = this;
+
+    //    var items = [];
+    //    this.state.userTeams && this.state.userTeams.map((userTeam, i) => {
+    //        items.push(
+    //            <RichCell
+    //                key={userTeam.team.id}
+    //                text={userTeam.team.description}
+    //                caption="Навыки"
+    //                after="1/3"
+    //                onClick={self.state.go}
+    //                data-to='teaminfo'
+    //                data-id={userTeam.team.id}>
+    //                {userTeam.team.name} - {userTeam.team.id}
+    //            </RichCell>
+    //        );
+    //    });
+
+    //    return (
+    //        <List>
+    //            {items}
+    //        </List>
+    //    );
+    //}
 
 }
 

@@ -4,7 +4,6 @@ import { Div,Title } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Typeahead } from 'react-bootstrap-typeahead';
-import qwest from 'qwest';
 
 class UserSkills extends React.Component {
     constructor(props) {
@@ -36,43 +35,25 @@ class UserSkills extends React.Component {
 
     async populateSkills(id) {
 
-        var self = this;
-        if (self.props.userSkills === null) {
+        if (this.props.userSkills === null) {
+            const getAllResponse = await fetch('/api/skill/getall');
+            const allSkillsData = await getAllResponse.json();
 
-            qwest.get('/api/skill/getall',
-                {
-                    cache: true
-                })
-                .then((xhr, resp) => {
-                    if (resp) {
-                        console.log('get all skills', resp);
-                        var options = resp && resp.collection.map(function (skill) {
-                            return { id: skill.id, label: skill.name };
-                        });
+            var options = allSkillsData && allSkillsData.map(function (skill) {
+                return { id: skill.id, label: skill.name };
+            });
 
-                        qwest.get(`/api/user/getSkills?vkId=${id}`,
-                            {
-                                cache: true
-                            })
-                            .then((xhr, resp) => {
-                                if (resp) {
-                                    console.log('user getSkills', resp);
-                                    var userSkills = resp && resp.collection.map(function (skill) {
-                                        return { id: skill.id, label: skill.name };
-                                    });
+            const getSkillsResponse = await fetch(`/api/user/getSkills?vkId=${id}`);
+            const userSkillsData = await getSkillsResponse.json();
 
-                                    self.setState({
-                                        options: options,
-                                        userSkills: userSkills
-                                    });
-                                }
-                            })
-                            .catch((error) =>
-                                console.log(`Error for get user. Details: ${error}`));
-                    }
-                })
-                .catch((error) =>
-                    console.log(`Error for get user. Details: ${error}`));
+            var userSkills = userSkillsData && userSkillsData.map(function (skill) {
+                return { id: skill.id, label: skill.name };
+            });
+
+            this.setState({
+                options: options,
+                userSkills: userSkills
+            });
 		}
 		else {
             this.setState({
