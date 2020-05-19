@@ -66,16 +66,15 @@ class UserTeams extends React.Component {
                                             actions={userTeam.userAction === 6 ?
                                                 <React.Fragment>
                                                     <Button onClick={(e) => this.handleJoin(e,userTeam)}>Принять</Button>
-                                                    <Button onClick={(e) => this.handleQuitOrDecline(e,userTeam)} mode="secondary">Отклонить</Button>
+                                                    <Button onClick={(e) => this.handleQuitOrDecline(e, userTeam)}
+                                                        mode="secondary">Отклонить</Button>
                                                 </React.Fragment> :
                                                 ((userTeam.userAction === 3 || userTeam.userAction === 2) && <React.Fragment>
                                                     <Button onClick={(e) => this.handleQuitOrDecline(e, userTeam)}
-                                                        mode="secondary">{userTeam.userAction === 3 ? "Выйти" : (userTeam.userAction === 2 ? "Отозвать заявку" : '')}
+                                                        mode="secondary">{userTeam.userAction === 3 ? "Выйти" :
+                                                            (userTeam.userAction === 2 ? "Отозвать заявку" : '')}
                                                     </Button>
                                                 </React.Fragment>
-                                                //<React.Fragment>
-                                                //    <Button onClick={(e) => this.handleQuitOrDecline(e, userTeam)} mode="secondary">Отозвать заявку</Button>
-                                                //</React.Fragment>
                                             )}>
                                             {userTeam.team.name}
                                         </RichCell>

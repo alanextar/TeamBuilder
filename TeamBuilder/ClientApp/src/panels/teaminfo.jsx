@@ -92,6 +92,9 @@ class Teaminfo extends React.Component {
                                         this.state.team.userTeams.map((members, i) => {
                                             return (
                                                 <SimpleCell
+                                                    onClick={this.state.go}
+                                                    data-to='user'
+                                                    data-id={members.userId}
                                                     before={<Avatar size={48} />}
                                                     after={<Icon28MessageOutline />}>
                                                     {members.user.firstName, members.user.fullName}

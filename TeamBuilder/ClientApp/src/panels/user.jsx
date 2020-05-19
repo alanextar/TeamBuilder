@@ -1,7 +1,10 @@
 ﻿import React from 'react';
 import ReactDOM from 'react-dom';
-import { Panel, PanelHeader, Group, Cell, Avatar, Search, Button, Div, Input } from '@vkontakte/vkui';
-import { Tabs, TabsItem, Separator, Checkbox, List, Header, FormLayout, Select, RichCell } from '@vkontakte/vkui';
+import {
+    Panel, PanelHeader, Group, Cell, Avatar, Search, Button, Div, Input, PanelHeaderBack,
+    Tabs, TabsItem, Separator, Checkbox, List, Header, FormLayout, Select, RichCell
+} from '@vkontakte/vkui';
+import {  } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import '../../src/styles/style.css';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
@@ -26,7 +29,7 @@ class User extends React.Component {
             isConfirmed: false,
             goUserEdit: props.goUserEdit,
             user: null,
-            isOwner: true
+            readOnlyMode: props.activeStory != 'user'
         }
 
         this.confirmUser = this.confirmUser.bind(this);
@@ -90,9 +93,10 @@ class User extends React.Component {
 
     render() {
         console.log('render user', this.state.user);
+        console.log('render user readOnlyMode', this.props.activeStory != 'user');
         return (
             <Panel id="user">
-                <PanelHeader>Профиль</PanelHeader>
+                <PanelHeader separator={false} left={this.state.readOnlyMode && <PanelHeaderBack onClick={this.state.goUserEdit} data-to={this.props.return} />}>Профиль</PanelHeader>
                 {this.state.fetchedUser &&
                     <Group title="VK Connect">
                         <Cell description={this.state.fetchedUser.city && this.state.fetchedUser.city.title ? this.state.fetchedUser.city.title : ''}
@@ -117,7 +121,7 @@ class User extends React.Component {
                     this.state.activeTabProfile === 'main' ?
                         <Group header={<Header mode="secondary">Информация о профиле участника</Header>}>
                             <List>
-                                {this.state.isOwner && <Cell asideContent=
+                                {this.state.readOnlyMode && <Cell asideContent=
                                     {
                                         <Icon24Write onClick={this.state.goUserEdit}
                                             data-to='userEdit'
@@ -140,12 +144,12 @@ class User extends React.Component {
                                 id={this.state.fetchedUser && this.state.fetchedUser.id} />
                         </Group> :
                         <Group>
-                            <UserTeams userTeams={this.state.user && this.state.user.userTeams} goUserEdit={this.state.goUserEdit} isOwner={this.state.isOwner} />
+                            <UserTeams userTeams={this.state.user && this.state.user.userTeams} goUserEdit={this.state.goUserEdit} isOwner={this.state.readOnlyMode} />
                         </Group>
                 }
                 <Div>
-                    <Checkbox disabled={!this.state.isOwner} onChange={(e) => this.handleCheckboxClick(e)} checked={this.state.user && this.state.user.isSearchable ? 'checked' : ''}>в поиске команды</Checkbox>
-                    {this.state.isOwner && <Button mode={this.state.isConfirmed ? "primary" : "destructive"} size='xl'
+                    <Checkbox disabled={!this.state.readOnlyMode} onChange={(e) => this.handleCheckboxClick(e)} checked={this.state.user && this.state.user.isSearchable ? 'checked' : ''}>в поиске команды</Checkbox>
+                    {this.state.readOnlyMode && <Button mode={this.state.isConfirmed ? "primary" : "destructive"} size='xl'
                         onClick={() => this.confirmUser(this.state.fetchedUser && this.state.fetchedUser.id, this.state.userSkills)}>
                         {this.state.isConfirmed ? "Сохранить" : "Подтвердить"}
                     </Button>}
