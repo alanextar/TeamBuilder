@@ -134,7 +134,7 @@ class TeamCreate extends React.Component {
                                 })}
 
                             </Select>
-                            <Button mode="destructive">Создать Событие</Button>
+                            <Button>Создать Событие</Button>
                         </ FormLayout>
                         :
                         <Cell>
@@ -154,7 +154,8 @@ class TeamCreate extends React.Component {
                 </ Group>
                 <FixedLayout vertical="bottom">
                     <Div>
-                        <Button mode="destructive"
+                        <Button 
+                            stretched={ true }
                             onClick={(e) => { this.state.check && this.postCreate(); this.state.go(e) }}
                             data-to={'teams'}>Создать Команду
                         </Button>

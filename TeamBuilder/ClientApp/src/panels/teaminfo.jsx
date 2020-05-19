@@ -4,10 +4,11 @@ import { Api } from './../api'
 
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell, InfoRow,
-    SimpleCell, Avatar, Div, Button
+    SimpleCell, Avatar, Div, Button, FixedLayout
 } from '@vkontakte/vkui';
 
 import Icon28MessageOutline from '@vkontakte/icons/dist/28/message_outline';
+import Icon28EditOutline from '@vkontakte/icons/dist/28/edit_outline';
 
 class Teaminfo extends React.Component {
     constructor(props) {
@@ -18,7 +19,8 @@ class Teaminfo extends React.Component {
             go: props.go,
             id: props.id,
             activeTab: 'teamDescription',
-            return: props.return
+            return: props.return,
+            edit: true,
         };
     }
 
@@ -45,6 +47,7 @@ class Teaminfo extends React.Component {
     }
 
     render() {
+        var self = this;
         return (
             <Panel id={this.state.id}>
                 <PanelHeader separator={false} left={<PanelHeaderBack onClick={this.state.go} data-to={this.state.return} />}>
@@ -86,31 +89,37 @@ class Teaminfo extends React.Component {
                             </ Cell>
                             :
                             <Cell>
-                                <InfoRow header='Участники'>
-                                    {console.log('userTeams ', this.state.team.userTeams)}
-                                    {this.state.team.userTeams &&
-                                        this.state.team.userTeams.map((members, i) => {
-                                            return (
-                                                <SimpleCell
-                                                    before={<Avatar size={48} />}
-                                                    after={<Icon28MessageOutline />}>
-                                                    {members.user.firstName, members.user.fullName}
-                                                </SimpleCell>
-                                        )}
-                                        )}
-                                </InfoRow>
+                                <Div>
+                                    <InfoRow header='Участники'>
+                                        {console.log('userTeams ', this.state.team.userTeams)}
+                                        {this.state.team.userTeams &&
+                                            this.state.team.userTeams.map((members, i) => {
+                                                { members.isOwner && self.setState({ edit: true}) }
+                                                return (
+                                                    <SimpleCell
+                                                        before={<Avatar size={48} />}
+                                                        after={<Icon28MessageOutline />}>
+                                                        {members.user.firstName, members.user.fullName}
+                                                    </SimpleCell>
+                                            )}
+                                            )}
+                                    </InfoRow>
+                                </ Div>
+                                <Div>
+                                    <InfoRow header='Описание задач'>
+                                        {this.state.team.descriptionRequiredMembers}
+                                    </ InfoRow>
+                                </ Div>
                             </ Cell>)}
-                    <Div>
-                        {/* add check on owner */}
-                        {this.state.team &&
-                        <Button
-                            mode="destructive"
-                            onClick={this.state.go}
-                            data-to='teamEdit'
-                            data-id={this.state.team.id} >
-                            Редактировать Команду
-                        </Button>}
-                    </Div>
+                    {this.state.team && this.state.edit &&
+                        <FixedLayout vertical="bottom" >
+                            <SimpleCell
+                                after={<Icon28EditOutline />}
+                                onClick={this.state.go}
+                                data-to='teamEdit'
+                                data-id={this.state.team.id}>
+                            </SimpleCell>
+                        </ FixedLayout>}
                 </ Group>
             </Panel>
         );
