@@ -125,6 +125,7 @@ namespace TeamBuilder.Controllers
 
 			var dbUser = context.Users
 				.Include(x => x.UserTeams)
+				.ThenInclude(x => x.Team)
 				.FirstOrDefault(u => u.Id == id);
 
 			var userTeamToJoin = dbUser.UserTeams.First(x => x.TeamId == teamId);

@@ -37,7 +37,7 @@ class UserTeams extends React.Component {
         const response = await fetch(`/api/user/joinTeam/?id=${userTeam.userId}&&teamId=${userTeam.teamId}`);
         const data = await response.json();
         console.log(data);
-        this.setState({ userTeams: data.userTeams });
+        this.setState({ userTeams: data });
     }
 
     async handleQuitOrDecline(e,userTeam) {
@@ -46,7 +46,7 @@ class UserTeams extends React.Component {
         const response = await fetch(`/api/user/quitOrDeclineTeam/?id=${userTeam.userId}&&teamId=${userTeam.teamId}`);
         const data = await response.json();
         console.log(data);
-        this.setState({ userTeams: data.userTeams });
+        this.setState({ userTeams: data });
     }
 
     render() {
