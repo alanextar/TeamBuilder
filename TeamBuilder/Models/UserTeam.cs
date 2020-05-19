@@ -16,5 +16,6 @@ namespace TeamBuilder.Models
 		public Team Team { get; set; }
 		public bool? IsConfirmed { get; set; }
 		public bool IsOwner { get; set; }
+		public UserActionEnum UserAction { get; set; }
 	}
 }

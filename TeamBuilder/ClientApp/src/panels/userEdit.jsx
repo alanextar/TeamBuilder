@@ -1,14 +1,12 @@
 ﻿import React from 'react';
 import ReactDOM from 'react-dom';
-import { Panel, PanelHeader, Group, Cell, Avatar, Search, Button, Div, Input, FormLayoutGroup, Textarea } from '@vkontakte/vkui';
-import { Tabs, TabsItem, Separator, Checkbox, List, Header, FormLayout, Select, RichCell } from '@vkontakte/vkui';
+import {
+    Panel, PanelHeader, Group, Cell, Avatar, Search, Button, Div, Input, FormLayoutGroup, Textarea,
+    Tabs, TabsItem, Separator, Checkbox, List, Header, FormLayout, Select, RichCell
+} from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import '../../src/styles/style.css';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
-import Icon28PhoneOutline from '@vkontakte/icons/dist/28/phone_outline';
-import Icon28ArticleOutline from '@vkontakte/icons/dist/28/article_outline';
-import Icon20HomeOutline from '@vkontakte/icons/dist/20/home_outline';
-import Icon24Write from '@vkontakte/icons/dist/24/write';
 
 class UserEdit extends React.Component {
     constructor(props) {
