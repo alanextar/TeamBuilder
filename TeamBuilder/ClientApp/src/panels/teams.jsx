@@ -5,14 +5,9 @@ import {
 } from '@vkontakte/vkui';
 import InfiniteScroll from 'react-infinite-scroller';
 import qwest from 'qwest';
+import { Api } from './../api';
 
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
-
-
-const api = {
-    baseUrl: '',
-    getTeams: '/api/teams/getpage'
-};
 
 class Teams extends React.Component {
     constructor(props) {
@@ -49,7 +44,7 @@ class Teams extends React.Component {
     async populateTeamData() {
         var self = this;
 
-        var url = api.baseUrl + api.getTeams;
+        var url = Api.Teams.GetPage;
 
         qwest.get(url, {
             pageSize: 20
@@ -82,7 +77,7 @@ class Teams extends React.Component {
         window.scrollTo(0, 0);
         var self = this;
         
-        var url = api.baseUrl + api.getTeams;
+        var url = Api.Teams.GetPage;
         //if (this.state.href) {
         //    url = this.state.href;
         //}
@@ -122,26 +117,22 @@ class Teams extends React.Component {
     render() {
         var self = this;
         //var href = self.state.href === api.baseUrl + api.getTeams ? self.state.href : self.state.href + '&prev=true';
-        const loader = <div className="loader">Loading ...</div>;
+        const loader = <div key={0}>Loading ...</div>;
 
         var items = [];
         this.state.teams && this.state.teams.map((team, i) => {
             items.push(
-                <CardGrid>
-                    <Card size="l" mode="shadow">
-                        {console.log('team', team.userTeams)}
+                    <Card size="l" mode="shadow" key={team.id}>
                         <RichCell
-                            key={team.id}
                             text={team.description}
                             caption="Навыки"
-                            after={team.userTeams.length + '/' + team.numberRequiredMembers}
+                            after="1/3"
                             onClick={self.state.go}
                             data-to='teaminfo'
                             data-id={team.id}>
                                 {team.name} - {team.id}
                         </RichCell>
                     </Card>
-                </CardGrid>
             );
         });
 
@@ -155,17 +146,16 @@ class Teams extends React.Component {
                 </PanelHeader>
                 <Search />
                 <PullToRefresh onRefresh={this.onRefresh} isFetching={this.state.fetching}>
-                    <Group>
+
                         <InfiniteScroll
                             pageStart={0}
                             loadMore={this.loadItems.bind(this)}
                             hasMore={this.state.hasMoreItems}
                             loader={loader}>
-                            <List>
+                            <CardGrid style={{ marginBottom: 10 }}>
                                 {items}
-                            </List>
+                            </CardGrid>
                         </InfiniteScroll>
-                    </Group>
                 </PullToRefresh>
             </Panel>
         );

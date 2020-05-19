@@ -8,6 +8,7 @@ using TeamBuilder.Models;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using TeamBuilder.Dto;
+using TeamBuilder.ViewModels;
 
 namespace TeamBuilder.Controllers
 {
@@ -194,17 +195,5 @@ namespace TeamBuilder.Controllers
 			await context.Teams.AddRangeAsync(teams);
 			await context.SaveChangesAsync();
 		}
-	}
-
-	public class Page<T>
-	{
-		public Page(IEnumerable<T> collection, string nextHref)
-		{
-			Collection = collection;
-			NextHref = nextHref;
-		}
-
-		public IEnumerable<T> Collection { get; set; }
-		public string NextHref { get; set; }
 	}
 }
