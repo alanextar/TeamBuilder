@@ -23,18 +23,18 @@ namespace TeamBuilder.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> Confirm([FromBody]ProfileViewModel userViewModel)
+		public async Task<IActionResult> Confirm([FromBody]ProfileViewModel profileViewModel)
 		{
-			_logger.LogInformation($"POST Request Confirm. Body: {JsonConvert.SerializeObject(userViewModel)}");
+			_logger.LogInformation($"POST Request Confirm. Body: {JsonConvert.SerializeObject(profileViewModel)}");
 
 			var user = context.Users.Include(x => x.UserSkills)
-				.ThenInclude(y => y.Skill).FirstOrDefault(u => u.VkId == userViewModel.VkId);
+				.ThenInclude(y => y.Skill).FirstOrDefault(u => u.VkId == profileViewModel.VkId);
 
 			if (user == null)
 			{
-				user = new User(userViewModel.VkId);
+				user = new User(profileViewModel.VkId);
 				user.UserSkills = new List<UserSkill>();
-				foreach (var skillId in userViewModel.SkillsIds)
+				foreach (var skillId in profileViewModel.SkillsIds)
 				{
 					user.UserSkills.Add(new UserSkill() { SkillId = skillId });
 				}
@@ -44,11 +44,13 @@ namespace TeamBuilder.Controllers
 			else
 			{
 				var dbUserSkills = user.UserSkills;
-				var userSkillsDto = userViewModel.SkillsIds.Select(s => new UserSkill { UserId = user.Id, SkillId = s }).ToList();
+				var userSkillsDto = profileViewModel.SkillsIds.Select(s => new UserSkill { UserId = user.Id, SkillId = s }).ToList();
 				context.TryUpdateManyToMany(dbUserSkills, userSkillsDto, x => new { x.SkillId });
 
 				context.Users.Update(user);
 			}
+
+			user.IsSearchable = profileViewModel.IsSearchable;
 			
 			await context.SaveChangesAsync();
 
@@ -95,6 +97,9 @@ namespace TeamBuilder.Controllers
 
 			var user = context.Users.Include(x => x.UserTeams)
 				.ThenInclude(y => y.Team)
+				.ThenInclude(y => y.Event)
+				.Include(x => x.UserSkills)
+				.ThenInclude(y => y.Skill)
 				.FirstOrDefault(u => u.VkId == vkId);
 
 			return Json(user);
@@ -113,6 +118,46 @@ namespace TeamBuilder.Controllers
 			context.SaveChanges();
 
 			return Ok("Saved");
+		}
+
+		public IActionResult JoinTeam(long id, long teamId)
+		{
+			_logger.LogInformation("Request JoinTeamm");
+
+			var dbUser = context.Users
+				.Include(x => x.UserTeams)
+				.ThenInclude(x => x.Team)
+				.ThenInclude(y => y.Event)
+				.FirstOrDefault(u => u.Id == id);
+
+			var userTeamToJoin = dbUser.UserTeams.First(x => x.TeamId == teamId);
+			userTeamToJoin.UserAction = UserActionEnum.JoinedTeam;
+
+			context.Update(dbUser);
+			context.SaveChanges();
+
+			return Json(dbUser.UserTeams);
+		}
+
+		public IActionResult QuitOrDeclineTeam(long id, long teamId)
+		{
+			_logger.LogInformation("Request JoinTeamm");
+
+			var dbUser = context.Users
+				.Include(x => x.UserTeams)
+				.ThenInclude(x => x.Team)
+				.ThenInclude(y => y.Event);
+
+			var userTeams = dbUser
+				.SelectMany(x => x.UserTeams);
+
+			var userTeamToDelete = userTeams
+				.First(y => y.TeamId == teamId && y.UserId == id);
+
+			context.UserTeams.Remove(userTeamToDelete);
+			context.SaveChanges();
+
+			return Json(userTeams);
 		}
 	}
 }
