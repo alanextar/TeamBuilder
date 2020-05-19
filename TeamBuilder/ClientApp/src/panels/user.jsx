@@ -26,7 +26,7 @@ class User extends React.Component {
             isConfirmed: false,
             goUserEdit: props.goUserEdit,
             user: null,
-            isOwner: false
+            isOwner: true
         }
 
         this.confirmUser = this.confirmUser.bind(this);

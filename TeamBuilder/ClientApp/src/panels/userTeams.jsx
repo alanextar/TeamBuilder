@@ -59,7 +59,7 @@ class UserTeams extends React.Component {
                                             text={userTeam.team.description}
                                             caption={"Событие: " + (userTeam.team.event ? userTeam.team.event.name : '')}
                                             after={userTeam.userAction === 3 ? < Icon28CheckCircleOutline /> :
-                                                (userTeam.userAction === 1 && <Icon28InfoOutline />)}
+                                                (userTeam.userAction === 2 && <Icon28InfoOutline />)}
                                             onClick={this.state.goUserEdit}
                                             data-to='teaminfo'
                                             data-id={userTeam.team.id}
