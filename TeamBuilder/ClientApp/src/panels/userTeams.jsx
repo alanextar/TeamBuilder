@@ -1,6 +1,9 @@
 ﻿import React from 'react';
 import ReactDOM from 'react-dom';
-import { Panel, PanelHeader, Group, Search, List, RichCell, Avatar, PullToRefresh, PanelHeaderButton, Cell, CardGrid, Card } from '@vkontakte/vkui';
+import {
+    Panel, PanelHeader, Group, Search, List, RichCell, Avatar, PullToRefresh,
+    PanelHeaderButton, Cell, CardGrid, Card, Button
+} from '@vkontakte/vkui';
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import '@vkontakte/vkui/dist/vkui.css';
 import Icon28CheckCircleOutline from '@vkontakte/icons/dist/28/check_circle_outline';
@@ -39,7 +42,8 @@ class UserTeams extends React.Component {
     }
 
     render() {
-        console.log('into userTeams','------------', this.state.userTeams)
+        console.log('into userTeams', '------------', this.state.userTeams)
+        var teamText = "заявка на рассмотрении";
         return (
             <Group>
                 <List>
@@ -53,10 +57,16 @@ class UserTeams extends React.Component {
                                         <RichCell key={userTeam.team.id}
                                             text={userTeam.team.description}
                                             caption="Команда"
-                                            after={userTeam.isConfirmed ? <Icon28CheckCircleOutline /> : <Icon28InfoOutline />}
+                                            after={userTeam.isConfirmed ? 'заявка на рассмотрении'  < Icon28CheckCircleOutline />  : <Icon28InfoOutline />}
                                             onClick={this.state.goUserEdit}
                                             data-to='teaminfo'
-                                            data-id={userTeam.team.id}>
+                                            data-id={userTeam.team.id}
+                                            actions={
+                                                <React.Fragment>
+                                                    <Button>Принять</Button>
+                                                    <Button mode="secondary">Отклонить</Button>
+                                                </React.Fragment>
+                                            }>
                                             {userTeam.team.name}
                                         </RichCell>
                                     </Card>

@@ -25,7 +25,8 @@ class User extends React.Component {
             selectedSkills: null,
             isConfirmed: false,
             goUserEdit: props.goUserEdit,
-            user: null
+            user: null,
+            isOwner: false
         }
 
         this.confirmUser = this.confirmUser.bind(this);
@@ -116,14 +117,14 @@ class User extends React.Component {
                     this.state.activeTabProfile === 'main' ?
                         <Group header={<Header mode="secondary">Информация о профиле участника</Header>}>
                             <List>
-                                <Cell asideContent=
+                                {this.state.isOwner && <Cell asideContent=
                                     {
-                                    <Icon24Write onClick={this.state.goUserEdit}
-                                        data-to='userEdit'
-                                        data-id={this.state.fetchedUser && this.state.fetchedUser.id}
-                                        data-user={JSON.stringify(this.state.user)} /> 
+                                        <Icon24Write onClick={this.state.goUserEdit}
+                                            data-to='userEdit'
+                                            data-id={this.state.fetchedUser && this.state.fetchedUser.id}
+                                            data-user={JSON.stringify(this.state.user)} />
                                     }>
-                                </Cell>
+                                </Cell>}
                                 <Cell before={<Icon20HomeOutline height={28} width={28} />}>
                                     город: {this.state.user && this.state.user.city}
                                 </Cell>
@@ -139,15 +140,15 @@ class User extends React.Component {
                                 id={this.state.fetchedUser && this.state.fetchedUser.id} />
                         </Group> :
                         <Group>
-                            <UserTeams userTeams={this.state.user && this.state.user.userTeams} goUserEdit={this.state.goUserEdit} />
+                            <UserTeams userTeams={this.state.user && this.state.user.userTeams} goUserEdit={this.state.goUserEdit} isOwner={this.state.isOwner} />
                         </Group>
                 }
                 <Div>
-                    <Checkbox onChange={(e) => this.handleCheckboxClick(e)} checked={this.state.user && this.state.user.isSearchable ? 'checked' : ''}>в поиске команды</Checkbox>
-                    <Button mode={this.state.isConfirmed ? "primary" : "destructive"} size='xl'
+                    <Checkbox disabled={!this.state.isOwner} onChange={(e) => this.handleCheckboxClick(e)} checked={this.state.user && this.state.user.isSearchable ? 'checked' : ''}>в поиске команды</Checkbox>
+                    {this.state.isOwner && <Button mode={this.state.isConfirmed ? "primary" : "destructive"} size='xl'
                         onClick={() => this.confirmUser(this.state.fetchedUser && this.state.fetchedUser.id, this.state.userSkills)}>
                         {this.state.isConfirmed ? "Сохранить" : "Подтвердить"}
-                    </Button>
+                    </Button>}
                 </Div>
             </Panel>
         )

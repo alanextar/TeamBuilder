@@ -118,5 +118,20 @@ namespace TeamBuilder.Controllers
 
 			return Ok("Saved");
 		}
+
+		[HttpPost]
+		public IActionResult JoinTeam(long vkId, long teamId)
+		{
+			_logger.LogInformation("Request JoinTeamm");
+
+			var dbUser = context.Users
+				.Include(x => x.UserTeams)
+				.FirstOrDefault(u => u.VkId == vkId);
+
+			context.Update(dbUser);
+			context.SaveChanges();
+
+			return Ok("Saved");
+		}
 	}
 }
