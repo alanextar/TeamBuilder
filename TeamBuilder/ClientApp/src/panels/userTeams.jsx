@@ -30,16 +30,23 @@ class UserTeams extends React.Component {
         this.setState({ teams: data });
     }
 
-    async handleJoin(userTeam) {
-        const response = await fetch(`/api/user/joinTeam/?vkId=${vkId}&&teamId=${teamId}`);
+    async handleJoin(e, userTeam) {
+        console.log(userTeam);
+        e.stopPropagation();
+        console.log('into handleJoin');
+        const response = await fetch(`/api/user/joinTeam/?id=${userTeam.userId}&&teamId=${userTeam.teamId}`);
         const data = await response.json();
-        this.setState({ userTeams: data });
+        console.log(data);
+        this.setState({ userTeams: data.userTeams });
     }
 
-    async handleQuitOrDecline(userTeam) {
-        const response = await fetch(`/api/user/quitOrDecline/?vkId=${vkId}&&teamId=${teamId}`);
+    async handleQuitOrDecline(e,userTeam) {
+        e.stopPropagation();
+        console.log('into handleQuiteOrDecline');
+        const response = await fetch(`/api/user/quitOrDeclineTeam/?id=${userTeam.userId}&&teamId=${userTeam.teamId}`);
         const data = await response.json();
-        this.setState({ userTeams: data });
+        console.log(data);
+        this.setState({ userTeams: data.userTeams });
     }
 
     render() {
@@ -64,11 +71,11 @@ class UserTeams extends React.Component {
                                             data-id={userTeam.team.id}
                                             actions={userTeam.userAction === 6 ?
                                                 <React.Fragment>
-                                                    <Button onClick={() => this.handleJoin(userTeam)}>Принять</Button>
-                                                    <Button onClick={() => this.handleQuitOrDecline(userTeam)} mode="secondary">Отклонить</Button>
+                                                    <Button onClick={(e) => this.handleJoin(e,userTeam)}>Принять</Button>
+                                                    <Button onClick={(e) => this.handleQuitOrDecline(e,userTeam)} mode="secondary">Отклонить</Button>
                                                 </React.Fragment> :
                                                 (userTeam.userAction === 3 && <React.Fragment>
-                                                    <Button onClick={() => this.handleQuitOrDecline(userTeam)} mode="secondary">Выйти</Button>
+                                                    <Button onClick={(e) => this.handleQuitOrDecline(e,userTeam)} mode="secondary">Выйти</Button>
                                                 </React.Fragment>)
                                             }>
                                             {userTeam.team.name}

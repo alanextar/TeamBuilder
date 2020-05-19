@@ -119,23 +119,24 @@ namespace TeamBuilder.Controllers
 			return Ok("Saved");
 		}
 
-		[HttpPost]
-		public IActionResult JoinTeam(long vkId, long teamId)
+		public IActionResult JoinTeam(long id, long teamId)
 		{
 			_logger.LogInformation("Request JoinTeamm");
 
 			var dbUser = context.Users
 				.Include(x => x.UserTeams)
-				.FirstOrDefault(u => u.VkId == vkId);
+				.FirstOrDefault(u => u.Id == id);
+
+			var userTeamToJoin = dbUser.UserTeams.First(x => x.TeamId == teamId);
+			userTeamToJoin.UserAction = UserActionEnum.JoinedTeam;
 
 			context.Update(dbUser);
 			context.SaveChanges();
 
-			return Json(dbUser);
+			return Json(dbUser.UserTeams);
 		}
 
-		[HttpPost]
-		public IActionResult DeclineTeam(long vkId, long teamId)
+		public IActionResult QuitOrDeclineTeam(long id, long teamId)
 		{
 			_logger.LogInformation("Request JoinTeamm");
 
@@ -143,15 +144,16 @@ namespace TeamBuilder.Controllers
 				.Include(x => x.UserTeams)
 				.ThenInclude(x => x.Team);
 
-			var userTeamToDelete = dbUser
-				.SelectMany(x => x.UserTeams)
-				.First(y => y.TeamId == teamId && y.User.VkId == vkId);
+			var userTeams = dbUser
+				.SelectMany(x => x.UserTeams);
 
+			var userTeamToDelete = userTeams
+				.First(y => y.TeamId == teamId && y.UserId == id);
 
 			context.UserTeams.Remove(userTeamToDelete);
 			context.SaveChanges();
 
-			return Json(dbUser);
+			return Json(userTeams);
 		}
 	}
 }
