@@ -48,7 +48,7 @@ namespace TeamBuilder
 
 		private bool Check(string launchParams)
 		{
-			if (env.IsDevelopment() && string.IsNullOrEmpty(launchParams)) //TODO убрать 2ое условие после того как проверю что всё работает
+			if (env.IsDevelopment())
 				return true;
 
 			var queryNvc = HttpUtility.ParseQueryString(new Uri($"http://localhost/{launchParams}").Query);
