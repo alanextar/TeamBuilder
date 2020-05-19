@@ -97,6 +97,7 @@ namespace TeamBuilder.Controllers
 
 			var user = context.Users.Include(x => x.UserTeams)
 				.ThenInclude(y => y.Team)
+				.ThenInclude(y => y.Event)
 				.Include(x => x.UserSkills)
 				.ThenInclude(y => y.Skill)
 				.FirstOrDefault(u => u.VkId == vkId);
@@ -126,6 +127,7 @@ namespace TeamBuilder.Controllers
 			var dbUser = context.Users
 				.Include(x => x.UserTeams)
 				.ThenInclude(x => x.Team)
+				.ThenInclude(y => y.Event)
 				.FirstOrDefault(u => u.Id == id);
 
 			var userTeamToJoin = dbUser.UserTeams.First(x => x.TeamId == teamId);
@@ -143,7 +145,8 @@ namespace TeamBuilder.Controllers
 
 			var dbUser = context.Users
 				.Include(x => x.UserTeams)
-				.ThenInclude(x => x.Team);
+				.ThenInclude(x => x.Team)
+				.ThenInclude(y => y.Event);
 
 			var userTeams = dbUser
 				.SelectMany(x => x.UserTeams);

@@ -57,7 +57,7 @@ class UserTeams extends React.Component {
                                     <Card size="l" mode="shadow">
                                         <RichCell key={userTeam.team.id}
                                             text={userTeam.team.description}
-                                            caption="Команда"
+                                            caption={"Событие: " + (userTeam.team.event ? userTeam.team.event.name : '')}
                                             after={userTeam.userAction === 3 ? < Icon28CheckCircleOutline /> :
                                                 (userTeam.userAction === 1 && <Icon28InfoOutline />)}
                                             onClick={this.state.goUserEdit}
@@ -68,10 +68,15 @@ class UserTeams extends React.Component {
                                                     <Button onClick={(e) => this.handleJoin(e,userTeam)}>Принять</Button>
                                                     <Button onClick={(e) => this.handleQuitOrDecline(e,userTeam)} mode="secondary">Отклонить</Button>
                                                 </React.Fragment> :
-                                                (userTeam.userAction === 3 && <React.Fragment>
-                                                    <Button onClick={(e) => this.handleQuitOrDecline(e,userTeam)} mode="secondary">Выйти</Button>
-                                                </React.Fragment>)
-                                            }>
+                                                ((userTeam.userAction === 3 || userTeam.userAction === 2) && <React.Fragment>
+                                                    <Button onClick={(e) => this.handleQuitOrDecline(e, userTeam)}
+                                                        mode="secondary">{userTeam.userAction === 3 ? "Выйти" : (userTeam.userAction === 2 ? "Отозвать заявку" : '')}
+                                                    </Button>
+                                                </React.Fragment>
+                                                //<React.Fragment>
+                                                //    <Button onClick={(e) => this.handleQuitOrDecline(e, userTeam)} mode="secondary">Отозвать заявку</Button>
+                                                //</React.Fragment>
+                                            )}>
                                             {userTeam.team.name}
                                         </RichCell>
                                     </Card>
