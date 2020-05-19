@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TeamBuilder.Controllers;
+using TeamBuilder.Controllers.Paging;
 
 namespace TeamBuilder.Models
 {
-	public class Event
+	public class Event: IDbItem
 	{
 		public long Id { get; set; }
 		public string Name { get; set; }

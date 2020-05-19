@@ -8,6 +8,7 @@ using TeamBuilder.Models;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using TeamBuilder.Dto;
+using TeamBuilder.ViewModels;
 
 namespace TeamBuilder.Controllers
 {
@@ -47,7 +48,7 @@ namespace TeamBuilder.Controllers
 			var countSkip = prev ? 0 : page * pageSize;
 
 			string nextHref = null;
-			var teams = context.Teams.Skip(countSkip).Take(++countTake).OrderBy(t => t.Id).ToList();
+			var teams = context.Teams.Include(x => x.UserTeams).Skip(countSkip).Take(++countTake).OrderBy(t => t.Id).ToList();
 			if (teams.Count == countTake)
 			{
 				nextHref = $"{HttpContext.Request.Path}?pageSize={pageSize}&page={++page}";
@@ -194,17 +195,5 @@ namespace TeamBuilder.Controllers
 			await context.Teams.AddRangeAsync(teams);
 			await context.SaveChangesAsync();
 		}
-	}
-
-	public class Page<T>
-	{
-		public Page(IEnumerable<T> collection, string nextHref)
-		{
-			Collection = collection;
-			NextHref = nextHref;
-		}
-
-		public IEnumerable<T> Collection { get; set; }
-		public string NextHref { get; set; }
 	}
 }
