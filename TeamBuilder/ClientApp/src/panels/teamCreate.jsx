@@ -2,7 +2,7 @@
 
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell,
-    Div, Button, Textarea, FormLayout, Select, Input, Slider
+    Div, Button, Textarea, FormLayout, Select, Input, Slider, FixedLayout
 } from '@vkontakte/vkui';
 import qwest from 'qwest';
 import { Api } from './../api';
@@ -12,6 +12,9 @@ class TeamCreate extends React.Component {
         super(props);
 
         this.state = {
+            name: null,
+            description: null,
+            membersDescription:null,
             events: null,
             check: null,
             usersNumber: 2,
@@ -21,6 +24,10 @@ class TeamCreate extends React.Component {
         };
 
         this.onChange = this.onChange.bind(this);
+        this.onDescriptionChange = this.onDescriptionChange.bind(this);
+        this.onMembersDescriptionChange = this.onMembersDescriptionChange.bind(this);
+        this.onNameChange = this.onNameChange.bind(this);
+        this.postCreate = this.postCreate.bind(this);
     }
 
     componentDidMount() {
@@ -29,13 +36,14 @@ class TeamCreate extends React.Component {
 
     async populateTeamData() {
         var self = this;
-        qwest.get(Api.Events.GetEventsAll,
+        qwest.get(Api.Events.GetAll,
             {},
             {
                 cache: true
             })
             .then((xhr, resp) => {
                 if (resp) {
+                    console.log("events getall", resp)
                     self.setState({ events: resp });
                 }
             })
@@ -46,6 +54,36 @@ class TeamCreate extends React.Component {
     onChange(e) {
         const { check, value } = e.currentTarget;
         this.setState({ check: value });
+    }
+
+    onNameChange(e) {
+        const { name, value } = e.currentTarget;
+        this.setState({ name: value })
+    }
+
+    onDescriptionChange(e) {
+        const { description, value } = e.currentTarget;
+        this.setState({ description: value })
+    }
+
+    onMembersDescriptionChange(e) {
+        const { membersDescription, value } = e.currentTarget;
+        this.setState({ membersDescription: value })
+    }
+
+    async postCreate() {
+        let name = this.state.name;
+        let description = this.state.description;
+        let numberRequiredMembers = this.state.usersNumber;
+        let eventId = this.state.check;
+        let descriptionRequiredMembers = this.state.membersDescription;
+        var createTeamViewModel = { name, description, numberRequiredMembers, descriptionRequiredMembers, eventId };
+
+        let response = await fetch('/api/teams/create', {
+            method: 'post',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(createTeamViewModel)
+        });
     }
 
     render() {
@@ -76,9 +114,8 @@ class TeamCreate extends React.Component {
                 <Group>
                     {this.state.activeTab === 'teamDescription' ?
                         <FormLayout >
-                            <Input top="Название команды" type="text" placeholder="DreamTeam" />
-
-                            <Textarea top="Описание команды" />
+                            <Input top="Название команды" type="text" placeholder="DreamTeam" onChange={ this.onNameChange } />
+                            <Textarea top="Описание команды" onChange={ this.onDescriptionChange } />
                             <Select
                                 top="Выберете событие"
                                 placeholder="Событие"
@@ -90,7 +127,7 @@ class TeamCreate extends React.Component {
                             >
                                 {this.state.events && this.state.events.map((ev, i) => {
                                     return (
-                                        <option value={i}>
+                                        <option value={ev.id}>
                                             {ev.name}
                                         </ option>
                                     )
@@ -111,13 +148,18 @@ class TeamCreate extends React.Component {
                                     top="Количество участников в команде"
                                 />
                                 <Input value={String(this.state.usersNumber)} onChange={e => this.setState({ usersNumber: e.target.value })} type="number" />
-                                <Textarea top="Описание участников и их задач" />
+                                <Textarea top="Описание участников и их задач" onChange={ this.onMembersDescriptionChange } />
                             </ FormLayout>
                         </ Cell>}
                 </ Group>
-                <Div>
-                    <Button mode="destructive">Создать Команду</Button>
-                </Div>
+                <FixedLayout vertical="bottom">
+                    <Div>
+                        <Button mode="destructive"
+                            onClick={(e) => { this.state.check && this.postCreate(); this.state.go(e) }}
+                            data-to={'teams'}>Создать Команду
+                        </Button>
+                    </Div>
+                </ FixedLayout>
             </Panel>
         );
     }

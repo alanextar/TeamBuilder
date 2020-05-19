@@ -2,7 +2,7 @@
     static baseUrl = '';
     static prefix = 'api';
     static teamsStr = 'teams';
-    static eventStr = 'events'
+    static eventStr = 'event'
 
     static Teams = {
         Get: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/get`,
