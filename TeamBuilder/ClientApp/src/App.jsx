@@ -115,6 +115,7 @@ const App = () => {
                 <Teaminfo id='teaminfo' go={goTeam} teamId={activeTeam} return='teams' />
                 <TeamCreate id='teamCreate' go={goTeam} />
                 <TeamEdit id='teamEdit' go={goTeam} teamId={activeTeam} />
+                <User id='user' fetchedUser={fetchedUser} goUserEdit={goTeam} activeStory={activeStory} return='teaminfo' />
             </View>
             {/*<View id='users' activePanel='panel2'>
                  <Panel2 id='panel2' go={go}/>
@@ -125,7 +126,7 @@ const App = () => {
                 <EventInfo id='eventInfo' go={goEvent} back={back}/>
             </View>
             <View id='user' activePanel={activeUserPanel}>
-                <User id='user' fetchedUser={fetchedUser} goUserEdit={goUserEdit} />
+                <User id='user' fetchedUser={fetchedUser} goUserEdit={goUserEdit} activeStory={activeStory} />
                 <UserEdit id='userEdit' goUserEdit={goUserEdit} fetchedUser={fetchedUser} user={activeUser} />
                 <Teaminfo id='teaminfo' go={goUserEdit} teamId={activeTeam} return='user' />
             </View>
