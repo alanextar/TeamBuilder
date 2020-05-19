@@ -49,6 +49,13 @@ namespace TeamBuilder
                 .WithMany(u => u.UserSkills)
                 .HasForeignKey(us => us.SkillId);
 
+            modelBuilder.Entity<User>()
+                .HasMany(e => e.Roles)
+                .WithOne()
+                .HasForeignKey(e => e.UserId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
+
         }
     }
 }
