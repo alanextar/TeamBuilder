@@ -21,19 +21,13 @@ class UserTeams extends React.Component {
     }
 
     componentDidMount() {
-        //this.populateTeamData();
-    }
 
-    async populateTeamData() {
-        const response = await fetch('/api/teams/getpage/20');
-        const data = await response.json();
-        this.setState({ teams: data });
     }
 
     async handleJoin(e, userTeam) {
-        console.log(userTeam);
         e.stopPropagation();
         console.log('into handleJoin');
+        console.log(userTeam);
         const response = await fetch(`/api/user/joinTeam/?id=${userTeam.userId}&&teamId=${userTeam.teamId}`);
         const data = await response.json();
         console.log(data);

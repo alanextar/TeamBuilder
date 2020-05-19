@@ -63,12 +63,12 @@ class User extends React.Component {
         }
 
         var isSearchable = this.state.user.isSearchable;
-        var userDto = { vkId, skillsIds, isSearchable };
+        var profileViewModel = { vkId, skillsIds, isSearchable };
 
         let response = await fetch('/api/user/confirm', {
             method: 'post',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(userDto),
+            body: JSON.stringify(profileViewModel),
         });
 
         this.setState({ isConfirmed: true });

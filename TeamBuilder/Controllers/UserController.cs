@@ -23,18 +23,18 @@ namespace TeamBuilder.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> Confirm([FromBody]ProfileViewModel userViewModel)
+		public async Task<IActionResult> Confirm([FromBody]ProfileViewModel profileViewModel)
 		{
-			_logger.LogInformation($"POST Request Confirm. Body: {JsonConvert.SerializeObject(userViewModel)}");
+			_logger.LogInformation($"POST Request Confirm. Body: {JsonConvert.SerializeObject(profileViewModel)}");
 
 			var user = context.Users.Include(x => x.UserSkills)
-				.ThenInclude(y => y.Skill).FirstOrDefault(u => u.VkId == userViewModel.VkId);
+				.ThenInclude(y => y.Skill).FirstOrDefault(u => u.VkId == profileViewModel.VkId);
 
 			if (user == null)
 			{
-				user = new User(userViewModel.VkId);
+				user = new User(profileViewModel.VkId);
 				user.UserSkills = new List<UserSkill>();
-				foreach (var skillId in userViewModel.SkillsIds)
+				foreach (var skillId in profileViewModel.SkillsIds)
 				{
 					user.UserSkills.Add(new UserSkill() { SkillId = skillId });
 				}
@@ -44,13 +44,13 @@ namespace TeamBuilder.Controllers
 			else
 			{
 				var dbUserSkills = user.UserSkills;
-				var userSkillsDto = userViewModel.SkillsIds.Select(s => new UserSkill { UserId = user.Id, SkillId = s }).ToList();
+				var userSkillsDto = profileViewModel.SkillsIds.Select(s => new UserSkill { UserId = user.Id, SkillId = s }).ToList();
 				context.TryUpdateManyToMany(dbUserSkills, userSkillsDto, x => new { x.SkillId });
 
 				context.Users.Update(user);
 			}
 
-			user.IsSearchable = userDto.IsSearchable;
+			user.IsSearchable = profileViewModel.IsSearchable;
 			
 			await context.SaveChangesAsync();
 

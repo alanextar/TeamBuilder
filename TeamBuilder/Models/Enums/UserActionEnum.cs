@@ -10,8 +10,6 @@ namespace TeamBuilder.Models
 	{
 		[Display(Name = "Нет действия")]
 		None = 0,
-		[Display(Name = "Ждет ответа от команды")]
-		WaitingResponse = 1,
 		[Display(Name = "Отправил запрос в команду")]
 		SentRequest = 2,
 		[Display(Name = "Присоединился")]
