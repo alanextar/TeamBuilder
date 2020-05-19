@@ -93,7 +93,9 @@ namespace TeamBuilder.Controllers
 		[HttpGet]
 		public IActionResult Get(long vkId)
 		{
-			_logger.LogInformation("Request ConfirmUser");
+			var launchParams = HttpContext.Request.Headers["Launch-Params"].ToString();
+
+			_logger.LogInformation($"GETRequest {HttpContext.Request.Headers[":path"]}. launch params: {JsonConvert.SerializeObject(launchParams)}");
 
 			var user = context.Users.Include(x => x.UserTeams)
 				.ThenInclude(y => y.Team)
@@ -107,7 +109,8 @@ namespace TeamBuilder.Controllers
 		[HttpPost]
 		public IActionResult Edit([FromBody]User user)
 		{
-			_logger.LogInformation("Request ConfirmUser");
+			var launchParams = HttpContext.Request.Headers["Launch-Params"].ToString();
+			_logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. params: {JsonConvert.SerializeObject(launchParams)}");
 
 			var dbUser = context.Users.FirstOrDefault(u => u.VkId == user.VkId);
 			dbUser.City = user.City;

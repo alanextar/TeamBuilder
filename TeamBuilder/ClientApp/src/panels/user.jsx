@@ -9,8 +9,9 @@ import Icon28PhoneOutline from '@vkontakte/icons/dist/28/phone_outline';
 import Icon28ArticleOutline from '@vkontakte/icons/dist/28/article_outline';
 import Icon20HomeOutline from '@vkontakte/icons/dist/20/home_outline';
 import Icon24Write from '@vkontakte/icons/dist/24/write';
-import UserTeams from './userTeams'
-import UserSkills from './userSkills'
+import UserTeams from './userTeams';
+import UserSkills from './userSkills';
+import qwest from 'qwest';
 
 class User extends React.Component {
     constructor(props) {
@@ -36,17 +37,27 @@ class User extends React.Component {
     }
 
     isUserConfirmed(vkId) {
-        fetch(`/api/user/checkconfirmation?vkId=${vkId}`)
-            .then((response) => {
-                this.setState({ isConfirmed: response })
 
-                console.log('before user fetch', vkId);
-
-                fetch(`/api/user/get?vkId=${vkId}`)
-                    .then(response => response.json())
-                    .then(data => this.setState({ user: data }));
-            } 
-        );
+        var self = this;
+        qwest.get(`/api/user/checkconfirmation?vkId=${vkId}`)
+            .then((xhr, resp) => {
+                self.setState({ isConfirmed: resp });
+                if (resp) {
+                    qwest.get(`/api/user/get?vkId=${vkId}`,
+                        {
+                            cache: true
+                        })
+                        .then((xhr, resp) => {
+                            if (resp) {
+                                self.setState({ user: resp })
+                            }
+                        })
+                        .catch((error) =>
+                            console.log(`Error for get user. Details: ${error}`));
+                }
+            })
+            .catch((error) =>
+                console.log(`Error for get team id:${self.props.teamId}. Details: ${error}`));
 
 	}
 
@@ -64,13 +75,19 @@ class User extends React.Component {
         var isSearchable = this.state.user.isSearchable;
         var userDto = { vkId, skillsIds, isSearchable };
 
-        let response = await fetch('/api/user/confirm', {
-            method: 'post',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(userDto),
-        });
+        var self = this;
 
-        this.setState({ isConfirmed: true });
+        qwest.post('/api/user/confirm',
+            {
+                userDto: JSON.stringify(userDto),
+            })
+            .then((xhr, resp) => {
+                if (resp) {
+                    self.setState({ isConfirmed: true });
+                }
+            })
+            .catch((error) =>
+                console.log(`Error for get team id:${self.props.teamId}. Details: ${error}`));
     }
 
     handleClick(event, selectedSkills) {
