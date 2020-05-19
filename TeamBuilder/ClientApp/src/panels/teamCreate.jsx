@@ -4,6 +4,8 @@ import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell,
     Div, Button, Textarea, FormLayout, Select, Input, Slider
 } from '@vkontakte/vkui';
+import qwest from 'qwest';
+import { Api } from './../api';
 
 class TeamCreate extends React.Component {
     constructor(props) {
@@ -26,10 +28,19 @@ class TeamCreate extends React.Component {
     }
 
     async populateTeamData() {
-        const response = await fetch(`/api/event/getall`);
-        const data = await response.json();
-        this.setState({ events: data });
-        console.log('events ', data)
+        var self = this;
+        qwest.get(Api.Events.GetEventsAll,
+            {},
+            {
+                cache: true
+            })
+            .then((xhr, resp) => {
+                if (resp) {
+                    self.setState({ events: resp });
+                }
+            })
+            .catch((error) =>
+                console.log(`Error for get all events: Details: ${error}`));
     }
 
     onChange(e) {
