@@ -9,7 +9,10 @@ import App from './App'
 bridge.send("VKWebAppInit", {});
 
 qwest.setDefaultOptions({
+    dataType: 'json',
+    responseType: 'json',
     headers: {
+        'Content-Type': 'application/json',
         'Launch-Params': window.location.search
     }
 });
