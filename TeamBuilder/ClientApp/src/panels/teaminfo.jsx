@@ -59,12 +59,16 @@ class Teaminfo extends React.Component {
                         this.state.activeTab === 'teamDescription' ?
                             <Cell>
                                 {console.log('==== ', this.state.team)}
-                                <InfoRow header='Описаноие команды'>
-                                    {this.state.team.description}    
-                                </InfoRow>
-                                <InfoRow header='Участвуем в '>
-                                    {this.state.team.events.name}
-                                </InfoRow>
+                                <SimpleCell>
+                                    <InfoRow header='Описаноие команды'>
+                                        {this.state.team.description}    
+                                    </InfoRow>
+                                </ SimpleCell>
+                                <SimpleCell>
+                                    <InfoRow header='Участвуем в '>
+                                        {this.state.team.event && this.state.team.event.name}
+                                    </InfoRow>
+                                </ SimpleCell>
                             </ Cell>
                             : 
                             <Cell>
