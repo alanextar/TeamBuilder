@@ -126,7 +126,7 @@ class Teams extends React.Component {
                         <RichCell
                             text={team.description}
                             caption="Навыки"
-                            after="1/3"
+                            after={team.userTeams.length + '/' + team.numberRequiredMembers}
                             onClick={self.state.go}
                             data-to='teaminfo'
                             data-id={team.id}>
