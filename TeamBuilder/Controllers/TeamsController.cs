@@ -76,8 +76,6 @@ namespace TeamBuilder.Controllers
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(createTeamViewModel)}");
 
 			var @event = await context.Events.FirstOrDefaultAsync(e => e.Id == createTeamViewModel.EventId);
-			if (@event == null)
-				return NotFound($"Event '{createTeamViewModel.EventId}' not found");
 
 			var config = new MapperConfiguration(cfg => cfg.CreateMap<CreateTeamViewModel,Team>()
 				.ForMember("Event", opt => opt.MapFrom(_ => @event)));
@@ -123,7 +121,7 @@ namespace TeamBuilder.Controllers
 			if (team == null)
 				return NotFound($"Team '{id}' not found");
 
-			context.Teams.Remove(team);
+			context.Remove(team);
 			await context.SaveChangesAsync();
 
 			return Ok("Deleted");
