@@ -188,14 +188,13 @@ class TeamEdit extends React.Component {
                 </ Group>
                 <FixedLayout vertical="bottom">
                     <Div>
-                        {this.state.props && (
-                            <Button
-                                stretched={true}
-                                onClick={(e) => { this.postEdit(); this.state.go(e) }}
-                                data-to={'teaminfo'}
-                                data-id={this.state.props.teamId} >
-                                Применить Изменения
-                            </Button>)}
+                        <Button
+                            stretched={true}
+                            onClick={(e) => { this.postEdit(); this.state.go(e) }}
+                            data-to={'teaminfo'}
+                            data-id={this.props.teamId} >
+                            Применить Изменения
+                        </Button>)
                     </Div>
                 </ FixedLayout>
             </Panel>
