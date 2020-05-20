@@ -23,7 +23,7 @@ import User from './panels/user'
 import UserEdit from './panels/userEdit'
 
 const App = () => {
-    const [activeStory, setActiveStore] = useState('events');
+    const [activeStory, setActiveStore] = useState('teams');
     const [back, setBack] = useState(null);
 
     const [activeTeamPanel, setActiveTeamPanel] = useState('teams');

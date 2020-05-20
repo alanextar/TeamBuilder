@@ -6,6 +6,7 @@ import {
 import InfiniteScroll from 'react-infinite-scroller';
 import qwest from 'qwest';
 import { Api } from './../api';
+import debounce from 'lodash.debounce';
 
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 
@@ -20,7 +21,8 @@ class Teams extends React.Component {
             teams: [],
             go: props.go,
             page_id: props.id,
-            fetching: false
+            fetching: false,
+            search: '',
         };
 
         console.log(`.ctr.Href: ${this.state.href}`);
@@ -34,6 +36,8 @@ class Teams extends React.Component {
             });
 
         };
+
+        this.onChangeSearch = this.onChangeSearch.bind(this);
     }
 
     componentDidMount() {
@@ -47,7 +51,6 @@ class Teams extends React.Component {
         var url = Api.Teams.GetPage;
 
         qwest.get(url, {
-            pageSize: 20
         }, {
             cache: true
         })
@@ -74,21 +77,20 @@ class Teams extends React.Component {
     }
 
     loadItems(page) {
-        window.scrollTo(0, 0);
-        var self = this;
-        
-        var url = Api.Teams.GetPage;
-        //if (this.state.href) {
-        //    url = this.state.href;
-        //}
+        console.log("for Danya", this.state.search)
+        var url = this.state.search.length === 0 ? `${Api.Teams.GetPage}` : `${Api.Teams.PagingSearch}?search=${this.state.search}`;
+        console.log("for Danya 2", url)
+        console.log("for Danya 3", this.state.nextHref)
         if (this.state.nextHref) {
             url = this.state.nextHref;
         }
+        window.scrollTo(0, 0);
+        var self = this;
+       
 
         console.log(`loadItems.Url: ${url}`);
 
         qwest.get(url, {
-            pageSize: 20
         }, {
             cache: true
         })
@@ -112,6 +114,27 @@ class Teams extends React.Component {
                     }
                 }
             });
+    }
+
+    async searchTeams(value) {
+        const response = await fetch(`${Api.Teams.PagingSearch}?search=${value}`);
+        const data = await response.json();
+        console.log('searchTeam', data)
+        this.setState({
+            teams: data.collection,
+            hasMoreItems: true,
+            nextHref: data.nextHref
+        });
+    }
+
+    delayedSearchEvents = debounce(this.searchTeams, 250);
+    
+    onChangeSearch(e) {
+        this.setState({
+            search: e.target.value,
+            nextHref: null
+        })
+        this.delayedSearchEvents(e.target.value)
     }
 
     render() {
@@ -142,9 +165,9 @@ class Teams extends React.Component {
                     <PanelHeaderButton>
                         <Icon28AddOutline onClick={this.state.go} data-to='teamCreate' />
                     </PanelHeaderButton>}>
-                        Команды
+                    Команды
                 </PanelHeader>
-                <Search />
+                <Search value={this.state.search} onChange={this.onChangeSearch} after={null} />
                 <PullToRefresh onRefresh={this.onRefresh} isFetching={this.state.fetching}>
 
                         <InfiniteScroll
@@ -157,8 +180,8 @@ class Teams extends React.Component {
                             </CardGrid>
                         </InfiniteScroll>
                 </PullToRefresh>
-            </Panel>
-        );
+            </Panel>)
+        
     }
 };
 
