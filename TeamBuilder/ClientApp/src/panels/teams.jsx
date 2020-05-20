@@ -77,16 +77,12 @@ class Teams extends React.Component {
     }
 
     loadItems(page) {
-        console.log("for Danya", this.state.search)
-        var url = this.state.search.length === 0 ? `${Api.Teams.GetPage}` : `${Api.Teams.PagingSearch}?search=${this.state.search}`;
-        console.log("for Danya 2", url)
-        console.log("for Danya 3", this.state.nextHref)
+        var url = `${Api.Teams.GetPage}`;
         if (this.state.nextHref) {
             url = this.state.nextHref;
         }
         window.scrollTo(0, 0);
         var self = this;
-       
 
         console.log(`loadItems.Url: ${url}`);
 
@@ -122,7 +118,7 @@ class Teams extends React.Component {
         console.log('searchTeam', data)
         this.setState({
             teams: data.collection,
-            hasMoreItems: true,
+            hasMoreItems: data.nextHref ? true : false,
             nextHref: data.nextHref
         });
     }

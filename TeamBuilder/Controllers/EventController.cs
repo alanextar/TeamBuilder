@@ -33,11 +33,15 @@ namespace TeamBuilder.Controllers
 		{
 			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
 
+			if (string.IsNullOrEmpty(search))
+				return RedirectToAction("GetPage", new { pageSize, page, prev});
+
 			if (pageSize == 0)
 				return NoContent();
 
 			bool Filter(Event @event) => @event.Name.ToLowerInvariant().Contains(search?.ToLowerInvariant() ?? string.Empty);
 			var result = context.Events.GetPage(pageSize, HttpContext.Request, page, prev, Filter);
+			result.NextHref = result.NextHref == null ? null : $"{result.NextHref}&search={search}";
 			logger.LogInformation($"Response EventsCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
 			                      $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
 

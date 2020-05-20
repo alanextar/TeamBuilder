@@ -21,7 +21,11 @@ const Events = props => {
     const searchEvents = value => {
         fetch(`${Api.Events.PagingSearch}?search=${value}`)
             .then((resp) => resp.json())
-            .then(json => setEvents(json.collection))
+            .then(json => {
+                setEvents(json.collection);
+                setNextHref(json.nextHref);
+                setHasMoreItems(json.nextHref ? true : false);
+            })
             .catch((error) => console.log(`Error for get filtered events page. Details: ${error}`));
     }
 
@@ -51,7 +55,7 @@ const Events = props => {
     //#region Scroll
 
     const loadItems = page => {
-        var url = search.length === 0 ? `${Api.Events.GetPage}` : `${Api.Events.PagingSearch}?search=${search}`;
+        var url = `${Api.Events.GetPage}`;
         if (nextHref) {
             url = nextHref;
         }
@@ -86,7 +90,7 @@ const Events = props => {
                         caption={`${event.startDate} - ${event.startDate}`}
                         onClick={props.go}
                         data-to='eventInfo'
-                        data-id={event.id}
+                        data-event={event}
                         data-from={props.id}>
                         {event.name}
                     </RichCell>

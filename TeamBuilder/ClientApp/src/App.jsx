@@ -35,6 +35,7 @@ const App = () => {
     const [activeUser, setActiveUser] = useState(null);
 
     const [activeEventPanel, setActiveEventPanel] = useState('events');
+    const [event, setEvent] = useState(null);
 
     const [city, setCity] = useState(null);
     const [about, setAbout] = useState(null);
@@ -65,6 +66,7 @@ const App = () => {
     };
 
     const goEvent = e => {
+        setEvent(e.currentTarget.dataset.event);
         setActiveEventPanel(e.currentTarget.dataset.to);
         setBack(e.currentTarget.dataset.from);
     };
@@ -120,7 +122,7 @@ const App = () => {
             <View id='events' activePanel={activeEventPanel}>
                 <Events id='events' go={goEvent} />
                 <EventCreate id='eventCreate' go={goEvent} back={back} owner={fetchedUser.id} />
-                <EventInfo id='eventInfo' go={goEvent} back={back}/>
+                <EventInfo id='eventInfo' event={event} go={goEvent} back={back}/>
             </View>
             <View id='user' activePanel={activeUserPanel}>
                 <User id='user' fetchedUser={fetchedUser} goUserEdit={goUserEdit} activeStory={activeStory} />
