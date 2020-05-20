@@ -2,8 +2,7 @@
 import ReactDOM from 'react-dom';
 import {
     Panel, PanelHeader, Group, Cell, Avatar, Search, Button, Div, Input, PanelHeaderBack,
-    Tabs, TabsItem, Separator, Checkbox, List, Header, FormLayout, Select, RichCell, ModalRoot,
-    ModalPage
+    Tabs, TabsItem, Separator, Checkbox, List, Header, FormLayout, Select, RichCell
 } from '@vkontakte/vkui';
 import {  } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
@@ -27,12 +26,10 @@ class User extends React.Component {
             activeTabProfile: 'main',
             selected: false,
             selectedSkills: null,
-            isConfirmed: null,
+            isConfirmed: false,
             goUserEdit: props.goUserEdit,
             user: null,
-            readOnlyMode: props.activeStory != 'user',
-            setActiveModal: props.setActiveModal,
-            goActiveModal: props.goActiveModal
+            readOnlyMode: props.activeStory != 'user'
         }
 
         this.confirmUser = this.confirmUser.bind(this);
@@ -97,7 +94,6 @@ class User extends React.Component {
     render() {
         console.log('render user', this.state.user);
         console.log('render user readOnlyMode', this.props.activeStory != 'user');
-
         return (
             <Panel id="user">
                 <PanelHeader separator={false} left={this.state.readOnlyMode &&
@@ -157,19 +153,10 @@ class User extends React.Component {
                 <Div>
                     <Checkbox disabled={this.state.readOnlyMode} onChange={(e) => this.handleCheckboxClick(e)}
                         checked={this.state.user && this.state.user.isSearchable ? 'checked' : ''}>в поиске команды</Checkbox>
-                    {!this.state.readOnlyMode && <Button mode={this.state.isConfirmed && (this.state.isConfirmed ? "primary" : "destructive")} size='xl'
+                    {!this.state.readOnlyMode && <Button mode={this.state.isConfirmed ? "primary" : "destructive"} size='xl'
                         onClick={() => this.confirmUser(this.state.fetchedUser && this.state.fetchedUser.id, this.state.userSkills)}>
-                        {this.state.isConfirmed && (this.state.isConfirmed ? "Сохранить" : "Подтвердить")}
+                        {this.state.isConfirmed ? "Сохранить" : "Подтвердить"}
                     </Button>}
-                    
-                </Div>
-                <Div>
-                    <Button mode="primary" size='xl'
-                        data-activeModal="filters"
-                        data-modalHistory=""
-                        onClick={(e) => { this.state.goActiveModal(e) }}>
-                        Добавить к себе в команду
-                    </Button>
                 </Div>
             </Panel>
         )
