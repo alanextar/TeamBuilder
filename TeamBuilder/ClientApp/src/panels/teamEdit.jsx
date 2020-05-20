@@ -101,7 +101,7 @@ class TeamEdit extends React.Component {
         const check = this.state.check;
         return (
             <Panel id={this.state.id}>
-                <PanelHeader separator={false} left={<PanelHeaderBack onClick={this.state.go} data-to='teams' />}>
+                <PanelHeader separator={false} left={<PanelHeaderBack onClick={this.state.go} data-to={'teaminfo'} data-id={this.props.teamId} />}>
                     {this.state.team && this.state.name}
                 </PanelHeader>
                 <Tabs>
@@ -188,11 +188,12 @@ class TeamEdit extends React.Component {
                 </ Group>
                 <FixedLayout vertical="bottom">
                     <Div>
-                        {this.state.check && (
+                        {this.state.props && (
                             <Button
                                 stretched={true}
                                 onClick={(e) => { this.postEdit(); this.state.go(e) }}
-                                data-to={this.state.id}>
+                                data-to={'teaminfo'}
+                                data-id={this.state.props.teamId} >
                                 Применить Изменения
                             </Button>)}
                     </Div>
