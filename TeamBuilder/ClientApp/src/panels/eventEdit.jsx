@@ -6,12 +6,12 @@ import {
 } from '@vkontakte/vkui';
 import { Api } from '../api';
 
-const EventCreate = props => {
-    const [eventName, setEventName] = useState('');
-    const [eventDescription, setEventDescription] = useState('');
-    const [eventLink, setEventLink] = useState('');
-    const [eventStartDate, setEventStartDate] = useState('');
-    const [eventFinishDate, setEventFinishDate] = useState('');
+const EventEdit = props => {
+    const [eventName, setEventName] = useState(props.event.name);
+    const [eventDescription, setEventDescription] = useState(props.event.description);
+    const [eventLink, setEventLink] = useState(props.event.link);
+    const [eventStartDate, setEventStartDate] = useState(props.event.startDate);
+    const [eventFinishDate, setEventFinishDate] = useState(props.event.finishDate);
 
     const onNameChange = (e) => {
         setEventName(e.target.value);
@@ -33,7 +33,7 @@ const EventCreate = props => {
         setEventFinishDate(e.target.value);
     };
 
-    const eventCreate = () => {
+    const eventEdit = () => {
         let name = eventName;
         let description = eventDescription;
         let link = eventLink;
@@ -41,7 +41,7 @@ const EventCreate = props => {
         let finishDate = eventFinishDate;
         let ownerId = props.owner.id;
         var createEventViewModel = { name, description, startDate, finishDate, link, ownerId }
-        fetch(`${Api.Events.Create}`, {
+        fetch(`${Api.Events.Edit}`, {
             method: 'post',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(createEventViewModel)
@@ -54,7 +54,7 @@ const EventCreate = props => {
 
         <Panel id={props.id}>
             <PanelHeader separator={false} left={<PanelHeaderBack onClick={props.go} data-to={props.back} />}>
-                Создать мероприятие
+                Редактировать мероприятие
         </PanelHeader>
 
             <Group>
@@ -69,8 +69,8 @@ const EventCreate = props => {
             <FixedLayout vertical="bottom">
                 <Button
                     stretched={true}
-                    onClick={(e) => { eventCreate(); props.go(e) }}
-                    data-to={'events'}
+                    onClick={(e) => { eventEdit(); props.go(e) }}
+                    data-to={'eventsInfo'}
                     data-from={props.id}>
                     Создать оревнование
                 </Button>
@@ -79,4 +79,4 @@ const EventCreate = props => {
     );
 }
 
-export default EventCreate;
+export default EventEdit;

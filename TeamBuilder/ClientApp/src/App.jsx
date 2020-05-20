@@ -11,6 +11,7 @@ import Icon28FavoriteOutline from '@vkontakte/icons/dist/28/favorite_outline';
 import Events from './panels/events'
 import EventCreate from './panels/eventCreate'
 import EventInfo from './panels/eventInfo'
+import EventEdit from './panels/eventEdit'
 
 import Teams from './panels/teams'
 import TeamInfo from './panels/teamInfo' 
@@ -117,13 +118,11 @@ const App = () => {
                 <TeamEdit id='teamEdit' go={goTeam} teamId={activeTeam} />
                 <User id='user' fetchedUser={fetchedUser} goUserEdit={goTeam} activeStory={activeStory} return='teaminfo' />
             </View>
-            {/*<View id='users' activePanel='panel2'>
-                 <Panel2 id='panel2' go={go}/>
-             </View>*/}
             <View id='events' activePanel={activeEventPanel}>
-                <Events id='events' go={goEvent}/>
-                <EventCreate id='eventCreate' go={goEvent} back={back}/>
-                <EventInfo id='eventInfo' event={event} go={goEvent} back={back}/>
+                <Events id='events' go={goEvent} />
+                <EventCreate id='eventCreate' go={goEvent} back={back} owner={fetchedUser} />
+                <EventInfo id='eventInfo' event={event} go={goEvent} back={back} />
+                <EventEdit id='eventEdit' event={event} go={goEvent} back={back} />
             </View>
             <View id='user' activePanel={activeUserPanel}>
                 <User id='user' fetchedUser={fetchedUser} goUserEdit={goUserEdit} activeStory={activeStory} />
