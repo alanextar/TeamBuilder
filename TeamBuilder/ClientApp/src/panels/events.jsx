@@ -90,7 +90,7 @@ const Events = props => {
                         caption={`${event.startDate} - ${event.startDate}`}
                         onClick={props.go}
                         data-to='eventInfo'
-                        data-event={event}
+                        data-event={JSON.stringify(event)}
                         data-from={props.id}>
                         {event.name}
                     </RichCell>

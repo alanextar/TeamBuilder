@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using TeamBuilder.Extensions;
 using TeamBuilder.Models;
+using TeamBuilder.ViewModels;
 
 namespace TeamBuilder.Controllers
 {
@@ -60,6 +63,66 @@ namespace TeamBuilder.Controllers
 			                      $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
 
 			return Json(result);
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> Create([FromBody]CreateEventViewModel createEventViewModel)
+		{
+			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(createEventViewModel)}");
+
+			var user = await context.Users.FirstOrDefaultAsync(e => e.VkId == createEventViewModel.OwnerId);
+
+			if (user == null)
+				return Forbid();
+
+			var config = new MapperConfiguration(cfg => cfg.CreateMap<CreateEventViewModel, Event>()
+				.ForMember("Teams", opt => opt.Ignore())
+				.ForMember("Owner", opt => opt.MapFrom(_ => user)));
+			var mapper = new Mapper(config);
+			var @event = mapper.Map<CreateEventViewModel, Event>(createEventViewModel);
+
+			await context.Events.AddAsync(@event);
+			await context.SaveChangesAsync();
+
+			return Ok("Created");
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> Edit([FromBody]EditEventViewModel editEventViewModel)
+		{
+			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(editEventViewModel)}");
+
+			var @event = await context.Events.Include(e => e.Owner).FirstOrDefaultAsync(e => e.Id == editEventViewModel.Id);
+
+			var user = await context.Users.FirstOrDefaultAsync(e => e.VkId == editEventViewModel.UserId);
+			if (user == null || @event.Owner.VkId != editEventViewModel.UserId)
+				return Forbid();
+
+			var config = new MapperConfiguration(cfg => cfg.CreateMap<CreateEventViewModel, Event>()
+				.ForMember("Teams", opt => opt.Ignore())
+				.ForMember("Owner", opt => opt.Ignore()));
+			var mapper = new Mapper(config);
+			mapper.Map(editEventViewModel, @event);
+
+			context.Update(@event);
+			await context.SaveChangesAsync();
+
+			return Ok("Updated");
+		}
+
+		[HttpDelete]
+		public async Task<IActionResult> Delete(long id)
+		{
+			logger.LogInformation($"DELETE Request {HttpContext.Request.Headers[":path"]}.");
+
+			var @event = await context.Events.FirstOrDefaultAsync(e => e.Id == id);
+			if (@event == null)
+				return NotFound($"Event '{id}' not found");
+
+			context.Remove(@event);
+			await context.SaveChangesAsync();
+
+			return Ok("Deleted");
 		}
 
 		private async Task Initialize()

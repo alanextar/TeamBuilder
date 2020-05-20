@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using TeamBuilder.Models;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using TeamBuilder.Dto;
 using TeamBuilder.Extensions;
 using TeamBuilder.ViewModels;
 
