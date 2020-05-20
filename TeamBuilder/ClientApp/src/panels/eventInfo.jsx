@@ -11,7 +11,8 @@ import { Api } from '../api';
 const EventInfo = props => (
     <Panel id={props.id}>
         <PanelHeader separator={false} left={<PanelHeaderBack onClick={props.go} data-to={props.back} />}>
-            Создать мероприятие
+
+            {props.event && props.event.name}
         </PanelHeader>
 
             <Group>
