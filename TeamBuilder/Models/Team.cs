@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using TeamBuilder.Controllers.Paging;
 
 namespace TeamBuilder.Models
 {
-	public class Team
+	public class Team : IDbItem
 	{
 		public long Id { get; set; }
 		public string Name { get; set; }
