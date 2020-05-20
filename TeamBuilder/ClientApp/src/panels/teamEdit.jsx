@@ -189,7 +189,7 @@ class TeamEdit extends React.Component {
                 <FixedLayout vertical="bottom">
                     <Div>
                         <Button
-                            stretched={true}
+                            stretched
                             onClick={(e) => { this.postEdit(); this.state.go(e) }}
                             data-to={'teaminfo'}
                             data-id={this.props.teamId} >

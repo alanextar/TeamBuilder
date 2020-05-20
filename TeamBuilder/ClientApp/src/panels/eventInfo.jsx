@@ -45,7 +45,7 @@ const EventInfo = props => {
                             after={<Icon28EditOutline />}
                             onClick={props.go}
                             data-to='eventEdit'
-                            data-event={props.event}
+                            data-event={JSON.stringify(props.event)}
                             data-from={props.id}>
                         </SimpleCell>
                     </ FixedLayout>}
