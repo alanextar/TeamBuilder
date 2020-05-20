@@ -1,5 +1,8 @@
 ﻿import React, { useState, useEffect } from 'react';
-import { View, Epic, Tabbar, TabbarItem } from '@vkontakte/vkui';
+import {
+    View, Epic, Tabbar, TabbarItem, SelectMimicry, Radio, Checkbox, FormLayout,
+    FormLayoutGroup, Input, ModalRoot, ModalPage, PanelHeaderButton, Button, ModalPageHeader
+} from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import bridge from '@vkontakte/vk-bridge';
 
@@ -7,6 +10,9 @@ import Icon28Users from '@vkontakte/icons/dist/28/users';
 import Icon28Profile from '@vkontakte/icons/dist/28/profile';
 import Icon28Users3Outline from '@vkontakte/icons/dist/28/users_3_outline';
 import Icon28FavoriteOutline from '@vkontakte/icons/dist/28/favorite_outline';
+import Icon24Done from '@vkontakte/icons/dist/28/favorite_outline';
+import Icon24Cancel from '@vkontakte/icons/dist/28/favorite_outline';
+import Icon24Dismiss from '@vkontakte/icons/dist/28/favorite_outline';
 
 import Events from './panels/events'
 import EventCreate from './panels/eventCreate'
@@ -23,6 +29,8 @@ import User from './panels/user'
 import UserEdit from './panels/userEdit'
 
 const App = () => {
+    const [activeModal, setActiveModal] = useState(null);
+    const [modalHistory, setModalHistory] = useState([]);
     const [activeStory, setActiveStore] = useState('events');
     const [back, setBack] = useState(null);
 
@@ -38,6 +46,11 @@ const App = () => {
 
     const [city, setCity] = useState(null);
     const [about, setAbout] = useState(null);
+
+    const MODAL_PAGE_FILTERS = 'filters';
+    const MODAL_PAGE_COUNTRIES = 'countries';
+    const MODAL_PAGE_STORY_FEEDBACK = 'story-feedback';
+    const MODAL_PAGE_USER_INFO = 'user-info';
 
 
 	useEffect(() => {
@@ -81,6 +94,64 @@ const App = () => {
         setActiveUser(user);
     }
 
+    const goActiveModal = e => {
+        console.log('goActiveModal', e.currentTarget.dataset.activeModal, e.currentTarget.dataset.modalHistory);
+        setActiveModal("filters");
+        setModalHistory(e.currentTarget.dataset.modalHistory);
+    }
+
+    const modal = (
+        <ModalRoot
+            activeModal={activeModal}
+            onClose=""
+        >
+            <ModalPage
+                id="filters"
+                onClose=""
+                settlingHeight={50}
+                header={
+                    <ModalPageHeader
+                        left={<PanelHeaderButton onClick=""><Icon24Cancel /></PanelHeaderButton>}
+                        right={<PanelHeaderButton onClick=""><Icon24Done /></PanelHeaderButton>}
+                    >
+                        Фильтры
+            </ModalPageHeader>
+                }
+            >
+                <FormLayout>
+                    <SelectMimicry top="Страна" placeholder="Выбрать страну" onClick={() => setActiveModal(MODAL_PAGE_COUNTRIES)} />
+                </FormLayout>
+            </ModalPage>
+
+            <ModalPage
+                id={MODAL_PAGE_COUNTRIES}
+                header={
+                    <ModalPageHeader
+                        left={<PanelHeaderButton onClick=""><Icon24Cancel /></PanelHeaderButton>}
+                        right={<PanelHeaderButton onClick=""><Icon24Dismiss /></PanelHeaderButton>}
+                    >
+                        Выберите страну
+                    </ModalPageHeader>
+                }
+                settlingHeight={10}
+            >
+                <FormLayout>
+                    <Button mode="secondary" onClick={() => setActiveModal(MODAL_PAGE_USER_INFO)} size="xl">Информация о пользователе</Button>
+
+                    <FormLayoutGroup>
+                        {/* {importantCountries.map(({ id, title }) => {
+                            return (
+                                <Radio key={id} name="country" value={id}>{title}</Radio>
+                            );
+                        })} */}
+                        <Radio key="1" name="country" value="1">Команда 1</Radio>
+                        <Radio key="2" name="country" value="2">Команда 2</Radio>
+                        <Radio key="3" name="country" value="3">команда 3</Radio>
+                    </FormLayoutGroup>
+                </FormLayout>
+            </ModalPage>
+        </ModalRoot>);
+
 	return (
         <Epic activeStory={activeStory} tabbar={
             <Tabbar>
@@ -117,16 +188,13 @@ const App = () => {
                 <TeamEdit id='teamEdit' go={goTeam} teamId={activeTeam} />
                 <User id='user' fetchedUser={fetchedUser} goUserEdit={goTeam} activeStory={activeStory} return='teaminfo' />
             </View>
-            {/*<View id='users' activePanel='panel2'>
-                 <Panel2 id='panel2' go={go}/>
-             </View>*/}
             <View id='events' activePanel={activeEventPanel}>
                 <Events id='events' go={goEvent}/>
                 <EventCreate id='eventCreate' go={goEvent} back={back}/>
                 <EventInfo id='eventInfo' go={goEvent} back={back}/>
             </View>
-            <View id='user' activePanel={activeUserPanel}>
-                <User id='user' fetchedUser={fetchedUser} goUserEdit={goUserEdit} activeStory={activeStory} />
+            <View id='user' activePanel={activeUserPanel} modal={modal}>
+                <User id='user' fetchedUser={fetchedUser} goUserEdit={goUserEdit} activeStory={activeStory} goActiveModal={goActiveModal} />
                 <UserEdit id='userEdit' goUserEdit={goUserEdit} fetchedUser={fetchedUser} user={activeUser} />
                 <Teaminfo id='teaminfo' go={goUserEdit} teamId={activeTeam} return='user' />
             </View>
