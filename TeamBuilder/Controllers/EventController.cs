@@ -100,7 +100,7 @@ namespace TeamBuilder.Controllers
 
 			var config = new MapperConfiguration(cfg => cfg.CreateMap<CreateEventViewModel, Event>()
 				.ForMember("Teams", opt => opt.Ignore())
-				.ForMember("Owner", opt => opt.Ignore()));
+				.ForMember("Owner", opt => opt.MapFrom(_ => user)));
 			var mapper = new Mapper(config);
 			mapper.Map(editEventViewModel, @event);
 
