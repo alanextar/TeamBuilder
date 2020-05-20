@@ -160,9 +160,14 @@ namespace TeamBuilder.Controllers
 			return Json(userTeams);
 		}
 
-		public IActionResult AddUserToTeam(long id, long teamId)
+		public IActionResult SetTeam(long id, long teamId)
 		{
-			_logger.LogInformation("Request JoinTeamm");
+			_logger.LogInformation("Request SetTeam");
+
+			if (teamId == 0)
+			{
+				return NotFound();
+			}
 
 			var dbTeam = context.Teams.Include(x => x.UserTeams).FirstOrDefault(x => x.Id == teamId);
 

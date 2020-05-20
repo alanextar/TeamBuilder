@@ -28,6 +28,7 @@ class User extends React.Component {
             selectedSkills: null,
             isConfirmed: false,
             goUserEdit: props.goUserEdit,
+            goSetUserTeam: props.goSetUserTeam,
             user: null,
             readOnlyMode: props.activeStory != 'user'
         }
@@ -157,6 +158,14 @@ class User extends React.Component {
                         onClick={() => this.confirmUser(this.state.fetchedUser && this.state.fetchedUser.id, this.state.userSkills)}>
                         {this.state.isConfirmed ? "Сохранить" : "Подтвердить"}
                     </Button>}
+                </Div>
+                <Div>
+                    <Button mode="primary" size='xl'
+                        onClick={ this.state.goSetUserTeam }
+                        data-to='setUserTeam'
+                        data-user={JSON.stringify(this.state.user)}>
+                        Завербовать
+                    </Button>
                 </Div>
             </Panel>
         )

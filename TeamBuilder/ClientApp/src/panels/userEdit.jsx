@@ -54,7 +54,7 @@ class UserEdit extends React.Component {
 
     render() {
         console.log(this.state.fetchedUser);
-        console.log('userEdit render', this.state.user);
+        console.log('setUserEdit render', this.state.user);
         return (
             <Panel id="userEdit">
                 <PanelHeader>Профиль</PanelHeader>
