@@ -13,6 +13,9 @@ class TeamEdit extends React.Component {
         super(props);
 
         this.state = {
+            name: null,
+            description: null,
+            membersDescription: null,
             team: null,
             events: null,
             check: null,
@@ -23,6 +26,10 @@ class TeamEdit extends React.Component {
         };
 
         this.onChange = this.onChange.bind(this);
+        this.onDescriptionChange = this.onDescriptionChange.bind(this);
+        this.onMembersDescriptionChange = this.onMembersDescriptionChange.bind(this);
+        this.onNameChange = this.onNameChange.bind(this);
+        this.postEdit = this.postEdit.bind(this);
     }
 
     componentDidMount() {
@@ -45,6 +52,9 @@ class TeamEdit extends React.Component {
         console.log('data from teamEdit', data)
         this.setState({
             team: data,
+            name: data.name,
+            description: data.description,
+            membersDescription: data.descriptionRequiredMembers,
             usersNumber: data.numberRequiredMembers,
             check: data.event.id
         });
@@ -55,12 +65,44 @@ class TeamEdit extends React.Component {
         this.setState({ check: value });
     }
 
+    onNameChange(e) {
+        const { name, value } = e.currentTarget;
+        console.log('change name ', value);
+        this.setState({ name: value })
+    }
+
+    onDescriptionChange(e) {
+        const { description, value } = e.currentTarget;
+        this.setState({ description: value })
+    }
+
+    onMembersDescriptionChange(e) {
+        const { membersDescription, value } = e.currentTarget;
+        this.setState({ membersDescription: value })
+    }
+
+    async postEdit() {
+        let id = this.state.team.id;
+        let name = this.state.name;
+        let description = this.state.description;
+        let numberRequiredMembers = this.state.usersNumber;
+        let eventId = this.state.check;
+        let descriptionRequiredMembers = this.state.membersDescription;
+        var editTeamViewModel = { id, name, description, numberRequiredMembers, descriptionRequiredMembers, eventId };
+
+        let response = await fetch('/api/teams/edit', {
+            method: 'post',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(editTeamViewModel)
+        });
+    }
+
     render() {
         const check = this.state.check;
         return (
             <Panel id={this.state.id}>
-                <PanelHeader separator={false} left={<PanelHeaderBack onClick={this.state.go} data-to='teams' />}>
-                    {this.state.team && this.state.team.name}
+                <PanelHeader separator={false} left={<PanelHeaderBack onClick={this.state.go} data-to={'teaminfo'} data-id={this.props.teamId} />}>
+                    {this.state.team && this.state.name}
                 </PanelHeader>
                 <Tabs>
                     <TabsItem
@@ -84,9 +126,9 @@ class TeamEdit extends React.Component {
                     {this.state.team && (
                         this.state.activeTab === 'teamDescription' ?
                             <FormLayout >
-                                <Input top="Название команды" type="text" defaultValue={this.state.team.name} />
+                                <Input top="Название команды" type="text" defaultValue={this.state.name} onChange={this.onNameChange} />
 
-                                <Textarea top="Описание команды" defaultValue={this.state.team.description} />
+                                <Textarea top="Описание команды" defaultValue={this.state.description} onChange={this.onDescriptionChange} />
                                 <Select
                                     top="Выберете событие"
                                     placeholder="Событие"
@@ -120,7 +162,10 @@ class TeamEdit extends React.Component {
                                         top="Количество участников в команде"
                                     />
                                     <Input value={String(this.state.usersNumber)} onChange={e => this.setState({ usersNumber: e.target.value })} type="number" />
-                                    <Textarea top="Описание участников и их задач" defaultValue={this.state.team.descriptionRequiredMembers} />
+                                    <Textarea
+                                        top="Описание участников и их задач"
+                                        defaultValue={this.state.membersDescription}
+                                        onChange={this.onMembersDescriptionChange} />
                                 </ FormLayout>
 
                                 <InfoRow header='Участники'>
@@ -143,7 +188,13 @@ class TeamEdit extends React.Component {
                 </ Group>
                 <FixedLayout vertical="bottom">
                     <Div>
-                        <Button stretched={true}>Применить Изменения</Button>
+                        <Button
+                            stretched={true}
+                            onClick={(e) => { this.postEdit(); this.state.go(e) }}
+                            data-to={'teaminfo'}
+                            data-id={this.props.teamId} >
+                            Применить Изменения
+                        </Button>)
                     </Div>
                 </ FixedLayout>
             </Panel>
