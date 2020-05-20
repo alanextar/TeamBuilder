@@ -13,6 +13,9 @@ class TeamEdit extends React.Component {
         super(props);
 
         this.state = {
+            name: null,
+            description: null,
+            membersDescription: null,
             team: null,
             events: null,
             check: null,
@@ -23,6 +26,10 @@ class TeamEdit extends React.Component {
         };
 
         this.onChange = this.onChange.bind(this);
+        this.onDescriptionChange = this.onDescriptionChange.bind(this);
+        this.onMembersDescriptionChange = this.onMembersDescriptionChange.bind(this);
+        this.onNameChange = this.onNameChange.bind(this);
+        this.postEdit = this.postEdit.bind(this);
     }
 
     componentDidMount() {
@@ -45,6 +52,9 @@ class TeamEdit extends React.Component {
         console.log('data from teamEdit', data)
         this.setState({
             team: data,
+            name: data.name,
+            description: data.description,
+            membersDescription: data.descriptionRequiredMembers,
             usersNumber: data.numberRequiredMembers,
             check: data.event.id
         });
@@ -55,12 +65,43 @@ class TeamEdit extends React.Component {
         this.setState({ check: value });
     }
 
+    onNameChange(e) {
+        const { name, value } = e.currentTarget;
+        this.setState({ name: value })
+    }
+
+    onDescriptionChange(e) {
+        const { description, value } = e.currentTarget;
+        this.setState({ description: value })
+    }
+
+    onMembersDescriptionChange(e) {
+        const { membersDescription, value } = e.currentTarget;
+        this.setState({ membersDescription: value })
+    }
+
+    async postEdit() {
+        let id = this.state.team.id;
+        let name = this.state.name;
+        let description = this.state.description;
+        let numberRequiredMembers = this.state.usersNumber;
+        let eventId = this.state.check;
+        let descriptionRequiredMembers = this.state.membersDescription;
+        var editTeamViewModel = { id, name, description, numberRequiredMembers, descriptionRequiredMembers, eventId };
+
+        let response = await fetch('/api/teams/edit', {
+            method: 'post',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(editTeamViewModel)
+        });
+    }
+
     render() {
         const check = this.state.check;
         return (
             <Panel id={this.state.id}>
                 <PanelHeader separator={false} left={<PanelHeaderBack onClick={this.state.go} data-to='teams' />}>
-                    {this.state.team && this.state.team.name}
+                    {this.state.team && this.state.name}
                 </PanelHeader>
                 <Tabs>
                     <TabsItem
@@ -143,7 +184,11 @@ class TeamEdit extends React.Component {
                 </ Group>
                 <FixedLayout vertical="bottom">
                     <Div>
-                        <Button stretched={true}>Применить Изменения</Button>
+                        <Button
+                            stretched={true}
+                            onClick={(e) => { this.state.check && this.postEdit(); this.state.go(e) }}>
+                            Применить Изменения
+                        </Button>
                     </Div>
                 </ FixedLayout>
             </Panel>

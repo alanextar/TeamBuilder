@@ -94,7 +94,7 @@ class Teaminfo extends React.Component {
                                         {console.log('userTeams ', this.state.team.userTeams)}
                                         {this.state.team.userTeams &&
                                             this.state.team.userTeams.map((members, i) => {
-                                                { members.isOwner && self.setState({ edit: true}) }
+                                                //{ members.isOwner && (members.vkId === self.props.fetchedUser.id) && self.setState({ edit: true }) }
                                                 return (
                                                     <SimpleCell
                                                         onClick={this.state.go}
