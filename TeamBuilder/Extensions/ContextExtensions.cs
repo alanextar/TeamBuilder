@@ -28,18 +28,24 @@ namespace TeamBuilder.Extensions
                 .Select(t => t.t.item);
         }
 
-        public static Page<T> GetPage<T>(this DbSet<T> set, int pageSize, HttpRequest request, int page = 0,
-	        bool prev = false) 
+        public static Page<T> GetPage<T>(this DbSet<T> set, 
+	        int pageSize, 
+	        HttpRequest request, 
+	        int page = 0,
+	        bool prev = false,
+	        Func<T, bool> filter = null)
 	        where T: class, IDbItem
         {
 	        if (pageSize == 0)
 		        return new Page<T>(new List<T>(), null);
 
+	        filter ??= _ => true; 
+
 	        var countTake = prev ? (page + 1) * pageSize : pageSize ;
 	        var countSkip = prev ? 0 : page * pageSize;
 
 	        string nextHref = null;
-	        var items = set.Skip(countSkip).Take(++countTake).OrderBy(t => t.Id).ToList();
+	        var items = set.Where(filter).OrderBy(s => s.Id).Skip(countSkip).Take(++countTake).ToList();
 	        if (items.Count == countTake)
 	        {
 		        nextHref = $"{request.Path}?pageSize={pageSize}&page={++page}";

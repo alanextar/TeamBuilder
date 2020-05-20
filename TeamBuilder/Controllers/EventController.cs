@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -28,7 +29,22 @@ namespace TeamBuilder.Controllers
 			return Json(events);
 		}
 
-		public async Task<IActionResult> GetPage(int pageSize, int page = 0, bool prev = false)
+		public IActionResult PagingSearch(string search, int pageSize = 20, int page = 0, bool prev = false)
+		{
+			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
+
+			if (pageSize == 0)
+				return NoContent();
+
+			bool Filter(Event @event) => @event.Name.ToLowerInvariant().Contains(search?.ToLowerInvariant() ?? string.Empty);
+			var result = context.Events.GetPage(pageSize, HttpContext.Request, page, prev, Filter);
+			logger.LogInformation($"Response EventsCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
+			                      $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
+
+			return Json(result);
+		}
+
+		public async Task<IActionResult> GetPage(int pageSize = 20, int page = 0, bool prev = false)
 		{
 			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
 
@@ -36,7 +52,8 @@ namespace TeamBuilder.Controllers
 				await Initialize();
 
 			var result = context.Events.GetPage(pageSize, HttpContext.Request, page, prev);
-			logger.LogInformation($"Response TeamsCount:{result.Collection.Count()} / from:{result.Collection?.First().Id} / to:{result.Collection?.Last().Id} / NextHref:{result.NextHref}");
+			logger.LogInformation($"Response EventsCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
+			                      $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
 
 			return Json(result);
 		}
