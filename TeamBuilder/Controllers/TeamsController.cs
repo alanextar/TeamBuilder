@@ -12,7 +12,7 @@ using TeamBuilder.ViewModels;
 
 namespace TeamBuilder.Controllers
 {
-	public class TeamsController : ControllerBase
+	public class TeamsController : Controller
 	{
 		private readonly ApplicationContext context;
 		private readonly ILogger<TeamsController> logger;
@@ -48,7 +48,7 @@ namespace TeamBuilder.Controllers
 			var countSkip = prev ? 0 : page * pageSize;
 
 			string nextHref = null;
-			var teams = context.Teams.Include(x => x.UserTeams).Skip(countSkip).Take(++countTake).OrderBy(t => t.Id).ToList();
+			var teams = context.Teams.OrderBy(t => t.Id).Include(x => x.UserTeams).Skip(countSkip).Take(++countTake).OrderBy(t => t.Id).ToList();
 			if (teams.Count == countTake)
 			{
 				nextHref = $"{HttpContext.Request.Path}?pageSize={pageSize}&page={++page}";
@@ -100,18 +100,16 @@ namespace TeamBuilder.Controllers
 				return NotFound($"Team '{editTeamViewModel.Id}' not found");
 
 			var @event = await context.Events.FirstOrDefaultAsync(e => e.Id == editTeamViewModel.EventId);
-			if (@event == null)
-				return NotFound($"Event '{editTeamViewModel.EventId}' not found");
 
 			var config = new MapperConfiguration(cfg => cfg.CreateMap<EditTeamViewModel, Team>()
 				.ForMember("Event", opt => opt.MapFrom(_ => @event)));
 			var mapper = new Mapper(config);
-			var newTeam = mapper.Map<EditTeamViewModel, Team>(editTeamViewModel);
+			mapper.Map(editTeamViewModel, team);
 
-			context.Teams.Update(newTeam);
+			context.Update(team);
 			await context.SaveChangesAsync();
 
-			return Ok("Updated");
+			return Json(team);
 		}
 
 		[HttpDelete]
