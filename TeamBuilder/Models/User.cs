@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
+using TeamBuilder.Controllers.Paging;
 
 namespace TeamBuilder.Models
 {
-	public class User
+	public class User : IDbItem
 	{
 		public User()
 		{

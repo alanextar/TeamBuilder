@@ -14,18 +14,18 @@ namespace TeamBuilder.Controllers
 	public class UserController : Controller
 	{
 		private readonly ApplicationContext context;
-		private readonly ILogger<UserController> _logger;
+		private readonly ILogger<UserController> logger;
 
 		public UserController(ApplicationContext context, ILogger<UserController> logger)
 		{
 			this.context = context;
-			_logger = logger;
+			this.logger = logger;
 		}
 
 		[HttpPost]
 		public async Task<IActionResult> Confirm([FromBody]ProfileViewModel profileViewModel)
 		{
-			_logger.LogInformation($"POST Request Confirm. Body: {JsonConvert.SerializeObject(profileViewModel)}");
+			logger.LogInformation($"POST Request Confirm. Body: {JsonConvert.SerializeObject(profileViewModel)}");
 
 			var user = context.Users.Include(x => x.UserSkills)
 				.ThenInclude(y => y.Skill).FirstOrDefault(u => u.VkId == profileViewModel.VkId);
@@ -60,7 +60,7 @@ namespace TeamBuilder.Controllers
 		[HttpGet]
 		public IActionResult CheckConfirmation(long vkId)
 		{
-			_logger.LogInformation($"Request CheckConfirmation/{vkId}");
+			logger.LogInformation($"Request CheckConfirmation/{vkId}");
 
 			var isConfirmed = context.Users.FirstOrDefault(x => x.VkId == vkId) != null ? true : false;
 
@@ -69,7 +69,7 @@ namespace TeamBuilder.Controllers
 
 		public List<Skill> GetSkills(long vkId)
 		{
-			_logger.LogInformation($"Request GetSkills/{vkId}");
+			logger.LogInformation($"Request GetSkills/{vkId}");
 
 			var userSkills = context.Users.Include(x => x.UserSkills)
 				.ThenInclude(y => y.Skill)
@@ -78,12 +78,15 @@ namespace TeamBuilder.Controllers
 				.Select(x => x.Skill)
 				.ToList();
 
+			if (userSkills == null || !userSkills.Any())
+				return new List<Skill>();
+
 			return userSkills;
 		}
 
 		public User GetTeams(long vkId)
 		{
-			_logger.LogInformation($"Request GetTeams/{vkId}");
+			logger.LogInformation($"Request GetTeams/{vkId}");
 
 			var user = context.Users.Include(x => x.UserTeams).FirstOrDefault(x => x.Id == vkId);
 
@@ -93,7 +96,7 @@ namespace TeamBuilder.Controllers
 		[HttpGet]
 		public IActionResult Get(long vkId)
 		{
-			_logger.LogInformation("Request ConfirmUser");
+			logger.LogInformation("Request ConfirmUser");
 
 			var user = context.Users.Include(x => x.UserTeams)
 				.ThenInclude(y => y.Team)
@@ -108,7 +111,7 @@ namespace TeamBuilder.Controllers
 		[HttpPost]
 		public IActionResult Edit([FromBody]User user)
 		{
-			_logger.LogInformation("Request ConfirmUser");
+			logger.LogInformation("Request ConfirmUser");
 
 			var dbUser = context.Users.FirstOrDefault(u => u.VkId == user.VkId);
 			dbUser.City = user.City;
@@ -122,7 +125,7 @@ namespace TeamBuilder.Controllers
 
 		public IActionResult JoinTeam(long id, long teamId)
 		{
-			_logger.LogInformation("Request JoinTeamm");
+			logger.LogInformation("Request JoinTeamm");
 
 			var dbUser = context.Users
 				.Include(x => x.UserTeams)
@@ -141,7 +144,7 @@ namespace TeamBuilder.Controllers
 
 		public IActionResult QuitOrDeclineTeam(long id, long teamId)
 		{
-			_logger.LogInformation("Request JoinTeamm");
+			logger.LogInformation("Request JoinTeamm");
 
 			var dbUser = context.Users
 				.Include(x => x.UserTeams)
@@ -159,5 +162,55 @@ namespace TeamBuilder.Controllers
 
 			return Json(userTeams);
 		}
+
+		#region List
+
+		public IActionResult GetAll()
+		{
+			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
+
+			var users = context.Users.ToList();
+
+			logger.LogInformation($"Response UsersCount:{users.Count}");
+
+			return Json(users);
+		}
+
+		public IActionResult PagingSearch(string search, int pageSize = 20, int page = 0, bool prev = false)
+		{
+			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
+
+			if (string.IsNullOrEmpty(search))
+				return RedirectToAction("GetPage", new { pageSize, page, prev});
+
+			if (pageSize == 0)
+				return NoContent();
+
+			bool Filter(User user) => user.FullName.ToLowerInvariant().Contains(search?.ToLowerInvariant());
+			var result = context.Users.GetPage(pageSize, HttpContext.Request, page, prev, Filter);
+			result.NextHref = result.NextHref == null ? null : $"{result.NextHref}&search={search}";
+			logger.LogInformation($"Response UsersCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
+			                      $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
+
+			return Json(result);
+		}
+
+		public IActionResult GetPage(int pageSize = 20, int page = 0, bool prev = false)
+		{
+			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
+
+			//if (!context.Teams.Any())
+			//	await Initialize();
+
+			if (pageSize == 0)
+				return NoContent();
+
+			var teams = context.Users.GetPage(pageSize, HttpContext.Request, page, prev);
+
+			logger.LogInformation($"Response UsersCount:{teams.Collection.Count()} / from:{teams.Collection.FirstOrDefault()?.Id} / to:{teams.Collection.LastOrDefault()?.Id} / NextHref:{teams.NextHref}");
+			return Json(teams);
+		}
+
+		#endregion
 	}
 }
