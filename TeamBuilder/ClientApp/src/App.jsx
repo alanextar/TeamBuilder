@@ -11,11 +11,9 @@ import Icon28FavoriteOutline from '@vkontakte/icons/dist/28/favorite_outline';
 import Events from './panels/events'
 import EventCreate from './panels/eventCreate'
 import EventInfo from './panels/eventInfo'
-import Panel2 from './panels/panel2'
-import Panel3 from './panels/panel3'
 
 import Teams from './panels/teams'
-import Teaminfo from './panels/teaminfo' 
+import TeamInfo from './panels/teamInfo' 
 import TeamCreate from './panels/teamCreate'
 import TeamEdit from './panels/teamEdit'
 
@@ -114,7 +112,7 @@ const App = () => {
         }>
             <View id='teams' activePanel={activeTeamPanel} >
                 <Teams id='teams' go={goTeam} href={teamHref} />
-                <Teaminfo id='teaminfo' go={goTeam} teamId={activeTeam} return='teams' fetchedUser={fetchedUser}/>
+                <TeamInfo id='teaminfo' go={goTeam} teamId={activeTeam} return='teams' fetchedUser={fetchedUser}/>
                 <TeamCreate id='teamCreate' go={goTeam} />
                 <TeamEdit id='teamEdit' go={goTeam} teamId={activeTeam} />
                 <User id='user' fetchedUser={fetchedUser} goUserEdit={goTeam} activeStory={activeStory} return='teaminfo' />
@@ -130,7 +128,7 @@ const App = () => {
             <View id='user' activePanel={activeUserPanel}>
                 <User id='user' fetchedUser={fetchedUser} goUserEdit={goUserEdit} activeStory={activeStory} />
                 <UserEdit id='userEdit' goUserEdit={goUserEdit} fetchedUser={fetchedUser} user={activeUser} />
-                <Teaminfo id='teaminfo' go={goUserEdit} teamId={activeTeam} return='user' />
+                <TeamInfo id='teaminfo' go={goUserEdit} teamId={activeTeam} return='user' />
             </View>
         </Epic>
 
