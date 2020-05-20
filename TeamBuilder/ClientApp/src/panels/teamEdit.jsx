@@ -67,6 +67,7 @@ class TeamEdit extends React.Component {
 
     onNameChange(e) {
         const { name, value } = e.currentTarget;
+        console.log('change name ', value);
         this.setState({ name: value })
     }
 
@@ -125,9 +126,9 @@ class TeamEdit extends React.Component {
                     {this.state.team && (
                         this.state.activeTab === 'teamDescription' ?
                             <FormLayout >
-                                <Input top="Название команды" type="text" defaultValue={this.state.team.name} />
+                                <Input top="Название команды" type="text" defaultValue={this.state.name} onChange={this.onNameChange} />
 
-                                <Textarea top="Описание команды" defaultValue={this.state.team.description} />
+                                <Textarea top="Описание команды" defaultValue={this.state.description} onChange={this.onDescriptionChange} />
                                 <Select
                                     top="Выберете событие"
                                     placeholder="Событие"
@@ -161,7 +162,10 @@ class TeamEdit extends React.Component {
                                         top="Количество участников в команде"
                                     />
                                     <Input value={String(this.state.usersNumber)} onChange={e => this.setState({ usersNumber: e.target.value })} type="number" />
-                                    <Textarea top="Описание участников и их задач" defaultValue={this.state.team.descriptionRequiredMembers} />
+                                    <Textarea
+                                        top="Описание участников и их задач"
+                                        defaultValue={this.state.membersDescription}
+                                        onChange={this.onMembersDescriptionChange} />
                                 </ FormLayout>
 
                                 <InfoRow header='Участники'>
@@ -184,11 +188,12 @@ class TeamEdit extends React.Component {
                 </ Group>
                 <FixedLayout vertical="bottom">
                     <Div>
-                        <Button
-                            stretched={true}
-                            onClick={(e) => { this.state.check && this.postEdit(); this.state.go(e) }}>
-                            Применить Изменения
-                        </Button>
+                        {this.state.check && (
+                            <Button
+                                stretched={true}
+                                onClick={(e) => { this.postEdit(); this.state.go(e) }}>
+                                Применить Изменения
+                            </Button>)}
                     </Div>
                 </ FixedLayout>
             </Panel>

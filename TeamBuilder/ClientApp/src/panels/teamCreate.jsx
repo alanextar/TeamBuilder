@@ -154,11 +154,12 @@ class TeamCreate extends React.Component {
                 </ Group>
                 <FixedLayout vertical="bottom">
                     <Div>
+                        {this.state.check && (
                         <Button 
                             stretched={ true }
-                            onClick={(e) => { this.state.check && this.postCreate(); this.state.go(e) }}
+                            onClick={(e) => { this.postCreate(); this.state.go(e) }}
                             data-to={'teams'}>Создать Команду
-                        </Button>
+                        </Button> )}
                     </Div>
                 </ FixedLayout>
             </Panel>
