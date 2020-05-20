@@ -81,7 +81,7 @@ const EventEdit = props => {
                     data-to='eventInfo'
                     data-event={JSON.stringify(props.event)}
                     data-from={props.id}>
-                    Создать cоревнование
+                    Изменить мероприятие
                 </Button>
             </ FixedLayout>
         </Panel>

@@ -24,8 +24,8 @@ const EventInfo = props => {
                 </SimpleCell>
                 <SimpleCell>
                     <InfoRow header="Ссылка">
-                        {props.event && <a href={props.event.link}>{props.event.link}</a> }
-                        
+                        {props.event && <a href={props.event.link}>{props.event.link}</a>}
+
                     </InfoRow>
                 </SimpleCell>
                 <SimpleCell multiline>
