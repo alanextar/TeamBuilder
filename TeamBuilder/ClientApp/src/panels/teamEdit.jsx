@@ -191,7 +191,8 @@ class TeamEdit extends React.Component {
                         {this.state.check && (
                             <Button
                                 stretched={true}
-                                onClick={(e) => { this.postEdit(); this.state.go(e) }}>
+                                onClick={(e) => { this.postEdit(); this.state.go(e) }}
+                                data-to={this.state.id}>
                                 Применить Изменения
                             </Button>)}
                     </Div>
