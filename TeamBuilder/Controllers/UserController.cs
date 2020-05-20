@@ -78,6 +78,9 @@ namespace TeamBuilder.Controllers
 				.Select(x => x.Skill)
 				.ToList();
 
+			if (userSkills == null || !userSkills.Any())
+				return new List<Skill>();
+
 			return userSkills;
 		}
 
