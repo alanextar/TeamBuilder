@@ -43,7 +43,7 @@ namespace TeamBuilder.Controllers
 				return NoContent();
 
 			bool Filter(Team team) => team.Name.ToLowerInvariant().Contains(search?.ToLowerInvariant() ?? string.Empty);
-			var result = context.Teams.GetPage(pageSize, HttpContext.Request, page, prev, Filter);
+			var result = context.Teams.Include(x => x.Event).Include(x => x.UserTeams).GetPage(pageSize, HttpContext.Request, page, prev, Filter);
 			logger.LogInformation($"Response EventsCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
 			                      $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
 
@@ -60,7 +60,7 @@ namespace TeamBuilder.Controllers
 			if (pageSize == 0)
 				return NoContent();
 
-			var teams = context.Teams.GetPage(pageSize, HttpContext.Request, page, prev);
+			var teams = context.Teams.Include(x => x.Event).Include(x => x.UserTeams).GetPage(pageSize, HttpContext.Request, page, prev);
 
 			logger.LogInformation($"Response TeamsCount:{teams.Collection.Count()} / from:{teams.Collection.FirstOrDefault()?.Id} / to:{teams.Collection.LastOrDefault()?.Id} / NextHref:{teams.NextHref}");
 			return Json(teams);
