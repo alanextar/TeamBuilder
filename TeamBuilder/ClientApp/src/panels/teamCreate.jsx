@@ -134,7 +134,9 @@ class TeamCreate extends React.Component {
                                 })}
 
                             </Select>
-                            <Button>Создать Событие</Button>
+                            <Button onClick={this.state.go}
+                                data-to={'eventCreate'}
+                                data-from={this.state.id}>Создать Событие</Button>
                         </ FormLayout>
                         :
                         <Cell>
