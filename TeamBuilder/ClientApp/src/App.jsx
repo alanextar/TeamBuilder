@@ -23,7 +23,7 @@ import User from './panels/user'
 import UserEdit from './panels/userEdit'
 
 const App = () => {
-    const [activeStory, setActiveStore] = useState('teams');
+    const [activeStory, setActiveStore] = useState('events');
     const [back, setBack] = useState(null);
 
     const [activeTeamPanel, setActiveTeamPanel] = useState('teams');
@@ -66,7 +66,7 @@ const App = () => {
     };
 
     const goEvent = e => {
-        setEvent(e.currentTarget.dataset.event);
+        setEvent(e.currentTarget.dataset.event && JSON.parse(e.currentTarget.dataset.event));
         setActiveEventPanel(e.currentTarget.dataset.to);
         setBack(e.currentTarget.dataset.from);
     };
