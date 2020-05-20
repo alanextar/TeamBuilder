@@ -12,9 +12,9 @@ class TeamCreate extends React.Component {
         super(props);
 
         this.state = {
-            name: null,
-            description: null,
-            membersDescription:null,
+            name: '',
+            description: '',
+            membersDescription:'',
             events: null,
             check: null,
             usersNumber: 2,
@@ -114,8 +114,8 @@ class TeamCreate extends React.Component {
                 <Group>
                     {this.state.activeTab === 'teamDescription' ?
                         <FormLayout >
-                            <Input top="Название команды" type="text" placeholder="DreamTeam" onChange={ this.onNameChange } />
-                            <Textarea top="Описание команды" onChange={ this.onDescriptionChange } />
+                            <Input top="Название команды" type="text" placeholder="DreamTeam" onChange={this.onNameChange} defaultValue={this.state.name} />
+                            <Textarea top="Описание команды" onChange={this.onDescriptionChange} defaultValue={this.state.description} />
                             <Select
                                 top="Выберете событие"
                                 placeholder="Событие"
@@ -148,17 +148,18 @@ class TeamCreate extends React.Component {
                                     top="Количество участников в команде"
                                 />
                                 <Input value={String(this.state.usersNumber)} onChange={e => this.setState({ usersNumber: e.target.value })} type="number" />
-                                <Textarea top="Описание участников и их задач" onChange={ this.onMembersDescriptionChange } />
+                                <Textarea top="Описание участников и их задач" onChange={this.onMembersDescriptionChange} defaultValue={this.state.membersDescription} />
                             </ FormLayout>
                         </ Cell>}
                 </ Group>
                 <FixedLayout vertical="bottom">
                     <Div>
+                        {this.state.check && (
                         <Button 
                             stretched={ true }
-                            onClick={(e) => { this.state.check && this.postCreate(); this.state.go(e) }}
+                            onClick={(e) => { this.postCreate(); this.state.go(e) }}
                             data-to={'teams'}>Создать Команду
-                        </Button>
+                        </Button> )}
                     </Div>
                 </ FixedLayout>
             </Panel>

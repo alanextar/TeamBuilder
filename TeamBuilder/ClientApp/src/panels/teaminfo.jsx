@@ -20,7 +20,7 @@ class Teaminfo extends React.Component {
             id: props.id,
             activeTab: 'teamDescription',
             return: props.return,
-            edit: true,
+            edit: true
         };
     }
 
@@ -91,10 +91,11 @@ class Teaminfo extends React.Component {
                             <Cell>
                                 <Div>
                                     <InfoRow header='Участники'>
+                                        Требуется {this.state.team.numberRequiredMembers} участников
                                         {console.log('userTeams ', this.state.team.userTeams)}
                                         {this.state.team.userTeams &&
                                             this.state.team.userTeams.map((members, i) => {
-                                                { members.isOwner && self.setState({ edit: true}) }
+                                                //{ members.isOwner && (members.vkId === self.props.fetchedUser.id) && self.setState({ edit: true }) }
                                                 return (
                                                     <SimpleCell
                                                         onClick={this.state.go}
