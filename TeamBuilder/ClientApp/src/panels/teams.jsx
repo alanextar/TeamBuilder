@@ -6,6 +6,7 @@ import {
 import InfiniteScroll from 'react-infinite-scroller';
 import qwest from 'qwest';
 import { Api } from './../api';
+import debounce from 'lodash.debounce';
 
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 
@@ -20,7 +21,9 @@ class Teams extends React.Component {
             teams: [],
             go: props.go,
             page_id: props.id,
-            fetching: false
+            fetching: false,
+            search: '',
+            nextHref: null
         };
 
         console.log(`.ctr.Href: ${this.state.href}`);
@@ -34,6 +37,8 @@ class Teams extends React.Component {
             });
 
         };
+
+        this.onChangeSearch = this.onChangeSearch.bind(this);
     }
 
     componentDidMount() {
@@ -74,16 +79,13 @@ class Teams extends React.Component {
     }
 
     loadItems(page) {
+        var url = this.state.search.length === 0 ? `${Api.Teams.GetPage}` : `${Api.Teams.PagingSearch}?search=${this.state.search}`;
+        if (this.state.nextHref) {
+            url = this.nextHref;
+        }
         window.scrollTo(0, 0);
         var self = this;
-        
-        var url = Api.Teams.GetPage;
-        //if (this.state.href) {
-        //    url = this.state.href;
-        //}
-        if (this.state.nextHref) {
-            url = this.state.nextHref;
-        }
+       
 
         console.log(`loadItems.Url: ${url}`);
 
@@ -114,6 +116,25 @@ class Teams extends React.Component {
             });
     }
 
+    async searchTeams(value) {
+        const response = await fetch(`${Api.Teams.PagingSearch}?search=${value}`);
+        const data = await response.json();
+        console.log('teams from teamEdit', data)
+        this.setState({
+            teams: data,
+        });
+    }
+
+    delayedSearchEvents = debounce(this.searchTeams, 250);
+    
+    onChangeSearch(e) {
+        this.setState({
+            search: e.target.value,
+            nextHref: null
+        })
+        this.delayedSearchEvents(e.target.value)
+    }
+
     render() {
         var self = this;
         //var href = self.state.href === api.baseUrl + api.getTeams ? self.state.href : self.state.href + '&prev=true';
@@ -142,9 +163,9 @@ class Teams extends React.Component {
                     <PanelHeaderButton>
                         <Icon28AddOutline onClick={this.state.go} data-to='teamCreate' />
                     </PanelHeaderButton>}>
-                        Команды
+                    Команды
                 </PanelHeader>
-                <Search />
+                <Search value={this.state.search} onChange={this.onChangeSearch} after={null} />
                 <PullToRefresh onRefresh={this.onRefresh} isFetching={this.state.fetching}>
 
                         <InfiniteScroll
@@ -157,8 +178,8 @@ class Teams extends React.Component {
                             </CardGrid>
                         </InfiniteScroll>
                 </PullToRefresh>
-            </Panel>
-        );
+            </Panel>)
+        
     }
 };
 
