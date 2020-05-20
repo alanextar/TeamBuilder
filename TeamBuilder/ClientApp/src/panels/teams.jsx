@@ -122,7 +122,7 @@ class Teams extends React.Component {
         console.log('searchTeam', data)
         this.setState({
             teams: data.collection,
-            hasMoreItems: true,
+            hasMoreItems: data.nextHref ? true : false,
             nextHref: data.nextHref
         });
     }
