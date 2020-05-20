@@ -23,7 +23,6 @@ class Teams extends React.Component {
             page_id: props.id,
             fetching: false,
             search: '',
-            nextHref: null
         };
 
         console.log(`.ctr.Href: ${this.state.href}`);
@@ -52,7 +51,6 @@ class Teams extends React.Component {
         var url = Api.Teams.GetPage;
 
         qwest.get(url, {
-            pageSize: 20
         }, {
             cache: true
         })
@@ -79,9 +77,12 @@ class Teams extends React.Component {
     }
 
     loadItems(page) {
+        console.log("for Danya", this.state.search)
         var url = this.state.search.length === 0 ? `${Api.Teams.GetPage}` : `${Api.Teams.PagingSearch}?search=${this.state.search}`;
+        console.log("for Danya 2", url)
+        console.log("for Danya 3", this.state.nextHref)
         if (this.state.nextHref) {
-            url = this.nextHref;
+            url = this.state.nextHref;
         }
         window.scrollTo(0, 0);
         var self = this;
@@ -90,7 +91,6 @@ class Teams extends React.Component {
         console.log(`loadItems.Url: ${url}`);
 
         qwest.get(url, {
-            pageSize: 20
         }, {
             cache: true
         })
@@ -119,9 +119,11 @@ class Teams extends React.Component {
     async searchTeams(value) {
         const response = await fetch(`${Api.Teams.PagingSearch}?search=${value}`);
         const data = await response.json();
-        console.log('teams from teamEdit', data)
+        console.log('searchTeam', data)
         this.setState({
-            teams: data,
+            teams: data.collection,
+            hasMoreItems: true,
+            nextHref: data.nextHref
         });
     }
 
