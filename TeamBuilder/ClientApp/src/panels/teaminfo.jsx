@@ -97,6 +97,9 @@ class Teaminfo extends React.Component {
                                                 { members.isOwner && self.setState({ edit: true}) }
                                                 return (
                                                     <SimpleCell
+                                                        onClick={this.state.go}
+                                                        data-to='user'
+                                                        data-id={members.userId}
                                                         before={<Avatar size={48} />}
                                                         after={<Icon28MessageOutline />}>
                                                         {members.user.firstName, members.user.fullName}

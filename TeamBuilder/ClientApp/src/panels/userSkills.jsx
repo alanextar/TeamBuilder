@@ -77,7 +77,7 @@ class UserSkills extends React.Component {
                     top="Skills"
                     multiple
                     className="Select__el skillsInput"
-                    disabled={!this.props.isOwner}
+                    disabled={this.props.readOnlyMode}
                 />
             </Div>
         )
