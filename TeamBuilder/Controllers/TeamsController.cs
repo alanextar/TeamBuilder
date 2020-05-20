@@ -44,6 +44,7 @@ namespace TeamBuilder.Controllers
 
 			bool Filter(Team team) => team.Name.ToLowerInvariant().Contains(search?.ToLowerInvariant() ?? string.Empty);
 			var result = context.Teams.Include(x => x.Event).Include(x => x.UserTeams).GetPage(pageSize, HttpContext.Request, page, prev, Filter);
+			result.NextHref = result.NextHref == null ? null : $"{result.NextHref}&search={search}";
 			logger.LogInformation($"Response EventsCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
 			                      $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
 
