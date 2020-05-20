@@ -159,5 +159,22 @@ namespace TeamBuilder.Controllers
 
 			return Json(userTeams);
 		}
+
+		public IActionResult AddUserToTeam(long id, long teamId)
+		{
+			_logger.LogInformation("Request JoinTeamm");
+
+			var dbTeam = context.Teams.Include(x => x.UserTeams).FirstOrDefault(x => x.Id == teamId);
+
+			if (!dbTeam.UserTeams.Any(x => x.UserId == id))
+			{
+				dbTeam.UserTeams.Add(new UserTeam { UserId = id, UserAction = UserActionEnum.AcceptingOffer });
+
+				context.Update(dbTeam);
+				context.SaveChanges();
+			}
+
+			return Ok("Request was sent to user");
+		}
 	}
 }
