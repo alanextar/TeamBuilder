@@ -34,13 +34,14 @@ const EventEdit = props => {
     };
 
     const eventEdit = () => {
+        let id = props.event.id;
         let name = eventName;
         let description = eventDescription;
         let link = eventLink;
         let startDate = eventStartDate;
         let finishDate = eventFinishDate;
-        let ownerId = props.owner.id;
-        var createEventViewModel = { name, description, startDate, finishDate, link, ownerId }
+        let userId = props.owner.id;
+        var createEventViewModel = { id, name, description, startDate, finishDate, link, userId }
         fetch(`${Api.Events.Edit}`, {
             method: 'post',
             headers: { 'Content-Type': 'application/json' },
@@ -72,7 +73,7 @@ const EventEdit = props => {
                     onClick={(e) => { eventEdit(); props.go(e) }}
                     data-to={'eventsInfo'}
                     data-from={props.id}>
-                    Создать оревнование
+                    Изменить мероприятие
                 </Button>
             </ FixedLayout>
         </Panel>

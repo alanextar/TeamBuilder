@@ -123,7 +123,7 @@ const App = () => {
                 <Events id='events' go={goEvent} />
                 <EventCreate id='eventCreate' go={goEvent} back={back} owner={fetchedUser} />
                 <EventInfo id='eventInfo' event={event} go={goEvent} back={back} />
-                <EventEdit id='eventEdit' event={event} go={goEvent} back={back} />
+                <EventEdit id='eventEdit' event={event} go={goEvent} back={back} owner={fetchedUser} />
             </View>
             <View id='user' activePanel={activeUserPanel}>
                 <User id='user' fetchedUser={fetchedUser} goUserEdit={goUserEdit} activeStory={activeStory} />

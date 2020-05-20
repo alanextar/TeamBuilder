@@ -24,8 +24,8 @@ const EventInfo = props => {
                 </SimpleCell>
                 <SimpleCell>
                     <InfoRow header="Ссылка">
-                        {props.event && <a href={props.event.link}>{props.event.link}</a> }
-                        
+                        {props.event && <a href={props.event.link}>{props.event.link}</a>}
+
                     </InfoRow>
                 </SimpleCell>
                 <SimpleCell multiline>
@@ -45,7 +45,7 @@ const EventInfo = props => {
                             after={<Icon28EditOutline />}
                             onClick={props.go}
                             data-to='eventEdit'
-                            data-event={props.event}
+                            data-event={JSON.stringify(props.event)}
                             data-from={props.id}>
                         </SimpleCell>
                     </ FixedLayout>}
