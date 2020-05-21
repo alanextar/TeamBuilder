@@ -4,14 +4,14 @@ import Icon28UserOutline from '@vkontakte/icons/dist/28/user_outline';
 import Icon28UsersOutline from '@vkontakte/icons/dist/28/users_outline';
 import Icon28MusicOutline from '@vkontakte/icons/dist/28/music_outline';
 
-const Panel1 = ({ id, go, fetchedUser }) => (
+const Panel1 = ({ id, go, vkProfile }) => (
     <Panel id={id}>
         <PanelHeader>More</PanelHeader>
-        {fetchedUser &&
+        {vkProfile &&
             <Group title="Результат из VK Connect">
-                <Cell description={fetchedUser.city && fetchedUser.city.title ? fetchedUser.city.title : ''}
-                    before={fetchedUser.photo_200 ? <Avatar src={fetchedUser.photo_200} /> : null}>
-                    {`${fetchedUser.first_name} ${fetchedUser.last_name}`}
+                <Cell description={vkProfile.city && vkProfile.city.title ? vkProfile.city.title : ''}
+                    before={vkProfile.photo_200 ? <Avatar src={vkProfile.photo_200} /> : null}>
+                    {`${vkProfile.first_name} ${vkProfile.last_name}`}
                 </Cell>
             </Group>}
         <Group>

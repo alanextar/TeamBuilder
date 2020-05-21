@@ -14,6 +14,7 @@ import Icon20HomeOutline from '@vkontakte/icons/dist/20/home_outline';
 import Icon24Write from '@vkontakte/icons/dist/24/write';
 import UserTeams from './userTeams'
 import UserSkills from './userSkills'
+import bridge from '@vkontakte/vk-bridge';
 
 class User extends React.Component {
     constructor(props) {
@@ -22,60 +23,62 @@ class User extends React.Component {
         this.state = {
             skills: null,
             userSkills: null,
-            fetchedUser: props.fetchedUser,
+             //TO-DO получить юзера из апи вконтакте
+            vkUser: props.vkUser,
+            user: props.user,
             activeTabProfile: 'main',
             selected: false,
             selectedSkills: null,
             isConfirmed: false,
             goUserEdit: props.goUserEdit,
             goSetUserTeam: props.goSetUserTeam,
-            user: props.user,
-            readOnlyMode: props.activeStory != 'user',
+            isProfile: props.activeStory != 'user',
             recruitTeams: []
         }
 
         this.confirmUser = this.confirmUser.bind(this);
 
-        //useEffect(() => {
-        //    async function fetchData() {
-        //        const user = await bridge.send('VKWebAppGetUserInfo');
-        //        setUser(user);
-        //        setActiveUser(user);
-        //    }
-        //    fetchData();
-        //}, []);
     }
 
     componentDidMount() {
-        this.isUserConfirmed(this.state.fetchedUser.id);
+        useEffect(() => {
+            async function fetchData() {
+                const user = await bridge.send("VKWebAppCallAPIMethod", {
+                    "method": "users.get", "request_id": "32test", "params":
+                        { "user_ids": "1", "v": "5.103", "access_token": "your_token" }
+                });
+                console.log(user);
+            }
+            fetchData();
+        }, []);
+
+        this.isUserConfirmed(this.state.vkUser.id);
     }
 
-    isUserConfirmed(vkId) {
+    isUserConfirmed(id) {
         console.log('into isUserConfirmed');
-        fetch(`/api/user/checkconfirmation?vkId=${vkId}`)
+        fetch(`/api/user/checkconfirmation?id=${id}`)
             .then((response) => {
                 this.setState({ isConfirmed: response })
 
-                console.log('before user fetch', vkId);
-                var viewerId = this.state.fetchedUser.id;
-                var profileId = this.state.user.vkId;
-                console.log('profileId = ', profileId);
+                console.log('before user fetch', id);
+                var fetchedUserId = this.state.vkUser.id;
+                var fetchedProfileId = this.state.user.id;
+                console.log('profileId = ', fetchedProfileId);
 
-                this.state.readOnlyMode && fetch(`/api/user/get?profileId=${profileId}&&viewerId=${viewerId}`)
+                this.state.isProfile && fetch(`/api/user/get?fetchedProfileId=${fetchedProfileId}&&fetchedUserId=${fetchedUserId}`)
                     .then(response => response.json())
                     .then(data => this.setState({ user: data }));
 
-                this.state.readOnlyMode && fetch(`/api/user/getRecruitTeams?profileId=${profileId}&&viewerId=${viewerId}`)
+                this.state.isProfile && fetch(`/api/user/getRecruitTeams?fetchedProfileId=${fetchedProfileId}&&fetchedUserId=${fetchedUserId}`)
                     .then(response => response.json())
                     .then(data => this.setState({ recruitTeams: data }));
-
-                //console.log('111111111111111111111111111111111111', this.state.user);
             } 
         );
 
 	}
 
-    async confirmUser(vkId) {
+    async confirmUser(id) {
         console.log('into confirm user', this.state.user.isSearchable);
         let skillsIds;
 
@@ -87,7 +90,7 @@ class User extends React.Component {
         }
 
         var isSearchable = this.state.user.isSearchable;
-        var profileViewModel = { vkId, skillsIds, isSearchable };
+        var profileViewModel = { id, skillsIds, isSearchable };
 
         let response = await fetch('/api/user/confirm', {
             method: 'post',
@@ -113,18 +116,17 @@ class User extends React.Component {
     };
 
     render() {
-        console.log('render user', this.state.user);
         //console.log('render user readOnlyMode', this.props.activeStory != 'user');
         return (
             <Panel id="user">
-                <PanelHeader separator={false} left={this.state.readOnlyMode &&
+                <PanelHeader separator={false} left={this.state.isProfile &&
                     <PanelHeaderBack onClick={this.state.goUserEdit}
                     data-to={this.props.return} />}>Профиль</PanelHeader>
-                {this.state.fetchedUser &&
+                {this.state.vkUser &&
                     <Group title="VK Connect">
-                        <Cell description={this.state.fetchedUser.city && this.state.fetchedUser.city.title ? this.state.fetchedUser.city.title : ''}
-                            before={this.state.fetchedUser.photo_200 ? <Avatar src={this.state.fetchedUser.photo_200} /> : null}>
-                            {`${this.state.fetchedUser.first_name} ${this.state.fetchedUser.last_name}`}
+                        <Cell description={ this.state.vkUser.city && this.state.vkUser.city.title ? this.state.vkUser.city.title : ''}
+                            before={this.state.vkUser.photo_200 ? <Avatar src={this.state.vkUser.photo_200} /> : null}>
+                            {`${this.state.vkUser.first_name} ${this.state.vkUser.last_name}`}
                         </Cell>
                     </Group>}
                 <Separator />
@@ -148,7 +150,7 @@ class User extends React.Component {
                                     {
                                         <Icon24Write onClick={this.state.goUserEdit}
                                             data-to='userEdit'
-                                            data-id={this.state.fetchedUser && this.state.fetchedUser.id}
+                                            data-id={this.state.vkProfile && this.state.vkProfile.id}
                                             data-user={JSON.stringify(this.state.user)} />
                                     }>
                                 </Cell>}
@@ -162,20 +164,20 @@ class User extends React.Component {
                                     дополнительно: {this.state.user && this.state.user.about}
                                 </Cell>
                             </List> */}
-                            <UserSkills userSkills={this.state.userSkills} readOnlyMode={this.state.readOnlyMode}
+                            <UserSkills userSkills={this.state.userSkills} readOnlyMode={this.state.isProfile}
                                 handleClick={this.handleClick.bind(this, this.state.selectedSkills)}
-                                id={this.state.fetchedUser && this.state.fetchedUser.id} />
+                                id={this.state.vkUser && this.state.vkUser.id} />
                         </Group> :
                         <Group>
                             <UserTeams userTeams={this.state.user && this.state.user.userTeams}
-                                goUserEdit={this.state.goUserEdit} readOnlyMode={this.state.readOnlyMode} />
+                                goUserEdit={this.state.goUserEdit} readOnlyMode={this.state.isProfile} />
                         </Group>
                 }
                 <Div>
-                    <Checkbox disabled={this.state.readOnlyMode} onChange={(e) => this.handleCheckboxClick(e)}
+                    <Checkbox disabled={this.state.isProfile} onChange={(e) => this.handleCheckboxClick(e)}
                         checked={this.state.user && this.state.user.isSearchable ? 'checked' : ''}>в поиске команды</Checkbox>
-                    {!this.state.readOnlyMode && <Button mode={this.state.isConfirmed ? "primary" : "destructive"} size='xl'
-                        onClick={() => this.confirmUser(this.state.fetchedUser && this.state.fetchedUser.id, this.state.userSkills)}>
+                    {!this.state.isProfile && <Button mode={this.state.isConfirmed ? "primary" : "destructive"} size='xl'
+                        onClick={() => this.confirmUser(this.state.vkUser && this.state.vkUser.id, this.state.userSkills)}>
                         {this.state.isConfirmed ? "Сохранить" : "Подтвердить"}
                     </Button>}
                 </Div>

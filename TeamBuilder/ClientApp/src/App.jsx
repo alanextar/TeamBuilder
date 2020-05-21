@@ -32,13 +32,10 @@ const App = () => {
     const [teamHref, setTeamNextHref] = useState(null);
 
     const [activeUserPanel, setActiveUserPanel] = useState('user');
-    const [fetchedUser, setUser] = useState(null);
-    const [activeUser, setActiveUser] = useState(null);
+    const [vkProfile, setProfile] = useState(null);
+    const [user, setUser] = useState(null);
 
     const [activeEventPanel, setActiveEventPanel] = useState('events');
-
-    const [city, setCity] = useState(null);
-    const [about, setAbout] = useState(null);
 
 
 	useEffect(() => {
@@ -48,11 +45,12 @@ const App = () => {
 				schemeAttribute.value = data.scheme ? data.scheme : 'client_light';
 				document.body.attributes.setNamedItem(schemeAttribute);
 			}
-		});
+        });
+
 		async function fetchData() {
 			const user = await bridge.send('VKWebAppGetUserInfo');
+            setProfile(user);
             setUser(user);
-            setActiveUser(user);
         }
 		fetchData();
 	}, []);
@@ -64,8 +62,8 @@ const App = () => {
         setActiveTeam(e.currentTarget.dataset.id);
 
         let user = e.currentTarget.dataset.user && JSON.parse(e.currentTarget.dataset.user);
-        console.log('activeUser*******************', user);
-        setActiveUser(user);
+        console.log('user*******************', user);
+        setUser(user);
 
         console.log(`dataset.href: ${e.currentTarget.dataset.href}`);
     };
@@ -84,17 +82,17 @@ const App = () => {
         let user = e.currentTarget.dataset.user && JSON.parse(e.currentTarget.dataset.user);
         setActiveTeam(e.currentTarget.dataset.id);
         setActiveUserPanel(e.currentTarget.dataset.to);
-        setActiveUser(user);
+        setUser(user);
     }
 
     const goSetUserTeam = e => {
         let user = e.currentTarget.dataset.user && JSON.parse(e.currentTarget.dataset.user);
         console.log('goSetUserTeam', user);
-        setActiveUser(user);
+        setUser(user);
         setActiveUserPanel(e.currentTarget.dataset.to);
     }
 
-    console.log('into app', activeUser);
+    console.log('into app', user);
 
 	return (
         <Epic activeStory={activeStory} tabbar={
@@ -127,10 +125,10 @@ const App = () => {
         }>
             <View id='teams' activePanel={activeTeamPanel} >
                 <Teams id='teams' go={goTeam} href={teamHref} />
-                <Teaminfo id='teaminfo' go={goTeam} teamId={activeTeam} return='teams' fetchedUser={fetchedUser}/>
+                <Teaminfo id='teaminfo' go={goTeam} teamId={activeTeam} return='teams' vkProfile={vkProfile}/>
                 <TeamCreate id='teamCreate' go={goTeam} />
                 <TeamEdit id='teamEdit' go={goTeam} teamId={activeTeam} />
-                <User id='user' fetchedUser={fetchedUser} user={activeUser} goUserEdit={goTeam} activeStory={activeStory} goSetUserTeam={goSetUserTeam} return='teaminfo' />
+                <User id='user' vkProfile={vkProfile} user={user} goUserEdit={goTeam} activeStory={activeStory} goSetUserTeam={goSetUserTeam} return='teaminfo' />
             </View>
             {/*<View id='users' activePanel='panel2'>
                  <Panel2 id='panel2' go={go}/>
@@ -141,10 +139,10 @@ const App = () => {
                 <EventInfo id='eventInfo' go={goEvent} back={back}/>
             </View>
             <View id='user' activePanel={activeUserPanel}>
-                <User id='user' fetchedUser={fetchedUser} user={activeUser} goUserEdit={goUserEdit} activeStory={activeStory} goSetUserTeam={goSetUserTeam} />
-                <UserEdit id='userEdit' goUserEdit={goUserEdit} fetchedUser={fetchedUser} user={activeUser} />
+                <User id='user' vkProfile={vkProfile} user={user} goUserEdit={goUserEdit} activeStory={activeStory} goSetUserTeam={goSetUserTeam} />
+                <UserEdit id='userEdit' goUserEdit={goUserEdit} vkProfile={vkProfile} user={user} />
                 <Teaminfo id='teaminfo' go={goUserEdit} teamId={activeTeam} return='user' />
-                <SetUserTeam id='setUserTeam' goSetUserTeam={goSetUserTeam} user={activeUser} />
+                <SetUserTeam id='setUserTeam' goSetUserTeam={goSetUserTeam} user={user} />
             </View>
         </Epic>
 

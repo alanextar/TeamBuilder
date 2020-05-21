@@ -14,7 +14,7 @@ class SetUserTeam extends React.Component {
 
         this.state = {
             goSetUserTeam: props.goSetUserTeam,
-            fetchedUser: props.fetchedUser,
+            vkProfile: props.vkProfile,
             user: props.user,
             teams: null,
             selectedTeam: null,
@@ -37,7 +37,7 @@ class SetUserTeam extends React.Component {
     }
 
     async populateTeamData() {
-        const response = await fetch(`/api/teams/getOwnerTeams/?vkId=${this.state.fetchedUser.id}`);
+        const response = await fetch(`/api/teams/getOwnerTeams/?id=${this.state.vkProfile.id}`);
         const data = await response.json();
         this.setState({ teams: data }) 
     }
