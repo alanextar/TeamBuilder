@@ -51,7 +51,8 @@ const App = () => {
 		});
 		async function fetchData() {
 			const user = await bridge.send('VKWebAppGetUserInfo');
-			setUser(user);
+            setUser(user);
+            setActiveUser(user);
         }
 		fetchData();
 	}, []);
@@ -61,6 +62,10 @@ const App = () => {
         if (e.currentTarget.dataset.href)
             setTeamNextHref(e.currentTarget.dataset.href);
         setActiveTeam(e.currentTarget.dataset.id);
+
+        let user = e.currentTarget.dataset.user && JSON.parse(e.currentTarget.dataset.user);
+        console.log('activeUser*******************', user);
+        setActiveUser(user);
 
         console.log(`dataset.href: ${e.currentTarget.dataset.href}`);
     };
@@ -88,6 +93,8 @@ const App = () => {
         setActiveUser(user);
         setActiveUserPanel(e.currentTarget.dataset.to);
     }
+
+    console.log('into app', activeUser);
 
 	return (
         <Epic activeStory={activeStory} tabbar={
@@ -123,7 +130,7 @@ const App = () => {
                 <Teaminfo id='teaminfo' go={goTeam} teamId={activeTeam} return='teams' fetchedUser={fetchedUser}/>
                 <TeamCreate id='teamCreate' go={goTeam} />
                 <TeamEdit id='teamEdit' go={goTeam} teamId={activeTeam} />
-                <User id='user' fetchedUser={fetchedUser} goUserEdit={goTeam} activeStory={activeStory} return='teaminfo' />
+                <User id='user' fetchedUser={fetchedUser} user={activeUser} goUserEdit={goTeam} activeStory={activeStory} goSetUserTeam={goSetUserTeam} return='teaminfo' />
             </View>
             {/*<View id='users' activePanel='panel2'>
                  <Panel2 id='panel2' go={go}/>
@@ -134,7 +141,7 @@ const App = () => {
                 <EventInfo id='eventInfo' go={goEvent} back={back}/>
             </View>
             <View id='user' activePanel={activeUserPanel}>
-                <User id='user' fetchedUser={fetchedUser} goUserEdit={goUserEdit} activeStory={activeStory} goSetUserTeam={goSetUserTeam} />
+                <User id='user' fetchedUser={fetchedUser} user={activeUser} goUserEdit={goUserEdit} activeStory={activeStory} goSetUserTeam={goSetUserTeam} />
                 <UserEdit id='userEdit' goUserEdit={goUserEdit} fetchedUser={fetchedUser} user={activeUser} />
                 <Teaminfo id='teaminfo' go={goUserEdit} teamId={activeTeam} return='user' />
                 <SetUserTeam id='setUserTeam' goSetUserTeam={goSetUserTeam} user={activeUser} />

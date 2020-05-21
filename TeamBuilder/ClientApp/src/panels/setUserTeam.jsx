@@ -17,7 +17,9 @@ class SetUserTeam extends React.Component {
             fetchedUser: props.fetchedUser,
             user: props.user,
             teams: null,
-            selectedTeam: null
+            selectedTeam: null,
+            responseStatus: null,
+            recruitTeam: props.recruitTeam
         }
 
         this.post = this.post.bind(this);
@@ -35,7 +37,7 @@ class SetUserTeam extends React.Component {
     }
 
     async populateTeamData() {
-        const response = await fetch('/api/teams/getall');
+        const response = await fetch(`/api/teams/getOwnerTeams/?vkId=${this.state.fetchedUser.id}`);
         const data = await response.json();
         this.setState({ teams: data }) 
     }
@@ -76,7 +78,7 @@ class SetUserTeam extends React.Component {
                     </FormLayoutGroup>
                 </FormLayout>
                 <Div>
-                    <Button onClick={(e) => { this.post(); this.state.goSetUserTeam(e) }}
+                    <Button onClick={(e) => { this.post(); this.state.responseStatus && this.state.goSetUserTeam(e) }}
                         data-user={JSON.stringify(this.state.user)} data-to='user' mode="commerce">Принять</Button>
                     <Button onClick={this.state.goSetUserTeam} data-to='user'
                         data-user={JSON.stringify(this.state.user)} mode="destructive">Отменить</Button>

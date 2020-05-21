@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TeamBuilder.Models
 {
@@ -27,5 +28,8 @@ namespace TeamBuilder.Models
 		public List<UserTeam> UserTeams { get; set; }
 		public List<UserSkill> UserSkills { get; set; }
 		public List<Event> OwnEvents { get; set; }
+
+		[NotMapped]
+		public List<Team> TeamsToRecruit { get; set; }
 	}
 }

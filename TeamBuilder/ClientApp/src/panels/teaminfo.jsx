@@ -94,16 +94,17 @@ class Teaminfo extends React.Component {
                                         Требуется {this.state.team.numberRequiredMembers} участников
                                         {console.log('userTeams ', this.state.team.userTeams)}
                                         {this.state.team.userTeams &&
-                                            this.state.team.userTeams.map((members, i) => {
+                                            this.state.team.userTeams.map((userTeam, i) => {
                                                 //{ members.isOwner && (members.vkId === self.props.fetchedUser.id) && self.setState({ edit: true }) }
                                                 return (
                                                     <SimpleCell
                                                         onClick={this.state.go}
                                                         data-to='user'
-                                                        data-id={members.userId}
+                                                        data-id={userTeam.userId}
+                                                        data-user={JSON.stringify(userTeam.user)}
                                                         before={<Avatar size={48} />}
                                                         after={<Icon28MessageOutline />}>
-                                                        {members.user.firstName, members.user.fullName}
+                                                        {userTeam.user.firstName, userTeam.user.fullName}
                                                     </SimpleCell>
                                             )}
                                             )}

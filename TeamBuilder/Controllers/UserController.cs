@@ -91,7 +91,7 @@ namespace TeamBuilder.Controllers
 		}
 
 		[HttpGet]
-		public IActionResult Get(long vkId)
+		public IActionResult Get(long profileId, long viewerId)
 		{
 			_logger.LogInformation("Request ConfirmUser");
 
@@ -100,9 +100,36 @@ namespace TeamBuilder.Controllers
 				.ThenInclude(y => y.Event)
 				.Include(x => x.UserSkills)
 				.ThenInclude(y => y.Skill)
-				.FirstOrDefault(u => u.VkId == vkId);
+				.FirstOrDefault(u => u.VkId == profileId);
+
+			var viewerTeams = context.Users.Include(x => x.UserTeams)
+				.ThenInclude(y => y.Team).SelectMany(x => x.UserTeams)
+				.Where(x => x.IsOwner).Select(x => x.Team).ToList();
+
+			//команды оунера в которых не состоит юзер
+			user.TeamsToRecruit = viewerTeams.Except(user.UserTeams.Select(x => x.Team).ToList()).ToList();
 
 			return Json(user);
+		}
+
+		[HttpGet]
+		public IActionResult GetRecruitTeams(long profileId, long viewerId)
+		{
+			_logger.LogInformation("Request ConfirmUser");
+
+			var user = context.Users.Include(x => x.UserTeams)
+				.ThenInclude(y => y.Team)
+				.ThenInclude(y => y.Event)
+				.FirstOrDefault(u => u.VkId == profileId);
+
+			var viewerTeams = context.Users.Include(x => x.UserTeams)
+				.ThenInclude(y => y.Team).SelectMany(x => x.UserTeams)
+				.Where(x => x.IsOwner).Select(x => x.Team).ToList();
+
+			//команды оунера в которых не состоит юзер
+			user.TeamsToRecruit = viewerTeams.Except(user.UserTeams.Select(x => x.Team).ToList()).ToList();
+
+			return Json(user.TeamsToRecruit);
 		}
 
 		[HttpPost]
@@ -181,5 +208,20 @@ namespace TeamBuilder.Controllers
 
 			return Ok("Request was sent to user");
 		}
+
+		public IEnumerable<Team> GetOwnerTeams(long vkId)
+		{
+			_logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
+			var teams = context.Users
+				.Include(x => x.UserTeams)
+				.ThenInclude(y => y.Team)
+				.SelectMany(x => x.UserTeams)
+				.Where(x => x.UserId == vkId && x.IsOwner)
+				.Select(x => x.Team)
+				.ToList();
+
+			return teams;
+		}
+
 	}
 }

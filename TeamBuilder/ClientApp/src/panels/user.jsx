@@ -1,4 +1,4 @@
-﻿import React from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import {
     Panel, PanelHeader, Group, Cell, Avatar, Search, Button, Div, Input, PanelHeaderBack,
@@ -29,11 +29,21 @@ class User extends React.Component {
             isConfirmed: false,
             goUserEdit: props.goUserEdit,
             goSetUserTeam: props.goSetUserTeam,
-            user: null,
-            readOnlyMode: props.activeStory != 'user'
+            user: props.user,
+            readOnlyMode: props.activeStory != 'user',
+            recruitTeams: []
         }
 
         this.confirmUser = this.confirmUser.bind(this);
+
+        //useEffect(() => {
+        //    async function fetchData() {
+        //        const user = await bridge.send('VKWebAppGetUserInfo');
+        //        setUser(user);
+        //        setActiveUser(user);
+        //    }
+        //    fetchData();
+        //}, []);
     }
 
     componentDidMount() {
@@ -41,15 +51,25 @@ class User extends React.Component {
     }
 
     isUserConfirmed(vkId) {
+        console.log('into isUserConfirmed');
         fetch(`/api/user/checkconfirmation?vkId=${vkId}`)
             .then((response) => {
                 this.setState({ isConfirmed: response })
 
                 console.log('before user fetch', vkId);
+                var viewerId = this.state.fetchedUser.id;
+                var profileId = this.state.user.vkId;
+                console.log('profileId = ', profileId);
 
-                fetch(`/api/user/get?vkId=${vkId}`)
+                this.state.readOnlyMode && fetch(`/api/user/get?profileId=${profileId}&&viewerId=${viewerId}`)
                     .then(response => response.json())
                     .then(data => this.setState({ user: data }));
+
+                this.state.readOnlyMode && fetch(`/api/user/getRecruitTeams?profileId=${profileId}&&viewerId=${viewerId}`)
+                    .then(response => response.json())
+                    .then(data => this.setState({ recruitTeams: data }));
+
+                //console.log('111111111111111111111111111111111111', this.state.user);
             } 
         );
 
@@ -94,7 +114,7 @@ class User extends React.Component {
 
     render() {
         console.log('render user', this.state.user);
-        console.log('render user readOnlyMode', this.props.activeStory != 'user');
+        //console.log('render user readOnlyMode', this.props.activeStory != 'user');
         return (
             <Panel id="user">
                 <PanelHeader separator={false} left={this.state.readOnlyMode &&
@@ -123,7 +143,7 @@ class User extends React.Component {
                     {
                     this.state.activeTabProfile === 'main' ?
                         <Group header={<Header mode="secondary">Информация о профиле участника</Header>}>
-                            <List>
+                            {/* <List>
                                 {!this.state.readOnlyMode && <Cell asideContent=
                                     {
                                         <Icon24Write onClick={this.state.goUserEdit}
@@ -141,7 +161,7 @@ class User extends React.Component {
                                 <Cell before={<Icon28ArticleOutline />}>
                                     дополнительно: {this.state.user && this.state.user.about}
                                 </Cell>
-                            </List>
+                            </List> */}
                             <UserSkills userSkills={this.state.userSkills} readOnlyMode={this.state.readOnlyMode}
                                 handleClick={this.handleClick.bind(this, this.state.selectedSkills)}
                                 id={this.state.fetchedUser && this.state.fetchedUser.id} />
@@ -160,12 +180,14 @@ class User extends React.Component {
                     </Button>}
                 </Div>
                 <Div>
-                    <Button mode="primary" size='xl'
-                        onClick={ this.state.goSetUserTeam }
+                    {this.state.recruitTeams.length && < Button mode="primary" size='xl'
+                        onClick={this.state.goSetUserTeam}
                         data-to='setUserTeam'
-                        data-user={JSON.stringify(this.state.user)}>
+                        data-user={JSON.stringify(this.state.user)}
+                        recruitTeams={this.state.recruitTeams}
+                        >
                         Завербовать
-                    </Button>
+                    </Button>}
                 </Div>
             </Panel>
         )
