@@ -21,6 +21,7 @@ import TeamEdit from './panels/teamEdit'
 import Users from './panels/users'
 import User from './panels/user'
 import UserEdit from './panels/userEdit'
+import SetUserTeam from './panels/setUserTeam'
 
 const App = () => {
     const [activeStory, setActiveStore] = useState('events');
@@ -31,8 +32,9 @@ const App = () => {
     const [teamHref, setTeamNextHref] = useState(null);
 
     const [activeUserPanel, setActiveUserPanel] = useState('user');
-    const [fetchedUser, setUser] = useState(null);
-    const [activeUser, setActiveUser] = useState(null);
+    const [vkProfile, setProfile] = useState(null);
+    const [user, setUser] = useState(null);
+    const [userId, setUserId] = useState(null);
 
     const [activeEventPanel, setActiveEventPanel] = useState('events');
     const [event, setEvent] = useState(null);
@@ -51,9 +53,10 @@ const App = () => {
 				document.body.attributes.setNamedItem(schemeAttribute);
 			}
 		});
-		async function fetchData() {
-			const user = await bridge.send('VKWebAppGetUserInfo');
-			setUser(user);
+        async function fetchData() {
+            const user = await bridge.send('VKWebAppGetUserInfo');
+            setProfile(user);
+            setUserId(user.id);
         }
 		fetchData();
 	}, []);
@@ -63,7 +66,10 @@ const App = () => {
         if (e.currentTarget.dataset.href)
             setTeamNextHref(e.currentTarget.dataset.href);
         setActiveTeam(e.currentTarget.dataset.id);
-
+        setBack(e.currentTarget.dataset.from);
+        let userId = e.currentTarget.dataset.id;
+        console.log('!!!!!!!into goTeam', userId);
+        setUserId(userId);
         console.log(`dataset.href: ${e.currentTarget.dataset.href}`);
     };
 
@@ -83,7 +89,18 @@ const App = () => {
         let user = e.currentTarget.dataset.user && JSON.parse(e.currentTarget.dataset.user);
         setActiveTeam(e.currentTarget.dataset.id);
         setActiveUserPanel(e.currentTarget.dataset.to);
-        setActiveUser(user);
+        //setUser(user);
+        console.log('userId', e.currentTarget.dataset.userId);
+        setUserId(e.currentTarget.dataset.id);
+    }
+     
+    const goSetUserTeam = e => {
+        let user = e.currentTarget.dataset.user && JSON.parse(e.currentTarget.dataset.user);
+        console.log('goSetUserTeam', user);
+        setUser(user);
+        setUserId(e.currentTarget.dataset.user.id);
+        console.log('dataset', e.currentTarget.dataset);
+        setActiveUserPanel(e.currentTarget.dataset.to);
     }
 
     const goFoot = e => {
@@ -121,25 +138,28 @@ const App = () => {
         }>
             <View id='teams' activePanel={activeTeamPanel} >
                 <Teams id='teams' go={goTeam} href={teamHref} />
-                <TeamInfo id='teaminfo' go={goTeam} teamId={activeTeam} return='teams' fetchedUser={fetchedUser}/>
+                <TeamInfo id='teaminfo' go={goTeam} teamId={activeTeam} return='teams' vkProfile={vkProfile} />
                 <TeamCreate id='teamCreate' go={goTeam} back={back}/>
-                <TeamEdit id='teamEdit' go={goTeam} teamId={activeTeam} back={back}/>
-                <User id='user' fetchedUser={fetchedUser} goUserEdit={goTeam} activeStory={activeStory} return='teaminfo' />
-                <EventCreate id='eventCreate' go={goEvent} back={back} owner={fetchedUser} />
+                <TeamEdit id='teamEdit' go={goTeam} teamId={activeTeam} back={back} />
+                <User id='user' userId={userId} vkProfile={vkProfile} goUserEdit={goTeam}
+                    activeStory={activeStory} goSetUserTeam={goTeam} return='teaminfo' />
+                <SetUserTeam id='setUserTeam' goSetUserTeam={goTeam} user={user} userId={userId} vkProfile={vkProfile} />
+                <EventCreate id='eventCreate' go={goTeam} back={back} owner={vkProfile} />
             </View>
             <View id='users' activePanel={activeUsersPanel}>
                 <Users id='users' go={goUsers} />
             </View>
             <View id='events' activePanel={activeEventPanel}>
                 <Events id='events' go={goEvent} />
-                <EventCreate id='eventCreate' go={goEvent} back={back} owner={fetchedUser} />
+                <EventCreate id='eventCreate' go={goEvent} back={back} owner={vkProfile} />
                 <EventInfo id='eventInfo' event={event} go={goEvent} back={back} />
-                <EventEdit id='eventEdit' event={event} go={goEvent} back={back} owner={fetchedUser} />
+                <EventEdit id='eventEdit' event={event} go={goEvent} back={back} owner={vkProfile} />
             </View>
             <View id='user' activePanel={activeUserPanel}>
-                <User id='user' fetchedUser={fetchedUser} goUserEdit={goUserEdit} activeStory={activeStory} />
-                <UserEdit id='userEdit' goUserEdit={goUserEdit} fetchedUser={fetchedUser} user={activeUser} />
+                <User id='user' vkProfile={vkProfile} userId={userId} goUserEdit={goUserEdit} activeStory={activeStory} goSetUserTeam={goSetUserTeam} />
+                <UserEdit id='userEdit' goUserEdit={goUserEdit} vkProfile={vkProfile} user={user} />
                 <TeamInfo id='teaminfo' go={goUserEdit} teamId={activeTeam} return='user' />
+                <SetUserTeam id='setUserTeam' goSetUserTeam={goSetUserTeam} user={user} userId={userId} vkProfile={vkProfile}/>
             </View>
         </Epic>
 
