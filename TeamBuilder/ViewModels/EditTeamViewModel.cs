@@ -1,4 +1,4 @@
-﻿namespace TeamBuilder.Dto
+﻿namespace TeamBuilder.ViewModels
 {
 	public class EditTeamViewModel
 	{

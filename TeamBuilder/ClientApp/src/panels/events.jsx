@@ -1,4 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react';
+import debounce from 'lodash.debounce';
 import {
     Panel, PanelHeader, Group, Search, List, RichCell, PullToRefresh,
     PanelHeaderButton, CardGrid, Card, Div
@@ -13,25 +14,48 @@ const Events = props => {
     const [nextHref, setNextHref] = useState(null);
     const [events, setEvents] = useState([]);
 
-    const populateEventsData = () => {
-        fetch(`${Api.Events.GetPage}?pageSize=20`)
+    const [search, setSearch] = useState('');
+
+    //#region Search
+
+    const searchEvents = value => {
+        fetch(`${Api.Events.PagingSearch}?search=${value}`)
+            .then((resp) => resp.json())
+            .then(json => {
+                setEvents(json.collection);
+                setNextHref(json.nextHref);
+                setHasMoreItems(json.nextHref ? true : false);
+            })
+            .catch((error) => console.log(`Error for get filtered events page. Details: ${error}`));
+    }
+
+    const delayedSearchEvents = debounce(searchEvents, 250);
+
+    const onChangeSearch = e => {
+        setSearch(e.target.value);
+        setNextHref(null);
+        delayedSearchEvents(e.target.value);
+    }
+
+    //#endregion
+
+    const getEvents = () => {
+        fetch(`${Api.Events.GetPage}`)
             .then((resp) => resp.json())
             .then(json => setEvents(json.collection))
             .catch((error) => console.log(`Error for get events page. Details: ${error}`));
     }
 
-    //useEffect(() => {
-    //    populateEventsData();
-    //}, []);
-
     const onRefresh = () => {
         setFetching(true);
-        populateEventsData();
+        search.length === 0 ? getEvents() : searchEvents(search);
         setFetching(false);
     };
 
+    //#region Scroll
+
     const loadItems = page => {
-        var url = `${Api.Events.GetPage}?pageSize=20`;
+        var url = `${Api.Events.GetPage}`;
         if (nextHref) {
             url = nextHref;
         }
@@ -66,7 +90,7 @@ const Events = props => {
                         caption={`${event.startDate} - ${event.startDate}`}
                         onClick={props.go}
                         data-to='eventInfo'
-                        data-id={event.id}
+                        data-event={JSON.stringify(event)}
                         data-from={props.id}>
                         {event.name}
                     </RichCell>
@@ -77,6 +101,8 @@ const Events = props => {
         return items;
     }
 
+    //#endregion
+
     return (
         <Panel id={props.id}>
             <PanelHeader
@@ -86,17 +112,17 @@ const Events = props => {
                     </PanelHeaderButton>}>
                 Мероприятия
                 </PanelHeader>
-            <Search />
+            <Search value={search} onChange={onChangeSearch} after={null} />
             <PullToRefresh onRefresh={onRefresh} isFetching={fetching}>
-            <InfiniteScroll
-                pageStart={0}
-                loadMore={loadItems}
-                hasMore={hasMoreItems}
-                loader={loader}>
-                <CardGrid style={{ marginBottom: 10 }}>
-                    {getItems()}
-                </CardGrid>
-            </InfiniteScroll>
+                <InfiniteScroll
+                    pageStart={0}
+                    loadMore={loadItems}
+                    hasMore={hasMoreItems}
+                    loader={loader}>
+                    <CardGrid style={{ marginBottom: 10 }}>
+                        {getItems()}
+                    </CardGrid>
+                </InfiniteScroll>
             </PullToRefresh>
         </Panel >
     );

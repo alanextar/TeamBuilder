@@ -1,6 +1,6 @@
 ﻿import React from 'react';
 import qwest from 'qwest';
-import { Api } from './../api'
+import { Api } from '../api'
 
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell, InfoRow,
@@ -10,7 +10,7 @@ import {
 import Icon28MessageOutline from '@vkontakte/icons/dist/28/message_outline';
 import Icon28EditOutline from '@vkontakte/icons/dist/28/edit_outline';
 
-class Teaminfo extends React.Component {
+class TeamInfo extends React.Component {
     constructor(props) {
         super(props);
 
@@ -132,4 +132,4 @@ class Teaminfo extends React.Component {
 
 };
 
-export default Teaminfo;
+export default TeamInfo;

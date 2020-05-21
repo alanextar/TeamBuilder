@@ -10,7 +10,8 @@
         GetPage: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/getPage`,
         Create: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/create`,
         Delete: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/delete`,
-        Edit: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/edit`
+        Edit: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/edit`,
+        PagingSearch: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/pagingSearch`
     }
     static Events = {
         Get: `${this.baseUrl}/${this.prefix}/${this.eventStr}/get`,
@@ -18,6 +19,7 @@
         GetPage: `${this.baseUrl}/${this.prefix}/${this.eventStr}/getPage`,
         Create: `${this.baseUrl}/${this.prefix}/${this.eventStr}/create`,
         Delete: `${this.baseUrl}/${this.prefix}/${this.eventStr}/delete`,
-        Edit: `${this.baseUrl}/${this.prefix}/${this.eventStr}/edit`
+        Edit: `${this.baseUrl}/${this.prefix}/${this.eventStr}/edit`,
+        PagingSearch: `${this.baseUrl}/${this.prefix}/${this.eventStr}/pagingSearch`
     }
 }

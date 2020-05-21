@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using TeamBuilder.Models;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using TeamBuilder.Dto;
+using TeamBuilder.Extensions;
 using TeamBuilder.ViewModels;
 
 namespace TeamBuilder.Controllers
@@ -34,7 +34,26 @@ namespace TeamBuilder.Controllers
 			return teams;
 		}
 
-		public async Task<Page<Team>> GetPage(int pageSize, int page = 0, bool prev = false)
+		public IActionResult PagingSearch(string search, int pageSize = 20, int page = 0, bool prev = false)
+		{
+			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
+
+			if (string.IsNullOrEmpty(search))
+				return RedirectToAction("GetPage", new { pageSize, page, prev});
+
+			if (pageSize == 0)
+				return NoContent();
+
+			bool Filter(Team team) => team.Name.ToLowerInvariant().Contains(search?.ToLowerInvariant() ?? string.Empty);
+			var result = context.Teams.Include(x => x.Event).Include(x => x.UserTeams).GetPage(pageSize, HttpContext.Request, page, prev, Filter);
+			result.NextHref = result.NextHref == null ? null : $"{result.NextHref}&search={search}";
+			logger.LogInformation($"Response TeamsCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
+			                      $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
+
+			return Json(result);
+		}
+
+		public async Task<IActionResult> GetPage(int pageSize = 20, int page = 0, bool prev = false)
 		{
 			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
 
@@ -42,21 +61,12 @@ namespace TeamBuilder.Controllers
 				await Initialize();
 
 			if (pageSize == 0)
-				return new Page<Team>(new List<Team>(), null);
+				return NoContent();
 
-			var countTake = prev ? (page + 1) * pageSize : pageSize ;
-			var countSkip = prev ? 0 : page * pageSize;
+			var teams = context.Teams.Include(x => x.Event).Include(x => x.UserTeams).GetPage(pageSize, HttpContext.Request, page, prev);
 
-			string nextHref = null;
-			var teams = context.Teams.OrderBy(t => t.Id).Include(x => x.UserTeams).Skip(countSkip).Take(++countTake).OrderBy(t => t.Id).ToList();
-			if (teams.Count == countTake)
-			{
-				nextHref = $"{HttpContext.Request.Path}?pageSize={pageSize}&page={++page}";
-				teams = teams.SkipLast(1).ToList();
-			}
-
-			logger.LogInformation($"Response TeamsCount:{teams.Count} / from:{teams.First().Id} / to:{teams.Last().Id} / NextHref:{nextHref}");
-			return new Page<Team>(teams, nextHref);
+			logger.LogInformation($"Response TeamsCount:{teams.Collection.Count()} / from:{teams.Collection.FirstOrDefault()?.Id} / to:{teams.Collection.LastOrDefault()?.Id} / NextHref:{teams.NextHref}");
+			return Json(teams);
 		}
 		
 		public Team Get(int id)

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using TeamBuilder.Controllers.Paging;
 using TeamBuilder.ViewModels;
 
@@ -28,27 +29,32 @@ namespace TeamBuilder.Extensions
                 .Select(t => t.t.item);
         }
 
-        public static Page<T> GetPage<T>(this DbSet<T> set, int pageSize, HttpRequest request, int page = 0,
-	        bool prev = false) 
-	        where T: class, IDbItem
-        {
-	        if (pageSize == 0)
-		        return new Page<T>(new List<T>(), null);
+        public static Page<T> GetPage<T>(this IEnumerable<T> set, 
+			int pageSize, 
+			HttpRequest request, 
+			int page = 0,
+			bool prev = false,
+			Func<T, bool> filter = null)
+			where T: class, IDbItem
+		{
+			if (pageSize == 0)
+				return new Page<T>(new List<T>(), null);
 
-	        var countTake = prev ? (page + 1) * pageSize : pageSize ;
-	        var countSkip = prev ? 0 : page * pageSize;
+			filter ??= _ => true; 
 
-	        string nextHref = null;
-	        var items = set.Skip(countSkip).Take(++countTake).OrderBy(t => t.Id).ToList();
-	        if (items.Count == countTake)
-	        {
-		        nextHref = $"{request.Path}?pageSize={pageSize}&page={++page}";
-		        items = items.SkipLast(1).ToList();
-	        }
+			var countTake = prev ? (page + 1) * pageSize : pageSize ;
+			var countSkip = prev ? 0 : page * pageSize;
 
-	        return new Page<T>(items, nextHref);
+			string nextHref = null;
+			var items = set.Where(filter).OrderBy(s => s.Id).Skip(countSkip).Take(++countTake).ToList();
+			if (items.Count == countTake)
+			{
+				nextHref = $"{request.Path}?pageSize={pageSize}&page={++page}";
+				items = items.SkipLast(1).ToList();
+			}
 
-        }
+			return new Page<T>(items, nextHref);
 
+		}
     }
 }

@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using TeamBuilder.Controllers.Paging;
 
 namespace TeamBuilder.Models
 {
-	public class User
+	public class User : IDbItem
 	{
 		public User()
 		{
