@@ -33,6 +33,7 @@ const App = () => {
     const [activeUserPanel, setActiveUserPanel] = useState('user');
     const [vkProfile, setProfile] = useState(null);
     const [user, setUser] = useState(null);
+    const [userId, setUserId] = useState(null);
 
     const [activeEventPanel, setActiveEventPanel] = useState('events');
     const [event, setEvent] = useState(null);
@@ -48,7 +49,7 @@ const App = () => {
         async function fetchData() {
             const user = await bridge.send('VKWebAppGetUserInfo');
             setProfile(user);
-            setUser(user);
+            setUserId(user.id);
         }
 		fetchData();
 	}, []);
@@ -59,8 +60,9 @@ const App = () => {
             setTeamNextHref(e.currentTarget.dataset.href);
         setActiveTeam(e.currentTarget.dataset.id);
         setBack(e.currentTarget.dataset.from);
-        let user = e.currentTarget.dataset.user && JSON.parse(e.currentTarget.dataset.user);
-        setUser(user);
+        let userId = e.currentTarget.dataset.userId;
+        console.log('into goTeam', userId);
+        setUserId(userId);
         console.log(`dataset.href: ${e.currentTarget.dataset.href}`);
     };
 
@@ -79,13 +81,17 @@ const App = () => {
         let user = e.currentTarget.dataset.user && JSON.parse(e.currentTarget.dataset.user);
         setActiveTeam(e.currentTarget.dataset.id);
         setActiveUserPanel(e.currentTarget.dataset.to);
-        setUser(user);
+        //setUser(user);
+        console.log('userId', e.currentTarget.dataset.userId);
+        setUserId(e.currentTarget.dataset.userId);
     }
-
+     
     const goSetUserTeam = e => {
         let user = e.currentTarget.dataset.user && JSON.parse(e.currentTarget.dataset.user);
         console.log('goSetUserTeam', user);
         setUser(user);
+        setUserId(e.currentTarget.dataset.user.id);
+        console.log('dataset', e.currentTarget.dataset);
         setActiveUserPanel(e.currentTarget.dataset.to);
     }
 
@@ -122,9 +128,10 @@ const App = () => {
                 <Teams id='teams' go={goTeam} href={teamHref} />
                 <TeamInfo id='teaminfo' go={goTeam} teamId={activeTeam} return='teams' vkProfile={vkProfile} />
                 <TeamCreate id='teamCreate' go={goTeam} back={back}/>
-                <TeamEdit id='teamEdit' go={goTeam} teamId={activeTeam} back={back}/>
-                <User id='user' vkProfile={vkProfile} user={user} goUserEdit={goTeam}
+                <TeamEdit id='teamEdit' go={goTeam} teamId={activeTeam} back={back} />
+                <User id='user' userId={userId} vkProfile={vkProfile} goUserEdit={goTeam}
                     activeStory={activeStory} goSetUserTeam={goSetUserTeam} return='teaminfo' />
+                <SetUserTeam id='setUserTeam' goSetUserTeam={goSetUserTeam} user={user} />
                 <EventCreate id='eventCreate' go={goTeam} back={back} owner={vkProfile} />
             </View>
             <View id='events' activePanel={activeEventPanel}>
@@ -134,7 +141,7 @@ const App = () => {
                 <EventEdit id='eventEdit' event={event} go={goEvent} back={back} owner={vkProfile} />
             </View>
             <View id='user' activePanel={activeUserPanel}>
-                <User id='user' vkProfile={vkProfile} user={user} goUserEdit={goUserEdit} activeStory={activeStory} goSetUserTeam={goSetUserTeam} />
+                <User id='user' vkProfile={vkProfile} userId={userId} goUserEdit={goUserEdit} activeStory={activeStory} goSetUserTeam={goSetUserTeam} />
                 <UserEdit id='userEdit' goUserEdit={goUserEdit} vkProfile={vkProfile} user={user} />
                 <TeamInfo id='teaminfo' go={goUserEdit} teamId={activeTeam} return='user' />
                 <SetUserTeam id='setUserTeam' goSetUserTeam={goSetUserTeam} user={user} />

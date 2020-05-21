@@ -25,9 +25,10 @@ class User extends React.Component {
         this.state = {
             skills: null,
             userSkills: null,
+            userId: props.userId, 
             vkUser: null,
             vkProfile: props.vkProfile,
-            user: props.user,
+            user: null,
             activeTabProfile: 'main',
             selected: false,
             selectedSkills: null,
@@ -44,7 +45,7 @@ class User extends React.Component {
 
     componentDidMount() {
         this.fetchVkUser();
-        this.isUserConfirmed(this.state.user.id);
+        this.isUserConfirmed(this.state.userId);
     }
 
     isUserConfirmed(id) {
@@ -53,16 +54,15 @@ class User extends React.Component {
             .then((response) => {
                 this.setState({ isConfirmed: response })
 
-                var id = this.state.user.id;
                 var vkProfileId = this.state.vkProfile.id;
                 console.log('before user fetch', id);
                 console.log('profileId = ', vkProfileId);
 
-                this.state.readOnlyMode && fetch(`/api/user/get?id=${id}`)
+                fetch(`/api/user/get/?id=${id}`)
                     .then(response => response.json())
                     .then(data => this.setState({ user: data }));
 
-                this.state.readOnlyMode && fetch(`/api/user/getRecruitTeams?vkProfileId=${vkProfileId}&&id=${id}`)
+                fetch(`/api/user/getRecruitTeams?vkProfileId=${vkProfileId}&&id=${id}`)
                     .then(response => response.json())
                     .then(data => this.setState({ recruitTeams: data }));
             } 
@@ -74,9 +74,8 @@ class User extends React.Component {
         const t = await bridge.send("VKWebAppGetAuthToken",
             { "app_id": 7448436, "scope": "" });
 
-        let url = new URL('https://api.vk.com/method/users.get/?')
         let params = {
-            user_id: this.state.user.id,
+            user_id: this.state.userId,
             fields: 'city,photo_200,contacts',
             v: '5.103',
             access_token: t.access_token
@@ -172,7 +171,7 @@ class User extends React.Component {
                             </List>
                             <UserSkills userSkills={this.state.userSkills} readOnlyMode={this.state.readOnlyMode}
                                 handleClick={this.handleClick.bind(this, this.state.selectedSkills)}
-                                id={this.state.user && this.state.user.id} />
+                                id={this.state.userId} />
                         </Group> :
                         <Group>
                             <UserTeams userTeams={this.state.user && this.state.user.userTeams}
@@ -182,13 +181,13 @@ class User extends React.Component {
                 <Div>
                     <Checkbox disabled={this.state.readOnlyMode} onChange={(e) => this.handleCheckboxClick(e)}
                         checked={this.state.user && this.state.user.isSearchable ? 'checked' : ''}>в поиске команды</Checkbox>
-                    {!this.state.readOnlyMode && <Button mode={this.state.isConfirmed ? "primary" : "destructive"} size='xl'
+                    {this.state.user && !this.state.readOnlyMode && <Button mode={this.state.isConfirmed ? "primary" : "destructive"} size='xl'
                         onClick={() => this.confirmUser(this.state.vkUser && this.state.vkUser.id, this.state.userSkills)}>
                         {this.state.isConfirmed ? "Сохранить" : "Подтвердить"}
                     </Button>}
                 </Div>
                 <Div>
-                    {this.state.recruitTeams.length > 0 && < Button mode="primary" size='xl'
+                    {this.state.recruitTeams && this.state.recruitTeams.length > 0 && < Button mode="primary" size='xl'
                         onClick={this.state.goSetUserTeam}
                         data-to='setUserTeam'
                         data-user={JSON.stringify(this.state.user)}

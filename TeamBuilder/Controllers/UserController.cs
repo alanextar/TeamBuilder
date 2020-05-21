@@ -118,12 +118,15 @@ namespace TeamBuilder.Controllers
 				.ThenInclude(y => y.Event)
 				.FirstOrDefault(u => u.Id == id);
 
-			var profileTeams = context.Users.Include(x => x.UserTeams)
+			if (user.IsSearchable)
+			{
+				var profileTeams = context.Users.Include(x => x.UserTeams)
 				.ThenInclude(y => y.Team).SelectMany(x => x.UserTeams)
 				.Where(x => x.IsOwner && x.UserId == vkProfileId).Select(x => x.Team).ToList();
 
-			//команды оунера в которых не состоит юзер
-			user.TeamsToRecruit = profileTeams.Except(user.UserTeams.Select(x => x.Team).ToList()).ToList();
+				//команды оунера в которых не состоит юзер
+				user.TeamsToRecruit = profileTeams.Except(user.UserTeams.Select(x => x.Team).ToList()).ToList();
+			}
 
 			return Json(user.TeamsToRecruit);
 		}
