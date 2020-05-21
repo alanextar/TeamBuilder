@@ -11,11 +11,10 @@ import Icon28FavoriteOutline from '@vkontakte/icons/dist/28/favorite_outline';
 import Events from './panels/events'
 import EventCreate from './panels/eventCreate'
 import EventInfo from './panels/eventInfo'
-import Panel2 from './panels/panel2'
-import Panel3 from './panels/panel3'
+import EventEdit from './panels/eventEdit'
 
 import Teams from './panels/teams'
-import Teaminfo from './panels/teaminfo' 
+import TeamInfo from './panels/teamInfo' 
 import TeamCreate from './panels/teamCreate'
 import TeamEdit from './panels/teamEdit'
 
@@ -36,7 +35,7 @@ const App = () => {
     const [user, setUser] = useState(null);
 
     const [activeEventPanel, setActiveEventPanel] = useState('events');
-
+    const [event, setEvent] = useState(null);
 
 	useEffect(() => {
 		bridge.subscribe(({ detail: { type, data } }) => {
@@ -45,11 +44,9 @@ const App = () => {
 				schemeAttribute.value = data.scheme ? data.scheme : 'client_light';
 				document.body.attributes.setNamedItem(schemeAttribute);
 			}
-        });
-
-		async function fetchData() {
+		});
+        async function fetchData() {
             const user = await bridge.send('VKWebAppGetUserInfo');
-            console.log(user);
             setProfile(user);
             setUser(user);
         }
@@ -61,15 +58,14 @@ const App = () => {
         if (e.currentTarget.dataset.href)
             setTeamNextHref(e.currentTarget.dataset.href);
         setActiveTeam(e.currentTarget.dataset.id);
-
+        setBack(e.currentTarget.dataset.from);
         let user = e.currentTarget.dataset.user && JSON.parse(e.currentTarget.dataset.user);
         setUser(user);
-        console.log('user *******************', user);
-
         console.log(`dataset.href: ${e.currentTarget.dataset.href}`);
     };
 
     const goEvent = e => {
+        setEvent(e.currentTarget.dataset.event && JSON.parse(e.currentTarget.dataset.event));
         setActiveEventPanel(e.currentTarget.dataset.to);
         setBack(e.currentTarget.dataset.from);
     };
@@ -124,23 +120,23 @@ const App = () => {
         }>
             <View id='teams' activePanel={activeTeamPanel} >
                 <Teams id='teams' go={goTeam} href={teamHref} />
-                <Teaminfo id='teaminfo' go={goTeam} teamId={activeTeam} return='teams' vkProfile={vkProfile}/>
-                <TeamCreate id='teamCreate' go={goTeam} />
-                <TeamEdit id='teamEdit' go={goTeam} teamId={activeTeam} />
-                <User id='user' vkProfile={vkProfile} user={user} goUserEdit={goTeam} activeStory={activeStory} goSetUserTeam={goSetUserTeam} return='teaminfo' />
+                <TeamInfo id='teaminfo' go={goTeam} teamId={activeTeam} return='teams' vkProfile={vkProfile} />
+                <TeamCreate id='teamCreate' go={goTeam} back={back}/>
+                <TeamEdit id='teamEdit' go={goTeam} teamId={activeTeam} back={back}/>
+                <User id='user' vkProfile={vkProfile} user={user} goUserEdit={goTeam}
+                    activeStory={activeStory} goSetUserTeam={goSetUserTeam} return='teaminfo' />
+                <EventCreate id='eventCreate' go={goTeam} back={back} owner={vkProfile} />
             </View>
-            {/*<View id='users' activePanel='panel2'>
-                 <Panel2 id='panel2' go={go}/>
-             </View>*/}
             <View id='events' activePanel={activeEventPanel}>
-                <Events id='events' go={goEvent}/>
-                <EventCreate id='eventCreate' go={goEvent} back={back}/>
-                <EventInfo id='eventInfo' go={goEvent} back={back}/>
+                <Events id='events' go={goEvent} />
+                <EventCreate id='eventCreate' go={goEvent} back={back} owner={vkProfile} />
+                <EventInfo id='eventInfo' event={event} go={goEvent} back={back} />
+                <EventEdit id='eventEdit' event={event} go={goEvent} back={back} owner={vkProfile} />
             </View>
             <View id='user' activePanel={activeUserPanel}>
                 <User id='user' vkProfile={vkProfile} user={user} goUserEdit={goUserEdit} activeStory={activeStory} goSetUserTeam={goSetUserTeam} />
                 <UserEdit id='userEdit' goUserEdit={goUserEdit} vkProfile={vkProfile} user={user} />
-                <Teaminfo id='teaminfo' go={goUserEdit} teamId={activeTeam} return='user' />
+                <TeamInfo id='teaminfo' go={goUserEdit} teamId={activeTeam} return='user' />
                 <SetUserTeam id='setUserTeam' goSetUserTeam={goSetUserTeam} user={user} />
             </View>
         </Epic>

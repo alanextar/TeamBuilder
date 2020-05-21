@@ -25,7 +25,6 @@ class User extends React.Component {
         this.state = {
             skills: null,
             userSkills: null,
-             //TO-DO получить юзера из апи вконтакте
             vkUser: null,
             vkProfile: props.vkProfile,
             user: props.user,
