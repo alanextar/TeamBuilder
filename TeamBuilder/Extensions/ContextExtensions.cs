@@ -56,5 +56,28 @@ namespace TeamBuilder.Extensions
 			return new Page<T>(items, nextHref);
 
 		}
+
+        public static LaunchParams GetLaunchParams(this HttpRequest request)
+        {
+	        var raw = request.Headers["Launch-Params"].ToString();
+			return LaunchParams.Parse(raw);
+        }
     }
+
+	public class LaunchParams
+	{
+		public static LaunchParams Parse(string str)
+		{
+			var full = str.Trim('?', '/').Split('#');
+			var query = full[0];
+			var hash = full.Length == 2 ? full[1] : null;
+
+			var parameters = query
+				.Split('&', StringSplitOptions.RemoveEmptyEntries)
+				.Select(p => p.Split('=', StringSplitOptions.RemoveEmptyEntries))
+				.ToDictionary(kpv => kpv[0], kvp => kvp.Length == 2 ? kvp[1] : null);
+
+			return new LaunchParams();
+		}
+	}
 }

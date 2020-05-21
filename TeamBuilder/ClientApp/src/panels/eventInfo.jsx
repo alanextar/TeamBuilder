@@ -5,7 +5,7 @@ import {
     PanelHeaderBack, CardGrid, Card
 } from '@vkontakte/vkui';
 import Icon28EditOutline from '@vkontakte/icons/dist/28/edit_outline';
-import { Api } from '../api';
+import { Api } from '../infrastructure/api';
 
 const EventInfo = props => {
     const [edit, setEdit] = useState(true);

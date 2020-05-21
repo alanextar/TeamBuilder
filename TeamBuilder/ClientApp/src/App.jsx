@@ -18,6 +18,7 @@ import TeamInfo from './panels/teamInfo'
 import TeamCreate from './panels/teamCreate'
 import TeamEdit from './panels/teamEdit'
 
+import Users from './panels/users'
 import User from './panels/user'
 import UserEdit from './panels/userEdit'
 
@@ -35,6 +36,8 @@ const App = () => {
 
     const [activeEventPanel, setActiveEventPanel] = useState('events');
     const [event, setEvent] = useState(null);
+
+    const [activeUsersPanel, setActiveUsersPanel] = useState('users');
 
     const [city, setCity] = useState(null);
     const [about, setAbout] = useState(null);
@@ -64,15 +67,16 @@ const App = () => {
         console.log(`dataset.href: ${e.currentTarget.dataset.href}`);
     };
 
+    const goUsers = e => {
+        setActiveUsersPanel(e.currentTarget.dataset.to);
+        setBack(e.currentTarget.dataset.from);
+    };
+
     const goEvent = e => {
         setEvent(e.currentTarget.dataset.event && JSON.parse(e.currentTarget.dataset.event));
         setActiveEventPanel(e.currentTarget.dataset.to);
         setBack(e.currentTarget.dataset.from);
     };
-
-    const goFoot = e => {
-        setActiveStore(e.currentTarget.dataset.story);
-    }
 
     const goUserEdit = e => {
         console.log('into go', e.currentTarget.dataset.to, e.currentTarget.dataset.id);
@@ -80,6 +84,10 @@ const App = () => {
         setActiveTeam(e.currentTarget.dataset.id);
         setActiveUserPanel(e.currentTarget.dataset.to);
         setActiveUser(user);
+    }
+
+    const goFoot = e => {
+        setActiveStore(e.currentTarget.dataset.story);
     }
 
 	return (
@@ -118,6 +126,9 @@ const App = () => {
                 <TeamEdit id='teamEdit' go={goTeam} teamId={activeTeam} back={back}/>
                 <User id='user' fetchedUser={fetchedUser} goUserEdit={goTeam} activeStory={activeStory} return='teaminfo' />
                 <EventCreate id='eventCreate' go={goEvent} back={back} owner={fetchedUser} />
+            </View>
+            <View id='users' activePanel={activeUsersPanel}>
+                <Users id='users' go={goUsers} />
             </View>
             <View id='events' activePanel={activeEventPanel}>
                 <Events id='events' go={goEvent} />

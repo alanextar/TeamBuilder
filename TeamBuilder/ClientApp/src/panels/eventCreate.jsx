@@ -4,7 +4,7 @@ import {
     Panel, PanelHeader, Group, Button, Textarea, FixedLayout,
     PanelHeaderBack, Input, FormLayout
 } from '@vkontakte/vkui';
-import { Api } from '../api';
+import { Api } from '../infrastructure/api';
 
 const EventCreate = props => {
     const [eventName, setEventName] = useState('');

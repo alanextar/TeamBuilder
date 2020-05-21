@@ -187,7 +187,10 @@ namespace TeamBuilder.Controllers
 				return NoContent();
 
 			bool Filter(User user) => user.FullName.ToLowerInvariant().Contains(search?.ToLowerInvariant());
-			var result = context.Users.GetPage(pageSize, HttpContext.Request, page, prev, Filter);
+			var result = context.Users
+				.Include(u => u.UserSkills).ThenInclude(us => us.Skill)
+				.Include(u => u.UserTeams).ThenInclude(ut => ut.Team)
+				.GetPage(pageSize, HttpContext.Request, page, prev, Filter);
 			result.NextHref = result.NextHref == null ? null : $"{result.NextHref}&search={search}";
 			logger.LogInformation($"Response UsersCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
 			                      $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
@@ -205,10 +208,13 @@ namespace TeamBuilder.Controllers
 			if (pageSize == 0)
 				return NoContent();
 
-			var teams = context.Users.GetPage(pageSize, HttpContext.Request, page, prev);
+			var result = context.Users
+				.Include(u => u.UserSkills).ThenInclude(us => us.Skill)
+				.Include(u => u.UserTeams).ThenInclude(ut => ut.Team)
+				.GetPage(pageSize, HttpContext.Request, page, prev);
 
-			logger.LogInformation($"Response UsersCount:{teams.Collection.Count()} / from:{teams.Collection.FirstOrDefault()?.Id} / to:{teams.Collection.LastOrDefault()?.Id} / NextHref:{teams.NextHref}");
-			return Json(teams);
+			logger.LogInformation($"Response UsersCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
+			return Json(result);
 		}
 
 		#endregion
