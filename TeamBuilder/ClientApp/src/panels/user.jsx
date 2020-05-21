@@ -25,6 +25,7 @@ class User extends React.Component {
             userSkills: null,
              //TO-DO получить юзера из апи вконтакте
             vkUser: props.vkUser,
+            vkProfile: props.vkProfile,
             user: props.user,
             activeTabProfile: 'main',
             selected: false,
@@ -41,17 +42,7 @@ class User extends React.Component {
     }
 
     componentDidMount() {
-        useEffect(() => {
-            async function fetchData() {
-                const user = await bridge.send("VKWebAppCallAPIMethod", {
-                    "method": "users.get", "request_id": "32test", "params":
-                        { "user_ids": "1", "v": "5.103", "access_token": "your_token" }
-                });
-                console.log(user);
-            }
-            fetchData();
-        }, []);
-
+        this.fetchData();
         this.isUserConfirmed(this.state.vkUser.id);
     }
 
@@ -61,22 +52,28 @@ class User extends React.Component {
             .then((response) => {
                 this.setState({ isConfirmed: response })
 
+                var id = this.state.vkUser.id;
+                var vkProfileId = this.state.vkProfile.id;
                 console.log('before user fetch', id);
-                var fetchedUserId = this.state.vkUser.id;
-                var fetchedProfileId = this.state.user.id;
-                console.log('profileId = ', fetchedProfileId);
+                console.log('profileId = ', vkProfileId);
 
-                this.state.isProfile && fetch(`/api/user/get?fetchedProfileId=${fetchedProfileId}&&fetchedUserId=${fetchedUserId}`)
+                this.state.isProfile && fetch(`/api/user/get?id=${id}`)
                     .then(response => response.json())
                     .then(data => this.setState({ user: data }));
 
-                this.state.isProfile && fetch(`/api/user/getRecruitTeams?fetchedProfileId=${fetchedProfileId}&&fetchedUserId=${fetchedUserId}`)
+                this.state.isProfile && fetch(`/api/user/getRecruitTeams?vkProfileId=${vkProfileId}&&id=${id}`)
                     .then(response => response.json())
                     .then(data => this.setState({ recruitTeams: data }));
             } 
         );
 
-	}
+    }
+
+    async fetchData() {
+        const user = await bridge.send('VKWebAppGetUserInfo');
+        this.setState({ vkUser: user });
+        console.log('test fetch user', user);
+    }
 
     async confirmUser(id) {
         console.log('into confirm user', this.state.user.isSearchable);
@@ -145,7 +142,7 @@ class User extends React.Component {
                     {
                     this.state.activeTabProfile === 'main' ?
                         <Group header={<Header mode="secondary">Информация о профиле участника</Header>}>
-                            {/* <List>
+                            <List>
                                 {!this.state.readOnlyMode && <Cell asideContent=
                                     {
                                         <Icon24Write onClick={this.state.goUserEdit}
@@ -163,10 +160,10 @@ class User extends React.Component {
                                 <Cell before={<Icon28ArticleOutline />}>
                                     дополнительно: {this.state.user && this.state.user.about}
                                 </Cell>
-                            </List> */}
+                            </List>
                             <UserSkills userSkills={this.state.userSkills} readOnlyMode={this.state.isProfile}
                                 handleClick={this.handleClick.bind(this, this.state.selectedSkills)}
-                                id={this.state.vkUser && this.state.vkUser.id} />
+                                id={this.state.user && this.state.user.id} />
                         </Group> :
                         <Group>
                             <UserTeams userTeams={this.state.user && this.state.user.userTeams}

@@ -91,7 +91,7 @@ namespace TeamBuilder.Controllers
 		}
 
 		[HttpGet]
-		public IActionResult Get(long profileId, long userId)
+		public IActionResult Get(long id)
 		{
 			_logger.LogInformation("Request ConfirmUser");
 
@@ -100,20 +100,20 @@ namespace TeamBuilder.Controllers
 				.ThenInclude(y => y.Event)
 				.Include(x => x.UserSkills)
 				.ThenInclude(y => y.Skill)
-				.FirstOrDefault(u => u.Id == profileId);
+				.FirstOrDefault(u => u.Id == id);
 
 			return Json(user);
 		}
 
 		[HttpGet]
-		public IActionResult GetRecruitTeams(long vkProfileId, long userId)
+		public IActionResult GetRecruitTeams(long vkProfileId, long id)
 		{
 			_logger.LogInformation("Request ConfirmUser");
 
 			var user = context.Users.Include(x => x.UserTeams)
 				.ThenInclude(y => y.Team)
 				.ThenInclude(y => y.Event)
-				.FirstOrDefault(u => u.Id == userId);
+				.FirstOrDefault(u => u.Id == id);
 
 			var profileTeams = context.Users.Include(x => x.UserTeams)
 				.ThenInclude(y => y.Team).SelectMany(x => x.UserTeams)

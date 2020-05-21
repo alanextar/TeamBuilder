@@ -33,7 +33,7 @@ const App = () => {
 
     const [activeUserPanel, setActiveUserPanel] = useState('user');
     const [vkProfile, setProfile] = useState(null);
-    const [user, setUser] = useState(null);
+    const [vkUser, setUser] = useState(null);
 
     const [activeEventPanel, setActiveEventPanel] = useState('events');
 
@@ -92,7 +92,7 @@ const App = () => {
         setActiveUserPanel(e.currentTarget.dataset.to);
     }
 
-    console.log('into app', user);
+    console.log('into app', vkUser);
 
 	return (
         <Epic activeStory={activeStory} tabbar={
@@ -128,7 +128,7 @@ const App = () => {
                 <Teaminfo id='teaminfo' go={goTeam} teamId={activeTeam} return='teams' vkProfile={vkProfile}/>
                 <TeamCreate id='teamCreate' go={goTeam} />
                 <TeamEdit id='teamEdit' go={goTeam} teamId={activeTeam} />
-                <User id='user' vkProfile={vkProfile} user={user} goUserEdit={goTeam} activeStory={activeStory} goSetUserTeam={goSetUserTeam} return='teaminfo' />
+                <User id='user' vkProfile={vkProfile} vkUser={vkUser} goUserEdit={goTeam} activeStory={activeStory} goSetUserTeam={goSetUserTeam} return='teaminfo' />
             </View>
             {/*<View id='users' activePanel='panel2'>
                  <Panel2 id='panel2' go={go}/>
@@ -139,10 +139,10 @@ const App = () => {
                 <EventInfo id='eventInfo' go={goEvent} back={back}/>
             </View>
             <View id='user' activePanel={activeUserPanel}>
-                <User id='user' vkProfile={vkProfile} user={user} goUserEdit={goUserEdit} activeStory={activeStory} goSetUserTeam={goSetUserTeam} />
-                <UserEdit id='userEdit' goUserEdit={goUserEdit} vkProfile={vkProfile} user={user} />
+                <User id='user' vkProfile={vkProfile} vkUser={vkUser} goUserEdit={goUserEdit} activeStory={activeStory} goSetUserTeam={goSetUserTeam} />
+                <UserEdit id='userEdit' goUserEdit={goUserEdit} vkProfile={vkProfile} vkUser={vkUser} />
                 <Teaminfo id='teaminfo' go={goUserEdit} teamId={activeTeam} return='user' />
-                <SetUserTeam id='setUserTeam' goSetUserTeam={goSetUserTeam} user={user} />
+                <SetUserTeam id='setUserTeam' goSetUserTeam={goSetUserTeam} vkUser={vkUser} />
             </View>
         </Epic>
 
