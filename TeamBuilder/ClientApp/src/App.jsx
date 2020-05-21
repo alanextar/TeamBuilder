@@ -60,7 +60,7 @@ const App = () => {
         if (e.currentTarget.dataset.href)
             setTeamNextHref(e.currentTarget.dataset.href);
         setActiveTeam(e.currentTarget.dataset.id);
-
+        setBack(e.currentTarget.dataset.from);
         console.log(`dataset.href: ${e.currentTarget.dataset.href}`);
     };
 
