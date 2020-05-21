@@ -194,7 +194,7 @@ class TeamEdit extends React.Component {
                             data-to={'teaminfo'}
                             data-id={this.props.teamId} >
                             Применить Изменения
-                        </Button>)
+                        </Button>
                     </Div>
                 </ FixedLayout>
             </Panel>

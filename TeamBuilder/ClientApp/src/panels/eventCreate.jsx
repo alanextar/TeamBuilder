@@ -42,11 +42,11 @@ const EventCreate = props => {
         let ownerId = props.owner ? props.owner.id : -1;
         var createEventViewModel = { name, description, startDate, finishDate, link, ownerId }
         fetch(`${Api.Events.Create}`,
-                {
-                    method: 'post',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(createEventViewModel)
-                })
+            {
+                method: 'post',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(createEventViewModel)
+            })
             .then(console.log('ok'))
             .catch((error) => console.log(`Error for create events. Details: ${error}`));
     }
