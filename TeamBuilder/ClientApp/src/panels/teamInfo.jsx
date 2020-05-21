@@ -102,7 +102,7 @@ class TeamInfo extends React.Component {
                                                         data-to='user'
                                                         data-id={userTeam.userId}
                                                         data-user={JSON.stringify(userTeam.user)}
-                                                        before={<Avatar size={48} />}
+                                                        before={<Avatar size={48} src={userTeam.user.photo100}/>}
                                                         after={<Icon28MessageOutline />}>
                                                         {userTeam.user.firstName, userTeam.user.fullName}
                                                     </SimpleCell>

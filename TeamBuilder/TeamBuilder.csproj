@@ -37,10 +37,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="DemoDataSets\skills.json" />
+    <Content Remove="DemoDataSets\teams.json" />
     <Content Remove="DemoDataSets\users.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="DemoDataSets\skills.json" />
+    <None Include="DemoDataSets\teams.json" />
     <None Include="DemoDataSets\users.json" />
   </ItemGroup>
 

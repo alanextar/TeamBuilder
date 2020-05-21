@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -39,7 +40,7 @@ namespace TeamBuilder.Controllers
 			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
 
 			if (string.IsNullOrEmpty(search))
-				return RedirectToAction("GetPage", new { pageSize, page, prev});
+				return RedirectToAction("GetPage", new { pageSize, page, prev });
 
 			if (pageSize == 0)
 				return NoContent();
@@ -48,7 +49,7 @@ namespace TeamBuilder.Controllers
 			var result = context.Teams.Include(x => x.Event).Include(x => x.UserTeams).GetPage(pageSize, HttpContext.Request, page, prev, Filter);
 			result.NextHref = result.NextHref == null ? null : $"{result.NextHref}&search={search}";
 			logger.LogInformation($"Response TeamsCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
-			                      $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
+								  $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
 
 			return Json(result);
 		}
@@ -56,6 +57,8 @@ namespace TeamBuilder.Controllers
 		public async Task<IActionResult> GetPage(int pageSize = 20, int page = 0, bool prev = false)
 		{
 			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
+
+			//await PashalEggs.Eggs(context);
 
 			if (!context.Teams.Any())
 				await Initialize();
@@ -68,7 +71,7 @@ namespace TeamBuilder.Controllers
 			logger.LogInformation($"Response TeamsCount:{teams.Collection.Count()} / from:{teams.Collection.FirstOrDefault()?.Id} / to:{teams.Collection.LastOrDefault()?.Id} / NextHref:{teams.NextHref}");
 			return Json(teams);
 		}
-		
+
 		public Team Get(int id)
 		{
 			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
@@ -87,7 +90,7 @@ namespace TeamBuilder.Controllers
 
 			var @event = await context.Events.FirstOrDefaultAsync(e => e.Id == createTeamViewModel.EventId);
 
-			var config = new MapperConfiguration(cfg => cfg.CreateMap<CreateTeamViewModel,Team>()
+			var config = new MapperConfiguration(cfg => cfg.CreateMap<CreateTeamViewModel, Team>()
 				.ForMember("Event", opt => opt.MapFrom(_ => @event)));
 			var mapper = new Mapper(config);
 			var team = mapper.Map<CreateTeamViewModel, Team>(createTeamViewModel);
@@ -137,66 +140,13 @@ namespace TeamBuilder.Controllers
 
 		private async Task Initialize()
 		{
-			var teams = new List<Team>
+			var file = await System.IO.File.ReadAllTextAsync(@"DemoDataSets\teams.json");
+			var teams = JsonConvert.DeserializeObject<Team[]>(file);
+			teams = teams.Select(t =>
 			{
-				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
-				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
-				new Team {Name = "Lions MAD Lions", Description = "команда из екб"},
-				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
-				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
-				new Team {Name = "Lions MAD Lions", Description = "команда из екб"},
-				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
-				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
-				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
-				new Team {Name = "Lions MAD Lions", Description = "команда из екб"},
-				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
-				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
-				new Team {Name = "Lions MAD Lions", Description = "команда из екб"},
-				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
-				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
-				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
-				new Team {Name = "Lions MAD Lions", Description = "команда из екб"},
-				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
-				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
-				new Team {Name = "Lions MAD Lions", Description = "команда из екб"},
-				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
-				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
-				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
-				new Team {Name = "Lions MAD Lions", Description = "команда из екб"},
-				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
-				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
-				new Team {Name = "Lions MAD Lions", Description = "команда из екб"},
-				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
-				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
-				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
-				new Team {Name = "Lions MAD Lions", Description = "команда из екб"},
-				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
-				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
-				new Team {Name = "Lions MAD Lions", Description = "команда из екб"},
-				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
-				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
-				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
-				new Team {Name = "Lions MAD Lions", Description = "команда из екб"},
-				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
-				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
-				new Team {Name = "Lions MAD Lions", Description = "команда из екб"},
-				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
-				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
-				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
-				new Team {Name = "Lions MAD Lions", Description = "команда из екб"},
-				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
-				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
-				new Team {Name = "Lions MAD Lions", Description = "команда из екб"},
-				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
-				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
-				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
-				new Team {Name = "Lions MAD Lions", Description = "команда из екб"},
-				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
-				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
-				new Team {Name = "Lions MAD Lions", Description = "команда из екб"},
-				new Team {Name = "MiBR Made in Brazil", Description = "команда из екб"},
-				new Team {Name = "Na’Vi Natus Vincere", Description = "команда из екб"},
-			};
+				t.NumberRequiredMembers = new Random().Next(0, 15);
+				return t;
+			}).ToArray();
 
 			await context.Teams.AddRangeAsync(teams);
 			await context.SaveChangesAsync();

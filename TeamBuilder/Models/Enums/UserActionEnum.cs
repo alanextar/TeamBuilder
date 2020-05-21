@@ -9,16 +9,16 @@ namespace TeamBuilder.Models
 	public enum UserActionEnum
 	{
 		[Display(Name = "Нет действия")]
-		None = 0,
+		None,
 		[Display(Name = "Отправил запрос в команду")]
-		SentRequest = 2,
+		SentRequest,
 		[Display(Name = "Присоединился")]
-		JoinedTeam = 3,
+		JoinedTeam,
 		[Display(Name = "Отклонил запрос")]
-		CanceledTeamRequest = 4,
+		CanceledTeamRequest,
 		[Display(Name = "Самоустранился из команды")]
-		QuitTeam = 5,
+		QuitTeam,
 		[Display(Name = "Рассматривает предложение команды")]
-		AcceptingOffer = 6,
+		AcceptingOffer,
 	}
 }

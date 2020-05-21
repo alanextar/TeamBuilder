@@ -123,6 +123,12 @@ namespace TeamBuilder.Migrations
                     b.Property<string>("LastName")
                         .HasColumnType("text");
 
+                    b.Property<string>("Photo100")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Photo200")
+                        .HasColumnType("text");
+
                     b.Property<string>("SecondName")
                         .HasColumnType("text");
 

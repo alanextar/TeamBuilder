@@ -23,6 +23,8 @@ namespace TeamBuilder.Models
 		public string City { get; set; }
 		public string About { get; set; }
 		public string FullName => FirstName + " " + SecondName + " " + LastName;
+		public string Photo100 { get; set; }
+		public string Photo200 { get; set; }
 		public bool IsSearchable { get; set; }
 		//public bool IsConfirmed { get; set; }
 		public List<UserTeam> UserTeams { get; set; }
