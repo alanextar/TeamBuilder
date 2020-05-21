@@ -70,7 +70,7 @@ namespace TeamBuilder.Controllers
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(createEventViewModel)}");
 
-			var user = await context.Users.FirstOrDefaultAsync(e => e.VkId == createEventViewModel.OwnerId);
+			var user = await context.Users.FirstOrDefaultAsync(e => e.Id == createEventViewModel.OwnerId);
 
 			//if (user == null)
 			//	return Forbid();
@@ -94,7 +94,7 @@ namespace TeamBuilder.Controllers
 
 			var @event = await context.Events.Include(e => e.Owner).FirstOrDefaultAsync(e => e.Id == editEventViewModel.Id);
 
-			var user = await context.Users.FirstOrDefaultAsync(e => e.VkId == editEventViewModel.UserId);
+			var user = await context.Users.FirstOrDefaultAsync(e => e.Id == editEventViewModel.UserId);
 			//if (user == null || @event.Owner.VkId != editEventViewModel.UserId)
 			//	return Forbid();
 

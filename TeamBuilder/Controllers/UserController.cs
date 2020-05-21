@@ -28,11 +28,11 @@ namespace TeamBuilder.Controllers
 			logger.LogInformation($"POST Request Confirm. Body: {JsonConvert.SerializeObject(profileViewModel)}");
 
 			var user = context.Users.Include(x => x.UserSkills)
-				.ThenInclude(y => y.Skill).FirstOrDefault(u => u.VkId == profileViewModel.VkId);
+				.ThenInclude(y => y.Skill).FirstOrDefault(u => u.Id == profileViewModel.Id);
 
 			if (user == null)
 			{
-				user = new User(profileViewModel.VkId);
+				user = new User(profileViewModel.Id);
 				user.UserSkills = new List<UserSkill>();
 				foreach (var skillId in profileViewModel.SkillsIds)
 				{
@@ -58,22 +58,22 @@ namespace TeamBuilder.Controllers
 		}
 
 		[HttpGet]
-		public IActionResult CheckConfirmation(long vkId)
+		public IActionResult CheckConfirmation(long id)
 		{
-			logger.LogInformation($"Request CheckConfirmation/{vkId}");
+			logger.LogInformation($"Request CheckConfirmation/{id}");
 
-			var isConfirmed = context.Users.FirstOrDefault(x => x.VkId == vkId) != null ? true : false;
+			var isConfirmed = context.Users.FirstOrDefault(x => x.Id == id) != null ? true : false;
 
 			return Json(isConfirmed);
 		}
 
-		public List<Skill> GetSkills(long vkId)
+		public List<Skill> GetSkills(long id)
 		{
-			logger.LogInformation($"Request GetSkills/{vkId}");
+			logger.LogInformation($"Request GetSkills/{id}");
 
 			var userSkills = context.Users.Include(x => x.UserSkills)
 				.ThenInclude(y => y.Skill)
-				.FirstOrDefault(x => x.VkId == vkId)?
+				.FirstOrDefault(x => x.Id == id)?
 				.UserSkills
 				.Select(x => x.Skill)
 				.ToList();
@@ -84,17 +84,17 @@ namespace TeamBuilder.Controllers
 			return userSkills;
 		}
 
-		public User GetTeams(long vkId)
+		public User GetTeams(long id)
 		{
-			logger.LogInformation($"Request GetTeams/{vkId}");
+			logger.LogInformation($"Request GetTeams/{id}");
 
-			var user = context.Users.Include(x => x.UserTeams).FirstOrDefault(x => x.Id == vkId);
+			var user = context.Users.Include(x => x.UserTeams).FirstOrDefault(x => x.Id == id);
 
 			return user;
 		}
 
 		[HttpGet]
-		public IActionResult Get(long vkId)
+		public IActionResult Get(long id)
 		{
 			logger.LogInformation("Request ConfirmUser");
 
@@ -103,9 +103,32 @@ namespace TeamBuilder.Controllers
 				.ThenInclude(y => y.Event)
 				.Include(x => x.UserSkills)
 				.ThenInclude(y => y.Skill)
-				.FirstOrDefault(u => u.VkId == vkId);
+				.FirstOrDefault(u => u.Id == id);
 
 			return Json(user);
+		}
+
+		[HttpGet]
+		public IActionResult GetRecruitTeams(long vkProfileId, long id)
+		{
+			logger.LogInformation("Request ConfirmUser");
+
+			var user = context.Users.Include(x => x.UserTeams)
+				.ThenInclude(y => y.Team)
+				.ThenInclude(y => y.Event)
+				.FirstOrDefault(u => u.Id == id);
+
+			if (user.IsSearchable)
+			{
+				var profileTeams = context.Users.Include(x => x.UserTeams)
+				.ThenInclude(y => y.Team).SelectMany(x => x.UserTeams)
+				.Where(x => x.IsOwner && x.UserId == vkProfileId).Select(x => x.Team).ToList();
+
+				//команды оунера в которых не состоит юзер
+				user.TeamsToRecruit = profileTeams.Except(user.UserTeams.Select(x => x.Team).ToList()).ToList();
+			}
+
+			return Json(user.TeamsToRecruit);
 		}
 
 		[HttpPost]
@@ -113,7 +136,7 @@ namespace TeamBuilder.Controllers
 		{
 			logger.LogInformation("Request ConfirmUser");
 
-			var dbUser = context.Users.FirstOrDefault(u => u.VkId == user.VkId);
+			var dbUser = context.Users.FirstOrDefault(u => u.Id == user.Id);
 			dbUser.City = user.City;
 			dbUser.About = user.About;
 
@@ -127,31 +150,31 @@ namespace TeamBuilder.Controllers
 		{
 			logger.LogInformation("Request JoinTeamm");
 
-			var dbUser = context.Users
+			var user = context.Users
 				.Include(x => x.UserTeams)
 				.ThenInclude(x => x.Team)
 				.ThenInclude(y => y.Event)
 				.FirstOrDefault(u => u.Id == id);
 
-			var userTeamToJoin = dbUser.UserTeams.First(x => x.TeamId == teamId);
+			var userTeamToJoin = user.UserTeams.First(x => x.TeamId == teamId);
 			userTeamToJoin.UserAction = UserActionEnum.JoinedTeam;
 
-			context.Update(dbUser);
+			context.Update(user);
 			context.SaveChanges();
 
-			return Json(dbUser.UserTeams);
+			return Json(user.UserTeams);
 		}
 
 		public IActionResult QuitOrDeclineTeam(long id, long teamId)
 		{
 			logger.LogInformation("Request JoinTeamm");
 
-			var dbUser = context.Users
+			var user = context.Users
 				.Include(x => x.UserTeams)
 				.ThenInclude(x => x.Team)
 				.ThenInclude(y => y.Event);
 
-			var userTeams = dbUser
+			var userTeams = user
 				.SelectMany(x => x.UserTeams);
 
 			var userTeamToDelete = userTeams
@@ -161,6 +184,42 @@ namespace TeamBuilder.Controllers
 			context.SaveChanges();
 
 			return Json(userTeams);
+		}
+
+		public IActionResult SetTeam(long id, long teamId)
+		{
+			logger.LogInformation("Request SetTeam");
+
+			if (teamId == 0)
+			{
+				return NotFound();
+			}
+
+			var dbTeam = context.Teams.Include(x => x.UserTeams).FirstOrDefault(x => x.Id == teamId);
+
+			if (!dbTeam.UserTeams.Any(x => x.UserId == id))
+			{
+				dbTeam.UserTeams.Add(new UserTeam { UserId = id, UserAction = UserActionEnum.AcceptingOffer });
+
+				context.Update(dbTeam);
+				context.SaveChanges();
+			}
+
+			return Ok("Request was sent to user");
+		}
+
+		public IEnumerable<Team> GetOwnerTeams(long id)
+		{
+			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
+			var teams = context.Users
+				.Include(x => x.UserTeams)
+				.ThenInclude(y => y.Team)
+				.SelectMany(x => x.UserTeams)
+				.Where(x => x.UserId == id && x.IsOwner)
+				.Select(x => x.Team)
+				.ToList();
+
+			return teams;
 		}
 
 		#region List
