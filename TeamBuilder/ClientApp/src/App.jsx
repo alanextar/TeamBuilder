@@ -33,7 +33,7 @@ const App = () => {
 
     const [activeUserPanel, setActiveUserPanel] = useState('user');
     const [vkProfile, setProfile] = useState(null);
-    const [vkUser, setUser] = useState(null);
+    const [user, setUser] = useState(null);
 
     const [activeEventPanel, setActiveEventPanel] = useState('events');
 
@@ -48,7 +48,8 @@ const App = () => {
         });
 
 		async function fetchData() {
-			const user = await bridge.send('VKWebAppGetUserInfo');
+            const user = await bridge.send('VKWebAppGetUserInfo');
+            console.log(user);
             setProfile(user);
             setUser(user);
         }
@@ -62,8 +63,8 @@ const App = () => {
         setActiveTeam(e.currentTarget.dataset.id);
 
         let user = e.currentTarget.dataset.user && JSON.parse(e.currentTarget.dataset.user);
-        console.log('user*******************', user);
         setUser(user);
+        console.log('user *******************', user);
 
         console.log(`dataset.href: ${e.currentTarget.dataset.href}`);
     };
@@ -91,8 +92,6 @@ const App = () => {
         setUser(user);
         setActiveUserPanel(e.currentTarget.dataset.to);
     }
-
-    console.log('into app', vkUser);
 
 	return (
         <Epic activeStory={activeStory} tabbar={
@@ -128,7 +127,7 @@ const App = () => {
                 <Teaminfo id='teaminfo' go={goTeam} teamId={activeTeam} return='teams' vkProfile={vkProfile}/>
                 <TeamCreate id='teamCreate' go={goTeam} />
                 <TeamEdit id='teamEdit' go={goTeam} teamId={activeTeam} />
-                <User id='user' vkProfile={vkProfile} vkUser={vkUser} goUserEdit={goTeam} activeStory={activeStory} goSetUserTeam={goSetUserTeam} return='teaminfo' />
+                <User id='user' vkProfile={vkProfile} user={user} goUserEdit={goTeam} activeStory={activeStory} goSetUserTeam={goSetUserTeam} return='teaminfo' />
             </View>
             {/*<View id='users' activePanel='panel2'>
                  <Panel2 id='panel2' go={go}/>
@@ -139,10 +138,10 @@ const App = () => {
                 <EventInfo id='eventInfo' go={goEvent} back={back}/>
             </View>
             <View id='user' activePanel={activeUserPanel}>
-                <User id='user' vkProfile={vkProfile} vkUser={vkUser} goUserEdit={goUserEdit} activeStory={activeStory} goSetUserTeam={goSetUserTeam} />
-                <UserEdit id='userEdit' goUserEdit={goUserEdit} vkProfile={vkProfile} vkUser={vkUser} />
+                <User id='user' vkProfile={vkProfile} user={user} goUserEdit={goUserEdit} activeStory={activeStory} goSetUserTeam={goSetUserTeam} />
+                <UserEdit id='userEdit' goUserEdit={goUserEdit} vkProfile={vkProfile} user={user} />
                 <Teaminfo id='teaminfo' go={goUserEdit} teamId={activeTeam} return='user' />
-                <SetUserTeam id='setUserTeam' goSetUserTeam={goSetUserTeam} vkUser={vkUser} />
+                <SetUserTeam id='setUserTeam' goSetUserTeam={goSetUserTeam} user={user} />
             </View>
         </Epic>
 

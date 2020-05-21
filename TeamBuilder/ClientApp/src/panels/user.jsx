@@ -20,11 +20,13 @@ class User extends React.Component {
     constructor(props) {
         super(props);
 
+        console.log('active story', props.activeStory);
+
         this.state = {
             skills: null,
             userSkills: null,
              //TO-DO получить юзера из апи вконтакте
-            vkUser: props.vkUser,
+            vkUser: null,
             vkProfile: props.vkProfile,
             user: props.user,
             activeTabProfile: 'main',
@@ -33,7 +35,7 @@ class User extends React.Component {
             isConfirmed: false,
             goUserEdit: props.goUserEdit,
             goSetUserTeam: props.goSetUserTeam,
-            isProfile: props.activeStory != 'user',
+            readOnlyMode: props.activeStory != 'user',
             recruitTeams: []
         }
 
@@ -42,8 +44,8 @@ class User extends React.Component {
     }
 
     componentDidMount() {
-        this.fetchData();
-        this.isUserConfirmed(this.state.vkUser.id);
+        this.fetchVkUser();
+        this.isUserConfirmed(this.state.user.id);
     }
 
     isUserConfirmed(id) {
@@ -52,16 +54,16 @@ class User extends React.Component {
             .then((response) => {
                 this.setState({ isConfirmed: response })
 
-                var id = this.state.vkUser.id;
+                var id = this.state.user.id;
                 var vkProfileId = this.state.vkProfile.id;
                 console.log('before user fetch', id);
                 console.log('profileId = ', vkProfileId);
 
-                this.state.isProfile && fetch(`/api/user/get?id=${id}`)
+                this.state.readOnlyMode && fetch(`/api/user/get?id=${id}`)
                     .then(response => response.json())
                     .then(data => this.setState({ user: data }));
 
-                this.state.isProfile && fetch(`/api/user/getRecruitTeams?vkProfileId=${vkProfileId}&&id=${id}`)
+                this.state.readOnlyMode && fetch(`/api/user/getRecruitTeams?vkProfileId=${vkProfileId}&&id=${id}`)
                     .then(response => response.json())
                     .then(data => this.setState({ recruitTeams: data }));
             } 
@@ -69,10 +71,21 @@ class User extends React.Component {
 
     }
 
-    async fetchData() {
-        const user = await bridge.send('VKWebAppGetUserInfo');
-        this.setState({ vkUser: user });
-        console.log('test fetch user', user);
+    async fetchVkUser() {
+        const t = await bridge.send("VKWebAppGetAuthToken",
+            { "app_id": 7448436, "scope": "" });
+
+        let url = new URL('https://api.vk.com/method/users.get/?')
+        let params = {
+            user_id: this.state.user.id,
+            fields: 'city,photo_200,contacts',
+            v: '5.103',
+            access_token: t.access_token
+        };
+
+        const request = await bridge.send("VKWebAppCallAPIMethod", { "method": "users.get", "request_id": "32test", "params": params });
+        console.log('fetched vk user -----------------', request.response[0].first_name);
+        this.setState({ vkUser: request.response[0] });
     }
 
     async confirmUser(id) {
@@ -116,12 +129,12 @@ class User extends React.Component {
         //console.log('render user readOnlyMode', this.props.activeStory != 'user');
         return (
             <Panel id="user">
-                <PanelHeader separator={false} left={this.state.isProfile &&
+                <PanelHeader separator={false} left={this.state.readOnlyMode &&
                     <PanelHeaderBack onClick={this.state.goUserEdit}
                     data-to={this.props.return} />}>Профиль</PanelHeader>
                 {this.state.vkUser &&
                     <Group title="VK Connect">
-                        <Cell description={ this.state.vkUser.city && this.state.vkUser.city.title ? this.state.vkUser.city.title : ''}
+                     <Cell description={ this.state.vkUser.city && this.state.vkUser.city.title ? this.state.vkUser.city.title : ''}
                             before={this.state.vkUser.photo_200 ? <Avatar src={this.state.vkUser.photo_200} /> : null}>
                             {`${this.state.vkUser.first_name} ${this.state.vkUser.last_name}`}
                         </Cell>
@@ -151,9 +164,6 @@ class User extends React.Component {
                                             data-user={JSON.stringify(this.state.user)} />
                                     }>
                                 </Cell>}
-                                <Cell before={<Icon20HomeOutline height={28} width={28} />}>
-                                    город: {this.state.user && this.state.user.city}
-                                </Cell>
                                 <Cell before={<Icon28PhoneOutline />}>
                                     тел.:
                                 </Cell>
@@ -161,25 +171,25 @@ class User extends React.Component {
                                     дополнительно: {this.state.user && this.state.user.about}
                                 </Cell>
                             </List>
-                            <UserSkills userSkills={this.state.userSkills} readOnlyMode={this.state.isProfile}
+                            <UserSkills userSkills={this.state.userSkills} readOnlyMode={this.state.readOnlyMode}
                                 handleClick={this.handleClick.bind(this, this.state.selectedSkills)}
                                 id={this.state.user && this.state.user.id} />
                         </Group> :
                         <Group>
                             <UserTeams userTeams={this.state.user && this.state.user.userTeams}
-                                goUserEdit={this.state.goUserEdit} readOnlyMode={this.state.isProfile} />
+                                goUserEdit={this.state.goUserEdit} readOnlyMode={this.state.readOnlyMode} />
                         </Group>
                 }
                 <Div>
-                    <Checkbox disabled={this.state.isProfile} onChange={(e) => this.handleCheckboxClick(e)}
+                    <Checkbox disabled={this.state.readOnlyMode} onChange={(e) => this.handleCheckboxClick(e)}
                         checked={this.state.user && this.state.user.isSearchable ? 'checked' : ''}>в поиске команды</Checkbox>
-                    {!this.state.isProfile && <Button mode={this.state.isConfirmed ? "primary" : "destructive"} size='xl'
+                    {!this.state.readOnlyMode && <Button mode={this.state.isConfirmed ? "primary" : "destructive"} size='xl'
                         onClick={() => this.confirmUser(this.state.vkUser && this.state.vkUser.id, this.state.userSkills)}>
                         {this.state.isConfirmed ? "Сохранить" : "Подтвердить"}
                     </Button>}
                 </Div>
                 <Div>
-                    {this.state.recruitTeams.length && < Button mode="primary" size='xl'
+                    {this.state.recruitTeams.length > 0 && < Button mode="primary" size='xl'
                         onClick={this.state.goSetUserTeam}
                         data-to='setUserTeam'
                         data-user={JSON.stringify(this.state.user)}
