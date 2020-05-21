@@ -18,6 +18,7 @@ import TeamInfo from './panels/teamInfo'
 import TeamCreate from './panels/teamCreate'
 import TeamEdit from './panels/teamEdit'
 
+import Users from './panels/users'
 import User from './panels/user'
 import UserEdit from './panels/userEdit'
 import SetUserTeam from './panels/setUserTeam'
@@ -37,6 +38,12 @@ const App = () => {
 
     const [activeEventPanel, setActiveEventPanel] = useState('events');
     const [event, setEvent] = useState(null);
+
+    const [activeUsersPanel, setActiveUsersPanel] = useState('users');
+
+    const [city, setCity] = useState(null);
+    const [about, setAbout] = useState(null);
+
 
 	useEffect(() => {
 		bridge.subscribe(({ detail: { type, data } }) => {
@@ -66,15 +73,16 @@ const App = () => {
         console.log(`dataset.href: ${e.currentTarget.dataset.href}`);
     };
 
+    const goUsers = e => {
+        setActiveUsersPanel(e.currentTarget.dataset.to);
+        setBack(e.currentTarget.dataset.from);
+    };
+
     const goEvent = e => {
         setEvent(e.currentTarget.dataset.event && JSON.parse(e.currentTarget.dataset.event));
         setActiveEventPanel(e.currentTarget.dataset.to);
         setBack(e.currentTarget.dataset.from);
     };
-
-    const goFoot = e => {
-        setActiveStore(e.currentTarget.dataset.story);
-    }
 
     const goUserEdit = e => {
         console.log('into go', e.currentTarget.dataset.to, e.currentTarget.dataset.id);
@@ -93,6 +101,10 @@ const App = () => {
         setUserId(e.currentTarget.dataset.user.id);
         console.log('dataset', e.currentTarget.dataset);
         setActiveUserPanel(e.currentTarget.dataset.to);
+    }
+
+    const goFoot = e => {
+        setActiveStore(e.currentTarget.dataset.story);
     }
 
 	return (
@@ -133,6 +145,9 @@ const App = () => {
                     activeStory={activeStory} goSetUserTeam={goTeam} return='teaminfo' />
                 <SetUserTeam id='setUserTeam' goSetUserTeam={goTeam} user={user} userId={userId} vkProfile={vkProfile} />
                 <EventCreate id='eventCreate' go={goTeam} back={back} owner={vkProfile} />
+            </View>
+            <View id='users' activePanel={activeUsersPanel}>
+                <Users id='users' go={goUsers} />
             </View>
             <View id='events' activePanel={activeEventPanel}>
                 <Events id='events' go={goEvent} />

@@ -246,7 +246,10 @@ namespace TeamBuilder.Controllers
 				return NoContent();
 
 			bool Filter(User user) => user.FullName.ToLowerInvariant().Contains(search?.ToLowerInvariant());
-			var result = context.Users.GetPage(pageSize, HttpContext.Request, page, prev, Filter);
+			var result = context.Users
+				.Include(u => u.UserSkills).ThenInclude(us => us.Skill)
+				.Include(u => u.UserTeams).ThenInclude(ut => ut.Team)
+				.GetPage(pageSize, HttpContext.Request, page, prev, Filter);
 			result.NextHref = result.NextHref == null ? null : $"{result.NextHref}&search={search}";
 			logger.LogInformation($"Response UsersCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
 			                      $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
@@ -254,20 +257,32 @@ namespace TeamBuilder.Controllers
 			return Json(result);
 		}
 
-		public IActionResult GetPage(int pageSize = 20, int page = 0, bool prev = false)
+		public async Task<IActionResult> GetPage(int pageSize = 20, int page = 0, bool prev = false)
 		{
 			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
 
-			//if (!context.Teams.Any())
-			//	await Initialize();
+			if (!context.Users.Any())
+				await Initialize();
 
 			if (pageSize == 0)
 				return NoContent();
 
-			var teams = context.Users.GetPage(pageSize, HttpContext.Request, page, prev);
+			var result = context.Users
+				.Include(u => u.UserSkills).ThenInclude(us => us.Skill)
+				.Include(u => u.UserTeams).ThenInclude(ut => ut.Team)
+				.GetPage(pageSize, HttpContext.Request, page, prev);
 
-			logger.LogInformation($"Response UsersCount:{teams.Collection.Count()} / from:{teams.Collection.FirstOrDefault()?.Id} / to:{teams.Collection.LastOrDefault()?.Id} / NextHref:{teams.NextHref}");
-			return Json(teams);
+			logger.LogInformation($"Response UsersCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
+			return Json(result);
+		}
+
+		private async Task Initialize()
+		{
+			var file = await System.IO.File.ReadAllTextAsync(@"DemoDataSets\users.json");
+			var users = JsonConvert.DeserializeObject<User[]>(file);
+
+			await context.Users.AddRangeAsync(users);
+			await context.SaveChangesAsync();
 		}
 
 		#endregion

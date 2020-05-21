@@ -4,7 +4,7 @@ import {
     Panel, PanelHeader, Group, Button, Textarea, FixedLayout,
     PanelHeaderBack, Input, FormLayout
 } from '@vkontakte/vkui';
-import { Api } from '../api';
+import { Api } from '../infrastructure/api';
 
 const EventEdit = props => {
     const [changedEvent, setChangedEvent] = useState(props.event.name);
@@ -45,23 +45,23 @@ const EventEdit = props => {
         let userId = props.owner ? props.owner.id : -1;
         var editEventViewModel = { id, name, description, startDate, finishDate, link, userId }
         fetch(`${Api.Events.Edit}`,
-                {
-                    method: 'post',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(editEventViewModel)
-                })
+            {
+                method: 'post',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(editEventViewModel)
+            })
             .then(resp => resp.json())
             .then(json => {
                 setChangedEvent(json);
                 console.log(json);
-            })
-            .catch((error) => console.log(`Error for create events. Details: ${error}`));
+            } )
+            .catch((error) => console.log(`Error for editing events. Details: ${error}`));
     }
 
     return (
 
         <Panel id={props.id}>
-            <PanelHeader separator={false} left={<PanelHeaderBack onClick={props.go} data-to={props.back} data-event={JSON.stringify(props.event)}/>}>
+            <PanelHeader separator={false} left={<PanelHeaderBack onClick={props.go} data-to={props.back} data-event={JSON.stringify(props.event)} />}>
                 Редактировать мероприятие
         </PanelHeader>
 

@@ -1,6 +1,6 @@
 ﻿import React from 'react';
 import qwest from 'qwest';
-import { Api } from '../api'
+import { Api } from '../infrastructure/api';
 
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell, InfoRow,
