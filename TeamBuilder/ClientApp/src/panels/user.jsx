@@ -191,6 +191,7 @@ class User extends React.Component {
                         onClick={this.state.goSetUserTeam}
                         data-to='setUserTeam'
                         data-user={JSON.stringify(this.state.user)}
+                        data-id={this.state.userId}
                         recruitTeams={this.state.recruitTeams}
                         >
                         Завербовать
