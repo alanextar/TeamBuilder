@@ -1,0 +1,62 @@
+﻿[
+    {
+        "Id": 1,
+        "Name": "C++",
+        "Description": ""
+    },
+    {
+        "Id": 3,
+        "Name": "JS",
+        "Description": ""
+    },
+    {
+        "Id": 4,
+        "Name": "React",
+        "Description": ""
+    },
+    {
+        "Id": 5,
+        "Name": "Html",
+        "Description": ""
+    },
+    {
+        "Id": 6,
+        "Name": "Css",
+        "Description": ""
+    },
+    {
+        "Id": 7,
+        "Name": "Redux",
+        "Description": ""
+    },
+    {
+        "Id": 8,
+        "Name": "Asp.Net",
+        "Description": ""
+    },
+    {
+        "Id": 9,
+        "Name": "Asp.Net Core",
+        "Description": ""
+    },
+    {
+        "Id": 10,
+        "Name": "Python",
+        "Description": ""
+    },
+    {
+        "Id": 11,
+        "Name": "Go",
+        "Description": ""
+    },
+    {
+        "Id": 12,
+        "Name": "C",
+        "Description": ""
+    },
+    {
+        "Id": 2,
+        "Name": "C#",
+        "Description": "C# (произносится си шарп) — объектно-ориентированный язык программирования. Разработан в 1998—2001 годах группой инженеров компании Microsoft под руководством Андерса Хейлсберга и Скотта Вильтаумота[7] как язык разработки приложений для платформы Microsoft .NET Framework. Впоследствии был стандартизирован как ECMA-334 и ISO\\\/IEC 23270."
+    }
+]

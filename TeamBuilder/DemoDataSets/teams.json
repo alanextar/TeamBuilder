@@ -1,0 +1,130 @@
+﻿[
+  {
+    "Id": 32,
+    "Name": "Na’Vi Natus Vincere",
+    "Description": "команда из екб",
+    "Link": null,
+    "NumberRequiredMembers" : 0,
+    "DescriptionRequiredMembers" : "Берём всех"
+  },
+  {
+    "Id": 33,
+    "Name": "Пермский пряник",
+    "Description": "команда из Перми",
+    "Link": null,
+    "NumberRequiredMembers": 0,
+    "DescriptionRequiredMembers": "Нужны умные"
+  },
+  {
+    "Id": 34,
+    "Name": "MiBR Made in Brazil",
+    "Description": "Мы можем всё",
+    "Link": null,
+    "NumberRequiredMembers": 0,
+    "DescriptionRequiredMembers": "Надо бэк и фронт"
+  },
+  {
+    "Id": 35,
+    "Name": "Lions MAD Lions",
+    "Description": "Участвуем везде",
+    "Link": null,
+    "NumberRequiredMembers": 0,
+    "DescriptionRequiredMembers": "Нужно Больше аналитиков"
+  },
+  {
+    "Id": 36,
+    "Name": "Самая лучшая команда",
+    "Description": "Мы лучшие",
+    "Link": null,
+    "NumberRequiredMembers": 0,
+    "DescriptionRequiredMembers": "Тестировщик где?!"
+  },
+  {
+    "Id": 37,
+    "Name": "Robots Mans",
+    "Description": "Робототехника",
+    "Link": null,
+    "NumberRequiredMembers": 0,
+    "DescriptionRequiredMembers": "Только девочки"
+  },
+  {
+    "Id": 38,
+    "Name": "MiBR Made in Brazil",
+    "Description": "команда из екб",
+    "Link": null,
+    "NumberRequiredMembers": 0,
+    "DescriptionRequiredMembers": "Только мальчики"
+  },
+  {
+    "Id": 39,
+    "Name": "Lions MAD Lions",
+    "Description": "команда из екб",
+    "Link": null,
+    "NumberRequiredMembers": 0,
+    "DescriptionRequiredMembers": "Межгендерная пати"
+  },
+  {
+    "Id": 40,
+    "Name": "Na’Vi Natus Vincere",
+    "Description": "команда из екб",
+    "Link": null,
+    "NumberRequiredMembers": 0,
+    "DescriptionRequiredMembers": "Межгендерная пати"
+  },
+  {
+    "Id": 41,
+    "Name": "MiBR Made in Brazil",
+    "Description": "команда из екб",
+    "Link": null,
+    "NumberRequiredMembers": 0,
+    "DescriptionRequiredMembers": "Межгендерная пати"
+  },
+  {
+    "Id": 42,
+    "Name": "MiBR Made in Brazil",
+    "Description": "команда из екб",
+    "Link": null,
+    "NumberRequiredMembers": 0,
+    "DescriptionRequiredMembers": "Межгендерная пати"
+  },
+  {
+    "Id": 43,
+    "Name": "Lions MAD Lions",
+    "Description": "команда из екб",
+    "Link": null,
+    "NumberRequiredMembers": 0,
+    "DescriptionRequiredMembers": "Межгендерная пати"
+  },
+  {
+    "Id": 44,
+    "Name": "Na’Vi Natus Vincere",
+    "Description": "команда из екб",
+    "Link": null,
+    "NumberRequiredMembers": 0,
+    "DescriptionRequiredMembers": "Межгендерная пати"
+  },
+  {
+    "Id": 45,
+    "Name": "MiBR Made in Brazil",
+    "Description": "команда из екб",
+    "Link": null,
+    "NumberRequiredMembers": 0,
+    "DescriptionRequiredMembers": "Межгендерная пати"
+  },
+  {
+    "Id": 46,
+    "Name": "MiBR Made in Brazil",
+    "Description": "команда из екб",
+    "Link": null,
+    "NumberRequiredMembers": 0,
+    "DescriptionRequiredMembers": "Межгендерная пати"
+  },
+  {
+    "Id": 47,
+    "Name": "Lions MAD Lions",
+    "Description": "команда из екб",
+    "Link": null,
+    "NumberRequiredMembers": 0,
+    "DescriptionRequiredMembers": "Межгендерная пати"
+  }
+]

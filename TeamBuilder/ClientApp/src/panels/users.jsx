@@ -91,7 +91,7 @@ const Users = props => {
             htmlItems.push(
                 <Card size="l" mode="shadow" key={user.id}>
                     <SimpleCell
-                        before={<Avatar size={48} />}
+                        before={<Avatar size={48} src={user.photo100} />}
                         after={user.userSkills && user.userSkills.map(s => s.skill.name).join(", ")}
                         description={user.userTeams.length !== 0 ? `Состоит в ${user.userTeams.filter(ut => ut.isConfirmed).length} команд` : `В творческом поиске`}
                         onClick={props.go}
