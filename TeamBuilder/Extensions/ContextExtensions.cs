@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using TeamBuilder.Controllers.Paging;
+using TeamBuilder.Models.Other;
 using TeamBuilder.ViewModels;
 
 namespace TeamBuilder.Extensions
@@ -34,8 +35,8 @@ namespace TeamBuilder.Extensions
 			HttpRequest request, 
 			int page = 0,
 			bool prev = false,
-			Func<T, bool> filter = null)
-			where T: class, IDbItem
+			Func<T, bool> filter = null) 
+	        where T: class, IDbItem
 		{
 			if (pageSize == 0)
 				return new Page<T>(new List<T>(), null);
@@ -54,30 +55,17 @@ namespace TeamBuilder.Extensions
 			}
 
 			return new Page<T>(items, nextHref);
-
 		}
 
-        public static LaunchParams GetLaunchParams(this HttpRequest request)
+        public static LaunchParams VkLaunchParams(this HttpContext context)
+        {
+	        return context.Request.VkLaunchParams();
+        }
+
+        public static LaunchParams VkLaunchParams(this HttpRequest request)
         {
 	        var raw = request.Headers["Launch-Params"].ToString();
 			return LaunchParams.Parse(raw);
         }
     }
-
-	public class LaunchParams
-	{
-		public static LaunchParams Parse(string str)
-		{
-			var full = str.Trim('?', '/').Split('#');
-			var query = full[0];
-			var hash = full.Length == 2 ? full[1] : null;
-
-			var parameters = query
-				.Split('&', StringSplitOptions.RemoveEmptyEntries)
-				.Select(p => p.Split('=', StringSplitOptions.RemoveEmptyEntries))
-				.ToDictionary(kpv => kpv[0], kvp => kvp.Length == 2 ? kvp[1] : null);
-
-			return new LaunchParams();
-		}
-	}
 }

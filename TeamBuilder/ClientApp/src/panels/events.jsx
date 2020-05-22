@@ -60,6 +60,8 @@ const Events = props => {
             url = nextHref;
         }
 
+        console.log(`event.loadItems.url: ${url}`);
+
         fetch(url)
             .then(resp => resp.json())
             .then(e => {

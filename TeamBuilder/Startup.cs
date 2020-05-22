@@ -69,7 +69,7 @@ namespace TeamBuilder
 				appBuilder =>
 				{
 					appBuilder.UseRouting();
-					appBuilder.UserSignCheck(env);
+					appBuilder.UserSignCheck();
 					appBuilder.UseEndpoints(endpoints =>
 					{
 						endpoints.MapControllerRoute(

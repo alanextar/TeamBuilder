@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Web;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -8,15 +8,17 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using TeamBuilder.Extensions;
 
 namespace TeamBuilder
 {
 	public static class MiddlewareExtensions
 	{
-		public static IApplicationBuilder UserSignCheck(this IApplicationBuilder builder, IWebHostEnvironment env)
+		public static IApplicationBuilder UserSignCheck(this IApplicationBuilder builder)
 		{
-			return builder.UseMiddleware<SignCheckMiddleware>(env);
+			return builder.UseMiddleware<SignCheckMiddleware>();
 		}
 	}
 
@@ -24,18 +26,21 @@ namespace TeamBuilder
 	{
 		private readonly RequestDelegate next;
 		private readonly IWebHostEnvironment env;
+		private readonly IConfiguration configuration;
 
-		public SignCheckMiddleware(RequestDelegate next, IWebHostEnvironment env)
+		public SignCheckMiddleware(RequestDelegate next, IWebHostEnvironment env, IConfiguration configuration)
 		{
 			this.next = next;
 			this.env = env;
+			this.configuration = configuration;
 		}
 
 		public async Task InvokeAsync(HttpContext context)
 		{
 			var launchParams = context.Request.Headers["Launch-Params"].ToString();
+			var parsed = string.IsNullOrEmpty(launchParams) ? null : context.Request.VkLaunchParams().ParsedQuery;
 
-			if (!Check(launchParams))
+			if (!Check(parsed))
 			{
 				context.Response.StatusCode = 403;
 				await context.Response.WriteAsync("Launch params is invalid");
@@ -46,15 +51,19 @@ namespace TeamBuilder
 			}
 		}
 
-		private bool Check(string launchParams)
+		private bool Check(IReadOnlyDictionary<string, string> launchParams)
 		{
-			if (env.IsDevelopment())
+			if (env.IsDevelopment() && launchParams == null)
 				return true;
 
-			var queryNvc = HttpUtility.ParseQueryString(new Uri($"http://localhost/{launchParams}").Query);
-			var query = queryNvc.AllKeys.ToDictionary(k => k, k => queryNvc[k]);
-			var secret = Environment.GetEnvironmentVariable("VK_SECURE_KEY") ?? string.Empty;
-			var checkedQuery = query
+			if (!launchParams.ContainsKey("sign") || string.IsNullOrEmpty(launchParams["sign"]))
+				return false;
+
+			var secret = env.IsDevelopment() ? configuration["VK_SECURE_KEY"] : Environment.GetEnvironmentVariable("VK_SECURE_KEY");
+			if (string.IsNullOrEmpty(secret))
+				return false;
+
+			var checkedQuery = launchParams
 				.Where(q => q.Key.StartsWith("vk_"))
 				.OrderBy(q => q.Key)
 				.Select(q => $"{q.Key}={q.Value}")
@@ -62,7 +71,7 @@ namespace TeamBuilder
 
 			var sign = GetSign(checkedQuery, secret);
 
-			return sign == query["sign"];
+			return sign == launchParams["sign"];
 		}
 
 		private string GetSign(string checkedQuery, string secret)

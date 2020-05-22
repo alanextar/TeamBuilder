@@ -272,7 +272,8 @@ namespace TeamBuilder.Controllers
 				.Include(u => u.UserTeams).ThenInclude(ut => ut.Team)
 				.GetPage(pageSize, HttpContext.Request, page, prev);
 
-			logger.LogInformation($"Response UsersCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
+			logger.LogInformation($"Response UsersCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
+			                      $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
 			return Json(result);
 		}
 
