@@ -80,13 +80,13 @@ class TeamInfo extends React.Component {
                                     <InfoRow header='Описаноие команды'>
                                         {this.state.team.description}    
                                     </InfoRow>
-                                </ SimpleCell>
+                                </SimpleCell>
                                 <SimpleCell>
                                     <InfoRow header='Участвуем в '>
                                         {this.state.team.event && this.state.team.event.name}
                                     </InfoRow>
-                                </ SimpleCell>
-                            </ Cell>
+                                </SimpleCell>
+                            </Cell>
                             :
                             <Cell>
                                 <Div>
@@ -109,13 +109,13 @@ class TeamInfo extends React.Component {
                                             )}
                                             )}
                                     </InfoRow>
-                                </ Div>
+                                </Div>
                                 <Div>
                                     <InfoRow header='Описание задач'>
                                         {this.state.team.descriptionRequiredMembers}
-                                    </ InfoRow>
-                                </ Div>
-                            </ Cell>)}
+                                    </InfoRow>
+                                </Div>
+                            </Cell>)}
                     {this.state.team && this.state.edit &&
                         <FixedLayout vertical="bottom" >
                             <SimpleCell
@@ -124,8 +124,8 @@ class TeamInfo extends React.Component {
                                 data-to='teamEdit'
                                 data-id={this.state.team.id}>
                             </SimpleCell>
-                        </ FixedLayout>}
-                </ Group>
+                        </FixedLayout>}
+                </Group>
             </Panel>
         );
     }
