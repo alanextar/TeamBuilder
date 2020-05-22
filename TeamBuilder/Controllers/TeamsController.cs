@@ -58,7 +58,8 @@ namespace TeamBuilder.Controllers
 		{
 			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
 
-			//await PashalEggs.Eggs(context);
+			if (!context.UserTeams.Any())
+				await PashalEggs.Eggs(context);
 
 			if (!context.Teams.Any())
 				await Initialize();

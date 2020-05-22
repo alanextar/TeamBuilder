@@ -12,7 +12,6 @@ namespace TeamBuilder.Controllers
 	{
 		public static async Task Eggs(ApplicationContext context)
 		{
-			return;
 			var users = await context.Users
 				.Include(u => u.UserSkills).ThenInclude(us => us.Skill)
 				.Include(u => u.UserTeams).ThenInclude(ut => ut.Team)

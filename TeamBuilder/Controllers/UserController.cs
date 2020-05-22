@@ -279,9 +279,12 @@ namespace TeamBuilder.Controllers
 		private async Task Initialize()
 		{
 			var file = await System.IO.File.ReadAllTextAsync(@"DemoDataSets\users.json");
+			var fileSkills = await System.IO.File.ReadAllTextAsync(@"DemoDataSets\skills.json");
 			var users = JsonConvert.DeserializeObject<User[]>(file);
+			var skills = JsonConvert.DeserializeObject<Skill[]>(fileSkills);
 
 			await context.Users.AddRangeAsync(users);
+			await context.Skills.AddRangeAsync(skills);
 			await context.SaveChangesAsync();
 		}
 
