@@ -58,21 +58,21 @@ class UserTeams extends React.Component {
                                         <RichCell key={userTeam.team.id}
                                             text={userTeam.team.description}
                                             caption={"Событие: " + (userTeam.team.event ? userTeam.team.event.name : '')}
-                                            after={userTeam.userAction === 3 ? < Icon28CheckCircleOutline /> :
-                                                (userTeam.userAction === 2 && <Icon28InfoOutline />)}
+                                            after={userTeam.userAction === 2 ? < Icon28CheckCircleOutline /> :
+                                                (userTeam.userAction === 1 && <Icon28InfoOutline />)}
                                             onClick={this.state.goUserEdit}
                                             data-to='teaminfo'
                                             data-id={userTeam.team.id}
-                                            actions={!this.props.readOnlyMode && (userTeam.userAction === 6 ?
+                                            actions={!this.props.readOnlyMode && (userTeam.userAction === 5 ?
                                                 <React.Fragment>
                                                     <Button onClick={(e) => this.handleJoin(e,userTeam)}>Принять</Button>
                                                     <Button onClick={(e) => this.handleQuitOrDecline(e, userTeam)}
                                                         mode="secondary">Отклонить</Button>
                                                 </React.Fragment> :
-                                                ((userTeam.userAction === 3 || userTeam.userAction === 2) && <React.Fragment>
+                                                ((userTeam.userAction === 2 || userTeam.userAction === 1) && <React.Fragment>
                                                     <Button onClick={(e) => this.handleQuitOrDecline(e, userTeam)}
-                                                        mode="secondary">{userTeam.userAction === 3 ? "Выйти" :
-                                                            (userTeam.userAction === 2 ? "Отозвать заявку" : '')}
+                                                        mode="secondary">{userTeam.userAction === 2 ? "Выйти" :
+                                                            (userTeam.userAction === 1 ? "Отозвать заявку" : '')}
                                                     </Button>
                                                 </React.Fragment>
                                             ))}>
