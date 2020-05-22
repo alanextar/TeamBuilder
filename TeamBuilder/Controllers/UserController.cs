@@ -172,18 +172,16 @@ namespace TeamBuilder.Controllers
 			var user = context.Users
 				.Include(x => x.UserTeams)
 				.ThenInclude(x => x.Team)
-				.ThenInclude(y => y.Event);
+				.ThenInclude(y => y.Event)
+				.FirstOrDefault(x => x.Id == id);
 
-			var userTeams = user
-				.SelectMany(x => x.UserTeams);
-
-			var userTeamToDelete = userTeams
+			var userTeamToDelete = user.UserTeams
 				.First(y => y.TeamId == teamId && y.UserId == id);
 
 			context.UserTeams.Remove(userTeamToDelete);
 			context.SaveChanges();
 
-			return Json(userTeams);
+			return Json(user.UserTeams);
 		}
 
 		public IActionResult SetTeam(long id, long teamId)
