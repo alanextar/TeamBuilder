@@ -18,6 +18,7 @@ namespace TeamBuilder.Controllers
 				.ToListAsync();
 			var skills = await context.Skills.Include(s => s.UserSkills).ThenInclude(us => us.User).ToListAsync();
 			var teams = await context.Teams.Include(t => t.Event).Include(t => t.UserTeams).ToListAsync();
+			var events = await context.Events.ToListAsync();
 
 			foreach (var user in users)
 			{
@@ -29,13 +30,14 @@ namespace TeamBuilder.Controllers
 			{
 				var random = new Random();
 				var userToTeam = RandomArrayEntries(users, random.Next(1, 10));
-				team.UserTeams.AddRange(userToTeam.Select(ut => 
+				team.UserTeams.AddRange(userToTeam.Select(ut =>
 					new UserTeam
 					{
-						IsConfirmed = random.Next(0,1) == 0,
+						IsConfirmed = random.Next(0, 1) == 0,
 						User = ut,
 						UserAction = (UserActionEnum)random.Next(1, 6)
 					}));
+				team.Event = events[random.Next(0, events.Count - 1)];
 			}
 
 			context.UpdateRange(users);

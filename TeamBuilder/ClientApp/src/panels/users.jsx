@@ -1,53 +1,68 @@
 import React, { useState, useEffect } from 'react';
-import debounce from 'lodash.debounce';
+import useDebounce from '../infrastructure/use-debounce';
 import {
-    Panel, PanelHeader, Avatar, Search, List, RichCell, PullToRefresh,
+    Panel, PanelHeader, Avatar, Search, PanelSpinner, RichCell, PullToRefresh,
     PanelHeaderButton, CardGrid, Card, Div, SimpleCell
 } from '@vkontakte/vkui';
 import InfiniteScroll from 'react-infinite-scroller';
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
+import Icon24Work from '@vkontakte/icons/dist/24/work';
 import { Api } from '../infrastructure/api';
 
 const Users = props => {
+    const [isSearching, setIsSearching] = useState(false);
     const [fetching, setFetching] = useState(false);
+
     const [hasMoreItems, setHasMoreItems] = useState(true);
     const [nextHref, setNextHref] = useState(null);
+
     const [items, setItems] = useState([]);
 
-    const [search, setSearch] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
+    const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+    useEffect(
+        () => {
+            if (debouncedSearchTerm) {
+                setIsSearching(true);
+                searchItems(debouncedSearchTerm)
+                    .then(result => {
+                        setItems(result.collection);
+                        setNextHref(result.nextHref);
+                        setIsSearching(false);
+                    });
+            }
+            else {
+                setIsSearching(true);
+                getItems().then(result => {
+                    setItems(result.collection);
+                    setNextHref(result.nextHref);
+                    setIsSearching(false);
+                })
+            }
+        },
+        [debouncedSearchTerm]
+    )
 
     //#region Search
 
-    const searchItems = value => {
-        fetch(`${Api.Users.PagingSearch}?search=${value}`)
-            .then((resp) => resp.json())
-            .then(json => {
-                setItems(json.collection);
-                setNextHref(json.nextHref);
-                setHasMoreItems(json.nextHref ? true : false);
-            })
-            .catch((error) => console.log(`Error for get filtered users page. Details: ${error}`));
-    }
-
-    const delayedSearchItems = debounce(searchItems, 250);
-
-    const onChangeSearch = e => {
-        setSearch(e.target.value);
-        setNextHref(null);
-        delayedSearchItems(e.target.value);
-    }
-
-    const getItems = () => {
-        fetch(`${Api.User.GetPage}`)
-            .then((resp) => resp.json())
-            .then(json => setItems(json.collection))
-            .catch((error) => console.log(`Error for get users page. Details: ${error}`));
-    }
-
     const onRefresh = () => {
         setFetching(true);
-        search.length === 0 ? getItems() : searchItems(search);
-        setFetching(false);
+        if (searchTerm) {
+            searchItems(debouncedSearchTerm)
+                .then(result => {
+                    setItems(result.collection);
+                    setNextHref(result.nextHref);
+                    setFetching(false);
+                });
+        }
+        else {
+            getItems().then(result => {
+                setItems(result.collection);
+                setNextHref(result.nextHref);
+                setFetching(false);
+            })
+        }
     };
 
     //#endregion
@@ -55,16 +70,10 @@ const Users = props => {
     //#region Scroll
 
     const loadItems = page => {
-        var url = `${Api.User.GetPage}`;
+        var url = `${Api.Users.GetPage}`;
         if (nextHref) {
             url = nextHref;
         }
-
-        console.log(`user.url: ${url}`)
-        console.log(`user.nextHref: ${nextHref}`)
-        console.log(`user.hasMoreItems: ${hasMoreItems}`)
-        console.log(`user.items: ${items.length}`)
-
         fetch(url)
             .then(resp => resp.json())
             .then(e => {
@@ -72,7 +81,6 @@ const Users = props => {
                 e.collection.map((item) => {
                     itemsTemp.push(item);
                 });
-
                 if (e.nextHref) {
                     setNextHref(e.nextHref);
                     setItems(itemsTemp);
@@ -83,27 +91,19 @@ const Users = props => {
             .catch((error) => console.log(`Error for get users page. Details: ${error}`));
     };
 
-    const loader = <div key={0}>Loading ...</div>;
+    const loader = <PanelSpinner key={0} size="large" />
 
-    const convertItemsToHtml = () => {
-        var htmlItems = [];
-        items && items.map((user, i) => {
-            htmlItems.push(
-                <Card size="l" mode="shadow" key={user.id}>
-                    <SimpleCell
-                        before={<Avatar size={48} src={user.photo100} />}
-                        after={user.userSkills && user.userSkills.map(s => s.skill.name).join(", ")}
-                        description={user.userTeams.length !== 0 ? `Состоит в ${user.userTeams.filter(ut => ut.isConfirmed).length} команд` : `В творческом поиске`}
-                        onClick={props.go}
-                        data-to='user'
-                        data-from={props.id}>
-                        {user.firstName} {user.secondName}
-                    </SimpleCell>
-                </Card>
-            );
-        });
+    const stringfySkills = (skills) => {
+        var joined = skills && skills.map(s => s.name).join(", ");
+        var max = 30;
+        var result = joined.length > max ? `${joined.substring(0, max)}...` : joined;
+        return result;
+    }
 
-        return htmlItems;
+    const stringfyTeams = (teams) => {
+        var confirmedTeams = teams && teams.filter(ut => ut.isConfirmed);
+        var result = confirmedTeams.length !== 0 && <Icon24Work />
+        return result;
     }
 
     //#endregion
@@ -111,20 +111,57 @@ const Users = props => {
     return (
         <Panel id={props.id}>
             <PanelHeader>Пользователи</PanelHeader>
-            <Search value={search} onChange={onChangeSearch} after={null} />
+            <Search value={searchTerm} onChange={e => setSearchTerm(e.target.value)} after={null} />
             <PullToRefresh onRefresh={onRefresh} isFetching={fetching}>
-                <InfiniteScroll
-                    pageStart={0}
-                    loadMore={loadItems}
-                    hasMore={hasMoreItems}
-                    loader={loader}>
-                    <CardGrid style={{ marginBottom: 10 }}>
-                        {convertItemsToHtml()}
-                    </CardGrid>
-                </InfiniteScroll>
+                {isSearching ? loader :
+                    <InfiniteScroll
+                        pageStart={0}
+                        loadMore={loadItems}
+                        hasMore={hasMoreItems}
+                        loader={loader}>
+                        <CardGrid style={{ marginBottom: 10 }}>
+                            {items && items.map(user => (
+                                <Card size="l" mode="shadow" key={user.id}>
+                                    <RichCell
+                                        before={<Avatar size={48} src={user.photo100} />}
+                                        after={stringfyTeams(user.userTeams)} //count
+                                        caption={user.city ? user.city : 'Ekaterinburg'} // city 
+                                        bottom={stringfySkills(user.skills)} // skills
+                                        text={user.about ? user.about : 'Хороший человек'} //descr 
+                                        onClick={props.go}
+                                        data-to='user'
+                                        data-from={props.id}>
+                                        {user.firstName} {user.lastName}
+                                    </RichCell>
+                                </Card>
+                            ))}
+                        </CardGrid>
+                    </InfiniteScroll>}
             </PullToRefresh>
         </Panel>
     );
 };
+
+function searchItems(value) {
+    console.log(`users.search ${value}`);
+    return fetch(`${Api.Users.PagingSearch}?search=${value}`)
+        .then(resp => resp.json())
+        .then(json => json)
+        .catch(error => {
+            console.error(`Error for get filtered users page. Details: ${error}`);
+            return {};
+        });
+}
+
+
+function getItems() {
+    return fetch(`${Api.Users.GetPage}`)
+        .then(resp => resp.json())
+        .then(json => json)
+        .catch(error => {
+            console.log(`Error for get users page. Details: ${error}`);
+            return {};
+        });
+}
 
 export default Users;
