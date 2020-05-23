@@ -94,6 +94,12 @@ namespace TeamBuilder.Migrations
                     b.Property<int>("NumberRequiredMembers")
                         .HasColumnType("integer");
 
+                    b.Property<string>("Photo100")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Photo200")
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
 
                     b.HasIndex("EventId");
@@ -116,6 +122,9 @@ namespace TeamBuilder.Migrations
 
                     b.Property<string>("FirstName")
                         .HasColumnType("text");
+
+                    b.Property<bool>("IsModerator")
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsSearchable")
                         .HasColumnType("boolean");

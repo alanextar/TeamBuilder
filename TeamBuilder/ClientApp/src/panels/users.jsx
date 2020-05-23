@@ -38,7 +38,7 @@ const Users = props => {
     }
 
     const getItems = () => {
-        fetch(`${Api.User.GetPage}`)
+        fetch(`${Api.Users.GetPage}`)
             .then((resp) => resp.json())
             .then(json => setItems(json.collection))
             .catch((error) => console.log(`Error for get users page. Details: ${error}`));
@@ -55,7 +55,7 @@ const Users = props => {
     //#region Scroll
 
     const loadItems = page => {
-        var url = `${Api.User.GetPage}`;
+        var url = `${Api.Users.GetPage}`;
         if (nextHref) {
             url = nextHref;
         }
@@ -85,6 +85,20 @@ const Users = props => {
 
     const loader = <div key={0}>Loading ...</div>;
 
+    const stringfySkills = (skills) => 
+    {
+        var joined = skills && skills.map(s => s.name).join(", ");
+        var result = joined.length > 15 ? `${joined.substring(0, 15)}...` : joined;
+        return result;
+    } 
+
+    const stringfyTeams = (teams) => 
+    {
+        var confirmedTeams = teams && teams.filter(ut => ut.isConfirmed);
+        var result = confirmedTeams.length !== 0 ? `В ${confirmedTeams.length} командах` : `В творческом поиске`;
+        return result;
+    } 
+
     const convertItemsToHtml = () => {
         var htmlItems = [];
         items && items.map((user, i) => {
@@ -92,12 +106,12 @@ const Users = props => {
                 <Card size="l" mode="shadow" key={user.id}>
                     <SimpleCell
                         before={<Avatar size={48} src={user.photo100} />}
-                        after={user.userSkills && user.userSkills.map(s => s.skill.name).join(", ")}
-                        description={user.userTeams.length !== 0 ? `Состоит в ${user.userTeams.filter(ut => ut.isConfirmed).length} команд` : `В творческом поиске`}
+                        after={stringfySkills(user.skills)}
+                        description={stringfyTeams(user.userTeams)}
                         onClick={props.go}
                         data-to='user'
                         data-from={props.id}>
-                        {user.firstName} {user.secondName}
+                        {user.firstName} {user.lastName}
                     </SimpleCell>
                 </Card>
             );

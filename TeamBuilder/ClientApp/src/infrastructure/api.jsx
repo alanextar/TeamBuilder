@@ -15,7 +15,7 @@
         PagingSearch: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/pagingSearch`
     }
 
-    static User = {
+    static Users = {
         Get: `${this.baseUrl}/${this.prefix}/${this.userStr}/get`,
         GetAll: `${this.baseUrl}/${this.prefix}/${this.userStr}/getAll`,
         GetPage: `${this.baseUrl}/${this.prefix}/${this.userStr}/getPage`,

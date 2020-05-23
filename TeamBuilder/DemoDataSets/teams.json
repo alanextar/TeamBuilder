@@ -1,130 +1,178 @@
 ﻿[
   {
+    "Id": 34,
+    "Name": "MiBR Made in Brazil",
+    "Description": "Мы можем всё",
+    "EventId": null,
+    "DescriptionRequiredMembers": "Надо бэк и фронт",
+    "Link": null,
+    "NumberRequiredMembers": 7,
+    "Photo100": "https:\/\/i.picsum.photos\/id\/217\/100\/100.jpg",
+    "Photo200": "https:\/\/i.picsum.photos\/id\/217\/200\/200.jpg"
+  },
+  {
     "Id": 32,
     "Name": "Na’Vi Natus Vincere",
     "Description": "команда из екб",
+    "EventId": null,
+    "DescriptionRequiredMembers": "Берём всех",
     "Link": null,
-    "NumberRequiredMembers" : 0,
-    "DescriptionRequiredMembers" : "Берём всех"
+    "NumberRequiredMembers": 4,
+    "Photo100": "https:\/\/i.picsum.photos\/id\/664\/100\/100.jpg",
+    "Photo200": "https:\/\/i.picsum.photos\/id\/664\/200\/200.jpg"
   },
   {
     "Id": 33,
     "Name": "Пермский пряник",
     "Description": "команда из Перми",
+    "EventId": null,
+    "DescriptionRequiredMembers": "Нужны умные",
     "Link": null,
-    "NumberRequiredMembers": 0,
-    "DescriptionRequiredMembers": "Нужны умные"
-  },
-  {
-    "Id": 34,
-    "Name": "MiBR Made in Brazil",
-    "Description": "Мы можем всё",
-    "Link": null,
-    "NumberRequiredMembers": 0,
-    "DescriptionRequiredMembers": "Надо бэк и фронт"
+    "NumberRequiredMembers": 8,
+    "Photo100": "https:\/\/i.picsum.photos\/id\/973\/100\/100.jpg",
+    "Photo200": "https:\/\/i.picsum.photos\/id\/973\/200\/200.jpg"
   },
   {
     "Id": 35,
     "Name": "Lions MAD Lions",
     "Description": "Участвуем везде",
+    "EventId": null,
+    "DescriptionRequiredMembers": "Нужно Больше аналитиков",
     "Link": null,
-    "NumberRequiredMembers": 0,
-    "DescriptionRequiredMembers": "Нужно Больше аналитиков"
+    "NumberRequiredMembers": 5,
+    "Photo100": "https:\/\/i.picsum.photos\/id\/311\/100\/100.jpg",
+    "Photo200": "https:\/\/i.picsum.photos\/id\/311\/200\/200.jpg"
   },
   {
     "Id": 36,
     "Name": "Самая лучшая команда",
     "Description": "Мы лучшие",
+    "EventId": null,
+    "DescriptionRequiredMembers": "Тестировщик где?!",
     "Link": null,
-    "NumberRequiredMembers": 0,
-    "DescriptionRequiredMembers": "Тестировщик где?!"
+    "NumberRequiredMembers": 14,
+    "Photo100": "https:\/\/i.picsum.photos\/id\/208\/100\/100.jpg",
+    "Photo200": "https:\/\/i.picsum.photos\/id\/208\/200\/200.jpg"
   },
   {
     "Id": 37,
     "Name": "Robots Mans",
     "Description": "Робототехника",
+    "EventId": null,
+    "DescriptionRequiredMembers": "Только девочки",
     "Link": null,
-    "NumberRequiredMembers": 0,
-    "DescriptionRequiredMembers": "Только девочки"
+    "NumberRequiredMembers": 6,
+    "Photo100": "https:\/\/i.picsum.photos\/id\/983\/100\/100.jpg",
+    "Photo200": "https:\/\/i.picsum.photos\/id\/983\/200\/200.jpg"
   },
   {
     "Id": 38,
     "Name": "MiBR Made in Brazil",
     "Description": "команда из екб",
+    "EventId": null,
+    "DescriptionRequiredMembers": "Только мальчики",
     "Link": null,
-    "NumberRequiredMembers": 0,
-    "DescriptionRequiredMembers": "Только мальчики"
-  },
-  {
-    "Id": 39,
-    "Name": "Lions MAD Lions",
-    "Description": "команда из екб",
-    "Link": null,
-    "NumberRequiredMembers": 0,
-    "DescriptionRequiredMembers": "Межгендерная пати"
+    "NumberRequiredMembers": 14,
+    "Photo100": "https:\/\/i.picsum.photos\/id\/696\/100\/100.jpg",
+    "Photo200": "https:\/\/i.picsum.photos\/id\/696\/200\/200.jpg"
   },
   {
     "Id": 40,
     "Name": "Na’Vi Natus Vincere",
     "Description": "команда из екб",
+    "EventId": null,
+    "DescriptionRequiredMembers": "Межгендерная пати",
     "Link": null,
-    "NumberRequiredMembers": 0,
-    "DescriptionRequiredMembers": "Межгендерная пати"
+    "NumberRequiredMembers": 4,
+    "Photo100": "https:\/\/i.picsum.photos\/id\/782\/100\/100.jpg",
+    "Photo200": "https:\/\/i.picsum.photos\/id\/782\/200\/200.jpg"
   },
   {
     "Id": 41,
     "Name": "MiBR Made in Brazil",
     "Description": "команда из екб",
+    "EventId": null,
+    "DescriptionRequiredMembers": "Межгендерная пати",
     "Link": null,
-    "NumberRequiredMembers": 0,
-    "DescriptionRequiredMembers": "Межгендерная пати"
+    "NumberRequiredMembers": 9,
+    "Photo100": "https:\/\/i.picsum.photos\/id\/671\/100\/100.jpg",
+    "Photo200": "https:\/\/i.picsum.photos\/id\/671\/200\/200.jpg"
   },
   {
     "Id": 42,
     "Name": "MiBR Made in Brazil",
     "Description": "команда из екб",
+    "EventId": null,
+    "DescriptionRequiredMembers": "Межгендерная пати",
     "Link": null,
-    "NumberRequiredMembers": 0,
-    "DescriptionRequiredMembers": "Межгендерная пати"
+    "NumberRequiredMembers": 2,
+    "Photo100": "https:\/\/i.picsum.photos\/id\/12\/100\/100.jpg",
+    "Photo200": "https:\/\/i.picsum.photos\/id\/12\/200\/200.jpg"
   },
   {
     "Id": 43,
     "Name": "Lions MAD Lions",
     "Description": "команда из екб",
+    "EventId": null,
+    "DescriptionRequiredMembers": "Межгендерная пати",
     "Link": null,
-    "NumberRequiredMembers": 0,
-    "DescriptionRequiredMembers": "Межгендерная пати"
+    "NumberRequiredMembers": 14,
+    "Photo100": "https:\/\/i.picsum.photos\/id\/954\/100\/100.jpg",
+    "Photo200": "https:\/\/i.picsum.photos\/id\/954\/200\/200.jpg"
   },
   {
     "Id": 44,
     "Name": "Na’Vi Natus Vincere",
     "Description": "команда из екб",
+    "EventId": null,
+    "DescriptionRequiredMembers": "Межгендерная пати",
     "Link": null,
-    "NumberRequiredMembers": 0,
-    "DescriptionRequiredMembers": "Межгендерная пати"
+    "NumberRequiredMembers": 6,
+    "Photo100": "https:\/\/i.picsum.photos\/id\/870\/100\/100.jpg",
+    "Photo200": "https:\/\/i.picsum.photos\/id\/870\/200\/200.jpg"
   },
   {
     "Id": 45,
     "Name": "MiBR Made in Brazil",
     "Description": "команда из екб",
+    "EventId": null,
+    "DescriptionRequiredMembers": "Межгендерная пати",
     "Link": null,
-    "NumberRequiredMembers": 0,
-    "DescriptionRequiredMembers": "Межгендерная пати"
+    "NumberRequiredMembers": 6,
+    "Photo100": "https:\/\/i.picsum.photos\/id\/40\/100\/100.jpg",
+    "Photo200": "https:\/\/i.picsum.photos\/id\/40\/200\/200.jpg"
   },
   {
     "Id": 46,
     "Name": "MiBR Made in Brazil",
     "Description": "команда из екб",
+    "EventId": null,
+    "DescriptionRequiredMembers": "Межгендерная пати",
     "Link": null,
-    "NumberRequiredMembers": 0,
-    "DescriptionRequiredMembers": "Межгендерная пати"
+    "NumberRequiredMembers": 5,
+    "Photo100": "https:\/\/i.picsum.photos\/id\/46\/100\/100.jpg",
+    "Photo200": "https:\/\/i.picsum.photos\/id\/46\/200\/200.jpg"
   },
   {
     "Id": 47,
     "Name": "Lions MAD Lions",
     "Description": "команда из екб",
+    "EventId": null,
+    "DescriptionRequiredMembers": "Межгендерная пати",
     "Link": null,
-    "NumberRequiredMembers": 0,
-    "DescriptionRequiredMembers": "Межгендерная пати"
+    "NumberRequiredMembers": 1,
+    "Photo100": "https:\/\/i.picsum.photos\/id\/431\/100\/100.jpg",
+    "Photo200": "https:\/\/i.picsum.photos\/id\/431\/200\/200.jpg"
+  },
+  {
+    "Id": 39,
+    "Name": "Lions MAD Lions",
+    "Description": "команда из екб",
+    "EventId": null,
+    "DescriptionRequiredMembers": "Межгендерная пати",
+    "Link": null,
+    "NumberRequiredMembers": 4,
+    "Photo100": "https:\/\/i.picsum.photos\/id\/496\/100\/100.jpg",
+    "Photo200": "https:\/\/i.picsum.photos\/id\/496\/200\/200.jpg"
   }
 ]

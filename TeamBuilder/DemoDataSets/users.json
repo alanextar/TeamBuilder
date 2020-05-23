@@ -321,7 +321,8 @@
     "screen_name": "vitalyavolyn",
     "Photo100": "",
     "Photo200": "",
-    "IsSearchable": true
+    "IsSearchable": true,
+    "IsModerator": true
   },
   {
     "id": 30504678,
@@ -330,7 +331,8 @@
     "screen_name": "vitalyavolyn",
     "Photo100": "",
     "Photo200": "",
-    "IsSearchable": true
+    "IsSearchable": true,
+    "IsModerator": true
   },
   {
     "id": 252814030,
@@ -339,6 +341,7 @@
     "screen_name": "vitalyavolyn",
     "Photo100": "",
     "Photo200": "",
-    "IsSearchable": true
+    "IsSearchable": true,
+    "IsModerator": true
   }
 ]

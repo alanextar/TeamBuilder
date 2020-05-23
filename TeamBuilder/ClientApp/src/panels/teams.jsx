@@ -1,6 +1,6 @@
 ﻿import React from 'react';
 import {
-    Panel, PanelHeader, Group, Search, List, RichCell, PullToRefresh,
+    Panel, PanelHeader, Avatar, Search, List, RichCell, PullToRefresh,
     PanelHeaderButton, CardGrid, Card
 } from '@vkontakte/vkui';
 import InfiniteScroll from 'react-infinite-scroller';
@@ -124,13 +124,19 @@ class Teams extends React.Component {
     }
 
     delayedSearchEvents = debounce(this.searchTeams, 250);
-    
+
     onChangeSearch(e) {
         this.setState({
             search: e.target.value,
             nextHref: null
         })
         this.delayedSearchEvents(e.target.value)
+    }
+
+    getRandomInt() {
+        var min = 0;
+        var max = 1000;
+        return Math.floor(Math.random() * (+max - +min)) + +min;
     }
 
     render() {
@@ -141,17 +147,18 @@ class Teams extends React.Component {
         var items = [];
         this.state.teams && this.state.teams.map((team, i) => {
             items.push(
-                    <Card size="l" mode="shadow" key={team.id}>
-                        <RichCell
-                            text={team.description}
-                            caption="Навыки"
-                            after={team.userTeams.length + '/' + team.numberRequiredMembers}
-                            onClick={self.state.go}
-                            data-to='teaminfo'
-                            data-id={team.id}>
-                                {team.name} - {team.id}
-                        </RichCell>
-                    </Card>
+                <Card size="l" mode="shadow" key={team.id}>
+                    <RichCell
+                        before={<Avatar size={64} src={team.photo100} />}
+                        text={team.description}
+                        caption="Навыки"
+                        after={team.userTeams.length + '/' + team.numberRequiredMembers}
+                        onClick={self.state.go}
+                        data-to='teaminfo'
+                        data-id={team.id}>
+                        {team.name} - {team.id}
+                    </RichCell>
+                </Card>
             );
         });
 
@@ -166,18 +173,18 @@ class Teams extends React.Component {
                 <Search value={this.state.search} onChange={this.onChangeSearch} after={null} />
                 <PullToRefresh onRefresh={this.onRefresh} isFetching={this.state.fetching}>
 
-                        <InfiniteScroll
-                            pageStart={0}
-                            loadMore={this.loadItems.bind(this)}
-                            hasMore={this.state.hasMoreItems}
-                            loader={loader}>
-                            <CardGrid style={{ marginBottom: 10 }}>
-                                {items}
-                            </CardGrid>
-                        </InfiniteScroll>
+                    <InfiniteScroll
+                        pageStart={0}
+                        loadMore={this.loadItems.bind(this)}
+                        hasMore={this.state.hasMoreItems}
+                        loader={loader}>
+                        <CardGrid style={{ marginBottom: 10 }}>
+                            {items}
+                        </CardGrid>
+                    </InfiniteScroll>
                 </PullToRefresh>
             </Panel>)
-        
+
     }
 };
 
