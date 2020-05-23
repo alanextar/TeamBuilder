@@ -1,7 +1,7 @@
 ﻿import React, { useState, useEffect } from 'react';
 import {
-    View, Epic, Tabbar, TabbarItem, ModalRoot, ModalPage, ModalPageHeader, Radio,
-    PanelHeaderButton, FormLayout, SelectMimicry, FormLayoutGroup,
+    View, Epic, Tabbar, TabbarItem, ModalRoot, ModalPage, ModalPageHeader,
+    PanelHeaderButton, FormLayout, Select,
     IS_PLATFORM_IOS, IS_PLATFORM_ANDROID
 } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
@@ -29,6 +29,8 @@ import User from './panels/user'
 import UserEdit from './panels/userEdit'
 import SetUserTeam from './panels/setUserTeam'
 
+import { Api } from './infrastructure/api';
+
 const App = () => {
     const [activeStory, setActiveStore] = useState('teams');
     const [back, setBack] = useState(null);
@@ -51,6 +53,7 @@ const App = () => {
     const [about, setAbout] = useState(null);
 
     const [activeModal, setactiveModal] = useState(null);
+    const [events, setEvents] = useState(null);
 
 
     useEffect(() => {
@@ -119,6 +122,13 @@ const App = () => {
         setactiveModal(null);
     };
 
+    const getEvents = () => {
+        fetch(`${Api.Events.GetAll}`)
+            .then((resp) => resp.json())
+            .then(json => setEvents(json.collection))
+            .catch((error) => console.log(`Error for get events page. Details: ${error}`));
+    }
+
     return (
         <Epic activeStory={activeStory} tabbar={
             <Tabbar>
@@ -148,6 +158,7 @@ const App = () => {
                 ><Icon28Profile /></TabbarItem>
             </Tabbar>
         }>
+            {getEvents()}
             <View id='teams'
                 activePanel={activeTeamPanel}
                 modal={
@@ -165,13 +176,20 @@ const App = () => {
                             }
                         >
                             <FormLayout>
-                                <SelectMimicry top="Страна" placeholder="Не выбрана" />
-                                <SelectMimicry top="Город" placeholder="Не выбран" />
-                                <FormLayoutGroup top="Пол">
-                                    <Radio name="sex" value="male" defaultChecked>Любой</Radio>
-                                    <Radio name="sex" value="male">Мужской</Radio>
-                                    <Radio name="sex" value="female">Женский</Radio>
-                                </FormLayoutGroup>
+                                {console.log('events', events)}
+                                <Select top="Соревнования" placeholder="Не выбрано">
+                                    {events && events.map((ev, i) => {
+                                        return (
+                                            <option value={ev.id}>
+                                                {ev.name}
+                                            </ option>
+                                        )
+                                    })}
+                                    
+                                </ Select>
+                                <Select top="Навыки" placeholder="Не выбраны" >
+
+                                </ Select>
                             </FormLayout>
                         </ModalPage>
                     </ModalRoot>
