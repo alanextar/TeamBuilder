@@ -70,10 +70,10 @@ namespace TeamBuilder.Controllers
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(createEventViewModel)}");
 
-			var user = await context.Users.FirstOrDefaultAsync(e => e.VkId == createEventViewModel.OwnerId);
+			var user = await context.Users.FirstOrDefaultAsync(e => e.Id == createEventViewModel.OwnerId);
 
-			if (user == null)
-				return Forbid();
+			//if (user == null)
+			//	return Forbid();
 
 			var config = new MapperConfiguration(cfg => cfg.CreateMap<CreateEventViewModel, Event>()
 				.ForMember("Teams", opt => opt.Ignore())
@@ -84,7 +84,7 @@ namespace TeamBuilder.Controllers
 			await context.Events.AddAsync(@event);
 			await context.SaveChangesAsync();
 
-			return Ok("Created");
+			return Json(@event);
 		}
 
 		[HttpPost]
@@ -94,11 +94,11 @@ namespace TeamBuilder.Controllers
 
 			var @event = await context.Events.Include(e => e.Owner).FirstOrDefaultAsync(e => e.Id == editEventViewModel.Id);
 
-			var user = await context.Users.FirstOrDefaultAsync(e => e.VkId == editEventViewModel.UserId);
-			if (user == null || @event.Owner.VkId != editEventViewModel.UserId)
-				return Forbid();
+			var user = await context.Users.FirstOrDefaultAsync(e => e.Id == editEventViewModel.UserId);
+			//if (user == null || @event.Owner.VkId != editEventViewModel.UserId)
+			//	return Forbid();
 
-			var config = new MapperConfiguration(cfg => cfg.CreateMap<CreateEventViewModel, Event>()
+			var config = new MapperConfiguration(cfg => cfg.CreateMap<EditEventViewModel, Event>()
 				.ForMember("Teams", opt => opt.Ignore())
 				.ForMember("Owner", opt => opt.Ignore()));
 			var mapper = new Mapper(config);
@@ -107,7 +107,7 @@ namespace TeamBuilder.Controllers
 			context.Update(@event);
 			await context.SaveChangesAsync();
 
-			return Ok("Updated");
+			return Json(@event);
 		}
 
 		[HttpDelete]

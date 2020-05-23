@@ -5,7 +5,7 @@ import {
 } from '@vkontakte/vkui';
 import InfiniteScroll from 'react-infinite-scroller';
 import qwest from 'qwest';
-import { Api } from './../api';
+import { Api } from '../infrastructure/api';
 import debounce from 'lodash.debounce';
 
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';

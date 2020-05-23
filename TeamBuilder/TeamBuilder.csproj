@@ -7,6 +7,7 @@
     <IsPackable>false</IsPackable>
     <SpaRoot>ClientApp\</SpaRoot>
     <DefaultItemExcludes>$(DefaultItemExcludes);$(SpaRoot)node_modules\**</DefaultItemExcludes>
+    <UserSecretsId>cc5d3e75-04d9-46bc-920e-3730093de744</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -34,6 +35,18 @@
     <Content Remove="$(SpaRoot)**" />
     <None Remove="$(SpaRoot)**" />
     <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="DemoDataSets\skills.json" />
+    <Content Remove="DemoDataSets\teams.json" />
+    <Content Remove="DemoDataSets\users.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="DemoDataSets\skills.json" />
+    <None Include="DemoDataSets\teams.json" />
+    <None Include="DemoDataSets\users.json" />
   </ItemGroup>
 
   <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">

@@ -43,7 +43,7 @@ class UserSkills extends React.Component {
                 return { id: skill.id, label: skill.name };
             });
 
-            const getSkillsResponse = await fetch(`/api/user/getSkills?vkId=${id}`);
+            const getSkillsResponse = await fetch(`/api/user/getSkills?id=${id}`);
             const userSkillsData = await getSkillsResponse.json();
 
             var userSkills = userSkillsData && userSkillsData.map(function (skill) {

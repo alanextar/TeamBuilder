@@ -1,6 +1,6 @@
 ﻿import React from 'react';
 import qwest from 'qwest';
-import { Api } from './../api'
+import { Api } from '../infrastructure/api';
 
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell, InfoRow,
@@ -10,7 +10,7 @@ import {
 import Icon28MessageOutline from '@vkontakte/icons/dist/28/message_outline';
 import Icon28EditOutline from '@vkontakte/icons/dist/28/edit_outline';
 
-class Teaminfo extends React.Component {
+class TeamInfo extends React.Component {
     constructor(props) {
         super(props);
 
@@ -80,13 +80,13 @@ class Teaminfo extends React.Component {
                                     <InfoRow header='Описаноие команды'>
                                         {this.state.team.description}    
                                     </InfoRow>
-                                </ SimpleCell>
+                                </SimpleCell>
                                 <SimpleCell>
                                     <InfoRow header='Участвуем в '>
                                         {this.state.team.event && this.state.team.event.name}
                                     </InfoRow>
-                                </ SimpleCell>
-                            </ Cell>
+                                </SimpleCell>
+                            </Cell>
                             :
                             <Cell>
                                 <Div>
@@ -94,27 +94,28 @@ class Teaminfo extends React.Component {
                                         Требуется {this.state.team.numberRequiredMembers} участников
                                         {console.log('userTeams ', this.state.team.userTeams)}
                                         {this.state.team.userTeams &&
-                                            this.state.team.userTeams.map((members, i) => {
-                                                //{ members.isOwner && (members.vkId === self.props.fetchedUser.id) && self.setState({ edit: true }) }
+                                            this.state.team.userTeams.map((userTeam, i) => {
+                                                //{ members.isOwner && (members.id === self.props.vkProfile.id) && self.setState({ edit: true }) }
                                                 return (
                                                     <SimpleCell
                                                         onClick={this.state.go}
                                                         data-to='user'
-                                                        data-id={members.userId}
-                                                        before={<Avatar size={48} />}
+                                                        data-id={userTeam.userId}
+                                                        data-user={JSON.stringify(userTeam.user)}
+                                                        before={<Avatar size={48} src={userTeam.user.photo100}/>}
                                                         after={<Icon28MessageOutline />}>
-                                                        {members.user.firstName, members.user.fullName}
+                                                        {userTeam.user.firstName, userTeam.user.fullName}
                                                     </SimpleCell>
                                             )}
                                             )}
                                     </InfoRow>
-                                </ Div>
+                                </Div>
                                 <Div>
                                     <InfoRow header='Описание задач'>
                                         {this.state.team.descriptionRequiredMembers}
-                                    </ InfoRow>
-                                </ Div>
-                            </ Cell>)}
+                                    </InfoRow>
+                                </Div>
+                            </Cell>)}
                     {this.state.team && this.state.edit &&
                         <FixedLayout vertical="bottom" >
                             <SimpleCell
@@ -123,12 +124,12 @@ class Teaminfo extends React.Component {
                                 data-to='teamEdit'
                                 data-id={this.state.team.id}>
                             </SimpleCell>
-                        </ FixedLayout>}
-                </ Group>
+                        </FixedLayout>}
+                </Group>
             </Panel>
         );
     }
 
 };
 
-export default Teaminfo;
+export default TeamInfo;

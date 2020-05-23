@@ -5,7 +5,7 @@ import {
     Div, Button, Textarea, FormLayout, Select, Input, Slider, FixedLayout
 } from '@vkontakte/vkui';
 import qwest from 'qwest';
-import { Api } from './../api';
+import { Api } from '../infrastructure/api';
 
 class TeamCreate extends React.Component {
     constructor(props) {

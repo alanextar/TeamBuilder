@@ -4,7 +4,7 @@ import {
     Panel, PanelHeader, Group, Button, Textarea, FixedLayout,
     PanelHeaderBack, Input, FormLayout
 } from '@vkontakte/vkui';
-import { Api } from '../api';
+import { Api } from '../infrastructure/api';
 
 const EventCreate = props => {
     const [eventName, setEventName] = useState('');
@@ -39,15 +39,16 @@ const EventCreate = props => {
         let link = eventLink;
         let startDate = eventStartDate;
         let finishDate = eventFinishDate;
-        let ownerId = props.owner.id;
+        let ownerId = props.owner ? props.owner.id : -1;
         var createEventViewModel = { name, description, startDate, finishDate, link, ownerId }
-        fetch(`${Api.Events.Create}`, {
-            method: 'post',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(createEventViewModel)
-        })
+        fetch(`${Api.Events.Create}`,
+            {
+                method: 'post',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(createEventViewModel)
+            })
             .then(console.log('ok'))
-            .catch((error) => console.log(`Error for create events. Details: ${error}`))
+            .catch((error) => console.log(`Error for create events. Details: ${error}`));
     }
 
     return (

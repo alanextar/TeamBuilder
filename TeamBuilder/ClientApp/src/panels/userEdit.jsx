@@ -14,7 +14,7 @@ class UserEdit extends React.Component {
 
         this.state = {
             goUserEdit: props.goUserEdit,
-            fetchedUser: props.fetchedUser,
+            vkProfile: props.vkProfile,
             user: props.user
         }
 
@@ -39,10 +39,10 @@ class UserEdit extends React.Component {
     }
 
     async postEdit() {
-        let vkId = this.state.fetchedUser.id;
+        let id = this.state.vkProfile.id;
         let city = this.state.user.city;
         let about = this.state.user.about;
-        var user = { vkId, city, about };
+        var user = { id, city, about };
 
         let response = await fetch('/api/user/edit', {
             method: 'post',
@@ -53,16 +53,16 @@ class UserEdit extends React.Component {
     }
 
     render() {
-        console.log(this.state.fetchedUser);
-        console.log('userEdit render', this.state.user);
+        console.log(this.state.vkProfile);
+        console.log('setUserEdit render', this.state.user);
         return (
             <Panel id="userEdit">
                 <PanelHeader>Профиль</PanelHeader>
-                {this.state.fetchedUser &&
+                {this.state.vkProfile &&
                     <Group title="VK Connect">
-                        <Cell description={this.state.fetchedUser.city && this.state.fetchedUser.city.title ? this.state.fetchedUser.city.title : ''}
-                            before={this.state.fetchedUser.photo_200 ? <Avatar src={this.state.fetchedUser.photo_200} /> : null}>
-                            {`${this.state.fetchedUser.first_name} ${this.state.fetchedUser.last_name}`}
+                        <Cell description={this.state.vkProfile.city && this.state.vkProfile.city.title ? this.state.vkProfile.city.title : ''}
+                            before={this.state.vkProfile.photo_200 ? <Avatar src={this.state.vkProfile.photo_200} /> : null}>
+                            {`${this.state.vkProfile.first_name} ${this.state.vkProfile.last_name}`}
                         </Cell>
                     </Group>}
                 <Separator />
@@ -75,10 +75,10 @@ class UserEdit extends React.Component {
                 <Div>
                     <Button onClick={(e) => { this.postEdit(); this.state.goUserEdit(e) }}
                         data-user={JSON.stringify(this.state.user)} data-to='user'
-                        data-id={this.state.fetchedUser.id} mode="commerce">Принять</Button>
+                        data-id={this.state.vkProfile.id} mode="commerce">Принять</Button>
                     <Button onClick={this.state.goUserEdit} data-to='user'
                         data-user={JSON.stringify(this.state.user)}
-                        data-id={this.state.fetchedUser.id} mode="destructive">Отменить</Button>
+                        data-id={this.state.vkProfile.id} mode="destructive">Отменить</Button>
                 </Div>
             </Panel>
         )

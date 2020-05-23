@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using TeamBuilder.Controllers.Paging;
 
 namespace TeamBuilder.Models
@@ -10,23 +11,27 @@ namespace TeamBuilder.Models
 
 		}
 
-		public User(long vkId)
+		public User(long id)
 		{
-			VkId = vkId;
+			Id = id;
 		}
 
 		public long Id { get; set; }
-		public long VkId { get; set; }
 		public string FirstName { get; set; }
 		public string SecondName { get; set; }
 		public string LastName { get; set; }
 		public string City { get; set; }
 		public string About { get; set; }
 		public string FullName => FirstName + " " + SecondName + " " + LastName;
+		public string Photo100 { get; set; }
+		public string Photo200 { get; set; }
 		public bool IsSearchable { get; set; }
 		//public bool IsConfirmed { get; set; }
 		public List<UserTeam> UserTeams { get; set; }
 		public List<UserSkill> UserSkills { get; set; }
 		public List<Event> OwnEvents { get; set; }
+
+		[NotMapped]
+		public List<Team> TeamsToRecruit { get; set; }
 	}
 }

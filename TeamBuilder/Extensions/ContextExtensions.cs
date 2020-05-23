@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using TeamBuilder.Controllers.Paging;
+using TeamBuilder.Models.Other;
 using TeamBuilder.ViewModels;
 
 namespace TeamBuilder.Extensions
@@ -34,8 +35,8 @@ namespace TeamBuilder.Extensions
 			HttpRequest request, 
 			int page = 0,
 			bool prev = false,
-			Func<T, bool> filter = null)
-			where T: class, IDbItem
+			Func<T, bool> filter = null) 
+	        where T: class, IDbItem
 		{
 			if (pageSize == 0)
 				return new Page<T>(new List<T>(), null);
@@ -54,7 +55,17 @@ namespace TeamBuilder.Extensions
 			}
 
 			return new Page<T>(items, nextHref);
-
 		}
+
+        public static LaunchParams VkLaunchParams(this HttpContext context)
+        {
+	        return context.Request.VkLaunchParams();
+        }
+
+        public static LaunchParams VkLaunchParams(this HttpRequest request)
+        {
+	        var raw = request.Headers["Launch-Params"].ToString();
+			return LaunchParams.Parse(raw);
+        }
     }
 }

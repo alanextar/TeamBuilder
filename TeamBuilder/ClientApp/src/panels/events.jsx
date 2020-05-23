@@ -6,7 +6,7 @@ import {
 } from '@vkontakte/vkui';
 import InfiniteScroll from 'react-infinite-scroller';
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
-import { Api } from './../api';
+import { Api } from '../infrastructure/api';
 
 const Events = props => {
     const [fetching, setFetching] = useState(false);
@@ -59,6 +59,8 @@ const Events = props => {
         if (nextHref) {
             url = nextHref;
         }
+
+        console.log(`event.loadItems.url: ${url}`);
 
         fetch(url)
             .then(resp => resp.json())
@@ -124,7 +126,7 @@ const Events = props => {
                     </CardGrid>
                 </InfiniteScroll>
             </PullToRefresh>
-        </Panel >
+        </Panel>
     );
 };
 
