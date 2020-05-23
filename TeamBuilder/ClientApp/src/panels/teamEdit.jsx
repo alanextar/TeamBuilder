@@ -3,7 +3,7 @@
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell,
     Div, Button, Textarea, FormLayout, Select, Input, Slider, InfoRow, Avatar,
-    SimpleCell, FixedLayout
+    FixedLayout, RichCell
 } from '@vkontakte/vkui';
 
 import Icon24DismissDark from '@vkontakte/icons/dist/24/dismiss_dark';
@@ -22,7 +22,8 @@ class TeamEdit extends React.Component {
             usersNumber: 2,
             go: props.go,
             id: props.id,
-            activeTab: 'teamDescription'
+            activeTab: 'teamDescription',
+            userTeams: null,
         };
 
         this.onChange = this.onChange.bind(this);
@@ -56,7 +57,8 @@ class TeamEdit extends React.Component {
             description: data.description,
             membersDescription: data.descriptionRequiredMembers,
             usersNumber: data.numberRequiredMembers,
-            check: data.event.id
+            check: data.event.id,
+            userTeams: data.userTeams
         });
     }
 
@@ -95,7 +97,26 @@ class TeamEdit extends React.Component {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(editTeamViewModel)
         });
-    }
+    };
+
+    async handleJoin(e, userTeam) {
+        e.stopPropagation();
+        console.log('into handleJoin');
+        console.log(userTeam);
+        const response = await fetch(`/api/user/joinTeam/?id=${userTeam.userId}&&teamId=${userTeam.teamId}`);
+        const data = await response.json();
+        console.log(data);
+        this.setState({ userTeams: data });
+    };
+
+    async dropUser(e, userTeam) {
+        e.stopPropagation();
+        console.log('into handleQuiteOrDecline');
+        const response = await fetch(`/api/user/quitOrDeclineTeam/?id=${userTeam.userId}&&teamId=${userTeam.teamId}`);
+        const data = await response.json();
+        console.log(data);
+        this.setState({ userTeams: data });
+    };
 
     render() {
         const check = this.state.check;
@@ -172,12 +193,30 @@ class TeamEdit extends React.Component {
                                     {console.log('userTeams ', this.state.team.userTeams)}
                                     {this.state.team.userTeams &&
                                         this.state.team.userTeams.map((members, i) => {
+                                            console.log('userAction', members.userAction)
                                             return (
-                                                <SimpleCell
+                                                (members.userAction === 1 || members.userAction === 2 || members.userAction === 5) &&
+                                                <RichCell
                                                     before={<Avatar size={48} />}
-                                                    after={<Icon24DismissDark />}>
-                                                    {members.user.firstName, members.user.fullName}
-                                                </SimpleCell>
+                                                    after={members.userAction === 2 && <Icon24DismissDark
+                                                        onClick={(e) => this.dropUser(e, members)} />}
+                                                    actions={
+                                                        members.userAction === 1 &&
+                                                        <React.Fragment>
+                                                            <Button
+                                                                onClick={(e) => this.handleJoin(e, members)}>Принять</Button>
+                                                            <Button mode="secondary"
+                                                                onClick={(e) => this.dropUser(e, members)}>Отклонить</Button>
+                                                        </React.Fragment> ||
+                                                        members.userAction === 5 &&
+                                                        <React.Fragment>
+                                                            <Button mode="secondary"
+                                                                onClick={(e) => this.dropUser(e, members)}>Отозвать предложение</Button>
+                                                        </React.Fragment>
+                                                    }
+                                                >
+                                                    { members.user.fullName }
+                                                </RichCell>
                                             )
                                         }
                                         )}
@@ -185,19 +224,18 @@ class TeamEdit extends React.Component {
 
                             </ Cell>
                     )}
-                </ Group>
-                <FixedLayout vertical="bottom">
-                    <Div>
-                        <Button
-                            stretched
-                            onClick={(e) => { this.postEdit(); this.state.go(e) }}
-                            data-to={'teaminfo'}
-                            data-id={this.props.teamId} >
-                            Применить Изменения
+                <Div>
+                    <Button
+                        stretched
+                        onClick={(e) => { this.postEdit(); this.state.go(e) }}
+                        data-to={'teaminfo'}
+                        data-id={this.props.teamId} >
+                        Применить Изменения
                         </Button>
-                    </Div>
-                </ FixedLayout>
-            </Panel>
+                </Div>
+                </ Group>
+
+            </Panel >
         );
     }
 
