@@ -1,4 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react';
+import { connect } from 'react-redux';
 import { View, Epic, Tabbar, TabbarItem } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import bridge from '@vkontakte/vk-bridge';
@@ -22,6 +23,8 @@ import Users from './panels/users'
 import User from './panels/user'
 import UserEdit from './panels/userEdit'
 import SetUserTeam from './panels/setUserTeam'
+
+import * as actions from './actions/actions'
 
 const App = () => {
     const [activeStory, setActiveStore] = useState('events');
@@ -166,4 +169,10 @@ const App = () => {
     );
 }
 
-export default App;
+function mapStateToProps(state) {
+    return {
+        phones: state.get("phones")
+    };
+}
+
+export default connect(mapStateToProps, actions)(App);
