@@ -10,11 +10,8 @@ namespace TeamBuilder.Models
 	public class UserSkill
 	{
 		public long UserId { get; set; }
-		[JsonIgnore]
-		[ForeignKey(nameof(UserId))]
 		public User User { get; set; }
 		public long SkillId { get; set; }
-		[ForeignKey(nameof(SkillId))]
 		public Skill Skill { get; set; }
 	}
 }

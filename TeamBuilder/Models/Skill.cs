@@ -12,4 +12,11 @@ namespace TeamBuilder.Models
 		public string Description { get; set; }
 		public List<UserSkill> UserSkills { get; set; }
 	}
+
+	public class SkillDto
+	{
+		public long Id { get; set; }
+		public string Name { get; set; }
+		public string Description { get; set; }
+	}
 }

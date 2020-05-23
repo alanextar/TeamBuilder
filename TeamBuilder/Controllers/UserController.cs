@@ -32,8 +32,7 @@ namespace TeamBuilder.Controllers
 
 			if (user == null)
 			{
-				user = new User(profileViewModel.Id);
-				user.UserSkills = new List<UserSkill>();
+				user = new User { Id = profileViewModel.Id };
 				foreach (var skillId in profileViewModel.SkillsIds)
 				{
 					user.UserSkills.Add(new UserSkill() { SkillId = skillId });
@@ -51,7 +50,7 @@ namespace TeamBuilder.Controllers
 			}
 
 			user.IsSearchable = profileViewModel.IsSearchable;
-			
+
 			await context.SaveChangesAsync();
 
 			return Ok("Confirmed");
@@ -238,19 +237,21 @@ namespace TeamBuilder.Controllers
 			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
 
 			if (string.IsNullOrEmpty(search))
-				return RedirectToAction("GetPage", new { pageSize, page, prev});
+				return RedirectToAction("GetPage", new { pageSize, page, prev });
 
 			if (pageSize == 0)
 				return NoContent();
 
-			bool Filter(User user) => user.FullName.ToLowerInvariant().Contains(search?.ToLowerInvariant());
+			bool Filter(UserDto user) => user.FullName.ToLowerInvariant().Contains(search?.ToLowerInvariant());
 			var result = context.Users
 				.Include(u => u.UserSkills).ThenInclude(us => us.Skill)
 				.Include(u => u.UserTeams).ThenInclude(ut => ut.Team)
+				.HackForReferenceLoop()
 				.GetPage(pageSize, HttpContext.Request, page, prev, Filter);
 			result.NextHref = result.NextHref == null ? null : $"{result.NextHref}&search={search}";
+
 			logger.LogInformation($"Response UsersCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
-			                      $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
+								  $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
 
 			return Json(result);
 		}
@@ -266,12 +267,13 @@ namespace TeamBuilder.Controllers
 				return NoContent();
 
 			var result = context.Users
-				.Include(u => u.UserSkills).ThenInclude(us => us.Skill)
-				.Include(u => u.UserTeams).ThenInclude(ut => ut.Team)
-				.GetPage(pageSize, HttpContext.Request, page, prev);
+					.Include(u => u.UserSkills).ThenInclude(us => us.Skill)
+					.Include(u => u.UserTeams).ThenInclude(ut => ut.Team)
+					.HackForReferenceLoop()
+					.GetPage(pageSize, HttpContext.Request, page, prev);
 
 			logger.LogInformation($"Response UsersCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
-			                      $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
+									  $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
 			return Json(result);
 		}
 
