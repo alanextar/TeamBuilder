@@ -2,11 +2,18 @@
 using System.Linq;
 using AutoMapper;
 using TeamBuilder.Models;
+using TeamBuilder.ViewModels;
 
 namespace TeamBuilder.Extensions
 {
 	public static class HackExtensions
 	{
+		public static Page<UserDto> HackForReferenceLoop(this Page<User> users)
+		{
+			var converted = users.Collection.HackForReferenceLoop();
+			return new Page<UserDto>(converted, users.NextHref);
+		}
+
 		public static IEnumerable<UserDto> HackForReferenceLoop(this IEnumerable<User> users)
 		{
 			var config = new MapperConfiguration(cfg => cfg.CreateMap<User, UserDto>()

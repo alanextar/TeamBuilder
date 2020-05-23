@@ -242,12 +242,13 @@ namespace TeamBuilder.Controllers
 			if (pageSize == 0)
 				return NoContent();
 
-			bool Filter(UserDto user) => user.FullName.ToLowerInvariant().Contains(search?.ToLowerInvariant());
+			bool Filter(User user) => user.FullName.ToLowerInvariant().Contains(search?.ToLowerInvariant());
 			var result = context.Users
 				.Include(u => u.UserSkills).ThenInclude(us => us.Skill)
 				.Include(u => u.UserTeams).ThenInclude(ut => ut.Team)
-				.HackForReferenceLoop()
-				.GetPage(pageSize, HttpContext.Request, page, prev, Filter);
+				.GetPage(pageSize, HttpContext.Request, page, prev, Filter)
+				.HackForReferenceLoop();
+
 			result.NextHref = result.NextHref == null ? null : $"{result.NextHref}&search={search}";
 
 			logger.LogInformation($"Response UsersCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
@@ -267,10 +268,10 @@ namespace TeamBuilder.Controllers
 				return NoContent();
 
 			var result = context.Users
-					.Include(u => u.UserSkills).ThenInclude(us => us.Skill)
-					.Include(u => u.UserTeams).ThenInclude(ut => ut.Team)
-					.HackForReferenceLoop()
-					.GetPage(pageSize, HttpContext.Request, page, prev);
+				.Include(u => u.UserSkills).ThenInclude(us => us.Skill)
+				.Include(u => u.UserTeams).ThenInclude(ut => ut.Team)
+				.GetPage(pageSize, HttpContext.Request, page, prev)
+				.HackForReferenceLoop();
 
 			logger.LogInformation($"Response UsersCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
 									  $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
