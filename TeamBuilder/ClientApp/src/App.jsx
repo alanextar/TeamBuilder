@@ -1,8 +1,14 @@
 ﻿import React, { useState, useEffect } from 'react';
-import { View, Epic, Tabbar, TabbarItem } from '@vkontakte/vkui';
+import {
+    View, Epic, Tabbar, TabbarItem, ModalRoot, ModalPage, ModalPageHeader, Radio,
+    PanelHeaderButton, FormLayout, SelectMimicry, FormLayoutGroup,
+    IS_PLATFORM_IOS, IS_PLATFORM_ANDROID
+} from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import bridge from '@vkontakte/vk-bridge';
 
+import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
+import Icon24Done from '@vkontakte/icons/dist/24/done';
 import Icon28Users from '@vkontakte/icons/dist/28/users';
 import Icon28Profile from '@vkontakte/icons/dist/28/profile';
 import Icon28Users3Outline from '@vkontakte/icons/dist/28/users_3_outline';
@@ -14,7 +20,7 @@ import EventInfo from './panels/eventInfo'
 import EventEdit from './panels/eventEdit'
 
 import Teams from './panels/teams'
-import TeamInfo from './panels/teamInfo' 
+import TeamInfo from './panels/teamInfo'
 import TeamCreate from './panels/teamCreate'
 import TeamEdit from './panels/teamEdit'
 
@@ -44,22 +50,24 @@ const App = () => {
     const [city, setCity] = useState(null);
     const [about, setAbout] = useState(null);
 
+    const [activeModal, setactiveModal] = useState(null);
 
-	useEffect(() => {
-		bridge.subscribe(({ detail: { type, data } }) => {
-			if (type === 'VKWebAppUpdateConfig') {
-				const schemeAttribute = document.createAttribute('scheme');
-				schemeAttribute.value = data.scheme ? data.scheme : 'client_light';
-				document.body.attributes.setNamedItem(schemeAttribute);
-			}
-		});
+
+    useEffect(() => {
+        bridge.subscribe(({ detail: { type, data } }) => {
+            if (type === 'VKWebAppUpdateConfig') {
+                const schemeAttribute = document.createAttribute('scheme');
+                schemeAttribute.value = data.scheme ? data.scheme : 'client_light';
+                document.body.attributes.setNamedItem(schemeAttribute);
+            }
+        });
         async function fetchData() {
             const user = await bridge.send('VKWebAppGetUserInfo');
             setProfile(user);
             setUserId(user.id);
         }
-		fetchData();
-	}, []);
+        fetchData();
+    }, []);
 
     const goTeam = e => {
         setActiveTeamPanel(e.currentTarget.dataset.to);
@@ -93,7 +101,7 @@ const App = () => {
         console.log('userId', e.currentTarget.dataset.userId);
         setUserId(e.currentTarget.dataset.id);
     }
-     
+
     const goSetUserTeam = e => {
         let user = e.currentTarget.dataset.user && JSON.parse(e.currentTarget.dataset.user);
         console.log('goSetUserTeam', user);
@@ -107,7 +115,11 @@ const App = () => {
         setActiveStore(e.currentTarget.dataset.story);
     }
 
-	return (
+    const hideModal = () => {
+        setactiveModal(null);
+    };
+
+    return (
         <Epic activeStory={activeStory} tabbar={
             <Tabbar>
                 <TabbarItem
@@ -136,10 +148,37 @@ const App = () => {
                 ><Icon28Profile /></TabbarItem>
             </Tabbar>
         }>
-            <View id='teams' activePanel={activeTeamPanel} >
-                <Teams id='teams' go={goTeam} href={teamHref} />
+            <View id='teams'
+                activePanel={activeTeamPanel}
+                modal={
+                    <ModalRoot activeModal={activeModal}>
+                        <ModalPage
+                            id="filters"
+                            onClose={hideModal}
+                            header={
+                                <ModalPageHeader
+                                    left={IS_PLATFORM_ANDROID && <PanelHeaderButton onClick={hideModal}><Icon24Cancel /></PanelHeaderButton>}
+                                    right={<PanelHeaderButton onClick={hideModal}>{IS_PLATFORM_IOS ? 'Готово' : <Icon24Done />}</PanelHeaderButton>}
+                                >
+                                    Фильтры
+                                </ModalPageHeader>
+                            }
+                        >
+                            <FormLayout>
+                                <SelectMimicry top="Страна" placeholder="Не выбрана" />
+                                <SelectMimicry top="Город" placeholder="Не выбран" />
+                                <FormLayoutGroup top="Пол">
+                                    <Radio name="sex" value="male" defaultChecked>Любой</Radio>
+                                    <Radio name="sex" value="male">Мужской</Radio>
+                                    <Radio name="sex" value="female">Женский</Radio>
+                                </FormLayoutGroup>
+                            </FormLayout>
+                        </ModalPage>
+                    </ModalRoot>
+                }>
+                <Teams id='teams' go={goTeam} href={teamHref} onFiltersClick={() => setactiveModal('filters')} />
                 <TeamInfo id='teaminfo' go={goTeam} teamId={activeTeam} return='teams' vkProfile={vkProfile} />
-                <TeamCreate id='teamCreate' go={goTeam} back={back}/>
+                <TeamCreate id='teamCreate' go={goTeam} back={back} />
                 <TeamEdit id='teamEdit' go={goTeam} teamId={activeTeam} back={back} />
                 <User id='user' userId={userId} vkProfile={vkProfile} goUserEdit={goTeam}
                     activeStory={activeStory} goSetUserTeam={goTeam} return='teaminfo' />
@@ -159,7 +198,7 @@ const App = () => {
                 <User id='user' vkProfile={vkProfile} userId={userId} goUserEdit={goUserEdit} activeStory={activeStory} goSetUserTeam={goSetUserTeam} />
                 <UserEdit id='userEdit' goUserEdit={goUserEdit} vkProfile={vkProfile} user={user} />
                 <TeamInfo id='teaminfo' go={goUserEdit} teamId={activeTeam} return='user' />
-                <SetUserTeam id='setUserTeam' goSetUserTeam={goSetUserTeam} user={user} userId={userId} vkProfile={vkProfile}/>
+                <SetUserTeam id='setUserTeam' goSetUserTeam={goSetUserTeam} user={user} userId={userId} vkProfile={vkProfile} />
             </View>
         </Epic>
 

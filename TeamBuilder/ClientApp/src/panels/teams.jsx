@@ -9,6 +9,7 @@ import { Api } from '../infrastructure/api';
 import debounce from 'lodash.debounce';
 
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
+import Icon24Filter from '@vkontakte/icons/dist/24/filter';
 
 class Teams extends React.Component {
     constructor(props) {
@@ -170,7 +171,9 @@ class Teams extends React.Component {
                     </PanelHeaderButton>}>
                     Команды
                 </PanelHeader>
-                <Search value={this.state.search} onChange={this.onChangeSearch} after={null} />
+                <Search value={this.state.search} onChange={this.onChangeSearch} after={null}
+                    icon={<Icon24Filter />}
+                    onIconClick={this.props.onFiltersClick} />
                 <PullToRefresh onRefresh={this.onRefresh} isFetching={this.state.fetching}>
 
                     <InfiniteScroll
