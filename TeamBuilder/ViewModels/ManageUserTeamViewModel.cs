@@ -1,6 +1,6 @@
 ﻿namespace TeamBuilder.ViewModels
 {
-	public class RejectedOrRemoveUserViewModel
+	public class ManageUserTeamViewModel
 	{
 		public long UserId { get; set; }
 		public long TeamId { get; set; }
