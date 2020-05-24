@@ -1,5 +1,9 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
+
+import { goBack, setPage } from '../store/router/actions';
+import { setEvent } from "../store/events/actions";
+
 import debounce from 'lodash.debounce';
 import {
     Panel, PanelHeader, Group, Search, List, RichCell, PullToRefresh,
@@ -8,7 +12,6 @@ import {
 import InfiniteScroll from 'react-infinite-scroller';
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import { Api } from '../infrastructure/api';
-import { goBack, setPage } from '../store/router/actions';
 
 const Events = props => {
     const [fetching, setFetching] = useState(false);
@@ -92,10 +95,8 @@ const Events = props => {
                     <RichCell
                         bottom={`${Math.floor(Math.random() * (+50 - +0)) + +0} команд`}
                         caption={`${event.startDate} - ${event.startDate}`}
-                        onClick={props.go}
-                        data-to='eventInfo'
-                        data-event={JSON.stringify(event)}
-                        data-from={props.id}>
+                        onClick={() => { setPage('events', 'eventInfo') }}
+                    >
                         {event.name}
                     </RichCell>
                 </Card>
@@ -136,6 +137,7 @@ const Events = props => {
 
 const mapDispatchToProps = {
     setPage,
+    setEvent,
     goBack
 };
 

@@ -5,6 +5,7 @@ import {formDataReducer} from "./formData/reducers";
 import { teamReducer } from "./teams/reducers";
 import { userReducer } from "./user/reducers";
 import { participantReducer } from "./participants/reducers";
+import { eventReducer } from "./events/reducers";
 
 export default combineReducers({
     vkui: vkuiReducer,
@@ -12,5 +13,6 @@ export default combineReducers({
     formData: formDataReducer,
     team: teamReducer,
     user: userReducer,
-    participant: participantReducer
+    participant: participantReducer,
+    event: eventReducer
 });
