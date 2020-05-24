@@ -122,7 +122,7 @@ const App = (props) => {
                 <TeamCreate id='teamCreate'/>
                 <TeamEdit id='teamEdit' />
                 <User id='user' activeStory={activeStory} />
-                <SetUserTeam id='setUserTeam' profile={props.profile} />
+                <SetUserTeam id='setUserTeam' />
                 <EventCreate id='eventCreate' owner={props.profile} />
             </View>
             <View id='users' activePanel={getActivePanel("users")}

@@ -1,8 +1,12 @@
 ﻿import React from 'react';
 import ReactDOM from 'react-dom';
+
+import { connect } from 'react-redux';
+import { bindActionCreators } from "redux";
+import { goBack, setPage } from "../store/router/actions";
+
 import {
-    Panel, PanelHeader, Group, Cell, Avatar, Search, Button, Div, Input, FormLayoutGroup, Textarea,
-    Tabs, TabsItem, Separator, Checkbox, List, Header, FormLayout, Select, RichCell
+    Panel, PanelHeader, Button, Div, FormLayoutGroup, Separator, FormLayout, Select, PanelHeaderBack
 } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import '../../src/styles/style.css';
@@ -19,7 +23,7 @@ class SetUserTeam extends React.Component {
             teams: null,
             selectedTeam: null,
             responseStatus: null,
-            recruitTeam: props.recruitTeam
+            recruitTeam: props.recruitTeams
         }
 
         this.post = this.post.bind(this);
@@ -33,7 +37,7 @@ class SetUserTeam extends React.Component {
     }
 
     componentDidMount() {
-        this.populateTeamData();
+        //this.populateTeamData();
     }
 
     async populateTeamData() {
@@ -43,8 +47,6 @@ class SetUserTeam extends React.Component {
     }
 
     async post() {
-        console.log('post setTeam ', this.state.selectedTeam)
-        console.log('!!!!!!!!!!!!!!!post setTeam userId', this.state.userId)
         var id = this.state.userId;
         var teamId = this.state.selectedTeam;
 
@@ -52,10 +54,12 @@ class SetUserTeam extends React.Component {
     }
 
     render() {
+        const { goBack, setPage } = this.props;
+
         console.log('setUserTeam render', this.state.user);
         return (
             <Panel id="setUserTeam">
-                <PanelHeader>Выбор команды</PanelHeader>
+                <PanelHeader left={<PanelHeaderBack onClick={() => goBack()} />}>Выбор команды</PanelHeader>
                 <Separator />
                 <FormLayout>
                     <FormLayoutGroup top="Завербовать">
@@ -64,7 +68,7 @@ class SetUserTeam extends React.Component {
                             placeholder="Команда"
                             onChange={this.onTeamSelect}
                             status={this.state.selectedTeam ? 'valid' : 'error'}
-                            bottom={this.state.selectedTeam ? '' : 'Пожалуйста, выберете или создайте событие'}
+                            bottom={this.state.selectedTeam ? '' : 'Пожалуйста, выберете или создайте команду'}
                             name="check"
                         >
                             {this.state.teams && this.state.teams.map((team, i) => {
@@ -79,16 +83,20 @@ class SetUserTeam extends React.Component {
                     </FormLayoutGroup>
                 </FormLayout>
                 <Div>
-                    <Button onClick={(e) => { this.post(); this.state.goSetUserTeam(e) }}
-                        data-user={JSON.stringify(this.state.user)}
-                        data-id={this.state.userId}
+                    <Button onClick={(e) => { this.post(); goBack() }}
                         data-to='user' mode="commerce">Принять</Button>
-                    <Button onClick={this.state.goSetUserTeam} data-to='user'
-                        data-user={JSON.stringify(this.state.user)} mode="destructive">Отменить</Button>
+                    <Button onClick={() => goBack()} data-to='user' mode="destructive">Отменить</Button>
                 </Div>
             </Panel>
         )
     }
 }
 
-export default SetUserTeam;
+function mapDispatchToProps(dispatch) {
+    return {
+        dispatch,
+        ...bindActionCreators({ setPage, goBack }, dispatch)
+    }
+}
+
+export default connect(null, mapDispatchToProps)(SetUserTeam);

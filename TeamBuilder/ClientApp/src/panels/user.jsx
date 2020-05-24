@@ -23,11 +23,10 @@ class User extends React.Component {
     constructor(props) {
         super(props);
 
-        console.log('user constructor', props.user.userSkills);
-
-        let userSkills = props.user.userSkills.map(function (userSkill) {
+        let userSkills = props.user.userSkills && props.user.userSkills.map(function (userSkill) {
             return { id: userSkill.skillId, label: userSkill.skill.name };
         })
+        let selectedSkills = userSkills;
 
         this.state = {
             skills: null,
@@ -37,7 +36,7 @@ class User extends React.Component {
             userSkills: userSkills,
             activeTabProfile: 'main',
             selected: false,
-            selectedSkills: null,
+            selectedSkills: selectedSkills,
             isConfirmed: false,
             readOnlyMode: props.activeStory != 'user',
             recruitTeams: []
@@ -54,7 +53,7 @@ class User extends React.Component {
 
     isUserConfirmed(id) {
         console.log('into isUserConfirmed');
-        if (this.state.user && this.state.user.is) {
+        if (this.state.user && this.state.user.isSearchable) {
             fetch(`/api/user/getRecruitTeams?vkProfileId=${this.state.vkProfile.id}&&id=${id}`)
                 .then(response => response.json())
                 .then(data => this.setState({ recruitTeams: data }));
@@ -79,22 +78,28 @@ class User extends React.Component {
     }
 
     async confirmUser(id) {
-        console.log('into confirm user', this.state.user.isSearchable);
-        let skillsIds = this.state.user.userSkills.map((s, i) => s.skillId);
+        let skillsIds = this.state.userSkills.map((s, i) => s.id);
+        console.log('into confirm user', skillsIds);
 
         var isSearchable = this.state.user.isSearchable;
         var profileViewModel = { id, skillsIds, isSearchable };
 
-        let response = await fetch('/api/user/confirm', {
+        let saveOrConfirm = await fetch('/api/user/confirm', {
             method: 'post',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(profileViewModel),
         });
 
-        this.setState({ isConfirmed: true });
+        let user = await saveOrConfirm.json()
+
+        console.log('updated user', user);
+
+        this.props.setUser(user);
     }
 
-    handleClick(event, selectedSkills) {
+    onSkillsChange(event, selectedSkills) {
+        console.log('onSkillsChange', selectedSkills);
+
         this.setState({
             userSkills: selectedSkills
         })
@@ -152,8 +157,8 @@ class User extends React.Component {
                             </List>
                             <UserSkills userSkills={this.state.userSkills}
                                 readOnlyMode={this.state.readOnlyMode}
-                                handleClick={this.handleClick.bind(this, this.state.selectedSkills)}
-                                id={this.state.user.id} />
+                                onSkillsChange={this.onSkillsChange.bind(this, this.state.selectedSkills)}
+                            />
                         </Group> :
                         <Group>
                             <UserTeams userTeams={this.state.user && this.state.user.userTeams}
@@ -170,10 +175,7 @@ class User extends React.Component {
                 </Div>
                 <Div>
                     {this.state.recruitTeams && this.state.recruitTeams.length > 0 && < Button mode="primary" size='xl'
-                        onClick={this.state.goSetUserTeam}
-                        data-to='setUserTeam'
-                        data-user={JSON.stringify(this.state.user)}
-                        data-id={this.state.user.id}
+                        onClick={() => setPage('teams', 'setUserTeam')}
                         recruitTeams={this.state.recruitTeams}
                         >
                         Завербовать
@@ -194,6 +196,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = {
     setPage,
+    setUser,
     goBack
 };
 

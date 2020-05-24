@@ -1,10 +1,5 @@
 ﻿import React from 'react';
 import ReactDOM from 'react-dom';
-
-import { connect } from 'react-redux';
-import { bindActionCreators } from "redux";
-import { setAllSkills } from "../store/user/actions";
-
 import { Div,Title } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -14,12 +9,7 @@ class UserSkills extends React.Component {
     constructor(props) {
         super(props);
 
-        console.log('userSkills constructor', props.allSkills);
-
         this.state = {
-            id: props.id,
-            go: props.go,
-            fetching: false,
             userSkills: props.userSkills ? props.userSkills : [],
             allSkills: []
         }
@@ -59,7 +49,7 @@ class UserSkills extends React.Component {
                 <Typeahead id="skills"
                     clearButton
                     onChange={(e) => {
-                        this.props.handleClick(e)
+                        this.props.onSkillsChange(e)
                     }}
                     options={this.state.allSkills}
                     selected={this.state.userSkills}
@@ -73,18 +63,4 @@ class UserSkills extends React.Component {
     }
 }
 
-const mapStateToProps = (state) => {
-    return {
-        allSkills: state.user.allSkills,
-    };
-};
-
-
-function mapDispatchToProps(dispatch) {
-    return {
-        dispatch,
-        ...bindActionCreators({ setAllSkills }, dispatch)
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(UserSkills);
+export default UserSkills
