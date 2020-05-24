@@ -5,6 +5,7 @@ import '@vkontakte/vkui/dist/vkui.css';
 import bridge from '@vkontakte/vk-bridge';
 import { bindActionCreators } from 'redux'
 import { goBack, closeModal, setStory } from "./store/router/actions";
+import { setUser } from "./store/user/actions";
 import { getActivePanel } from "./services/_functions";
  import * as VK from './services/VK';
 
@@ -33,25 +34,15 @@ import * as actions from './actions/actions'
 const App = (props) => {
     let lastAndroidBackAction = 0;
 
-    const [back, setBack] = useState(null);
-
-    const [activeTeamPanel, setActiveTeamPanel] = useState('teams');
-    const [activeTeam, setActiveTeam] = useState(null);
     const [teamHref, setTeamNextHref] = useState(null);
-
-    const [activeUserPanel, setActiveUserPanel] = useState('user');
     const [vkProfile, setProfile] = useState(null);
-    const [user, setUser] = useState(null);
-    const [userId, setUserId] = useState(null);
 
-    const [activeEventPanel, setActiveEventPanel] = useState('events');
-    const [event, setEvent] = useState(null);
-
-    const [activeUsersPanel, setActiveUsersPanel] = useState('users');
-
-    const [city, setCity] = useState(null);
-    const [about, setAbout] = useState(null);
-
+    const { goBack, setStory, closeModal, popouts, activeView,
+        activeStory, activeModals, panelsHistory, colorScheme, setUser
+    } = props;
+    let history = (panelsHistory[activeView] === undefined) ? [activeView] : panelsHistory[activeView];
+    let popout = (popouts[activeView] === undefined) ? null : popouts[activeView];
+    let activeModal = (activeModals[activeView] === undefined) ? null : activeModals[activeView];
 
 	useEffect(() => {
 		bridge.subscribe(({ detail: { type, data } }) => {
@@ -64,14 +55,12 @@ const App = (props) => {
 
         async function fetchData() {
             const user = await bridge.send('VKWebAppGetUserInfo');
-            setProfile(user);
-            setUserId(user.id);
         }
         fetchData();
 
         const { activeView, activeStory, activePanel } = props;
         const { goBack, dispatch } = props;
-        //dispatch(VK.initApp());
+
         window.onpopstate = () => {
             let timeNow = +new Date();
 
@@ -86,55 +75,11 @@ const App = (props) => {
 	}, []);
 
     const goTeam = e => {
-        setActiveTeamPanel(e.currentTarget.dataset.to);
         if (e.currentTarget.dataset.href)
             setTeamNextHref(e.currentTarget.dataset.href);
-        setActiveTeam(e.currentTarget.dataset.id);
-        setBack(e.currentTarget.dataset.from);
-        let userId = e.currentTarget.dataset.id;
-        console.log('!!!!!!!into goTeam', userId);
-        setUserId(userId);
+
         console.log(`dataset.href: ${e.currentTarget.dataset.href}`);
     };
-
-    const goUsers = e => {
-        setActiveUsersPanel(e.currentTarget.dataset.to);
-        setBack(e.currentTarget.dataset.from);
-    };
-
-    const goEvent = e => {
-        setEvent(e.currentTarget.dataset.event && JSON.parse(e.currentTarget.dataset.event));
-        setActiveEventPanel(e.currentTarget.dataset.to);
-        setBack(e.currentTarget.dataset.from);
-    };
-
-    const goUserEdit = e => {
-        console.log('into go', e.currentTarget.dataset.to, e.currentTarget.dataset.id);
-        let user = e.currentTarget.dataset.user && JSON.parse(e.currentTarget.dataset.user);
-        setActiveTeam(e.currentTarget.dataset.id);
-        setActiveUserPanel(e.currentTarget.dataset.to);
-        //setUser(user);
-        console.log('userId', e.currentTarget.dataset.userId);
-        setUserId(e.currentTarget.dataset.id);
-    }
-     
-    const goSetUserTeam = e => {
-        let user = e.currentTarget.dataset.user && JSON.parse(e.currentTarget.dataset.user);
-        console.log('goSetUserTeam', user);
-        setUser(user);
-        setUserId(e.currentTarget.dataset.user.id);
-        console.log('dataset', e.currentTarget.dataset);
-        setActiveUserPanel(e.currentTarget.dataset.to);
-    }
-
-    // const goFoot = e => {
-    //     setActiveStore(e.currentTarget.dataset.story);
-    // }
-
-    const { goBack, setStory, closeModal, popouts, activeView, activeStory, activeModals, panelsHistory, colorScheme } = props;
-    let history = (panelsHistory[activeView] === undefined) ? [activeView] : panelsHistory[activeView];
-    let popout = (popouts[activeView] === undefined) ? null : popouts[activeView];
-    let activeModal = (activeModals[activeView] === undefined) ? null : activeModals[activeView];
 
 	return (
         <Epic activeStory={activeStory} tabbar={
@@ -155,7 +100,10 @@ const App = (props) => {
                     text="События"
                 ><Icon28FavoriteOutline /></TabbarItem>
                 <TabbarItem
-                    onClick={() => setStory('user', 'user')}
+                    onClick={() =>
+                    {
+                        setStory('user', 'user');
+                    }}
                     selected={activeStory === 'user'}
                     text="Профиль"
                 ><Icon28Profile /></TabbarItem>
@@ -163,32 +111,33 @@ const App = (props) => {
         }>
             <View id='teams' activePanel={getActivePanel("teams")}
                 history={history} >
-                <Teams id='teams' activeStory={activeStory} go={goTeam} href={teamHref} />
-                <TeamInfo id='teaminfo' go={goTeam} teamId={activeTeam} return='teams' vkProfile={vkProfile} />
-                <TeamCreate id='teamCreate' go={goTeam} back={back}/>
-                <TeamEdit id='teamEdit' go={goTeam} teamId={activeTeam} back={back} />
-                <User id='user' userId={userId} vkProfile={vkProfile} goUserEdit={goTeam}
-                    activeStory={activeStory} goSetUserTeam={goTeam} return='teaminfo' />
-                <SetUserTeam id='setUserTeam' goSetUserTeam={goTeam} user={user} userId={userId} vkProfile={vkProfile} />
-                <EventCreate id='eventCreate' go={goTeam} back={back} owner={vkProfile} />
+                <Teams id='teams' activeStory={activeStory} href={teamHref} />
+                <TeamInfo id='teaminfo' return='teams' vkProfile={vkProfile} />
+                <TeamCreate id='teamCreate'/>
+                <TeamEdit id='teamEdit' />
+                <User id='user' activeStory={activeStory} />
+                <SetUserTeam id='setUserTeam' vkProfile={vkProfile} />
+                <EventCreate id='eventCreate' owner={vkProfile} />
             </View>
-            <View id='users' activePanel={activeUsersPanel}>
-                <Users id='users' go={goUsers} />
+            <View id='users' activePanel={getActivePanel("users")}
+                history={history}
+            >
+                <Users id='users' />
             </View>
             <View id='events' activePanel={getActivePanel("events")}
                 history={history}>
-                <Events id='events' go={goEvent} />
-                <EventCreate id='eventCreate' go={goEvent} back={back} owner={vkProfile} />
-                <EventInfo id='eventInfo' event={event} go={goEvent} back={back} />
-                <EventEdit id='eventEdit' event={event} go={goEvent} back={back} owner={vkProfile} />
+                <Events id='events' />
+                <EventCreate id='eventCreate' owner={vkProfile} />
+                <EventInfo id='eventInfo' />
+                <EventEdit id='eventEdit' owner={vkProfile} />
             </View>
             <View id='user' activePanel={getActivePanel("user")}
                 history={history}
             >
-                <User id='user' vkProfile={vkProfile} userId={userId} goUserEdit={goUserEdit} activeStory={activeStory} goSetUserTeam={goSetUserTeam} />
-                <UserEdit id='userEdit' goUserEdit={goUserEdit} vkProfile={vkProfile} user={user} />
-                <TeamInfo id='teaminfo' go={goUserEdit} teamId={activeTeam} return='user' />
-                <SetUserTeam id='setUserTeam' goSetUserTeam={goSetUserTeam} user={user} userId={userId} vkProfile={vkProfile}/>
+                <User id='user' activeStory={activeStory} />
+                <UserEdit id='userEdit' />
+                <TeamInfo id='teaminfo' />
+                <SetUserTeam id='setUserTeam' />
             </View>
         </Epic>
 
