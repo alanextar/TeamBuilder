@@ -42,8 +42,8 @@ class Teams extends React.Component {
     }
 
     componentDidMount() {
-        //this.populateTeamData();
         window.scrollTo(0, 0);
+        this.searchTeams('');
     }
 
     async populateTeamData() {
@@ -114,7 +114,9 @@ class Teams extends React.Component {
     }
 
     async searchTeams(value) {
-        const response = await fetch(`${Api.Teams.PagingSearch}?search=${value}`);
+        console.log('searchTeam value', value)
+        console.log('searchTeam  event.id', this.props.filtredByEvent.id)
+        const response = await fetch(`${Api.Teams.PagingSearch}?search=${value}&eventId=${this.props.filtredByEvent.id}`);
         const data = await response.json();
         console.log('searchTeam', data)
         this.setState({
@@ -152,12 +154,12 @@ class Teams extends React.Component {
                     <RichCell
                         before={<Avatar size={64} src={team.photo100} />}
                         text={team.description}
-                        caption="Навыки"
+                        caption={team.event.name}
                         after={team.userTeams.length + '/' + team.numberRequiredMembers}
                         onClick={self.state.go}
                         data-to='teaminfo'
                         data-id={team.id}>
-                        {team.name} - {team.id}
+                        {team.name}
                     </RichCell>
                 </Card>
             );

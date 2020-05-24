@@ -103,7 +103,7 @@ class TeamEdit extends React.Component {
         e.stopPropagation();
         console.log('into handleJoin');
         console.log(userTeam);
-        const response = await fetch(`/api/user/joinTeam/?id=${userTeam.userId}&&teamId=${userTeam.teamId}`);
+        const response = await fetch(`/api/user/joinTeam/?id=${userTeam.userId}&teamId=${userTeam.teamId}`);
         const data = await response.json();
         console.log(data);
         this.setState({ userTeams: data });
@@ -112,7 +112,7 @@ class TeamEdit extends React.Component {
     async dropUser(e, userTeam) {
         e.stopPropagation();
         console.log('into handleQuiteOrDecline');
-        const response = await fetch(`/api/user/quitOrDeclineTeam/?id=${userTeam.userId}&&teamId=${userTeam.teamId}`);
+        const response = await fetch(`/api/user/quitOrDeclineTeam/?id=${userTeam.userId}&teamId=${userTeam.teamId}`);
         const data = await response.json();
         console.log(data);
         this.setState({ userTeams: data });

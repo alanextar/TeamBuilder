@@ -13,144 +13,153 @@ using TeamBuilder.ViewModels;
 
 namespace TeamBuilder.Controllers
 {
-	public class TeamsController : Controller
-	{
-		private readonly ApplicationContext context;
-		private readonly ILogger<TeamsController> logger;
+    public class TeamsController : Controller
+    {
+        private readonly ApplicationContext context;
+        private readonly ILogger<TeamsController> logger;
 
-		public TeamsController(ApplicationContext context, ILogger<TeamsController> logger)
-		{
-			this.context = context;
-			this.logger = logger;
-		}
+        public TeamsController(ApplicationContext context, ILogger<TeamsController> logger)
+        {
+            this.context = context;
+            this.logger = logger;
+        }
 
-		public IEnumerable<Team> GetAll()
-		{
-			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
+        public IEnumerable<Team> GetAll()
+        {
+            logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
 
-			var teams = context.Teams.ToList();
+            var teams = context.Teams.ToList();
 
-			logger.LogInformation($"Response TeamsCount:{teams.Count}");
+            logger.LogInformation($"Response TeamsCount:{teams.Count}");
 
-			return teams;
-		}
+            return teams;
+        }
 
-		public IActionResult PagingSearch(string search, int pageSize = 20, int page = 0, bool prev = false)
-		{
-			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
+        public IActionResult PagingSearch(string search, long eventId = -1, int pageSize = 20, int page = 0, bool prev = false)
+        {
+            logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
 
-			if (string.IsNullOrEmpty(search))
-				return RedirectToAction("GetPage", new { pageSize, page, prev });
+            //if (string.IsNullOrEmpty(search))
+            //    return RedirectToAction("GetPage", new { pageSize, page, prev });
 
-			if (pageSize == 0)
-				return NoContent();
+            if (pageSize == 0)
+                return NoContent();
 
-			bool Filter(Team team) => team.Name.ToLowerInvariant().Contains(search?.ToLowerInvariant() ?? string.Empty);
-			var result = context.Teams.Include(x => x.Event).Include(x => x.UserTeams).GetPage(pageSize, HttpContext.Request, page, prev, Filter);
-			result.NextHref = result.NextHref == null ? null : $"{result.NextHref}&search={search}";
-			logger.LogInformation($"Response TeamsCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
-								  $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
+            bool Filter(Team team)
+            {
+                var isEqual = team.Name.ToLowerInvariant().Contains(search?.ToLowerInvariant() ?? string.Empty);
+                if (eventId != -1)
+                {
+                    isEqual = team.Event.Id == eventId && isEqual;
+                }
+                return isEqual;
+            }
 
-			return Json(result);
-		}
+            var result = context.Teams.Include(x => x.Event).Include(x => x.UserTeams).GetPage(pageSize, HttpContext.Request, page, prev, Filter);
+            result.NextHref = result.NextHref == null ? null : $"{result.NextHref}&search={search}";
+            logger.LogInformation($"Response TeamsCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
+                                  $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
 
-		public async Task<IActionResult> GetPage(int pageSize = 20, int page = 0, bool prev = false)
-		{
-			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
+            return Json(result);
+        }
 
-			if (!context.UserTeams.Any())
-				await PashalEggs.Eggs(context);
+        public async Task<IActionResult> GetPage(int pageSize = 20, int page = 0, bool prev = false)
+        {
+            logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
 
-			if (!context.Teams.Any())
-				await Initialize();
+            if (!context.UserTeams.Any())
+                await PashalEggs.Eggs(context);
 
-			if (pageSize == 0)
-				return NoContent();
+            if (!context.Teams.Any())
+                await Initialize();
 
-			var teams = context.Teams.Include(x => x.Event).Include(x => x.UserTeams).GetPage(pageSize, HttpContext.Request, page, prev);
+            if (pageSize == 0)
+                return NoContent();
 
-			logger.LogInformation($"Response TeamsCount:{teams.Collection.Count()} / from:{teams.Collection.FirstOrDefault()?.Id} / to:{teams.Collection.LastOrDefault()?.Id} / NextHref:{teams.NextHref}");
-			return Json(teams);
-		}
+            var teams = context.Teams.Include(x => x.Event).Include(x => x.UserTeams).GetPage(pageSize, HttpContext.Request, page, prev);
 
-		public Team Get(int id)
-		{
-			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
+            logger.LogInformation($"Response TeamsCount:{teams.Collection.Count()} / from:{teams.Collection.FirstOrDefault()?.Id} / to:{teams.Collection.LastOrDefault()?.Id} / NextHref:{teams.NextHref}");
+            return Json(teams);
+        }
 
-			var team = context.Teams.Include(x => x.Event)
-				.Include(x => x.UserTeams).ThenInclude(x => x.User)
-				.FirstOrDefault(t => t.Id == id);
+        public Team Get(int id)
+        {
+            logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
 
-			return team;
-		}
+            var team = context.Teams.Include(x => x.Event)
+                .Include(x => x.UserTeams).ThenInclude(x => x.User)
+                .FirstOrDefault(t => t.Id == id);
 
-		[HttpPost]
-		public async Task<IActionResult> Create([FromBody]CreateTeamViewModel createTeamViewModel)
-		{
-			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(createTeamViewModel)}");
+            return team;
+        }
 
-			var @event = await context.Events.FirstOrDefaultAsync(e => e.Id == createTeamViewModel.EventId);
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody]CreateTeamViewModel createTeamViewModel)
+        {
+            logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(createTeamViewModel)}");
 
-			var config = new MapperConfiguration(cfg => cfg.CreateMap<CreateTeamViewModel, Team>()
-				.ForMember("Event", opt => opt.MapFrom(_ => @event)));
-			var mapper = new Mapper(config);
-			var team = mapper.Map<CreateTeamViewModel, Team>(createTeamViewModel);
+            var @event = await context.Events.FirstOrDefaultAsync(e => e.Id == createTeamViewModel.EventId);
 
-			await context.Teams.AddAsync(team);
-			await context.SaveChangesAsync();
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<CreateTeamViewModel, Team>()
+                .ForMember("Event", opt => opt.MapFrom(_ => @event)));
+            var mapper = new Mapper(config);
+            var team = mapper.Map<CreateTeamViewModel, Team>(createTeamViewModel);
 
-			return Ok("Created");
-		}
+            await context.Teams.AddAsync(team);
+            await context.SaveChangesAsync();
 
-		[HttpPost]
-		public async Task<IActionResult> Edit([FromBody]EditTeamViewModel editTeamViewModel)
-		{
-			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(editTeamViewModel)}");
+            return Ok("Created");
+        }
 
-			var team = await context.Teams.FirstOrDefaultAsync(t => t.Id == editTeamViewModel.Id);
-			if (team == null)
-				return NotFound($"Team '{editTeamViewModel.Id}' not found");
+        [HttpPost]
+        public async Task<IActionResult> Edit([FromBody]EditTeamViewModel editTeamViewModel)
+        {
+            logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(editTeamViewModel)}");
 
-			var @event = await context.Events.FirstOrDefaultAsync(e => e.Id == editTeamViewModel.EventId);
+            var team = await context.Teams.FirstOrDefaultAsync(t => t.Id == editTeamViewModel.Id);
+            if (team == null)
+                return NotFound($"Team '{editTeamViewModel.Id}' not found");
 
-			var config = new MapperConfiguration(cfg => cfg.CreateMap<EditTeamViewModel, Team>()
-				.ForMember("Event", opt => opt.MapFrom(_ => @event)));
-			var mapper = new Mapper(config);
-			mapper.Map(editTeamViewModel, team);
+            var @event = await context.Events.FirstOrDefaultAsync(e => e.Id == editTeamViewModel.EventId);
 
-			context.Update(team);
-			await context.SaveChangesAsync();
+            var config = new MapperConfiguration(cfg => cfg.CreateMap<EditTeamViewModel, Team>()
+                .ForMember("Event", opt => opt.MapFrom(_ => @event)));
+            var mapper = new Mapper(config);
+            mapper.Map(editTeamViewModel, team);
 
-			return Ok("Updated");
-		}
+            context.Update(team);
+            await context.SaveChangesAsync();
 
-		[HttpDelete]
-		public async Task<IActionResult> Delete(long id)
-		{
-			logger.LogInformation($"DELETE Request {HttpContext.Request.Headers[":path"]}.");
+            return Ok("Updated");
+        }
 
-			var team = await context.Teams.FirstOrDefaultAsync(t => t.Id == id);
-			if (team == null)
-				return NotFound($"Team '{id}' not found");
+        [HttpDelete]
+        public async Task<IActionResult> Delete(long id)
+        {
+            logger.LogInformation($"DELETE Request {HttpContext.Request.Headers[":path"]}.");
 
-			context.Remove(team);
-			await context.SaveChangesAsync();
+            var team = await context.Teams.FirstOrDefaultAsync(t => t.Id == id);
+            if (team == null)
+                return NotFound($"Team '{id}' not found");
 
-			return Ok("Deleted");
-		}
+            context.Remove(team);
+            await context.SaveChangesAsync();
 
-		private async Task Initialize()
-		{
-			var file = await System.IO.File.ReadAllTextAsync(@"DemoDataSets\teams.json");
-			var teams = JsonConvert.DeserializeObject<Team[]>(file);
-			teams = teams.Select(t =>
-			{
-				t.NumberRequiredMembers = new Random().Next(0, 15);
-				return t;
-			}).ToArray();
+            return Ok("Deleted");
+        }
 
-			await context.Teams.AddRangeAsync(teams);
-			await context.SaveChangesAsync();
-		}
-	}
+        private async Task Initialize()
+        {
+            var file = await System.IO.File.ReadAllTextAsync(@"DemoDataSets\teams.json");
+            var teams = JsonConvert.DeserializeObject<Team[]>(file);
+            teams = teams.Select(t =>
+            {
+                t.NumberRequiredMembers = new Random().Next(0, 15);
+                return t;
+            }).ToArray();
+
+            await context.Teams.AddRangeAsync(teams);
+            await context.SaveChangesAsync();
+        }
+    }
 }

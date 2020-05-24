@@ -1,7 +1,7 @@
 ﻿import React, { useState, useEffect } from 'react';
 import {
     View, Epic, Tabbar, TabbarItem, ModalRoot, ModalPage, ModalPageHeader,
-    PanelHeaderButton, FormLayout, Select,
+    PanelHeaderButton, FormLayout, SelectMimicry,
     IS_PLATFORM_IOS, IS_PLATFORM_ANDROID
 } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
@@ -23,6 +23,7 @@ import Teams from './panels/teams'
 import TeamInfo from './panels/teamInfo'
 import TeamCreate from './panels/teamCreate'
 import TeamEdit from './panels/teamEdit'
+import EventsFilter from './panels/eventsFilter'
 
 import Users from './panels/users'
 import User from './panels/user'
@@ -54,6 +55,7 @@ const App = () => {
 
     const [activeModal, setactiveModal] = useState(null);
     const [events, setEvents] = useState(null);
+    const [eventFilter, setEventFilter] = useState('');
 
 
     useEffect(() => {
@@ -70,6 +72,7 @@ const App = () => {
             setUserId(user.id);
         }
         fetchData();
+        getEvents();
     }, []);
 
     const goTeam = e => {
@@ -82,6 +85,7 @@ const App = () => {
         console.log('!!!!!!!into goTeam', userId);
         setUserId(userId);
         console.log(`dataset.href: ${e.currentTarget.dataset.href}`);
+        console.log(`dataset: ${e.currentTarget}`);
     };
 
     const goUsers = e => {
@@ -125,7 +129,7 @@ const App = () => {
     const getEvents = () => {
         fetch(`${Api.Events.GetAll}`)
             .then((resp) => resp.json())
-            .then(json => setEvents(json.collection))
+            .then(json => setEvents(json))
             .catch((error) => console.log(`Error for get events page. Details: ${error}`));
     }
 
@@ -158,7 +162,6 @@ const App = () => {
                 ><Icon28Profile /></TabbarItem>
             </Tabbar>
         }>
-            {getEvents()}
             <View id='teams'
                 activePanel={activeTeamPanel}
                 modal={
@@ -169,32 +172,27 @@ const App = () => {
                             header={
                                 <ModalPageHeader
                                     left={IS_PLATFORM_ANDROID && <PanelHeaderButton onClick={hideModal}><Icon24Cancel /></PanelHeaderButton>}
-                                    right={<PanelHeaderButton onClick={hideModal}>{IS_PLATFORM_IOS ? 'Готово' : <Icon24Done />}</PanelHeaderButton>}
+                                    right={<PanelHeaderButton
+                                        onClick={() => { hideModal(); setActiveTeamPanel('teams') }}>{IS_PLATFORM_IOS ? 'Готово' : <Icon24Done />}</PanelHeaderButton>}
                                 >
                                     Фильтры
                                 </ModalPageHeader>
-                            }
-                        >
-                            <FormLayout>
-                                {console.log('events', events)}
-                                <Select top="Соревнования" placeholder="Не выбрано">
-                                    {events && events.map((ev, i) => {
-                                        return (
-                                            <option value={ev.id}>
-                                                {ev.name}
-                                            </ option>
-                                        )
-                                    })}
-                                    
-                                </ Select>
-                                <Select top="Навыки" placeholder="Не выбраны" >
-
-                                </ Select>
-                            </FormLayout>
+                            }>
+                            {events &&
+                                <FormLayout>
+                                    {console.log('events', events)}
+                                <SelectMimicry top="Соревнования" placeholder="Не выбрано"
+                                    onClick={() => {
+                                        setActiveTeamPanel('eventsFilter');
+                                        hideModal();
+                                    }}>
+                                    {eventFilter.name}
+                                    </ SelectMimicry>
+                                </FormLayout>}
                         </ModalPage>
                     </ModalRoot>
                 }>
-                <Teams id='teams' go={goTeam} href={teamHref} onFiltersClick={() => setactiveModal('filters')} />
+                <Teams id='teams' go={goTeam} href={teamHref} onFiltersClick={() => setactiveModal('filters')} filtredByEvent={eventFilter} />
                 <TeamInfo id='teaminfo' go={goTeam} teamId={activeTeam} return='teams' vkProfile={vkProfile} />
                 <TeamCreate id='teamCreate' go={goTeam} back={back} />
                 <TeamEdit id='teamEdit' go={goTeam} teamId={activeTeam} back={back} />
@@ -202,6 +200,13 @@ const App = () => {
                     activeStory={activeStory} goSetUserTeam={goTeam} return='teaminfo' />
                 <SetUserTeam id='setUserTeam' goSetUserTeam={goTeam} user={user} userId={userId} vkProfile={vkProfile} />
                 <EventCreate id='eventCreate' go={goTeam} back={back} owner={vkProfile} />
+                <EventsFilter id='eventsFilter' go={goTeam} back={back}
+                    setActiveTeamPanel={setActiveTeamPanel}
+                    activeModal={() => setactiveModal('filters')}
+                    setEventFilter={(e) => {
+                        setEventFilter(e);
+                        console.log('event filtered ', e)
+                    }} />
             </View>
             <View id='users' activePanel={activeUsersPanel}>
                 <Users id='users' go={goUsers} />
