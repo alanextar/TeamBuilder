@@ -1,6 +1,5 @@
-import * as _repository from '../../services/_repository';
 import {
-    SET_USER, SET_PROFILE
+    SET_USER, SET_PROFILE, GET_USER
 } from './actionTypes';
 
 const initialState = {
@@ -8,18 +7,19 @@ const initialState = {
 };
 
 export const userReducer = (state = initialState, action) => {
+    console.log('action.type', action.type);
     switch (action.type) {
         case GET_USER: {
-            let User = _repository.getUser(action.payload.id);
+            //заглушка
 
             return {
                 ...state,
-                user: User
-            };
+            }
         }
         case SET_USER: {
             let User = action.payload.user;
 
+            console.log('SET USER', User);
             return {
                 ...state,
                 user: User

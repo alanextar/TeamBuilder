@@ -1,7 +1,6 @@
-import {SET_USER, SET_PROFILE} from './actionTypes';
+import {SET_USER, SET_PROFILE, GET_USER} from './actionTypes';
 
 export const setUser = (user) => {
-    console.log('!!!!!!!!!!!!!!!setUser user', user);
 
     return {
         type: SET_USER,
@@ -21,11 +20,11 @@ export const setProfile = (profile) => {
     }
 };
 
-export const GET_USER = (id) => {
+export const getUser = () => {
+
     return {
         type: GET_USER,
             payload: {
-            user: user
         }
     }
 };

@@ -5,7 +5,7 @@ import '@vkontakte/vkui/dist/vkui.css';
 import bridge from '@vkontakte/vk-bridge';
 import { bindActionCreators } from 'redux'
 import { goBack, closeModal, setStory } from "./store/router/actions";
-import { setUser, setProfile } from "./store/user/actions";
+import { setUser, setProfile, getUser } from "./store/user/actions";
 import { getActivePanel } from "./services/_functions";
  import * as VK from './services/VK';
 
@@ -36,7 +36,8 @@ const App = (props) => {
     const [teamHref, setTeamNextHref] = useState(null);
 
     const { goBack, setStory, closeModal, popouts, activeView,
-        activeStory, activeModals, panelsHistory, colorScheme, setUser, setProfile, profile
+        activeStory, activeModals, panelsHistory, colorScheme,
+        setUser, setProfile, profile, getUser
     } = props;
     let history = (panelsHistory[activeView] === undefined) ? [activeView] : panelsHistory[activeView];
     let popout = (popouts[activeView] === undefined) ? null : popouts[activeView];
@@ -54,7 +55,10 @@ const App = (props) => {
         async function fetchData() {
             const profile = await bridge.send('VKWebAppGetUserInfo');
             setProfile(profile);
-            getUser(profile.id);
+
+            let response = await fetch(`/api/user/get/?id=${profile.id}`);
+            let user = await response.json();
+            setUser(user);
         }
         fetchData();
 
@@ -152,7 +156,8 @@ const mapStateToProps = (state) => {
         activeModals: state.router.activeModals,
         popouts: state.router.popouts,
         scrollPosition: state.router.scrollPosition,
-        profile: state.user.profile
+        profile: state.user.profile,
+        user: state.user.user
         // colorScheme: state.vkui.colorScheme
     };
 };
@@ -161,7 +166,7 @@ const mapStateToProps = (state) => {
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
-        ...bindActionCreators({ setStory, goBack, closeModal, setProfile }, dispatch)
+        ...bindActionCreators({ setStory, goBack, closeModal, setProfile, setUser }, dispatch)
     }
 }
 

@@ -60,10 +60,6 @@ class User extends React.Component {
                 console.log('before user fetch', id);
                 console.log('profileId = ', vkProfileId);
 
-                fetch(`/api/user/get/?id=${id}`)
-                    .then(response => response.json())
-                    .then(data => this.setState({ user: data }));
-
                 fetch(`/api/user/getRecruitTeams?vkProfileId=${vkProfileId}&&id=${id}`)
                     .then(response => response.json())
                     .then(data => this.setState({ recruitTeams: data }));
@@ -129,7 +125,6 @@ class User extends React.Component {
         //console.log('render user readOnlyMode', this.props.activeStory != 'user');
 
         const { setPage, setUser } = this.props;
-        console.log('lalalalalalalalalalalalalalalalalalalalalalalalala');
 
         return (
             <Panel id="user">
@@ -209,6 +204,8 @@ class User extends React.Component {
 }
 
 const mapStateToProps = (state) => {
+    console.log('^^^^^^^^^^^^^^^^^^^^^', state.user.user);
+
     return {
         user: state.user.user,
         profile: state.user.profile
@@ -217,7 +214,6 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = {
     setPage,
-    setUser,
     goBack
 };
 
