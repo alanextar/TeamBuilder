@@ -1,5 +1,5 @@
 import {
-    SET_USER, SET_PROFILE, GET_USER
+    SET_USER, SET_PROFILE, GET_USER, SET_PROFILE_USER
 } from './actionTypes';
 
 const initialState = {
@@ -30,6 +30,12 @@ export const userReducer = (state = initialState, action) => {
             return {
                 ...state,
                 profile: action.payload.profile
+            };
+        }
+        case SET_PROFILE_USER: {
+            return {
+                ...state,
+                profileUser: action.payload.profileUser
             };
         }
 

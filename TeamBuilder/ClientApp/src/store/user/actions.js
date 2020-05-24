@@ -1,4 +1,4 @@
-import {SET_USER, SET_PROFILE, GET_USER} from './actionTypes';
+import {SET_USER, SET_PROFILE, GET_USER, SET_PROFILE_USER} from './actionTypes';
 
 export const setUser = (user) => {
 
@@ -16,6 +16,16 @@ export const setProfile = (profile) => {
         type: SET_PROFILE,
             payload: {
             profile: profile
+        }
+    }
+};
+
+export const setProfileUser = (profileUser) => {
+
+    return {
+        type: SET_PROFILE_USER,
+            payload: {
+                profileUser: profileUser
         }
     }
 };

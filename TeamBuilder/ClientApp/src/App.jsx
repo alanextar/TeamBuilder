@@ -5,7 +5,7 @@ import '@vkontakte/vkui/dist/vkui.css';
 import bridge from '@vkontakte/vk-bridge';
 import { bindActionCreators } from 'redux'
 import { goBack, closeModal, setStory } from "./store/router/actions";
-import { setUser, setProfile, getUser } from "./store/user/actions";
+import { setUser, setProfile, getUser, setProfileUser } from "./store/user/actions";
 import { getActivePanel } from "./services/_functions";
  import * as VK from './services/VK';
 
@@ -29,19 +29,14 @@ import User from './panels/user'
 import UserEdit from './panels/userEdit'
 import SetUserTeam from './panels/setUserTeam'
 
-import * as actions from './actions/actions'
-
 const App = (props) => {
     let lastAndroidBackAction = 0;
     const [teamHref, setTeamNextHref] = useState(null);
 
-    const { goBack, setStory, closeModal, popouts, activeView,
-        activeStory, activeModals, panelsHistory, colorScheme,
-        setUser, setProfile, profile, getUser
+    const { goBack, setStory, activeView, activeStory, panelsHistory,
+        setProfile, setUser, setProfileUser, profileUser, profile, user
     } = props;
     let history = (panelsHistory[activeView] === undefined) ? [activeView] : panelsHistory[activeView];
-    let popout = (popouts[activeView] === undefined) ? null : popouts[activeView];
-    let activeModal = (activeModals[activeView] === undefined) ? null : activeModals[activeView];
 
 	useEffect(() => {
 		bridge.subscribe(({ detail: { type, data } }) => {
@@ -59,6 +54,7 @@ const App = (props) => {
             let response = await fetch(`/api/user/get/?id=${profile.id}`);
             let user = await response.json();
             setUser(user);
+            setProfileUser(user);
         }
         fetchData();
 
@@ -107,6 +103,7 @@ const App = (props) => {
                     onClick={() =>
                     {
                         setStory('user', 'user');
+                        setUser(profileUser);
                     }}
                     selected={activeStory === 'user'}
                     text="Профиль"
@@ -153,11 +150,10 @@ const mapStateToProps = (state) => {
         activeView: state.router.activeView,
         activeStory: state.router.activeStory,
         panelsHistory: state.router.panelsHistory,
-        activeModals: state.router.activeModals,
-        popouts: state.router.popouts,
         scrollPosition: state.router.scrollPosition,
         profile: state.user.profile,
-        user: state.user.user
+        user: state.user.user,
+        profileUser: state.user.profileUser
         // colorScheme: state.vkui.colorScheme
     };
 };
@@ -166,7 +162,7 @@ const mapStateToProps = (state) => {
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
-        ...bindActionCreators({ setStory, goBack, closeModal, setProfile, setUser }, dispatch)
+        ...bindActionCreators({ setStory, goBack, closeModal, setProfile, setUser, setProfileUser }, dispatch)
     }
 }
 
