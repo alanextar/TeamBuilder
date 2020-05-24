@@ -1,5 +1,5 @@
 import {
-    SET_USER
+    SET_USER, SET_PROFILE
 } from './actionTypes';
 
 const initialState = {
@@ -7,16 +7,21 @@ const initialState = {
 };
 
 export const userReducer = (state = initialState, action) => {
-    console.log('@@@@@@@@@@@@@@@@@@!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!', action)
     switch (action.type) {
 
         case SET_USER: {
-            console.log('action.payload.user--------------', action.payload.user)
             let User = action.payload.user;
 
             return {
                 ...state,
                 user: User
+            };
+        }
+        case SET_PROFILE: {
+            console.log('!!!SET_PROFILE', action.payload.profile)
+            return {
+                ...state,
+                profile: action.payload.profile
             };
         }
 

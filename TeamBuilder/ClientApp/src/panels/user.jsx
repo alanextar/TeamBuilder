@@ -28,9 +28,8 @@ class User extends React.Component {
         this.state = {
             skills: null,
             userSkills: null,
-            userId: props.userId, 
             vkUser: null,
-            vkProfile: props.vkProfile,
+            vkProfile: props.profile,
             user: props.user,
             activeTabProfile: 'main',
             selected: false,
@@ -48,7 +47,7 @@ class User extends React.Component {
 
     componentDidMount() {
         this.fetchVkUser();
-        this.isUserConfirmed(this.state.userId);
+        this.isUserConfirmed(this.state.user.id);
     }
 
     isUserConfirmed(id) {
@@ -78,7 +77,7 @@ class User extends React.Component {
             { "app_id": 7448436, "scope": "" });
 
         let params = {
-            user_id: this.state.userId,
+            user_id: this.state.user.id,
             fields: 'city,photo_200,contacts',
             v: '5.103',
             access_token: t.access_token
@@ -178,7 +177,7 @@ class User extends React.Component {
                             </List>
                             <UserSkills userSkills={this.state.userSkills} readOnlyMode={this.state.readOnlyMode}
                                 handleClick={this.handleClick.bind(this, this.state.selectedSkills)}
-                                id={this.state.userId} />
+                                id={this.state.user.id} />
                         </Group> :
                         <Group>
                             <UserTeams userTeams={this.state.user && this.state.user.userTeams}
@@ -198,7 +197,7 @@ class User extends React.Component {
                         onClick={this.state.goSetUserTeam}
                         data-to='setUserTeam'
                         data-user={JSON.stringify(this.state.user)}
-                        data-id={this.state.userId}
+                        data-id={this.state.user.id}
                         recruitTeams={this.state.recruitTeams}
                         >
                         Завербовать
@@ -211,7 +210,8 @@ class User extends React.Component {
 
 const mapStateToProps = (state) => {
     return {
-        user: state.user.user
+        user: state.user.user,
+        profile: state.user.profile
     };
 };
 

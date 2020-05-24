@@ -5,7 +5,7 @@ import '@vkontakte/vkui/dist/vkui.css';
 import bridge from '@vkontakte/vk-bridge';
 import { bindActionCreators } from 'redux'
 import { goBack, closeModal, setStory } from "./store/router/actions";
-import { setUser } from "./store/user/actions";
+import { setUser, setProfile } from "./store/user/actions";
 import { getActivePanel } from "./services/_functions";
  import * as VK from './services/VK';
 
@@ -33,12 +33,10 @@ import * as actions from './actions/actions'
 
 const App = (props) => {
     let lastAndroidBackAction = 0;
-
     const [teamHref, setTeamNextHref] = useState(null);
-    const [vkProfile, setProfile] = useState(null);
 
     const { goBack, setStory, closeModal, popouts, activeView,
-        activeStory, activeModals, panelsHistory, colorScheme, setUser
+        activeStory, activeModals, panelsHistory, colorScheme, setUser, setProfile, profile
     } = props;
     let history = (panelsHistory[activeView] === undefined) ? [activeView] : panelsHistory[activeView];
     let popout = (popouts[activeView] === undefined) ? null : popouts[activeView];
@@ -54,7 +52,9 @@ const App = (props) => {
 		});
 
         async function fetchData() {
-            const user = await bridge.send('VKWebAppGetUserInfo');
+            const profile = await bridge.send('VKWebAppGetUserInfo');
+            setProfile(profile);
+            getUser(profile.id);
         }
         fetchData();
 
@@ -112,12 +112,12 @@ const App = (props) => {
             <View id='teams' activePanel={getActivePanel("teams")}
                 history={history} >
                 <Teams id='teams' activeStory={activeStory} href={teamHref} />
-                <TeamInfo id='teaminfo' return='teams' vkProfile={vkProfile} />
+                <TeamInfo id='teaminfo' return='teams' profile={props.profile} />
                 <TeamCreate id='teamCreate'/>
                 <TeamEdit id='teamEdit' />
                 <User id='user' activeStory={activeStory} />
-                <SetUserTeam id='setUserTeam' vkProfile={vkProfile} />
-                <EventCreate id='eventCreate' owner={vkProfile} />
+                <SetUserTeam id='setUserTeam' profile={props.profile} />
+                <EventCreate id='eventCreate' owner={props.profile} />
             </View>
             <View id='users' activePanel={getActivePanel("users")}
                 history={history}
@@ -127,9 +127,9 @@ const App = (props) => {
             <View id='events' activePanel={getActivePanel("events")}
                 history={history}>
                 <Events id='events' />
-                <EventCreate id='eventCreate' owner={vkProfile} />
+                <EventCreate id='eventCreate' owner={props.profile} />
                 <EventInfo id='eventInfo' />
-                <EventEdit id='eventEdit' owner={vkProfile} />
+                <EventEdit id='eventEdit' owner={props.profile} />
             </View>
             <View id='user' activePanel={getActivePanel("user")}
                 history={history}
@@ -152,7 +152,7 @@ const mapStateToProps = (state) => {
         activeModals: state.router.activeModals,
         popouts: state.router.popouts,
         scrollPosition: state.router.scrollPosition,
-
+        profile: state.user.profile
         // colorScheme: state.vkui.colorScheme
     };
 };
@@ -161,7 +161,7 @@ const mapStateToProps = (state) => {
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
-        ...bindActionCreators({ setStory, goBack, closeModal }, dispatch)
+        ...bindActionCreators({ setStory, goBack, closeModal, setProfile }, dispatch)
     }
 }
 
