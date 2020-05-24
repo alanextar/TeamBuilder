@@ -140,24 +140,18 @@ const App = (props) => {
         <Epic activeStory={activeStory} tabbar={
             <Tabbar>
                 <TabbarItem
-                    // onClick={goFoot}
                     onClick={() => setStory('teams', 'teams')}
                     selected={activeStory === 'teams'}
-                    data-story="teams"
                     text="Команды"
                 ><Icon28Users3Outline /></TabbarItem>
                 <TabbarItem
-                    // onClick={goFoot}
                     onClick={() => setStory('users', 'users')}
                     selected={activeStory === 'users'}
-                    data-story="users"
                     text="Участники"
                 ><Icon28Users /></TabbarItem>
                 <TabbarItem
-                    // onClick={goFoot}
                     onClick={() => setStory('events', 'events')}
                     selected={activeStory === 'events'}
-                    data-story="events"
                     text="События"
                 ><Icon28FavoriteOutline /></TabbarItem>
                 <TabbarItem

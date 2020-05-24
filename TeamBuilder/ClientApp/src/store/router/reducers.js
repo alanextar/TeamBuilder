@@ -54,6 +54,7 @@ export const routerReducer = (state = initialState, action) => {
                 VK.swipeBackOn();
             }
 
+            console.log('SET PAGE REDUCER (VIEW, PANEL)', View, Panel)
             return {
                 ...state,
                 activeView: View,

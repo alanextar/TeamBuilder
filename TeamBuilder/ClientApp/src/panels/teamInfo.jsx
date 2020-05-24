@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
 import { goBack, setPage } from "../store/router/actions";
 import { setTeam } from "../store/teams/actions";
+import { setUser } from "../store/user/actions";
 import * as VK from '../services/VK';
 
 import {
@@ -54,7 +55,7 @@ class TeamInfo extends React.Component {
     }
 
     render() {
-        const { id, goBack } = this.props;
+        const { id, goBack, setTeam, setUser, setPage } = this.props;
 
         var self = this;
         return (
@@ -100,16 +101,15 @@ class TeamInfo extends React.Component {
                                 <Div>
                                     <InfoRow header='Участники'>
                                         Требуется {this.state.team.numberRequiredMembers} участников
-                                        {console.log('userTeams ', this.state.team.userTeams)}
                                         {this.state.team.userTeams &&
                                             this.state.team.userTeams.map((userTeam, i) => {
                                                 //{ members.isOwner && (members.id === self.props.vkProfile.id) && self.setState({ edit: true }) }
                                                 return (
                                                     <SimpleCell
-                                                        onClick={this.state.go}
-                                                        data-to='user'
-                                                        data-id={userTeam.userId}
-                                                        data-user={JSON.stringify(userTeam.user)}
+                                                        onClick={() => {
+                                                            setPage('teams', 'user');
+                                                            setUser(userTeam.user)
+                                                        }}
                                                         before={<Avatar size={48} src={userTeam.user.photo100}/>}
                                                         after={<Icon28MessageOutline />}>
                                                         {userTeam.user.firstName, userTeam.user.fullName}
@@ -142,17 +142,15 @@ class TeamInfo extends React.Component {
 
 const mapStateToProps = (state) => {
     return {
-        activeTeam: state.team.activeTeam,
+        activeTeam: state.team.activeTeam
     };
 };
 
 
 function mapDispatchToProps(dispatch) {
     return {
-        setPage,
-        setTeam,
         dispatch,
-        ...bindActionCreators({ goBack }, dispatch)
+        ...bindActionCreators({ setPage, setTeam,setUser, goBack }, dispatch)
     }
 }
 

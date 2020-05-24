@@ -17,12 +17,13 @@ import UserTeams from './userTeams'
 import UserSkills from './userSkills'
 import bridge from '@vkontakte/vk-bridge';
 import { goBack, setPage } from '../store/router/actions';
+import { setUser } from '../store/user/actions';
 
 class User extends React.Component {
     constructor(props) {
         super(props);
 
-        console.log('active story', props.activeStory);
+        console.log('user constructor', props.user);
 
         this.state = {
             skills: null,
@@ -30,7 +31,7 @@ class User extends React.Component {
             userId: props.userId, 
             vkUser: null,
             vkProfile: props.vkProfile,
-            user: null,
+            user: props.user,
             activeTabProfile: 'main',
             selected: false,
             selectedSkills: null,
@@ -128,7 +129,8 @@ class User extends React.Component {
     render() {
         //console.log('render user readOnlyMode', this.props.activeStory != 'user');
 
-        const { setPage } = this.props;
+        const { setPage, setUser } = this.props;
+        console.log('lalalalalalalalalalalalalalalalalalalalalalalalala');
 
         return (
             <Panel id="user">
@@ -207,9 +209,16 @@ class User extends React.Component {
     }
 }
 
+const mapStateToProps = (state) => {
+    return {
+        user: state.user.user
+    };
+};
+
 const mapDispatchToProps = {
     setPage,
+    setUser,
     goBack
 };
 
-export default connect(null, mapDispatchToProps)(User);
+export default connect(mapStateToProps, mapDispatchToProps)(User);
