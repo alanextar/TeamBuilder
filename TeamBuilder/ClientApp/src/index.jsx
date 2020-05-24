@@ -28,7 +28,7 @@ export const store = createStore(rootReducer, composeWithDevTools(
     applyMiddleware(thunk),
 ));
 
-store.dispatch(setStory('user', 'base'));
+store.dispatch(setStory('events', 'events'));
 
 ReactDOM.render(<Provider store={store}><App /></Provider>, document.getElementById('root'));
 if (process.env.NODE_ENV === "development") {

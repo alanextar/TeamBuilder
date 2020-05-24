@@ -69,6 +69,7 @@ const App = (props) => {
         }
         fetchData();
 
+        const { activeView, activeStory, activePanel } = props;
         const { goBack, dispatch } = props;
         //dispatch(VK.initApp());
         window.onpopstate = () => {
