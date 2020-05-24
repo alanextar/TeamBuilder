@@ -4,7 +4,7 @@ import { Api } from '../infrastructure/api';
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell,
     Div, Button, Textarea, FormLayout, Select, Input, Slider, InfoRow, Avatar,
-    FixedLayout, RichCell
+    RichCell
 } from '@vkontakte/vkui';
 
 import Icon24DismissDark from '@vkontakte/icons/dist/24/dismiss_dark';
@@ -98,13 +98,9 @@ class TeamEdit extends React.Component {
         this.setState({ userTeams: data });
     };
 
-    async dropUser(e, userTeam) {
-        e.stopPropagation();
-        console.log('into handleQuiteOrDecline');
-        const response = await fetch(`/api/user/quitOrDeclineTeam/?id=${userTeam.userId}&teamId=${userTeam.teamId}`);
-        const data = await response.json();
-        console.log(data);
-        this.setState({ userTeams: data });
+    dropUser(e, userTeam) {
+        Api.Teams.rejectedOrRemoveUser({ id: userTeam.teamId, userId: userTeam.userId })
+            .then(json => this.setState({ userTeams: json }))
     };
 
     render() {

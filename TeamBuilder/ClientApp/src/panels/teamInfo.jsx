@@ -92,8 +92,8 @@ class TeamInfo extends React.Component {
                                         {console.log('userTeams ', this.state.team.userTeams)}
                                             {this.state.team.userTeams &&
                                                 this.state.team.userTeams.map((userTeam, i) => {
-                                                    //{ members.isOwner && (members.id === self.props.vkProfile.id) && self.setState({ edit: true }) }
                                                     return (
+                                                        userTeam.userAction === 2 &&
                                                         <SimpleCell key={i}
                                                             onClick={this.state.go}
                                                             data-to='user'
@@ -103,6 +103,7 @@ class TeamInfo extends React.Component {
                                                             after={<Icon28MessageOutline />}>
                                                             {userTeam.user.firstName, userTeam.user.fullName}
                                                         </SimpleCell>
+
                                                     )
                                                 }
                                                 )}
