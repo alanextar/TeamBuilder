@@ -7,7 +7,7 @@ const initialState = {
 };
 
 export const userReducer = (state = initialState, action) => {
-    console.log('!!!!!!!!!!!!!!!!!!!!!!!!action.type', action.type);
+
     switch (action.type) {
         case SET_USER: {
 
@@ -44,6 +44,15 @@ export const userReducer = (state = initialState, action) => {
             return {
                 ...state,
                 participantUser: action.payload.participantUser
+            };
+        }
+        case SET_USER_SKILLS: {
+            var User = action.payload.user;
+            User.userSkills = action.payload.newSkills;
+
+            return {
+                ...state,
+                user: User
             };
         }
 
