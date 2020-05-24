@@ -7,6 +7,7 @@ import {
 import '@vkontakte/vkui/dist/vkui.css';
 import '../../src/styles/style.css';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
+import { Api, Urls } from '../infrastructure/api';
 
 class UserActions extends React.Component {
     constructor(props) {
@@ -22,19 +23,21 @@ class UserActions extends React.Component {
         e.stopPropagation();
         console.log('into handleJoin');
         console.log(userTeam);
-        const response = await fetch(`/api/user/joinTeam/?id=${userTeam.userId}&&teamId=${userTeam.teamId}`);
-        const data = await response.json();
-        console.log(data);
-        this.setState({ userTeams: data });
+        Api.get(Urls.Users.JoinTeam, { id: userTeam.userId, teamId: userTeam.teamId })
+            .then(result => {
+                console.log(result);
+                this.setState({ userTeams: result })
+            });
     }
 
     async handleQuitOrDecline(e, userTeam) {
         e.stopPropagation();
         console.log('into handleQuiteOrDecline');
-        const response = await fetch(`/api/user/quitOrDeclineTeam/?id=${userTeam.userId}&&teamId=${userTeam.teamId}`);
-        const data = await response.json();
-        console.log(data);
-        this.setState({ userTeams: data });
+        Api.get(Urls.Users.QuitOrDeclineTeam, { id: userTeam.userId, teamId: userTeam.teamId })
+        .then(result => {
+            console.log(result);
+            this.setState({ userTeams: result })
+        });
     }
 
     render() {

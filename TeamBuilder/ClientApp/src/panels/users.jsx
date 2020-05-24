@@ -7,7 +7,7 @@ import {
 import InfiniteScroll from 'react-infinite-scroller';
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import Icon24Work from '@vkontakte/icons/dist/24/work';
-import { Api } from '../infrastructure/api';
+import { Api, Urls } from '../infrastructure/api';
 
 const Users = props => {
     const [isSearching, setIsSearching] = useState(false);
@@ -24,8 +24,10 @@ const Users = props => {
     useEffect(
         () => {
             if (debouncedSearchTerm) {
+                
+            console.log("search if")
                 setIsSearching(true);
-                searchItems(debouncedSearchTerm)
+                Api.Users.pagingSearch(debouncedSearchTerm)
                     .then(result => {
                         setItems(result.collection);
                         setNextHref(result.nextHref);
@@ -34,12 +36,15 @@ const Users = props => {
                     });
             }
             else {
+            console.log("search else")
+
                 setIsSearching(true);
-                getItems().then(result => {
-                    setItems(result.collection);
-                    setNextHref(result.nextHref);
-                    setIsSearching(false);
-                })
+                Api.Users.getPage()
+                    .then(result => {
+                        setItems(result.collection);
+                        setNextHref(result.nextHref);
+                        setIsSearching(false);
+                    })
             }
         },
         [debouncedSearchTerm]
@@ -50,7 +55,7 @@ const Users = props => {
     const onRefresh = () => {
         setFetching(true);
         if (searchTerm) {
-            searchItems(debouncedSearchTerm)
+            Api.Users.pagingSearch(debouncedSearchTerm)
                 .then(result => {
                     setItems(result.collection);
                     setNextHref(result.nextHref);
@@ -58,11 +63,13 @@ const Users = props => {
                 });
         }
         else {
-            getItems().then(result => {
-                setItems(result.collection);
-                setNextHref(result.nextHref);
-                setFetching(false);
-            })
+            console.log("refresh")
+            Api.Users.getPage()
+                .then(result => {
+                    setItems(result.collection);
+                    setNextHref(result.nextHref);
+                    setFetching(false);
+                })
         }
     };
 
@@ -71,12 +78,12 @@ const Users = props => {
     //#region Scroll
 
     const loadItems = page => {
-        var url = `${Api.Users.GetPage}`;
+        var url = `${Urls.Users.GetPage}`;
         if (nextHref) {
             url = nextHref;
         }
-        fetch(url)
-            .then(resp => resp.json())
+        console.log(`load.url: ${url}`);
+        Api.get(url)
             .then(e => {
                 var itemsTemp = items;
                 e.collection.map((item) => {
@@ -125,10 +132,10 @@ const Users = props => {
                                 <Card size="l" mode="shadow" key={user.id}>
                                     <RichCell
                                         before={<Avatar size={48} src={user.photo100} />}
-                                        after={stringfyTeams(user.userTeams)} //count
-                                        caption={user.city ? user.city : 'Ekaterinburg'} // city 
-                                        bottom={stringfySkills(user.skills)} // skills
-                                        text={user.about ? user.about : 'Хороший человек'} //descr 
+                                        after={stringfyTeams(user.userTeams)}
+                                        caption={user.city ? user.city : 'Ekaterinburg'}
+                                        bottom={stringfySkills(user.skills)}
+                                        text={user.about ? user.about : 'Хороший человек'}
                                         onClick={props.go}
                                         data-to='user'
                                         data-from={props.id}>
@@ -142,27 +149,5 @@ const Users = props => {
         </Panel>
     );
 };
-
-function searchItems(value) {
-    console.log(`users.search ${value}`);
-    return fetch(`${Api.Users.PagingSearch}?search=${value}`)
-        .then(resp => resp.json())
-        .then(json => json)
-        .catch(error => {
-            console.error(`Error for get filtered users page. Details: ${error}`);
-            return {};
-        });
-}
-
-
-function getItems() {
-    return fetch(`${Api.Users.GetPage}`)
-        .then(resp => resp.json())
-        .then(json => json)
-        .catch(error => {
-            console.log(`Error for get users page. Details: ${error}`);
-            return {};
-        });
-}
 
 export default Users;

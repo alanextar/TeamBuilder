@@ -4,7 +4,7 @@ import {
     Panel, PanelHeader, Group, Cell, Avatar, Search, Button, Div, Input, PanelHeaderBack,
     Tabs, TabsItem, Separator, Checkbox, List, Header, FormLayout, Select, RichCell
 } from '@vkontakte/vkui';
-import {  } from '@vkontakte/vkui';
+import { } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import '../../src/styles/style.css';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
@@ -15,6 +15,7 @@ import Icon24Write from '@vkontakte/icons/dist/24/write';
 import UserTeams from './userTeams'
 import UserSkills from './userSkills'
 import bridge from '@vkontakte/vk-bridge';
+import { Api, Urls } from '../infrastructure/api';
 
 class User extends React.Component {
     constructor(props) {
@@ -25,7 +26,7 @@ class User extends React.Component {
         this.state = {
             skills: null,
             userSkills: null,
-            userId: props.userId, 
+            userId: props.userId,
             vkUser: null,
             vkProfile: props.vkProfile,
             user: null,
@@ -50,24 +51,20 @@ class User extends React.Component {
 
     isUserConfirmed(id) {
         console.log('into isUserConfirmed');
-        fetch(`/api/user/checkconfirmation?id=${id}`)
-            .then((response) => {
+        Api.get(Urls.Users.CheckConfirmation, { id: id })
+            .then(response => {
                 this.setState({ isConfirmed: response })
 
                 var vkProfileId = this.state.vkProfile.id;
                 console.log('before user fetch', id);
                 console.log('profileId = ', vkProfileId);
 
-                fetch(`/api/user/get/?id=${id}`)
-                    .then(response => response.json())
+                Api.get(Urls.Users.Get, { id: id })
                     .then(data => this.setState({ user: data }));
 
-                fetch(`/api/user/getRecruitTeams?vkProfileId=${vkProfileId}&&id=${id}`)
-                    .then(response => response.json())
+                Api.get(Urls.Users.GetRecruitTeams, { id: id, vkProfileId: vkProfileId })
                     .then(data => this.setState({ recruitTeams: data }));
-            } 
-        );
-
+            });
     }
 
     async fetchVkUser() {
@@ -93,19 +90,14 @@ class User extends React.Component {
         if (this.state.userSkills == null) {
             skillsIds = this.state.user.userSkills.map((s, i) => s.skillId);
         }
-		else {
+        else {
             skillsIds = this.state.userSkills.map((s, i) => s.id);
         }
 
         var isSearchable = this.state.user.isSearchable;
         var profileViewModel = { id, skillsIds, isSearchable };
 
-        let response = await fetch('/api/user/confirm', {
-            method: 'post',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(profileViewModel),
-        });
-
+        await Api.post(Urls.Users.Confirm, profileViewModel);
         this.setState({ isConfirmed: true });
     }
 
@@ -129,10 +121,10 @@ class User extends React.Component {
             <Panel id="user">
                 <PanelHeader separator={false} left={this.state.readOnlyMode &&
                     <PanelHeaderBack onClick={this.state.goUserEdit}
-                    data-to={this.props.return} />}>Профиль</PanelHeader>
+                        data-to={this.props.return} />}>Профиль</PanelHeader>
                 {this.state.vkUser &&
                     <Group title="VK Connect">
-                     <Cell description={ this.state.vkUser.city && this.state.vkUser.city.title ? this.state.vkUser.city.title : ''}
+                        <Cell description={this.state.vkUser.city && this.state.vkUser.city.title ? this.state.vkUser.city.title : ''}
                             before={this.state.vkUser.photo_200 ? <Avatar src={this.state.vkUser.photo_200} /> : null}>
                             {`${this.state.vkUser.first_name} ${this.state.vkUser.last_name}`}
                         </Cell>
@@ -150,7 +142,7 @@ class User extends React.Component {
                         Команды
                     </TabsItem>
                 </Tabs>
-                    {
+                {
                     this.state.activeTabProfile === 'main' ?
                         <Group header={<Header mode="secondary">Информация о профиле участника</Header>}>
                             <List>
@@ -193,7 +185,7 @@ class User extends React.Component {
                         data-user={JSON.stringify(this.state.user)}
                         data-id={this.state.userId}
                         recruitTeams={this.state.recruitTeams}
-                        >
+                    >
                         Завербовать
                     </Button>}
                 </Div>

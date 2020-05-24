@@ -7,6 +7,7 @@ using TeamBuilder.Models;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using TeamBuilder.Extensions;
+using TeamBuilder.Models.Enums;
 using TeamBuilder.ViewModels;
 
 namespace TeamBuilder.Controllers
@@ -196,7 +197,7 @@ namespace TeamBuilder.Controllers
 
 			if (!dbTeam.UserTeams.Any(x => x.UserId == id))
 			{
-				dbTeam.UserTeams.Add(new UserTeam { UserId = id, UserAction = UserActionEnum.AcceptingOffer });
+				dbTeam.UserTeams.Add(new UserTeam { UserId = id, UserAction = UserActionEnum.ConsideringOffer });
 
 				context.Update(dbTeam);
 				context.SaveChanges();
