@@ -27,7 +27,6 @@ class User extends React.Component {
 
         this.state = {
             skills: null,
-            userSkills: null,
             vkUser: null,
             vkProfile: props.profile,
             user: props.user,
@@ -35,8 +34,6 @@ class User extends React.Component {
             selected: false,
             selectedSkills: null,
             isConfirmed: false,
-            goUserEdit: props.goUserEdit,
-            goSetUserTeam: props.goSetUserTeam,
             readOnlyMode: props.activeStory != 'user',
             recruitTeams: []
         }
@@ -52,19 +49,11 @@ class User extends React.Component {
 
     isUserConfirmed(id) {
         console.log('into isUserConfirmed');
-        fetch(`/api/user/checkconfirmation?id=${id}`)
-            .then((response) => {
-                this.setState({ isConfirmed: response })
-
-                var vkProfileId = this.state.vkProfile.id;
-                console.log('before user fetch', id);
-                console.log('profileId = ', vkProfileId);
-
-                fetch(`/api/user/getRecruitTeams?vkProfileId=${vkProfileId}&&id=${id}`)
-                    .then(response => response.json())
-                    .then(data => this.setState({ recruitTeams: data }));
-            } 
-        );
+        if (this.state.user && this.state.user.is) {
+            fetch(`/api/user/getRecruitTeams?vkProfileId=${this.state.vkProfile.id}&&id=${id}`)
+                .then(response => response.json())
+                .then(data => this.setState({ recruitTeams: data }));
+		}
 
     }
 
@@ -86,14 +75,7 @@ class User extends React.Component {
 
     async confirmUser(id) {
         console.log('into confirm user', this.state.user.isSearchable);
-        let skillsIds;
-
-        if (this.state.userSkills == null) {
-            skillsIds = this.state.user.userSkills.map((s, i) => s.skillId);
-        }
-		else {
-            skillsIds = this.state.userSkills.map((s, i) => s.id);
-        }
+        let skillsIds = this.state.user.userSkills.map((s, i) => s.skillId);
 
         var isSearchable = this.state.user.isSearchable;
         var profileViewModel = { id, skillsIds, isSearchable };
@@ -115,22 +97,18 @@ class User extends React.Component {
     };
 
     handleCheckboxClick(event) {
-        console.log('checkbox clicked value', event.target.checked);
         var user = { ...this.state.user }
         user.isSearchable = event.target.checked;
         this.setState({ user });
     };
 
     render() {
-        //console.log('render user readOnlyMode', this.props.activeStory != 'user');
-
-        const { setPage, setUser } = this.props;
+        const { setPage, setUser, goBack } = this.props;
 
         return (
             <Panel id="user">
                 <PanelHeader separator={false} left={this.state.readOnlyMode &&
-                    <PanelHeaderBack onClick={this.state.goUserEdit}
-                    data-to={this.props.return} />}>Профиль</PanelHeader>
+                    <PanelHeaderBack onClick={() => goBack()} />}>Профиль</PanelHeader>
                 {this.state.vkUser &&
                     <Group title="VK Connect">
                      <Cell description={ this.state.vkUser.city && this.state.vkUser.city.title ? this.state.vkUser.city.title : ''}
@@ -157,10 +135,7 @@ class User extends React.Component {
                             <List>
                                 {!this.state.readOnlyMode && <Cell asideContent=
                                     {
-                                    <Icon24Write onClick={() => setPage('user', 'userEdit')}
-                                            data-to='userEdit'
-                                            data-id={this.state.vkProfile && this.state.vkProfile.id}
-                                            data-user={JSON.stringify(this.state.user)} />
+                                    <Icon24Write onClick={() => setPage('user', 'userEdit')} />
                                     }>
                                 </Cell>}
                                 <Cell before={<Icon28PhoneOutline />}>
@@ -183,7 +158,7 @@ class User extends React.Component {
                     <Checkbox disabled={this.state.readOnlyMode} onChange={(e) => this.handleCheckboxClick(e)}
                         checked={this.state.user && this.state.user.isSearchable ? 'checked' : ''}>в поиске команды</Checkbox>
                     {this.state.user && !this.state.readOnlyMode && <Button mode={this.state.isConfirmed ? "primary" : "destructive"} size='xl'
-                        onClick={() => this.confirmUser(this.state.vkUser && this.state.vkUser.id, this.state.userSkills)}>
+                        onClick={() => this.confirmUser(this.state.user && this.state.user.id, this.state.user.userSkills)}>
                         {this.state.isConfirmed ? "Сохранить" : "Подтвердить"}
                     </Button>}
                 </Div>
@@ -204,7 +179,6 @@ class User extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-    console.log('^^^^^^^^^^^^^^^^^^^^^', state.user.user);
 
     return {
         user: state.user.user,

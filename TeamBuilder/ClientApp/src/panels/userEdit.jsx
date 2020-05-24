@@ -4,12 +4,12 @@ import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
 
-import { goBack, openPopout, closePopout, openModal } from "../store/router/actions";
+import { goBack, setPage } from "../store/router/actions";
 import * as VK from '../services/VK';
 
 import {
-    Panel, PanelHeader, Group, Cell, Avatar, Search, Button, Div, Input, FormLayoutGroup, Textarea,
-    Tabs, TabsItem, Separator, Checkbox, List, Header, FormLayout, Select, RichCell, PanelHeaderBack
+    Panel, PanelHeader, Group, Cell, Avatar, Search, Button, Div, Input,
+    FormLayoutGroup, Textarea, Separator, FormLayout, Select, RichCell, PanelHeaderBack
 } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import '../../src/styles/style.css';
@@ -20,8 +20,7 @@ class UserEdit extends React.Component {
         super(props);
 
         this.state = {
-            goUserEdit: props.goUserEdit,
-            vkProfile: props.vkProfile,
+            vkProfile: props.profile,
             user: props.user
         }
 
@@ -31,16 +30,13 @@ class UserEdit extends React.Component {
     }
 
     handleAboutChange(event) {
-        console.log('original', this.state.user);
         var user = { ...this.state.user }
-        console.log('spread ', user);
         user.about = event.target.value;
         this.setState({ user });
     }
 
     handleCityChange(event) {
-        this.setState({ city: event.target.value });
-        var user = { ...this.state.user }
+        var user = { ...this.state.user };
         user.city = event.target.value;
         this.setState({ user })
     }
@@ -60,11 +56,8 @@ class UserEdit extends React.Component {
     }
 
     render() {
-        console.log(this.state.vkProfile);
-        console.log('setUserEdit render', this.state.user);
 
-        const { id, goBack } = this.props;
-        console.log('111111111111111111', goBack);
+        const { id, goBack, setPage } = this.props;
 
         return (
             <Panel id="userEdit">
@@ -84,23 +77,35 @@ class UserEdit extends React.Component {
                     </FormLayoutGroup>
                 </FormLayout>
                 <Div>
-                    <Button onClick={(e) => { this.postEdit(); this.state.goUserEdit(e) }}
-                        data-user={JSON.stringify(this.state.user)} data-to='user'
-                        data-id={this.state.vkProfile.id} mode="commerce">Принять</Button>
-                    <Button onClick={this.state.goUserEdit} data-to='user'
-                        data-user={JSON.stringify(this.state.user)}
-                        data-id={this.state.vkProfile.id} mode="destructive">Отменить</Button>
+                    <Button onClick={() => {
+                        this.postEdit();
+                        goBack()
+                    }}
+                        mode="commerce"
+                     >
+                        Принять
+                     </Button>
+                    <Button onClick={() => goBack()} mode="destructive">Отменить</Button>
                 </Div>
             </Panel>
         )
     }
 }
 
+const mapStateToProps = (state) => {
+
+    return {
+        user: state.user.user,
+        profile: state.user.profile
+    };
+};
+
 function mapDispatchToProps(dispatch) {
     return {
+        setPage,
         dispatch,
         ...bindActionCreators({ goBack }, dispatch)
     }
 }
 
-export default connect(null, mapDispatchToProps)(UserEdit);
+export default connect(mapStateToProps, mapDispatchToProps)(UserEdit);
