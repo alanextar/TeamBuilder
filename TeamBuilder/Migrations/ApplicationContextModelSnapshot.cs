@@ -169,9 +169,6 @@ namespace TeamBuilder.Migrations
                     b.Property<long>("TeamId")
                         .HasColumnType("bigint");
 
-                    b.Property<bool?>("IsConfirmed")
-                        .HasColumnType("boolean");
-
                     b.Property<bool>("IsOwner")
                         .HasColumnType("boolean");
 
