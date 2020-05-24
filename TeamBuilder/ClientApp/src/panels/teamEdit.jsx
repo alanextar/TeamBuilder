@@ -98,8 +98,8 @@ class TeamEdit extends React.Component {
         this.setState({ userTeams: data });
     };
 
-    dropUser(e, userTeam) {
-        Api.Teams.rejectedOrRemoveUser({ id: userTeam.teamId, userId: userTeam.userId })
+    async dropUser(e, userTeam) {
+        await Api.Teams.rejectedOrRemoveUser({ id: userTeam.teamId, userId: userTeam.userId })
             .then(json => this.setState({ userTeams: json }))
     };
 

@@ -96,7 +96,7 @@ class Teams extends React.Component {
     }
 
     async searchTeams(value) {
-        await Api.Teams.pagingSearch(value).then(result =>
+        await Api.Teams.pagingSearch({ search: value, eventId: this.props.filtredByEvent }).then(result =>
             this.setState({
                 teams: result.collection,
                 hasMoreItems: result.nextHref ? true : false,

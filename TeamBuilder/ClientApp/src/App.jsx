@@ -127,10 +127,7 @@ const App = () => {
     };
 
     const getEvents = () => {
-        fetch(`${Api.Events.GetAll}`)
-            .then((resp) => resp.json())
-            .then(json => setEvents(json))
-            .catch((error) => console.log(`Error for get events page. Details: ${error}`));
+        Api.Events.getAll().then(result => setEvents(result))
     }
 
     return (
