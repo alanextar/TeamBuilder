@@ -141,25 +141,25 @@ namespace TeamBuilder.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> RejectedOrRemoveUser(long id, long userId)
+		public async Task<IActionResult> RejectedOrRemoveUser([FromBody]RejectedOrRemoveUserViewModel model)
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");
 
-			var team = await context.Users
+			var team = await context.Teams
 				.Include(u => u.UserTeams)
 				.ThenInclude(ut => ut.User)
-				.FirstOrDefaultAsync(u => u.Id == id);
-			var userTeam = team?.UserTeams.FirstOrDefault(ut => ut.UserId == userId);
+				.FirstOrDefaultAsync(u => u.Id == model.TeamId);
+			var userTeam = team?.UserTeams.FirstOrDefault(ut => ut.UserId == model.UserId);
 
 			if (userTeam == null)
-				return NotFound($"Not found User {userId} or user {userId} inside Team {id}");
+				return NotFound($"Not found User {model.UserId} or user {model.UserId} inside Team {model.TeamId}");
 
 			userTeam.UserAction = userTeam.UserAction switch
 			{
 				UserActionEnum.SentRequest => UserActionEnum.RejectedTeamRequest,
 				UserActionEnum.JoinedTeam => UserActionEnum.QuitTeam,
 				_ => throw new Exception(
-					$"User '{userId}' have invalid userAction '{userTeam.UserAction}' for team '{id}'. " +
+					$"User '{model.UserId}' have invalid userAction '{userTeam.UserAction}' for team '{model.TeamId}'. " +
 					$"Available value: {UserActionEnum.RejectedTeamRequest}, {UserActionEnum.QuitTeam}")
 			};
 

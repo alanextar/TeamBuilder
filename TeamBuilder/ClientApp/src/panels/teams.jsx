@@ -95,14 +95,12 @@ class Teams extends React.Component {
     }
 
     async searchTeams(value) {
-        const response = await fetch(`${Api.Teams.PagingSearch}?search=${value}`);
-        const data = await response.json();
-        console.log('searchTeam', data)
-        this.setState({
-            teams: data.collection,
-            hasMoreItems: data.nextHref ? true : false,
-            nextHref: data.nextHref
-        });
+        await Api.Teams.pagingSearch(value).then(result =>
+            this.setState({
+                teams: result.collection,
+                hasMoreItems: result.nextHref ? true : false,
+                nextHref: result.nextHref
+            }));
     }
 
     delayedSearchEvents = debounce(this.searchTeams, 250);
