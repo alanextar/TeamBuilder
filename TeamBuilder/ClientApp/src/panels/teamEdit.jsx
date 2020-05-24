@@ -53,7 +53,8 @@ class TeamEdit extends React.Component {
                     description: result.description,
                     membersDescription: result.descriptionRequiredMembers,
                     usersNumber: result.numberRequiredMembers,
-                    eventId: result.event && result.event.id
+                    eventId: result.event && result.event.id,
+                    userTeams: result.userTeams
                 }));
     }
 
@@ -99,8 +100,11 @@ class TeamEdit extends React.Component {
     };
 
     async dropUser(e, userTeam) {
-        await Api.Teams.rejectedOrRemoveUser({ id: userTeam.teamId, userId: userTeam.userId })
-            .then(json => this.setState({ userTeams: json }))
+        await Api.Teams.rejectedOrRemoveUser({ teamId: userTeam.teamId, userId: userTeam.userId })
+            .then(json => {
+                console.log('on drop click ', JSON.stringify(json))
+                this.setState({ userTeams: json })
+            })
     };
 
     render() {
@@ -165,9 +169,9 @@ class TeamEdit extends React.Component {
                                 </FormLayout>
 
                                 <InfoRow header='Участники'>
-                                    {console.log('userTeams ', this.state.team.userTeams)}
-                                    {this.state.team.userTeams &&
-                                        this.state.team.userTeams.map((members, i) => {
+                                    {console.log('userTeams ', this.state.userTeams)}
+                                    {this.state.userTeams &&
+                                        this.state.userTeams.map((members, i) => {
                                             console.log('userAction', members.userAction)
                                             return (
                                                 (members.userAction === 1 || members.userAction === 2 || members.userAction === 5) &&
