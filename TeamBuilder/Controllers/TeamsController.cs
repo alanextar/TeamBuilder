@@ -148,7 +148,7 @@ namespace TeamBuilder.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> RejectedOrRemoveUser([FromBody]RejectedOrRemoveUserViewModel model)
+		public async Task<IActionResult> RejectedOrRemoveUser([FromBody]ManageUserTeamViewModel model)
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");
 
@@ -171,6 +171,31 @@ namespace TeamBuilder.Controllers
 			};
 
 			context.Update(userTeam);
+			await context.SaveChangesAsync();
+
+			return Json(team.UserTeams);
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> CancelRequestUser([FromBody]ManageUserTeamViewModel model)
+		{
+			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");
+
+			var team = await context.Teams
+				.Include(u => u.UserTeams)
+				.ThenInclude(ut => ut.User)
+				.FirstOrDefaultAsync(u => u.Id == model.TeamId);
+			var userTeam = team?.UserTeams.FirstOrDefault(ut => ut.UserId == model.UserId);
+
+			if (userTeam == null)
+				return NotFound($"Not found User {model.UserId} or user {model.UserId} inside Team {model.TeamId}");
+
+			if (userTeam.UserAction != UserActionEnum.ConsideringOffer)
+				throw new Exception($"User '{model.UserId}' have invalid userAction '{userTeam.UserAction}' for team '{model.TeamId}'. " +
+									$"Available value: {UserActionEnum.RejectedTeamRequest}, {UserActionEnum.QuitTeam}");
+
+
+			context.Remove(userTeam);
 			await context.SaveChangesAsync();
 
 			return Json(team.UserTeams);
