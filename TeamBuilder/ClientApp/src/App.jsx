@@ -3,6 +3,10 @@ import { connect } from 'react-redux';
 import { View, Epic, Tabbar, TabbarItem } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import bridge from '@vkontakte/vk-bridge';
+import { bindActionCreators } from 'redux'
+import { goBack, closeModal, setStory } from "./store/router/actions";
+import { getActivePanel } from "./services/_functions";
+ import * as VK from './services/VK';
 
 import Icon28Users from '@vkontakte/icons/dist/28/users';
 import Icon28Profile from '@vkontakte/icons/dist/28/profile';
@@ -26,8 +30,9 @@ import SetUserTeam from './panels/setUserTeam'
 
 import * as actions from './actions/actions'
 
-const App = () => {
-    const [activeStory, setActiveStore] = useState('events');
+const App = (props) => {
+    let lastAndroidBackAction = 0;
+
     const [back, setBack] = useState(null);
 
     const [activeTeamPanel, setActiveTeamPanel] = useState('teams');
@@ -56,12 +61,27 @@ const App = () => {
 				document.body.attributes.setNamedItem(schemeAttribute);
 			}
 		});
+
         async function fetchData() {
             const user = await bridge.send('VKWebAppGetUserInfo');
             setProfile(user);
             setUserId(user.id);
         }
-		fetchData();
+        fetchData();
+
+        const { goBack, dispatch } = props;
+        //dispatch(VK.initApp());
+        window.onpopstate = () => {
+            let timeNow = +new Date();
+
+            if (timeNow - this.lastAndroidBackAction > 500) {
+                lastAndroidBackAction = timeNow;
+
+                goBack();
+            } else {
+                window.history.pushState(null, null);
+            }
+        };
 	}, []);
 
     const goTeam = e => {
@@ -106,35 +126,39 @@ const App = () => {
         setActiveUserPanel(e.currentTarget.dataset.to);
     }
 
-    const goFoot = e => {
-        setActiveStore(e.currentTarget.dataset.story);
-    }
+    // const goFoot = e => {
+    //     setActiveStore(e.currentTarget.dataset.story);
+    // }
+
+    const { goBack, setStory, closeModal, popouts, activeView, activeStory, activeModals, panelsHistory, colorScheme } = props;
+    let history = (panelsHistory[activeView] === undefined) ? [activeView] : panelsHistory[activeView];
+    let popout = (popouts[activeView] === undefined) ? null : popouts[activeView];
+    let activeModal = (activeModals[activeView] === undefined) ? null : activeModals[activeView];
 
 	return (
         <Epic activeStory={activeStory} tabbar={
             <Tabbar>
                 <TabbarItem
-                    onClick={goFoot}
+                    // onClick={goFoot}
                     selected={activeStory === 'teams'}
                     data-story="teams"
                     text="Команды"
                 ><Icon28Users3Outline /></TabbarItem>
                 <TabbarItem
-                    onClick={goFoot}
+                    // onClick={goFoot}
                     selected={activeStory === 'users'}
                     data-story="users"
                     text="Участники"
                 ><Icon28Users /></TabbarItem>
                 <TabbarItem
-                    onClick={goFoot}
+                    // onClick={goFoot}
                     selected={activeStory === 'events'}
                     data-story="events"
                     text="События"
                 ><Icon28FavoriteOutline /></TabbarItem>
                 <TabbarItem
-                    onClick={goFoot}
+                    onClick={() => setStory('user', 'events')}
                     selected={activeStory === 'user'}
-                    data-story="user"
                     text="Профиль"
                 ><Icon28Profile /></TabbarItem>
             </Tabbar>
@@ -158,7 +182,10 @@ const App = () => {
                 <EventInfo id='eventInfo' event={event} go={goEvent} back={back} />
                 <EventEdit id='eventEdit' event={event} go={goEvent} back={back} owner={vkProfile} />
             </View>
-            <View id='user' activePanel={activeUserPanel}>
+            <View id='user' activePanel={getActivePanel("user")}
+                history={history}
+                onSwipeBack={() => goBack()}
+            >
                 <User id='user' vkProfile={vkProfile} userId={userId} goUserEdit={goUserEdit} activeStory={activeStory} goSetUserTeam={goSetUserTeam} />
                 <UserEdit id='userEdit' goUserEdit={goUserEdit} vkProfile={vkProfile} user={user} />
                 <TeamInfo id='teaminfo' go={goUserEdit} teamId={activeTeam} return='user' />
@@ -169,10 +196,25 @@ const App = () => {
     );
 }
 
-function mapStateToProps(state) {
+const mapStateToProps = (state) => {
     return {
-        phones: state.get("phones")
+        activeView: state.router.activeView,
+        activeStory: state.router.activeStory,
+        panelsHistory: state.router.panelsHistory,
+        activeModals: state.router.activeModals,
+        popouts: state.router.popouts,
+        scrollPosition: state.router.scrollPosition,
+
+        // colorScheme: state.vkui.colorScheme
     };
+};
+
+
+function mapDispatchToProps(dispatch) {
+    return {
+        dispatch,
+        ...bindActionCreators({ setStory, goBack, closeModal }, dispatch)
+    }
 }
 
-export default connect(mapStateToProps, actions)(App);
+export default connect(mapStateToProps, mapDispatchToProps)(App);

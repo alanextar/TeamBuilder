@@ -1,23 +1,20 @@
 ﻿import React from 'react';
 import ReactDOM from 'react-dom';
-import { createStore } from 'redux'
-import { Provider } from 'react-redux'
+
+import 'core-js/es6/map';
+import 'core-js/es6/set';
+import { applyMiddleware, createStore } from "redux";
+import thunk from 'redux-thunk';
+import { Provider } from 'react-redux';
+import rootReducer from './store/reducers';
+import { composeWithDevTools } from 'redux-devtools-extension';
+import { setStory } from "./store/router/actions";
+
 import qwest from 'qwest';
 
 import bridge from '@vkontakte/vk-bridge';
 
 import App from './App'
-import reducer from './reducers/reducer'
-import * as types from './constants/ActionTypes'
-
-const store = createStore(reducer)
-
-store.dispatch({
-    type: types.SET_STATE,
-    state: {
-        phones: ["iPhone 7 Plus", "Samsung Galaxy A5"]
-    }
-});
 
 bridge.send("VKWebAppInit", {});
 
@@ -26,6 +23,12 @@ qwest.setDefaultOptions({
         'Launch-Params': window.location.search
     }
 });
+
+export const store = createStore(rootReducer, composeWithDevTools(
+    applyMiddleware(thunk),
+));
+
+store.dispatch(setStory('user', 'base'));
 
 ReactDOM.render(<Provider store={store}><App /></Provider>, document.getElementById('root'));
 if (process.env.NODE_ENV === "development") {
