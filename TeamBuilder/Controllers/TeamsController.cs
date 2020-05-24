@@ -122,7 +122,7 @@ namespace TeamBuilder.Controllers
 			context.Update(team);
 			await context.SaveChangesAsync();
 
-			return Ok("Updated");
+			return Ok(team);
 		}
 
 		[HttpDelete]

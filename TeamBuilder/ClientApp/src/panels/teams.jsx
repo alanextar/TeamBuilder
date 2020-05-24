@@ -5,7 +5,7 @@ import {
 } from '@vkontakte/vkui';
 import InfiniteScroll from 'react-infinite-scroller';
 import qwest from 'qwest';
-import { Api } from '../infrastructure/api';
+import { Api, Urls } from '../infrastructure/api';
 import debounce from 'lodash.debounce';
 
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
@@ -42,13 +42,12 @@ class Teams extends React.Component {
 
     componentDidMount() {
         //this.populateTeamData();
-        window.scrollTo(0, 0);
     }
 
     async populateTeamData() {
         var self = this;
 
-        var url = Api.Teams.GetPage;
+        var url = Urls.Teams.GetPage;
 
         qwest.get(url, {
         }, {
@@ -77,31 +76,27 @@ class Teams extends React.Component {
     }
 
     loadItems(page) {
-        var url = `${Api.Teams.GetPage}`;
+        var self = this;
+        var url = `${Urls.Teams.GetPage}`;
         if (this.state.nextHref) {
             url = this.state.nextHref;
         }
-        window.scrollTo(0, 0);
-        var self = this;
 
         console.log(`loadItems.Url: ${url}`);
 
-        qwest.get(url, {
-        }, {
-            cache: true
-        })
-            .then((xhr, resp) => {
-                if (resp) {
+        Api.get(url)
+            .then(result => {
+                if (result) {
                     var teamsT = self.state.teams;
-                    resp.collection.map((team) => {
+                    result.collection.map((team) => {
                         teamsT.push(team);
                     });
 
-                    if (resp.nextHref) {
+                    if (result.nextHref) {
                         self.setState({
                             teams: teamsT,
                             href: url,
-                            nextHref: resp.nextHref
+                            nextHref: result.nextHref
                         });
                     } else {
                         self.setState({

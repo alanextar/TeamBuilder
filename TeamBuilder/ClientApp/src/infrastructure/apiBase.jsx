@@ -1,6 +1,4 @@
-﻿import { Url } from "./api";
-
-const initGet = {
+﻿const initGet = {
     method: 'GET',
     headers: {
         'Launch-Params': window.location.search

@@ -7,8 +7,7 @@ import {
 import InfiniteScroll from 'react-infinite-scroller';
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import Icon24Work from '@vkontakte/icons/dist/24/work';
-import { Api } from '../infrastructure/api';
-import { Urls } from '../infrastructure/urls';
+import { Api, Urls } from '../infrastructure/api';
 
 const Users = props => {
     const [isSearching, setIsSearching] = useState(false);

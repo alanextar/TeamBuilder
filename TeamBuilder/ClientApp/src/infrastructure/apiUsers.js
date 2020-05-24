@@ -1,5 +1,5 @@
 import * as api from "./apiBase";
-import { Urls } from "./urls"
+import { Urls } from "./api"
 
 export function pagingSearch(value) {
     console.log(`users.search ${value}`);
