@@ -2,6 +2,12 @@
 import qwest from 'qwest';
 import { Api } from '../infrastructure/api';
 
+import { connect } from 'react-redux';
+import { bindActionCreators } from "redux";
+import { goBack, setPage } from "../store/router/actions";
+import { setTeam } from "../store/teams/actions";
+import * as VK from '../services/VK';
+
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell, InfoRow,
     SimpleCell, Avatar, Div, Button, FixedLayout
@@ -13,6 +19,8 @@ import Icon28EditOutline from '@vkontakte/icons/dist/28/edit_outline';
 class TeamInfo extends React.Component {
     constructor(props) {
         super(props);
+
+        console.log('teamInfo constructor', props);
 
         this.state = {
             team: null,
@@ -47,11 +55,14 @@ class TeamInfo extends React.Component {
     }
 
     render() {
+        const { id, goBack, activeTeam } = this.props;
+        console.log('#############################', this.props);
+
         var self = this;
         return (
-            <Panel id={this.state.id}>
-                <PanelHeader separator={false} left={<PanelHeaderBack onClick={this.state.go} data-to={this.state.return} />}>
-                    {this.state.team && this.state.team.name}
+            <Panel id={id}>
+                <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} data-to={this.state.return} />}>
+                    {activeTeam && activeTeam.name}
                 </PanelHeader>
                 <Tabs>
                     <TabsItem
@@ -72,18 +83,17 @@ class TeamInfo extends React.Component {
                     </TabsItem>
                 </Tabs>
                 <Group>
-                    {this.state.team && (
+                    {activeTeam && (
                         this.state.activeTab === 'teamDescription' ?
                             <Cell>
-                                {console.log('==== ', this.state.team)}
                                 <SimpleCell>
                                     <InfoRow header='Описаноие команды'>
-                                        {this.state.team.description}    
+                                        {activeTeam.description}    
                                     </InfoRow>
                                 </SimpleCell>
                                 <SimpleCell>
                                     <InfoRow header='Участвуем в '>
-                                        {this.state.team.event && this.state.team.event.name}
+                                        {activeTeam.event && activeTeam.event.name}
                                     </InfoRow>
                                 </SimpleCell>
                             </Cell>
@@ -91,10 +101,10 @@ class TeamInfo extends React.Component {
                             <Cell>
                                 <Div>
                                     <InfoRow header='Участники'>
-                                        Требуется {this.state.team.numberRequiredMembers} участников
-                                        {console.log('userTeams ', this.state.team.userTeams)}
-                                        {this.state.team.userTeams &&
-                                            this.state.team.userTeams.map((userTeam, i) => {
+                                        Требуется {activeTeam.numberRequiredMembers} участников
+                                        {console.log('userTeams ', activeTeam.userTeams)}
+                                        {activeTeam.userTeams &&
+                                            activeTeam.userTeams.map((userTeam, i) => {
                                                 //{ members.isOwner && (members.id === self.props.vkProfile.id) && self.setState({ edit: true }) }
                                                 return (
                                                     <SimpleCell
@@ -112,17 +122,17 @@ class TeamInfo extends React.Component {
                                 </Div>
                                 <Div>
                                     <InfoRow header='Описание задач'>
-                                        {this.state.team.descriptionRequiredMembers}
+                                        {activeTeam.descriptionRequiredMembers}
                                     </InfoRow>
                                 </Div>
                             </Cell>)}
-                    {this.state.team && this.state.edit &&
+                    {activeTeam && this.state.edit &&
                         <FixedLayout vertical="bottom" >
                             <SimpleCell
                                 after={<Icon28EditOutline />}
                                 onClick={this.state.go}
                                 data-to='teamEdit'
-                                data-id={this.state.team.id}>
+                                data-id={activeTeam.id}>
                             </SimpleCell>
                         </FixedLayout>}
                 </Group>
@@ -132,4 +142,20 @@ class TeamInfo extends React.Component {
 
 };
 
-export default TeamInfo;
+const mapStateToProps = (state) => {
+    return {
+        activeTeam: state.team.activeTeam,
+    };
+};
+
+
+function mapDispatchToProps(dispatch) {
+    return {
+        setPage,
+        setTeam,
+        dispatch,
+        ...bindActionCreators({ goBack }, dispatch)
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(TeamInfo);

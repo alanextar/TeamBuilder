@@ -10,13 +10,14 @@ export const setStory = (story, initial_panel) => (
     }
 );
 
-export const setPage = (view, panel) => {
-    console.log('setPage (view,panel) =======', view, panel);
+export const setPage = (view, panel, param) => {
+    console.log('setPage (view,panel, id) =======', view, panel, param);
     return {
         type: SET_PAGE,
             payload: {
             view: view,
-                panel: panel
+                panel: panel,
+            param: param
         }
     }
 };

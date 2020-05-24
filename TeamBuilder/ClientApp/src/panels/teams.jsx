@@ -9,6 +9,7 @@ import InfiniteScroll from 'react-infinite-scroller';
 import qwest from 'qwest';
 import { Api } from '../infrastructure/api';
 import debounce from 'lodash.debounce';
+import { setTeam } from "../store/teams/actions";
 
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 
@@ -155,16 +156,15 @@ class Teams extends React.Component {
                         text={team.description}
                         caption="Навыки"
                         after={team.userTeams.length + '/' + team.numberRequiredMembers}
-                        onClick={() => setPage('teams', 'teaminfo')}
-                        data-to='teaminfo'
-                        data-id={team.id}>
+                        onClick={() => { setPage('teams', 'teaminfo'); setTeam(team) }}
+                    >
                         {team.name} - {team.id}
                     </RichCell>
                 </Card>
             );
         });
 
-        const { setPage } = this.props;
+        const { setPage, setTeam } = this.props;
 
         return (
             <Panel id={this.state.page_id}>
@@ -194,6 +194,7 @@ class Teams extends React.Component {
 
 const mapDispatchToProps = {
     setPage,
+    setTeam,
     goBack
 };
 
