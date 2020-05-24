@@ -15,7 +15,6 @@ class Teams extends React.Component {
 
         this.state = {
             hasMoreItems: true,
-            href: this.props.href,
             nextHref: null,
             teams: [],
             go: props.go,
@@ -23,9 +22,6 @@ class Teams extends React.Component {
             fetching: false,
             search: '',
         };
-
-        console.log(`.ctr.Href: ${this.state.href}`);
-        console.log(`.ctr.nextHref: ${this.state.nextHref}`);
 
         this.onRefresh = () => {
             this.setState({ fetching: true });
@@ -56,7 +52,6 @@ class Teams extends React.Component {
                     if (result.nextHref) {
                         self.setState({
                             teams: teamsT,
-                            href: url,
                             nextHref: result.nextHref
                         });
                     } else {
@@ -88,7 +83,6 @@ class Teams extends React.Component {
                     if (result.nextHref) {
                         self.setState({
                             teams: teamsT,
-                            href: url,
                             nextHref: result.nextHref
                         });
                     } else {
