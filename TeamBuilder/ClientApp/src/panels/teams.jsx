@@ -46,14 +46,8 @@ class Teams extends React.Component {
 
     async populateTeamData() {
         var self = this;
-
-        var url = Urls.Teams.GetPage;
-
-        qwest.get(url, {
-        }, {
-            cache: true
-        })
-            .then((xhr, resp) => {
+        Api.Teams.GetPage()
+            .then(result => {
                 if (resp) {
                     var teamsT = [];
                     resp.collection.map((team) => {

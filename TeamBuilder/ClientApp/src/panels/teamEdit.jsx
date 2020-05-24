@@ -106,7 +106,6 @@ class TeamEdit extends React.Component {
                         </TabsItem>
                 </Tabs>
                 <Group>
-                    {console.log(`team.event: ${this.state.team && this.state.team.event && this.state.team.event.name}`)}
                     {this.state.team && (
                         this.state.activeTab === 'teamDescription' ?
                             <FormLayout >

@@ -77,7 +77,7 @@ const EventEdit = props => {
                     data-from={props.id}>
                     Изменить мероприятие
                 </Button>
-            </ FixedLayout>
+            </FixedLayout>
         </Panel>
     );
 }

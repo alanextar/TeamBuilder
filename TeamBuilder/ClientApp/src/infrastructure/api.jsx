@@ -60,6 +60,7 @@ export class Urls {
         PagingSearch: `${this.baseUrl}/${this.prefix}/${this.userStr}/pagingSearch`,
         Confirm: `${this.baseUrl}/${this.prefix}/${this.userStr}/confirm`,
         CheckConfirmation: `${this.baseUrl}/${this.prefix}/${this.userStr}/checkConfirmation`,
+        GetRecruitTeams: `${this.baseUrl}/${this.prefix}/${this.userStr}/getRecruitTeams`,
         GetSkills: `${this.baseUrl}/${this.prefix}/${this.userStr}/getSkills`,
         GetTeams: `${this.baseUrl}/${this.prefix}/${this.userStr}/getTeams`,
         JoinTeam: `${this.baseUrl}/${this.prefix}/${this.userStr}/joinTeam`,
