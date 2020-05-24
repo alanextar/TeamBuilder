@@ -1,6 +1,6 @@
 import {
     SET_USER, SET_PROFILE, SET_PROFILE_USER, SET_TEAM_USER,
-    SET_EVENT_USER, SET_PARTICIPANT_USER, SET_USER_SKILLS
+    SET_EVENT_USER, SET_PARTICIPANT_USER, SET_USER_SKILLS, SET_ALL_SKILLS
 } from './actionTypes';
 
 export const setUser = (user) => {
@@ -70,6 +70,16 @@ export const setUserSkills = (user, newSkills) => {
         payload: {
             user: user,
             newSkills: newSkills
+        }
+    }
+};
+
+export const setAllSkills = (allSkills) => {
+
+    return {
+        type: SET_USER_SKILLS,
+        payload: {
+            allSkills: allSkills,
         }
     }
 };

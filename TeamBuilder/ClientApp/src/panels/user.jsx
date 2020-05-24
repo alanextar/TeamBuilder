@@ -23,13 +23,18 @@ class User extends React.Component {
     constructor(props) {
         super(props);
 
-        console.log('user constructor', props.user);
+        console.log('user constructor', props.user.userSkills);
+
+        let userSkills = props.user.userSkills.map(function (userSkill) {
+            return { id: userSkill.skillId, label: userSkill.skill.name };
+        })
 
         this.state = {
             skills: null,
             vkUser: null,
             vkProfile: props.profile,
             user: props.user,
+            userSkills: userSkills,
             activeTabProfile: 'main',
             selected: false,
             selectedSkills: null,
@@ -145,7 +150,8 @@ class User extends React.Component {
                                     дополнительно: {this.state.user && this.state.user.about}
                                 </Cell>
                             </List>
-                            <UserSkills userSkills={this.state.userSkills} readOnlyMode={this.state.readOnlyMode}
+                            <UserSkills userSkills={this.state.userSkills}
+                                readOnlyMode={this.state.readOnlyMode}
                                 handleClick={this.handleClick.bind(this, this.state.selectedSkills)}
                                 id={this.state.user.id} />
                         </Group> :

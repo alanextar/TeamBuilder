@@ -7,7 +7,6 @@ import { bindActionCreators } from "redux";
 import { goBack, setPage } from "../store/router/actions";
 import { setTeam } from "../store/teams/actions";
 import { setUser, setTeamUser } from "../store/user/actions";
-import * as VK from '../services/VK';
 
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell, InfoRow,

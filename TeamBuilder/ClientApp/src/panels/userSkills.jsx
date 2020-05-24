@@ -1,5 +1,10 @@
 ﻿import React from 'react';
 import ReactDOM from 'react-dom';
+
+import { connect } from 'react-redux';
+import { bindActionCreators } from "redux";
+import { setAllSkills } from "../store/user/actions";
+
 import { Div,Title } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -9,19 +14,21 @@ class UserSkills extends React.Component {
     constructor(props) {
         super(props);
 
+        console.log('userSkills constructor', props.allSkills);
+
         this.state = {
             id: props.id,
             go: props.go,
             fetching: false,
             userSkills: props.userSkills ? props.userSkills : [],
-            options: []
+            allSkills: []
         }
 
     }
 
 
     componentDidMount() {
-        this.populateSkills(this.state.id);
+        this.populateSkills();
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -33,37 +40,19 @@ class UserSkills extends React.Component {
         }
     }
 
-    async populateSkills(id) {
+    async populateSkills() {
+        const getAllSkills = await fetch('/api/skill/getall');
+        const allSkillsJson = await getAllSkills.json();
 
-        if (this.props.userSkills === null) {
-            const getAllResponse = await fetch('/api/skill/getall');
-            const allSkillsData = await getAllResponse.json();
+        var options = allSkillsJson && allSkillsJson.map(function (skill) {
+            return { id: skill.id, label: skill.name };
+        });
 
-            var options = allSkillsData && allSkillsData.map(function (skill) {
-                return { id: skill.id, label: skill.name };
-            });
-
-            const getSkillsResponse = await fetch(`/api/user/getSkills?id=${id}`);
-            const userSkillsData = await getSkillsResponse.json();
-
-            var userSkills = userSkillsData && userSkillsData.map(function (skill) {
-                return { id: skill.id, label: skill.name };
-            });
-
-            this.setState({
-                options: options,
-                userSkills: userSkills
-            });
-		}
-		else {
-            this.setState({
-                userSkills: this.props.userSkills
-            });
-		}
-        
+        this.setState({ allSkills: options });
     }
 
     render() {
+
         return (
             <Div>
                 <Title level="3" weight="regular" style={{ marginBottom: 16 }}>Скиллы:</Title>
@@ -72,7 +61,7 @@ class UserSkills extends React.Component {
                     onChange={(e) => {
                         this.props.handleClick(e)
                     }}
-                    options={this.state.options}
+                    options={this.state.allSkills}
                     selected={this.state.userSkills}
                     top="Skills"
                     multiple
@@ -84,4 +73,18 @@ class UserSkills extends React.Component {
     }
 }
 
-export default UserSkills;
+const mapStateToProps = (state) => {
+    return {
+        allSkills: state.user.allSkills,
+    };
+};
+
+
+function mapDispatchToProps(dispatch) {
+    return {
+        dispatch,
+        ...bindActionCreators({ setAllSkills }, dispatch)
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(UserSkills);
