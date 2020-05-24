@@ -141,18 +141,21 @@ const App = (props) => {
             <Tabbar>
                 <TabbarItem
                     // onClick={goFoot}
+                    onClick={() => setStory('teams', 'teams')}
                     selected={activeStory === 'teams'}
                     data-story="teams"
                     text="Команды"
                 ><Icon28Users3Outline /></TabbarItem>
                 <TabbarItem
                     // onClick={goFoot}
+                    onClick={() => setStory('users', 'users')}
                     selected={activeStory === 'users'}
                     data-story="users"
                     text="Участники"
                 ><Icon28Users /></TabbarItem>
                 <TabbarItem
                     // onClick={goFoot}
+                    onClick={() => setStory('events', 'events')}
                     selected={activeStory === 'events'}
                     data-story="events"
                     text="События"
@@ -164,8 +167,9 @@ const App = (props) => {
                 ><Icon28Profile /></TabbarItem>
             </Tabbar>
         }>
-            <View id='teams' activePanel={activeTeamPanel} >
-                <Teams id='teams' go={goTeam} href={teamHref} />
+            <View id='teams' activePanel={getActivePanel("teams")}
+                history={history} >
+                <Teams id='teams' activeStory={activeStory} go={goTeam} href={teamHref} />
                 <TeamInfo id='teaminfo' go={goTeam} teamId={activeTeam} return='teams' vkProfile={vkProfile} />
                 <TeamCreate id='teamCreate' go={goTeam} back={back}/>
                 <TeamEdit id='teamEdit' go={goTeam} teamId={activeTeam} back={back} />
@@ -177,7 +181,8 @@ const App = (props) => {
             <View id='users' activePanel={activeUsersPanel}>
                 <Users id='users' go={goUsers} />
             </View>
-            <View id='events' activePanel={activeEventPanel}>
+            <View id='events' activePanel={getActivePanel("events")}
+                history={history}>
                 <Events id='events' go={goEvent} />
                 <EventCreate id='eventCreate' go={goEvent} back={back} owner={vkProfile} />
                 <EventInfo id='eventInfo' event={event} go={goEvent} back={back} />

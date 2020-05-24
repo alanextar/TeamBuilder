@@ -1,4 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react';
+import { connect } from 'react-redux';
 import debounce from 'lodash.debounce';
 import {
     Panel, PanelHeader, Group, Search, List, RichCell, PullToRefresh,
@@ -7,6 +8,7 @@ import {
 import InfiniteScroll from 'react-infinite-scroller';
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import { Api } from '../infrastructure/api';
+import { goBack, setPage } from '../store/router/actions';
 
 const Events = props => {
     const [fetching, setFetching] = useState(false);
@@ -105,6 +107,8 @@ const Events = props => {
 
     //#endregion
 
+    const { setPage } = props;
+
     return (
         <Panel id={props.id}>
             <PanelHeader
@@ -130,4 +134,9 @@ const Events = props => {
     );
 };
 
-export default Events;
+const mapDispatchToProps = {
+    setPage,
+    goBack
+};
+
+export default connect(null, mapDispatchToProps)(Events);

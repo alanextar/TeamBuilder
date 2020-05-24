@@ -1,4 +1,6 @@
 ﻿import React from 'react';
+import { connect } from 'react-redux';
+import { goBack, setPage } from '../store/router/actions';
 import {
     Panel, PanelHeader, Avatar, Search, List, RichCell, PullToRefresh,
     PanelHeaderButton, CardGrid, Card
@@ -153,7 +155,7 @@ class Teams extends React.Component {
                         text={team.description}
                         caption="Навыки"
                         after={team.userTeams.length + '/' + team.numberRequiredMembers}
-                        onClick={self.state.go}
+                        onClick={() => setPage('teams', 'teaminfo')}
                         data-to='teaminfo'
                         data-id={team.id}>
                         {team.name} - {team.id}
@@ -161,6 +163,8 @@ class Teams extends React.Component {
                 </Card>
             );
         });
+
+        const { setPage } = this.props;
 
         return (
             <Panel id={this.state.page_id}>
@@ -188,4 +192,9 @@ class Teams extends React.Component {
     }
 };
 
-export default Teams;
+const mapDispatchToProps = {
+    setPage,
+    goBack
+};
+
+export default connect(null, mapDispatchToProps)(Teams);
