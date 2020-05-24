@@ -29,6 +29,7 @@ const Users = props => {
                     .then(result => {
                         setItems(result.collection);
                         setNextHref(result.nextHref);
+                        setHasMoreItems(result.nextHref ? true : false);
                         setIsSearching(false);
                     });
             }
