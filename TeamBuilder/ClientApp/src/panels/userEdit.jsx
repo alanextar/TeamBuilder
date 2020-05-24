@@ -14,6 +14,7 @@ import {
 import '@vkontakte/vkui/dist/vkui.css';
 import '../../src/styles/style.css';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
+import { Api, Urls } from '../infrastructure/api';
 
 class UserEdit extends React.Component {
     constructor(props) {
@@ -47,12 +48,7 @@ class UserEdit extends React.Component {
         let about = this.state.user.about;
         var user = { id, city, about };
 
-        let response = await fetch('/api/user/edit', {
-            method: 'post',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(user)
-        });
-
+        await Api.post(Urls.Users.Edit, user);
     }
 
     render() {

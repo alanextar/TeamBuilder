@@ -1,24 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace TeamBuilder.Models
+namespace TeamBuilder.Models.Enums
 {
 	public enum UserActionEnum
 	{
 		[Display(Name = "Нет действия")]
 		None,
-		[Display(Name = "Отправил запрос в команду")]
+		[Display(Name = "Отправил запрос в команду")]  // Из пользователя можно отменить запрос к команде, тогда UserTeam Удаляется
 		SentRequest,
-		[Display(Name = "Присоединился")]
+		[Display(Name = "В команде")] // Или юзер принял предложение, или команда приняла его заявку
 		JoinedTeam,
-		[Display(Name = "Отклонил запрос")]
-		CanceledTeamRequest,
-		[Display(Name = "Самоустранился из команды")]
+		[Display(Name = "Отклонил запрос")] // Или юзер отклонил предложение, или команда отклонила его заявку
+		RejectedTeamRequest,
+		[Display(Name = "Самоустранился из команды")] // Или юзер удалился из команды, или команда удалила юзера
 		QuitTeam,
-		[Display(Name = "Рассматривает предложение команды")]
-		AcceptingOffer,
+		[Display(Name = "Рассматривает предложение команды")] // Из команды можно отменить запрос к пользователю, тогда UserTeam Удаляется
+		ConsideringOffer
 	}
 }

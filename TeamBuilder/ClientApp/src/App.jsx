@@ -7,11 +7,10 @@ import { bindActionCreators } from 'redux'
 import { goBack, closeModal, setStory } from "./store/router/actions";
 import { setParticipant } from "./store/participants/actions";
 import {
-    setUser, setProfile, getUser,
-    setProfileUser, setTeamUser, setEventUser, setParticipantsUser
+    setUser, setProfile, getUser, setProfileUser, setTeamUser,
+    setEventUser, setParticipantsUser
 } from "./store/user/actions";
 import { getActivePanel } from "./services/_functions";
- import * as VK from './services/VK';
 
 import Icon28Users from '@vkontakte/icons/dist/28/users';
 import Icon28Profile from '@vkontakte/icons/dist/28/profile';
@@ -37,9 +36,8 @@ const App = (props) => {
     let lastAndroidBackAction = 0;
     const [teamHref, setTeamNextHref] = useState(null);
 
-    const { goBack, setStory, activeView, activeStory, panelsHistory, setProfile, setUser,
-        setProfileUser, setEventUser, setTeamUser, setParticipant, profile, profileUser,
-        teamUser, eventUser, participant, user
+    const { setStory, activeView, activeStory, panelsHistory, setProfile, setUser,
+        setProfileUser, profileUser, teamUser, eventUser, participant, user
     } = props;
     let history = (panelsHistory[activeView] === undefined) ? [activeView] : panelsHistory[activeView];
 

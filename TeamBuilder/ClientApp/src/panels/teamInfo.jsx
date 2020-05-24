@@ -1,5 +1,4 @@
 ﻿import React from 'react';
-import qwest from 'qwest';
 import { Api } from '../infrastructure/api';
 
 import { connect } from 'react-redux';
@@ -10,7 +9,7 @@ import { setUser, setTeamUser } from "../store/user/actions";
 
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell, InfoRow,
-    SimpleCell, Avatar, Div, Button, FixedLayout
+    SimpleCell, Avatar, Div, PullToRefresh, FixedLayout
 } from '@vkontakte/vkui';
 
 import Icon28MessageOutline from '@vkontakte/icons/dist/28/message_outline';
@@ -22,11 +21,18 @@ class TeamInfo extends React.Component {
 
         this.state = {
             team: props.activeTeam,
-            go: props.go,
             id: props.id,
             activeTab: 'teamDescription',
-            return: props.return,
             edit: true
+        };
+
+        this.onRefresh = async () => {
+            this.setState({ fetching: true });
+            await this.populateTeamData();
+            this.setState({
+                fetching: false
+            });
+
         };
     }
 
@@ -35,22 +41,8 @@ class TeamInfo extends React.Component {
     }
 
     async populateTeamData() {
-        var self = this;
-
-        qwest.get(Api.Teams.Get,
-            {
-                id: self.state.team.id
-            },
-            {
-                cache: true
-            })
-            .then((xhr, resp) => {
-                if (resp) {
-                    self.setState({ team: resp});
-                }
-            })
-            .catch((error) =>
-                console.log(`Error for get team id:${self.state.team.id}. Details: ${error}`));
+        Api.Teams.get(this.props.teamId)
+            .then(result => this.setState({ team: result }))
     }
 
     render() {
@@ -58,8 +50,8 @@ class TeamInfo extends React.Component {
 
         var self = this;
         return (
-            <Panel id={id}>
-                <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
+            <Panel id={this.state.id}>
+                <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} data-to={this.state.return} />}>
                     {this.state.team && this.state.team.name}
                 </PanelHeader>
                 <Tabs>
@@ -80,60 +72,65 @@ class TeamInfo extends React.Component {
                         Участники
                     </TabsItem>
                 </Tabs>
-                <Group>
-                    {this.state.team && (
-                        this.state.activeTab === 'teamDescription' ?
-                            <Cell>
-                                <SimpleCell>
-                                    <InfoRow header='Описаноие команды'>
-                                        {this.state.team.description}    
-                                    </InfoRow>
+                <PullToRefresh onRefresh={this.onRefresh} isFetching={this.state.fetching}>
+                    <Group>
+                        {this.state.team && (
+                            this.state.activeTab === 'teamDescription' ?
+                                <Cell>
+                                    {console.log('==== ', this.state.team)}
+                                    <SimpleCell>
+                                        <InfoRow header='Описание команды'>
+                                            {this.state.team.description}
+                                        </InfoRow>
+                                    </SimpleCell>
+                                    <SimpleCell>
+                                        <InfoRow header='Участвуем в '>
+                                            {this.state.team.event && this.state.team.event.name}
+                                        </InfoRow>
+                                    </SimpleCell>
+                                </Cell>
+                                :
+                                <Cell>
+                                    <Div>
+                                        <InfoRow header='Участники'>
+                                            Требуется {this.state.team.numberRequiredMembers} участников
+                                        {console.log('userTeams ', this.state.team.userTeams)}
+                                            {this.state.team.userTeams &&
+                                                this.state.team.userTeams.map((userTeam, i) => {
+                                                    //{ members.isOwner && (members.id === self.props.vkProfile.id) && self.setState({ edit: true }) }
+                                                    return (
+                                                        <SimpleCell key={i}
+                                                            onClick={() => {
+                                                                setPage('teams', 'user');
+                                                                setUser(userTeam.user);
+                                                                setTeamUser(userTeam.user)
+                                                            }}
+                                                            before={<Avatar size={48} src={userTeam.user.photo100} />}
+                                                            after={<Icon28MessageOutline />}>
+                                                            {userTeam.user.firstName, userTeam.user.fullName}
+                                                        </SimpleCell>
+                                                    )
+                                                }
+                                                )}
+                                        </InfoRow>
+                                    </Div>
+                                    <Div>
+                                        <InfoRow header='Описание задач'>
+                                            {this.state.team.descriptionRequiredMembers}
+                                        </InfoRow>
+                                    </Div>
+                                </Cell>)}
+                        {this.state.team && this.state.edit &&
+                            <FixedLayout vertical="bottom" >
+                                <SimpleCell
+                                    after={<Icon28EditOutline />}
+                                    onClick={this.state.go}
+                                    data-to='teamEdit'
+                                    data-id={this.state.team.id}>
                                 </SimpleCell>
-                                <SimpleCell>
-                                    <InfoRow header='Участвуем в '>
-                                        {this.state.team.event && this.state.team.event.name}
-                                    </InfoRow>
-                                </SimpleCell>
-                            </Cell>
-                            :
-                            <Cell>
-                                <Div>
-                                    <InfoRow header='Участники'>
-                                        Требуется {this.state.team.numberRequiredMembers} участников
-                                        {this.state.team.userTeams &&
-                                            this.state.team.userTeams.map((userTeam, i) => {
-                                                //{ members.isOwner && (members.id === self.props.vkProfile.id) && self.setState({ edit: true }) }
-                                                return (
-                                                    <SimpleCell
-                                                        onClick={() => {
-                                                            setPage('teams', 'user');
-                                                            setUser(userTeam.user);
-                                                            setTeamUser(userTeam.user)
-                                                        }}
-                                                        before={<Avatar size={48} src={userTeam.user.photo100}/>}
-                                                        after={<Icon28MessageOutline />}>
-                                                        {userTeam.user.firstName, userTeam.user.fullName}
-                                                    </SimpleCell>
-                                            )}
-                                            )}
-                                    </InfoRow>
-                                </Div>
-                                <Div>
-                                    <InfoRow header='Описание задач'>
-                                        {this.state.team.descriptionRequiredMembers}
-                                    </InfoRow>
-                                </Div>
-                            </Cell>)}
-                    {this.state.team && this.state.edit &&
-                        <FixedLayout vertical="bottom" >
-                            <SimpleCell
-                                after={<Icon28EditOutline />}
-                                onClick={this.state.go}
-                                data-to='teamEdit'
-                                data-id={this.state.team.id}>
-                            </SimpleCell>
-                        </FixedLayout>}
-                </Group>
+                            </FixedLayout>}
+                    </Group>
+                </PullToRefresh>
             </Panel>
         );
     }

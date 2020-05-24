@@ -110,10 +110,10 @@ namespace TeamBuilder.Controllers
 			return Json(@event);
 		}
 
-		[HttpDelete]
+		[HttpPost]
 		public async Task<IActionResult> Delete(long id)
 		{
-			logger.LogInformation($"DELETE Request {HttpContext.Request.Headers[":path"]}.");
+			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}.");
 
 			var @event = await context.Events.FirstOrDefaultAsync(e => e.Id == id);
 			if (@event == null)

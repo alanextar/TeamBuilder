@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using TeamBuilder.Models;
+using TeamBuilder.Models.Enums;
 
 namespace TeamBuilder.Controllers
 {
@@ -33,7 +34,6 @@ namespace TeamBuilder.Controllers
 				team.UserTeams.AddRange(userToTeam.Select(ut =>
 					new UserTeam
 					{
-						IsConfirmed = random.Next(0, 1) == 0,
 						User = ut,
 						UserAction = (UserActionEnum)random.Next(1, 6)
 					}));

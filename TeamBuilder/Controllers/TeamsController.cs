@@ -9,6 +9,7 @@ using TeamBuilder.Models;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using TeamBuilder.Extensions;
+using TeamBuilder.Models.Enums;
 using TeamBuilder.ViewModels;
 
 namespace TeamBuilder.Controllers
@@ -35,19 +36,26 @@ namespace TeamBuilder.Controllers
 			return teams;
 		}
 
-		public IActionResult PagingSearch(string search, int pageSize = 20, int page = 0, bool prev = false)
+		public IActionResult PagingSearch(string search, long? eventId, int pageSize = 20, int page = 0, bool prev = false)
 		{
 			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
-
-			if (string.IsNullOrEmpty(search))
-				return RedirectToAction("GetPage", new { pageSize, page, prev });
 
 			if (pageSize == 0)
 				return NoContent();
 
-			bool Filter(Team team) => team.Name.ToLowerInvariant().Contains(search?.ToLowerInvariant() ?? string.Empty);
+			bool Filter(Team team)
+			{
+				var isEqual = team.Name.ToLowerInvariant().Contains(search?.ToLowerInvariant() ?? string.Empty);
+				if (eventId != null)
+				{
+					isEqual = team.Event.Id == eventId && isEqual;
+				}
+				return isEqual;
+			}
 			var result = context.Teams.Include(x => x.Event).Include(x => x.UserTeams).GetPage(pageSize, HttpContext.Request, page, prev, Filter);
-			result.NextHref = result.NextHref == null ? null : $"{result.NextHref}&search={search}";
+			result.NextHref = result.NextHref == null ? null : $"{result.NextHref}&search={search}&eventId={eventId}";
+
+
 			logger.LogInformation($"Response TeamsCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
 								  $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
 
@@ -121,7 +129,7 @@ namespace TeamBuilder.Controllers
 			context.Update(team);
 			await context.SaveChangesAsync();
 
-			return Ok("Updated");
+			return Ok(team);
 		}
 
 		[HttpDelete]
@@ -137,6 +145,60 @@ namespace TeamBuilder.Controllers
 			await context.SaveChangesAsync();
 
 			return Ok("Deleted");
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> RejectedOrRemoveUser([FromBody]ManageUserTeamViewModel model)
+		{
+			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");
+
+			var team = await context.Teams
+				.Include(u => u.UserTeams)
+				.ThenInclude(ut => ut.User)
+				.FirstOrDefaultAsync(u => u.Id == model.TeamId);
+			var userTeam = team?.UserTeams.FirstOrDefault(ut => ut.UserId == model.UserId);
+
+			if (userTeam == null)
+				return NotFound($"Not found User {model.UserId} or user {model.UserId} inside Team {model.TeamId}");
+
+			userTeam.UserAction = userTeam.UserAction switch
+			{
+				UserActionEnum.SentRequest => UserActionEnum.RejectedTeamRequest,
+				UserActionEnum.JoinedTeam => UserActionEnum.QuitTeam,
+				_ => throw new Exception(
+					$"User '{model.UserId}' have invalid userAction '{userTeam.UserAction}' for team '{model.TeamId}'. " +
+					$"Available value: {UserActionEnum.RejectedTeamRequest}, {UserActionEnum.QuitTeam}")
+			};
+
+			context.Update(userTeam);
+			await context.SaveChangesAsync();
+
+			return Json(team.UserTeams);
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> CancelRequestUser([FromBody]ManageUserTeamViewModel model)
+		{
+			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");
+
+			var team = await context.Teams
+				.Include(u => u.UserTeams)
+				.ThenInclude(ut => ut.User)
+				.FirstOrDefaultAsync(u => u.Id == model.TeamId);
+			var userTeam = team?.UserTeams.FirstOrDefault(ut => ut.UserId == model.UserId);
+
+			if (userTeam == null)
+				return NotFound($"Not found User {model.UserId} or user {model.UserId} inside Team {model.TeamId}");
+
+			if (userTeam.UserAction != UserActionEnum.ConsideringOffer)
+				throw new Exception($"User '{model.UserId}' have invalid userAction '{userTeam.UserAction}' for team '{model.TeamId}'. " +
+									$"Available value: {UserActionEnum.RejectedTeamRequest}, {UserActionEnum.QuitTeam}");
+
+
+			context.Remove(userTeam);
+			await context.SaveChangesAsync();
+
+			return Json(team.UserTeams);
 		}
 
 		private async Task Initialize()

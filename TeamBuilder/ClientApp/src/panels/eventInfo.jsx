@@ -32,7 +32,6 @@ const EventInfo = props => {
                 <SimpleCell>
                     <InfoRow header="Ссылка">
                         {props.event && <a href={props.event.link}>{props.event.link}</a>}
-
                     </InfoRow>
                 </SimpleCell>
                 <SimpleCell multiline>
@@ -55,7 +54,7 @@ const EventInfo = props => {
                             data-event={JSON.stringify(props.event)}
                             data-from={props.id}>
                         </SimpleCell>
-                    </ FixedLayout>}
+                    </FixedLayout>}
             </Group>
         </Panel>
     );

@@ -1,11 +1,11 @@
 ﻿import React, { useState, useEffect } from 'react';
-import { connect } from 'react-redux';
 import ReactDOM from 'react-dom';
+import { connect } from 'react-redux';
 import {
     Panel, PanelHeader, Group, Cell, Avatar, Search, Button, Div, Input, PanelHeaderBack,
     Tabs, TabsItem, Separator, Checkbox, List, Header, FormLayout, Select, RichCell
 } from '@vkontakte/vkui';
-import {  } from '@vkontakte/vkui';
+import { } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import '../../src/styles/style.css';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
@@ -16,6 +16,7 @@ import Icon24Write from '@vkontakte/icons/dist/24/write';
 import UserTeams from './userTeams'
 import UserSkills from './userSkills'
 import bridge from '@vkontakte/vk-bridge';
+import { Api, Urls } from '../infrastructure/api';
 import { goBack, setPage } from '../store/router/actions';
 import { setUser } from '../store/user/actions';
 
@@ -57,7 +58,7 @@ class User extends React.Component {
             fetch(`/api/user/getRecruitTeams?vkProfileId=${this.state.vkProfile.id}&&id=${id}`)
                 .then(response => response.json())
                 .then(data => this.setState({ recruitTeams: data }));
-		}
+        }
 
     }
 
@@ -66,7 +67,7 @@ class User extends React.Component {
             { "app_id": 7448436, "scope": "" });
 
         let params = {
-            user_id: this.state.user.id,
+            user_id: this.state.userId,
             fields: 'city,photo_200,contacts',
             v: '5.103',
             access_token: t.access_token
@@ -107,6 +108,7 @@ class User extends React.Component {
     };
 
     handleCheckboxClick(event) {
+        console.log('checkbox clicked value', event.target.checked);
         var user = { ...this.state.user }
         user.isSearchable = event.target.checked;
         this.setState({ user });
@@ -121,7 +123,7 @@ class User extends React.Component {
                     <PanelHeaderBack onClick={() => goBack()} />}>Профиль</PanelHeader>
                 {this.state.vkUser &&
                     <Group title="VK Connect">
-                     <Cell description={ this.state.vkUser.city && this.state.vkUser.city.title ? this.state.vkUser.city.title : ''}
+                        <Cell description={this.state.vkUser.city && this.state.vkUser.city.title ? this.state.vkUser.city.title : ''}
                             before={this.state.vkUser.photo_200 ? <Avatar src={this.state.vkUser.photo_200} /> : null}>
                             {`${this.state.vkUser.first_name} ${this.state.vkUser.last_name}`}
                         </Cell>
@@ -139,13 +141,13 @@ class User extends React.Component {
                         Команды
                     </TabsItem>
                 </Tabs>
-                    {
+                {
                     this.state.activeTabProfile === 'main' ?
                         <Group header={<Header mode="secondary">Информация о профиле участника</Header>}>
                             <List>
                                 {!this.state.readOnlyMode && <Cell asideContent=
                                     {
-                                    <Icon24Write onClick={() => setPage('user', 'userEdit')} />
+                                        <Icon24Write onClick={() => setPage('user', 'userEdit')} />
                                     }>
                                 </Cell>}
                                 <Cell before={<Icon28PhoneOutline />}>
@@ -177,7 +179,7 @@ class User extends React.Component {
                     {this.state.recruitTeams && this.state.recruitTeams.length > 0 && < Button mode="primary" size='xl'
                         onClick={() => setPage('teams', 'setUserTeam')}
                         recruitTeams={this.state.recruitTeams}
-                        >
+                    >
                         Завербовать
                     </Button>}
                 </Div>
