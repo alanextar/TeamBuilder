@@ -9,6 +9,7 @@ using TeamBuilder.Models;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using TeamBuilder.Extensions;
+using TeamBuilder.Models.Enums;
 using TeamBuilder.ViewModels;
 
 namespace TeamBuilder.Controllers
@@ -137,6 +138,35 @@ namespace TeamBuilder.Controllers
 			await context.SaveChangesAsync();
 
 			return Ok("Deleted");
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> RejectedOrRemoveUser(long id, long userId)
+		{
+			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");
+
+			var team = await context.Users
+				.Include(u => u.UserTeams)
+				.ThenInclude(ut => ut.User)
+				.FirstOrDefaultAsync(u => u.Id == id);
+			var userTeam = team?.UserTeams.FirstOrDefault(ut => ut.UserId == userId);
+
+			if (userTeam == null)
+				return NotFound($"Not found User {userId} or user {userId} inside Team {id}");
+
+			userTeam.UserAction = userTeam.UserAction switch
+			{
+				UserActionEnum.SentRequest => UserActionEnum.RejectedTeamRequest,
+				UserActionEnum.JoinedTeam => UserActionEnum.QuitTeam,
+				_ => throw new Exception(
+					$"User '{userId}' have invalid userAction '{userTeam.UserAction}' for team '{id}'. " +
+					$"Available value: {UserActionEnum.RejectedTeamRequest}, {UserActionEnum.QuitTeam}")
+			};
+
+			context.Update(userTeam);
+			await context.SaveChangesAsync();
+
+			return Json(team.UserTeams);
 		}
 
 		private async Task Initialize()
