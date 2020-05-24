@@ -1,8 +1,15 @@
 ﻿import React from 'react';
 import ReactDOM from 'react-dom';
+
+import { connect } from 'react-redux';
+import { bindActionCreators } from "redux";
+
+import { goBack, openPopout, closePopout, openModal } from "../store/router/actions";
+import * as VK from '../services/VK';
+
 import {
     Panel, PanelHeader, Group, Cell, Avatar, Search, Button, Div, Input, FormLayoutGroup, Textarea,
-    Tabs, TabsItem, Separator, Checkbox, List, Header, FormLayout, Select, RichCell
+    Tabs, TabsItem, Separator, Checkbox, List, Header, FormLayout, Select, RichCell, PanelHeaderBack
 } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import '../../src/styles/style.css';
@@ -55,9 +62,13 @@ class UserEdit extends React.Component {
     render() {
         console.log(this.state.vkProfile);
         console.log('setUserEdit render', this.state.user);
+
+        const { id, goBack } = this.props;
+        console.log('111111111111111111', goBack);
+
         return (
             <Panel id="userEdit">
-                <PanelHeader>Профиль</PanelHeader>
+                <PanelHeader left={<PanelHeaderBack onClick={() => goBack()} />}>Профиль</PanelHeader>
                 {this.state.vkProfile &&
                     <Group title="VK Connect">
                         <Cell description={this.state.vkProfile.city && this.state.vkProfile.city.title ? this.state.vkProfile.city.title : ''}
@@ -85,4 +96,11 @@ class UserEdit extends React.Component {
     }
 }
 
-export default UserEdit;
+function mapDispatchToProps(dispatch) {
+    return {
+        dispatch,
+        ...bindActionCreators({ goBack }, dispatch)
+    }
+}
+
+export default connect(null, mapDispatchToProps)(UserEdit);

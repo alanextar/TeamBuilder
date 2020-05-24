@@ -1,4 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react';
+import { connect } from 'react-redux';
 import ReactDOM from 'react-dom';
 import {
     Panel, PanelHeader, Group, Cell, Avatar, Search, Button, Div, Input, PanelHeaderBack,
@@ -15,6 +16,7 @@ import Icon24Write from '@vkontakte/icons/dist/24/write';
 import UserTeams from './userTeams'
 import UserSkills from './userSkills'
 import bridge from '@vkontakte/vk-bridge';
+import { goBack, setPage } from '../store/router/actions';
 
 class User extends React.Component {
     constructor(props) {
@@ -125,6 +127,9 @@ class User extends React.Component {
 
     render() {
         //console.log('render user readOnlyMode', this.props.activeStory != 'user');
+
+        const { setPage } = this.props;
+
         return (
             <Panel id="user">
                 <PanelHeader separator={false} left={this.state.readOnlyMode &&
@@ -156,7 +161,7 @@ class User extends React.Component {
                             <List>
                                 {!this.state.readOnlyMode && <Cell asideContent=
                                     {
-                                        <Icon24Write onClick={this.state.goUserEdit}
+                                    <Icon24Write onClick={() => setPage('user', 'userEdit')}
                                             data-to='userEdit'
                                             data-id={this.state.vkProfile && this.state.vkProfile.id}
                                             data-user={JSON.stringify(this.state.user)} />
@@ -202,4 +207,9 @@ class User extends React.Component {
     }
 }
 
-export default User;
+const mapDispatchToProps = {
+    setPage,
+    goBack
+};
+
+export default connect(null, mapDispatchToProps)(User);

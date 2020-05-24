@@ -158,7 +158,7 @@ const App = (props) => {
                     text="События"
                 ><Icon28FavoriteOutline /></TabbarItem>
                 <TabbarItem
-                    onClick={() => setStory('user', 'events')}
+                    onClick={() => setStory('user', 'user')}
                     selected={activeStory === 'user'}
                     text="Профиль"
                 ><Icon28Profile /></TabbarItem>
@@ -185,7 +185,6 @@ const App = (props) => {
             </View>
             <View id='user' activePanel={getActivePanel("user")}
                 history={history}
-                onSwipeBack={() => goBack()}
             >
                 <User id='user' vkProfile={vkProfile} userId={userId} goUserEdit={goUserEdit} activeStory={activeStory} goSetUserTeam={goSetUserTeam} />
                 <UserEdit id='userEdit' goUserEdit={goUserEdit} vkProfile={vkProfile} user={user} />
