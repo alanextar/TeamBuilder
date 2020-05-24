@@ -21,7 +21,7 @@ export class Api {
     };
     
     static Teams = {
-        pagingSearch: (value) => teams.pagingSearch(value),
+        pagingSearch: (value, filter = {}) => teams.pagingSearch(value, filter),
         getPage: () => teams.getPage(),
         get: (id) => teams.get(id),
         create: (data) => teams.create(data),

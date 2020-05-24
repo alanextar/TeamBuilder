@@ -36,19 +36,26 @@ namespace TeamBuilder.Controllers
 			return teams;
 		}
 
-		public IActionResult PagingSearch(string search, int pageSize = 20, int page = 0, bool prev = false)
+		public IActionResult PagingSearch(string search, long? eventId, int pageSize = 20, int page = 0, bool prev = false)
 		{
 			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
-
-			if (string.IsNullOrEmpty(search))
-				return RedirectToAction("GetPage", new { pageSize, page, prev });
 
 			if (pageSize == 0)
 				return NoContent();
 
-			bool Filter(Team team) => team.Name.ToLowerInvariant().Contains(search?.ToLowerInvariant() ?? string.Empty);
+			bool Filter(Team team)
+			{
+				var isEqual = team.Name.ToLowerInvariant().Contains(search?.ToLowerInvariant() ?? string.Empty);
+				if (eventId != null)
+				{
+					isEqual = team.Event.Id == eventId && isEqual;
+				}
+				return isEqual;
+			}
 			var result = context.Teams.Include(x => x.Event).Include(x => x.UserTeams).GetPage(pageSize, HttpContext.Request, page, prev, Filter);
-			result.NextHref = result.NextHref == null ? null : $"{result.NextHref}&search={search}";
+			result.NextHref = result.NextHref == null ? null : $"{result.NextHref}&search={search}&eventId={eventId}";
+
+
 			logger.LogInformation($"Response TeamsCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
 								  $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
 
