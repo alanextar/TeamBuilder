@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
 import { goBack, setPage } from "../store/router/actions";
 import { setTeam } from "../store/teams/actions";
-import { setUser } from "../store/user/actions";
+import { setUser, setTeamUser } from "../store/user/actions";
 import * as VK from '../services/VK';
 
 import {
@@ -55,12 +55,12 @@ class TeamInfo extends React.Component {
     }
 
     render() {
-        const { id, goBack, setTeam, setUser, setPage } = this.props;
+        const { id, goBack, setTeam, setTeamUser, setUser, setPage } = this.props;
 
         var self = this;
         return (
             <Panel id={id}>
-                <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} data-to={this.state.return} />}>
+                <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
                     {this.state.team && this.state.team.name}
                 </PanelHeader>
                 <Tabs>
@@ -108,7 +108,8 @@ class TeamInfo extends React.Component {
                                                     <SimpleCell
                                                         onClick={() => {
                                                             setPage('teams', 'user');
-                                                            setUser(userTeam.user)
+                                                            setUser(userTeam.user);
+                                                            setTeamUser(userTeam.user)
                                                         }}
                                                         before={<Avatar size={48} src={userTeam.user.photo100}/>}
                                                         after={<Icon28MessageOutline />}>
@@ -142,7 +143,8 @@ class TeamInfo extends React.Component {
 
 const mapStateToProps = (state) => {
     return {
-        activeTeam: state.team.activeTeam
+        activeTeam: state.team.activeTeam,
+        teamUser: state.user.teamUser
     };
 };
 
@@ -150,7 +152,7 @@ const mapStateToProps = (state) => {
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
-        ...bindActionCreators({ setPage, setTeam,setUser, goBack }, dispatch)
+        ...bindActionCreators({ setPage, setTeam, setUser, goBack, setTeamUser }, dispatch)
     }
 }
 

@@ -1,4 +1,4 @@
-import {SET_USER, SET_PROFILE, GET_USER, SET_PROFILE_USER} from './actionTypes';
+import {SET_USER, SET_PROFILE, SET_PROFILE_USER, SET_TEAM_USER, SET_EVENT_USER, SET_PARTICIPANT_USER} from './actionTypes';
 
 export const setUser = (user) => {
 
@@ -30,11 +30,32 @@ export const setProfileUser = (profileUser) => {
     }
 };
 
-export const getUser = () => {
+export const setEventUser = (eventUser) => {
 
     return {
-        type: GET_USER,
+        type: SET_EVENT_USER,
             payload: {
+                eventUser: eventUser
+        }
+    }
+};
+
+export const setTeamUser = (teamUser) => {
+
+    return {
+        type: SET_TEAM_USER,
+            payload: {
+                teamUser: teamUser
+        }
+    }
+};
+
+export const setParticipantUser = (participantUser) => {
+
+    return {
+        type: SET_PARTICIPANT_USER,
+            payload: {
+                participantUser: participantUser
         }
     }
 };

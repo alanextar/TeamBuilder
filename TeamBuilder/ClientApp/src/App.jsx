@@ -5,7 +5,11 @@ import '@vkontakte/vkui/dist/vkui.css';
 import bridge from '@vkontakte/vk-bridge';
 import { bindActionCreators } from 'redux'
 import { goBack, closeModal, setStory } from "./store/router/actions";
-import { setUser, setProfile, getUser, setProfileUser } from "./store/user/actions";
+import { setParticipant } from "./store/participants/actions";
+import {
+    setUser, setProfile, getUser,
+    setProfileUser, setTeamUser, setEventUser, setParticipantsUser
+} from "./store/user/actions";
 import { getActivePanel } from "./services/_functions";
  import * as VK from './services/VK';
 
@@ -33,8 +37,9 @@ const App = (props) => {
     let lastAndroidBackAction = 0;
     const [teamHref, setTeamNextHref] = useState(null);
 
-    const { goBack, setStory, activeView, activeStory, panelsHistory,
-        setProfile, setUser, setProfileUser, profileUser, profile, user
+    const { goBack, setStory, activeView, activeStory, panelsHistory, setProfile, setUser,
+        setProfileUser, setEventUser, setTeamUser, setParticipant, profile, profileUser,
+        teamUser, eventUser, participant, user
     } = props;
     let history = (panelsHistory[activeView] === undefined) ? [activeView] : panelsHistory[activeView];
 
@@ -85,17 +90,17 @@ const App = (props) => {
         <Epic activeStory={activeStory} tabbar={
             <Tabbar>
                 <TabbarItem
-                    onClick={() => setStory('teams', 'teams')}
+                    onClick={() => { console.log('go teams', teamUser); setUser(teamUser); setStory('teams', 'teams') }}
                     selected={activeStory === 'teams'}
                     text="Команды"
                 ><Icon28Users3Outline /></TabbarItem>
                 <TabbarItem
-                    onClick={() => setStory('users', 'users')}
+                    onClick={() => { setStory('users', 'users'); setUser(participant) }}
                     selected={activeStory === 'users'}
                     text="Участники"
                 ><Icon28Users /></TabbarItem>
                 <TabbarItem
-                    onClick={() => setStory('events', 'events')}
+                    onClick={() => { setStory('events', 'events'); setUser(eventUser) } }
                     selected={activeStory === 'events'}
                     text="События"
                 ><Icon28FavoriteOutline /></TabbarItem>
@@ -124,6 +129,7 @@ const App = (props) => {
                 history={history}
             >
                 <Users id='users' />
+                <User id='user' activeStory={activeStory} />
             </View>
             <View id='events' activePanel={getActivePanel("events")}
                 history={history}>
@@ -153,7 +159,10 @@ const mapStateToProps = (state) => {
         scrollPosition: state.router.scrollPosition,
         profile: state.user.profile,
         user: state.user.user,
-        profileUser: state.user.profileUser
+        profileUser: state.user.profileUser,
+        eventUser: state.user.eventUser,
+        teamUser: state.user.teamUser,
+        participant: state.participant.participant
         // colorScheme: state.vkui.colorScheme
     };
 };
@@ -162,7 +171,10 @@ const mapStateToProps = (state) => {
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
-        ...bindActionCreators({ setStory, goBack, closeModal, setProfile, setUser, setProfileUser }, dispatch)
+        ...bindActionCreators({
+            setStory, goBack, closeModal, setProfile,
+            setUser, setProfileUser, setEventUser, setTeamUser, setParticipant
+        }, dispatch)
     }
 }
 

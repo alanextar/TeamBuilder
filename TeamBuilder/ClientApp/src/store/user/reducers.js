@@ -1,5 +1,5 @@
 import {
-    SET_USER, SET_PROFILE, GET_USER, SET_PROFILE_USER
+    SET_USER, SET_PROFILE, SET_PROFILE_USER, SET_EVENT_USER, SET_TEAM_USER, SET_PARTICIPANT_USER
 } from './actionTypes';
 
 const initialState = {
@@ -7,26 +7,16 @@ const initialState = {
 };
 
 export const userReducer = (state = initialState, action) => {
-    console.log('action.type', action.type);
+    console.log('!!!!!!!!!!!!!!!!!!!!!!!!action.type', action.type);
     switch (action.type) {
-        case GET_USER: {
-            //заглушка
-
-            return {
-                ...state,
-            }
-        }
         case SET_USER: {
-            let User = action.payload.user;
 
-            console.log('SET USER', User);
             return {
                 ...state,
-                user: User
+                user: action.payload.user
             };
         }
         case SET_PROFILE: {
-            console.log('!!!SET_PROFILE', action.payload.profile)
             return {
                 ...state,
                 profile: action.payload.profile
@@ -36,6 +26,24 @@ export const userReducer = (state = initialState, action) => {
             return {
                 ...state,
                 profileUser: action.payload.profileUser
+            };
+        }
+        case SET_EVENT_USER: {
+            return {
+                ...state,
+                eventUser: action.payload.eventUser
+            };
+        }
+        case SET_TEAM_USER: {
+            return {
+                ...state,
+                teamUser: action.payload.teamUser
+            };
+        }
+        case SET_PARTICIPANT_USER: {
+            return {
+                ...state,
+                participantUser: action.payload.participantUser
             };
         }
 
