@@ -157,9 +157,9 @@ class User extends React.Component {
                 <Div>
                     <Checkbox disabled={this.state.readOnlyMode} onChange={(e) => this.handleCheckboxClick(e)}
                         checked={this.state.user && this.state.user.isSearchable ? 'checked' : ''}>в поиске команды</Checkbox>
-                    {this.state.user && !this.state.readOnlyMode && <Button mode={this.state.isConfirmed ? "primary" : "destructive"} size='xl'
+                    {!this.state.readOnlyMode && <Button mode={this.state.user ? "primary" : "destructive"} size='xl'
                         onClick={() => this.confirmUser(this.state.user && this.state.user.id, this.state.user.userSkills)}>
-                        {this.state.isConfirmed ? "Сохранить" : "Подтвердить"}
+                        {this.state.user ? "Сохранить" : "Подтвердить"}
                     </Button>}
                 </Div>
                 <Div>
