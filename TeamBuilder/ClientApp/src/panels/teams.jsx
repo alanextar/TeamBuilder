@@ -4,7 +4,6 @@ import {
     PanelHeaderButton, CardGrid, Card
 } from '@vkontakte/vkui';
 import InfiniteScroll from 'react-infinite-scroller';
-import qwest from 'qwest';
 import { Api, Urls } from '../infrastructure/api';
 import debounce from 'lodash.debounce';
 
@@ -48,17 +47,17 @@ class Teams extends React.Component {
         var self = this;
         Api.Teams.GetPage()
             .then(result => {
-                if (resp) {
+                if (result) {
                     var teamsT = [];
-                    resp.collection.map((team) => {
+                    result.collection.map((team) => {
                         teamsT.push(team);
                     });
 
-                    if (resp.nextHref) {
+                    if (result.nextHref) {
                         self.setState({
                             teams: teamsT,
                             href: url,
-                            nextHref: resp.nextHref
+                            nextHref: result.nextHref
                         });
                     } else {
                         self.setState({
