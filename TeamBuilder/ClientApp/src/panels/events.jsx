@@ -7,6 +7,7 @@ import {
 import InfiniteScroll from 'react-infinite-scroller';
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import { Api } from '../infrastructure/api';
+import { Urls } from '../infrastructure/urls';
 
 const Events = props => {
     const [fetching, setFetching] = useState(false);
@@ -40,7 +41,7 @@ const Events = props => {
     //#endregion
 
     const getEvents = () => {
-        fetch(`${Api.Events.GetPage}`)
+        fetch(`${Urls.Events.GetPage}`)
             .then((resp) => resp.json())
             .then(json => setEvents(json.collection))
             .catch((error) => console.log(`Error for get events page. Details: ${error}`));
@@ -55,7 +56,7 @@ const Events = props => {
     //#region Scroll
 
     const loadItems = page => {
-        var url = `${Api.Events.GetPage}`;
+        var url = `${Urls.Events.GetPage}`;
         if (nextHref) {
             url = nextHref;
         }

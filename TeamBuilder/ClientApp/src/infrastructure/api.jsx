@@ -1,41 +1,28 @@
-﻿export class Api {
-    static baseUrl = '';
-    static prefix = 'api';
-    static teamsStr = 'teams';
-    static userStr = 'user';
-    static eventStr = 'event';
+﻿import { Urls } from "./urls";
+import * as api from "./apiBase";
+import * as users from "./apiUsers";
+import * as teams from "./apiTeams";
+import * as events from "./apiEvents";
 
-    static Teams = {
-        Get: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/get`,
-        GetAll: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/getAll`,
-        GetPage: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/getPage`,
-        Create: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/create`,
-        Delete: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/delete`,
-        Edit: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/edit`,
-        PagingSearch: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/pagingSearch`
-    }
+export class Api {
 
     static Users = {
-        Get: `${this.baseUrl}/${this.prefix}/${this.userStr}/get`,
-        GetAll: `${this.baseUrl}/${this.prefix}/${this.userStr}/getAll`,
-        GetPage: `${this.baseUrl}/${this.prefix}/${this.userStr}/getPage`,
-        Edit: `${this.baseUrl}/${this.prefix}/${this.userStr}/edit`,
-        PagingSearch: `${this.baseUrl}/${this.prefix}/${this.userStr}/pagingSearch`,
-        Confirm: `${this.baseUrl}/${this.prefix}/${this.userStr}/confirm`,
-        CheckConfirmation: `${this.baseUrl}/${this.prefix}/${this.userStr}/checkConfirmation`,
-        GetSkills: `${this.baseUrl}/${this.prefix}/${this.userStr}/getSkills`,
-        GetTeams: `${this.baseUrl}/${this.prefix}/${this.userStr}/getTeams`,
-        JoinTeam: `${this.baseUrl}/${this.prefix}/${this.userStr}/joinTeam`,
-        QuitOrDeclineTeam: `${this.baseUrl}/${this.prefix}/${this.userStr}/quitOrDeclineTeam`,
-    }
+        pagingSearch: (value) => users.pagingSearch(value),
+        getPage: () => users.getPage()
+    };
 
     static Events = {
-        Get: `${this.baseUrl}/${this.prefix}/${this.eventStr}/get`,
-        GetAll: `${this.baseUrl}/${this.prefix}/${this.eventStr}/getall`,
-        GetPage: `${this.baseUrl}/${this.prefix}/${this.eventStr}/getPage`,
-        Create: `${this.baseUrl}/${this.prefix}/${this.eventStr}/create`,
-        Delete: `${this.baseUrl}/${this.prefix}/${this.eventStr}/delete`,
-        Edit: `${this.baseUrl}/${this.prefix}/${this.eventStr}/edit`,
-        PagingSearch: `${this.baseUrl}/${this.prefix}/${this.eventStr}/pagingSearch`
-    }
+        pagingSearch: (value) => events.pagingSearch(value),
+        getPage: () => events.getPage(),
+        edit: (data) => events.edit(data)
+    };
+    
+    static Teams = {
+        pagingSearch: (value) => teams.pagingSearch(value),
+        getPage: () => teams.getPage(),
+        rejectedOrRemoveUser: (data) => teams.rejectedOrRemoveUser(data)
+    };
+
+    static get = (url, params = {}) => api.get(url, params);
+    static post = (url, data = {}) => api.post(url, data);
 }
