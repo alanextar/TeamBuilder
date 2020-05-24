@@ -22,6 +22,7 @@ export function get(url, params = {}) {
     if (searchParams){
         url = `${url}?${searchParams}`;
     }
+    console.log(`get request: ${url}`);
     return fetch(url, initGet)
         .then(resp => resp.json())
         .then(json => json)
