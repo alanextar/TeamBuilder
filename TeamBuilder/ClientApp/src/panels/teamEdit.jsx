@@ -19,7 +19,7 @@ class TeamEdit extends React.Component {
             membersDescription: '',
             team: null,
             events: [],
-            eventId: -1,
+            eventId: null,
             usersNumber: 2,
             go: props.go,
             id: props.id,
@@ -117,7 +117,7 @@ class TeamEdit extends React.Component {
                                     top="Выберете событие"
                                     placeholder="Событие"
                                     onChange={this.onEventChange}
-                                    value={this.state.eventId}
+                                    value={this.state.eventId ? this.state.eventId : ''}
                                     name="eventId"
                                 >
                                     {this.state.events && this.state.events.map((ev, i) => {
