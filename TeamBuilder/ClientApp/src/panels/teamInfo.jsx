@@ -20,10 +20,8 @@ class TeamInfo extends React.Component {
     constructor(props) {
         super(props);
 
-        console.log('teamInfo constructor', props);
-
         this.state = {
-            team: null,
+            team: props.activeTeam,
             go: props.go,
             id: props.id,
             activeTab: 'teamDescription',
@@ -38,9 +36,10 @@ class TeamInfo extends React.Component {
 
     async populateTeamData() {
         var self = this;
+
         qwest.get(Api.Teams.Get,
             {
-                id: self.props.teamId
+                id: self.state.team.id
             },
             {
                 cache: true
@@ -50,19 +49,18 @@ class TeamInfo extends React.Component {
                     self.setState({ team: resp});
                 }
             })
-            .catch((error) => 
-                console.log(`Error for get team id:${self.props.teamId}. Details: ${error}`));
+            .catch((error) =>
+                console.log(`Error for get team id:${self.state.team.id}. Details: ${error}`));
     }
 
     render() {
-        const { id, goBack, activeTeam } = this.props;
-        console.log('#############################', this.props);
+        const { id, goBack } = this.props;
 
         var self = this;
         return (
             <Panel id={id}>
                 <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} data-to={this.state.return} />}>
-                    {activeTeam && activeTeam.name}
+                    {this.state.team && this.state.team.name}
                 </PanelHeader>
                 <Tabs>
                     <TabsItem
@@ -83,17 +81,17 @@ class TeamInfo extends React.Component {
                     </TabsItem>
                 </Tabs>
                 <Group>
-                    {activeTeam && (
+                    {this.state.team && (
                         this.state.activeTab === 'teamDescription' ?
                             <Cell>
                                 <SimpleCell>
                                     <InfoRow header='Описаноие команды'>
-                                        {activeTeam.description}    
+                                        {this.state.team.description}    
                                     </InfoRow>
                                 </SimpleCell>
                                 <SimpleCell>
                                     <InfoRow header='Участвуем в '>
-                                        {activeTeam.event && activeTeam.event.name}
+                                        {this.state.team.event && this.state.team.event.name}
                                     </InfoRow>
                                 </SimpleCell>
                             </Cell>
@@ -101,10 +99,10 @@ class TeamInfo extends React.Component {
                             <Cell>
                                 <Div>
                                     <InfoRow header='Участники'>
-                                        Требуется {activeTeam.numberRequiredMembers} участников
-                                        {console.log('userTeams ', activeTeam.userTeams)}
-                                        {activeTeam.userTeams &&
-                                            activeTeam.userTeams.map((userTeam, i) => {
+                                        Требуется {this.state.team.numberRequiredMembers} участников
+                                        {console.log('userTeams ', this.state.team.userTeams)}
+                                        {this.state.team.userTeams &&
+                                            this.state.team.userTeams.map((userTeam, i) => {
                                                 //{ members.isOwner && (members.id === self.props.vkProfile.id) && self.setState({ edit: true }) }
                                                 return (
                                                     <SimpleCell
@@ -122,17 +120,17 @@ class TeamInfo extends React.Component {
                                 </Div>
                                 <Div>
                                     <InfoRow header='Описание задач'>
-                                        {activeTeam.descriptionRequiredMembers}
+                                        {this.state.team.descriptionRequiredMembers}
                                     </InfoRow>
                                 </Div>
                             </Cell>)}
-                    {activeTeam && this.state.edit &&
+                    {this.state.team && this.state.edit &&
                         <FixedLayout vertical="bottom" >
                             <SimpleCell
                                 after={<Icon28EditOutline />}
                                 onClick={this.state.go}
                                 data-to='teamEdit'
-                                data-id={activeTeam.id}>
+                                data-id={this.state.team.id}>
                             </SimpleCell>
                         </FixedLayout>}
                 </Group>
