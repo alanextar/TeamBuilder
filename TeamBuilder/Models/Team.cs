@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using TeamBuilder.Controllers.Paging;
+using TeamBuilder.Models.Enums;
 
 namespace TeamBuilder.Models
 {

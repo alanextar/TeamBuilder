@@ -1,4 +1,5 @@
 ﻿import React from 'react';
+import { Api } from '../infrastructure/api';
 
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell,
@@ -13,12 +14,12 @@ class TeamEdit extends React.Component {
         super(props);
 
         this.state = {
-            name: null,
-            description: null,
-            membersDescription: null,
+            name: '',
+            description: '',
+            membersDescription: '',
             team: null,
-            events: null,
-            check: null,
+            events: [],
+            eventId: null,
             usersNumber: 2,
             go: props.go,
             id: props.id,
@@ -26,7 +27,7 @@ class TeamEdit extends React.Component {
             userTeams: null,
         };
 
-        this.onChange = this.onChange.bind(this);
+        this.onEventChange = this.onEventChange.bind(this);
         this.onDescriptionChange = this.onDescriptionChange.bind(this);
         this.onMembersDescriptionChange = this.onMembersDescriptionChange.bind(this);
         this.onNameChange = this.onNameChange.bind(this);
@@ -39,64 +40,52 @@ class TeamEdit extends React.Component {
     }
 
     async populateEventsData() {
-        const response = await fetch(`/api/event/getall`);
-        const data = await response.json();
-        console.log('event from teamEdit', data)
-        this.setState({
-            events: data,
-        });
+        Api.Events.getAll()
+            .then(result => this.setState({ events: result, }));
     }
 
     async populateTeamData() {
-        const response = await fetch(`/api/teams/get/${this.props.teamId}`);
-        const data = await response.json();
-        console.log('data from teamEdit', data)
-        this.setState({
-            team: data,
-            name: data.name,
-            description: data.description,
-            membersDescription: data.descriptionRequiredMembers,
-            usersNumber: data.numberRequiredMembers,
-            check: data.event.id,
-            userTeams: data.userTeams
-        });
+        Api.Teams.get(this.props.teamId)
+            .then(result =>
+                this.setState({
+                    team: result,
+                    name: result.name,
+                    description: result.description,
+                    membersDescription: result.descriptionRequiredMembers,
+                    usersNumber: result.numberRequiredMembers,
+                    eventId: result.event && result.event.id
+                }));
     }
 
-    onChange(e) {
-        const { check, value } = e.currentTarget;
-        this.setState({ check: value });
+    onEventChange(e) {
+        console.log(`event.team: ${e.target.value}`)
+        this.setState({ eventId: e.target.value })
     }
 
     onNameChange(e) {
-        const { name, value } = e.currentTarget;
-        console.log('change name ', value);
-        this.setState({ name: value })
+        console.log(`event.Name: ${e.target.value}`)
+        this.setState({ name: e.target.value })
     }
 
     onDescriptionChange(e) {
-        const { description, value } = e.currentTarget;
-        this.setState({ description: value })
+        console.log(`event.Description: ${e.target.value}`)
+        this.setState({ description: e.target.value })
     }
 
     onMembersDescriptionChange(e) {
-        const { membersDescription, value } = e.currentTarget;
-        this.setState({ membersDescription: value })
+        this.setState({ membersDescription: e.target.value })
     }
 
-    async postEdit() {
-        let id = this.state.team.id;
-        let name = this.state.name;
-        let description = this.state.description;
-        let numberRequiredMembers = this.state.usersNumber;
-        let eventId = this.state.check;
-        let descriptionRequiredMembers = this.state.membersDescription;
-        var editTeamViewModel = { id, name, description, numberRequiredMembers, descriptionRequiredMembers, eventId };
-
-        let response = await fetch('/api/teams/edit', {
-            method: 'post',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(editTeamViewModel)
-        });
+    async postEdit(e) {
+        var editTeamViewModel = {
+            id: this.state.team.id,
+            name: this.state.name,
+            description: this.state.description,
+            numberRequiredMembers: this.state.usersNumber,
+            descriptionRequiredMembers: this.state.membersDescription,
+            eventId: this.state.eventId
+        }
+        Api.Teams.edit(editTeamViewModel);
     };
 
     async handleJoin(e, userTeam) {
@@ -119,7 +108,6 @@ class TeamEdit extends React.Component {
     };
 
     render() {
-        const check = this.state.check;
         return (
             <Panel id={this.state.id}>
                 <PanelHeader separator={false} left={<PanelHeaderBack onClick={this.state.go} data-to={'teaminfo'} data-id={this.props.teamId} />}>
@@ -127,21 +115,15 @@ class TeamEdit extends React.Component {
                 </PanelHeader>
                 <Tabs>
                     <TabsItem
-                        onClick={() => {
-                            this.setState({ activeTab: 'teamDescription' })
-                        }}
-                        selected={this.state.activeTab === 'teamDescription'}
-                    >
+                        onClick={() => { this.setState({ activeTab: 'teamDescription' }) }}
+                        selected={this.state.activeTab === 'teamDescription'}>
                         Описание
-                    </TabsItem>
+                        </TabsItem>
                     <TabsItem
-                        onClick={() => {
-                            this.setState({ activeTab: 'teamUsers' })
-                        }}
-                        selected={this.state.activeTab === 'teamUsers'}
-                    >
+                        onClick={() => { this.setState({ activeTab: 'teamUsers' }) }}
+                        selected={this.state.activeTab === 'teamUsers'}>
                         Участники
-                    </TabsItem>
+                        </TabsItem>
                 </Tabs>
                 <Group>
                     {this.state.team && (
@@ -153,24 +135,21 @@ class TeamEdit extends React.Component {
                                 <Select
                                     top="Выберете событие"
                                     placeholder="Событие"
-                                    defaultValue={this.state.team.events && this.state.team.events}
-                                    status={check ? 'valid' : 'error'}
-                                    bottom={check ? '' : 'Пожалуйста, выберете или создайте событие'}
-                                    onChange={this.onChange}
-                                    value={check}
-                                    name="check"
+                                    onChange={this.onEventChange}
+                                    value={this.state.eventId ? this.state.eventId : ''}
+                                    name="eventId"
                                 >
                                     {this.state.events && this.state.events.map((ev, i) => {
                                         return (
-                                            <option value={ev.id}>
+                                            <option value={ev.id} key={i}>
                                                 {ev.name}
-                                            </ option>
+                                            </option>
                                         )
                                     })}
 
                                 </Select>
                                 <Button>Создать Событие</Button>
-                            </ FormLayout>
+                            </FormLayout>
                             :
                             <Cell>
                                 <FormLayout >
@@ -187,7 +166,7 @@ class TeamEdit extends React.Component {
                                         top="Описание участников и их задач"
                                         defaultValue={this.state.membersDescription}
                                         onChange={this.onMembersDescriptionChange} />
-                                </ FormLayout>
+                                </FormLayout>
 
                                 <InfoRow header='Участники'>
                                     {console.log('userTeams ', this.state.team.userTeams)}
@@ -222,7 +201,7 @@ class TeamEdit extends React.Component {
                                         )}
                                 </InfoRow>
 
-                            </ Cell>
+                            </Cell>
                     )}
                 <Div>
                     <Button

@@ -36,26 +36,20 @@ const EventEdit = props => {
     };
 
     const eventEdit = () => {
-        let id = props.event.id;
-        let name = eventName;
-        let description = eventDescription;
-        let link = eventLink;
-        let startDate = eventStartDate;
-        let finishDate = eventFinishDate;
-        let userId = props.owner ? props.owner.id : -1;
-        var editEventViewModel = { id, name, description, startDate, finishDate, link, userId }
-        fetch(`${Api.Events.Edit}`,
-            {
-                method: 'post',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(editEventViewModel)
-            })
-            .then(resp => resp.json())
-            .then(json => {
-                setChangedEvent(json);
-                console.log(json);
-            } )
-            .catch((error) => console.log(`Error for editing events. Details: ${error}`));
+        var editEventViewModel = {
+            id: props.event.id,
+            name: eventName,
+            description: eventDescription,
+            link: eventLink,
+            startDate: eventStartDate,
+            finishDate: eventFinishDate,
+            userId: props.owner ? props.owner.id : -1
+        }
+        Api.Events.edit(editEventViewModel)
+            .then(result => {
+                setChangedEvent(result);
+                console.log(result);
+            });
     }
 
     return (
@@ -72,7 +66,7 @@ const EventEdit = props => {
                     <Input top="Ссылка на соревнование" type="text" onChange={onLinkChange} defaultValue={eventLink} />
                     <Input top="Дата начала соревнований" type="text" onChange={onStartDateChange} defaultValue={eventStartDate} />
                     <Input top="Дата завершения соревнований" type="text" onChange={onFinishDateChange} defaultValue={eventFinishDate} />
-                </ FormLayout>
+                </FormLayout>
             </Group>
             <FixedLayout vertical="bottom">
                 <Button
@@ -83,7 +77,7 @@ const EventEdit = props => {
                     data-from={props.id}>
                     Изменить мероприятие
                 </Button>
-            </ FixedLayout>
+            </FixedLayout>
         </Panel>
     );
 }
