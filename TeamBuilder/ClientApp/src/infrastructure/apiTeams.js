@@ -36,3 +36,8 @@ export function rejectedOrRemoveUser(data) {
     console.log(`teams.rejectedOrRemoveUser`);
     return api.post(Urls.Teams.RejectedOrRemoveUser, data);
 };
+
+export function cancelRequestUser(data) {
+    console.log(`teams.cancelRequestUser`);
+    return api.post(Urls.Teams.CancelRequestUser, data);
+};

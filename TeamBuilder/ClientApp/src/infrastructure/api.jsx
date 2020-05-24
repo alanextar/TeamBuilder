@@ -27,7 +27,8 @@ export class Api {
         create: (data) => teams.create(data),
         edit: (data) => teams.edit(data),
         delete: (data) => teams.remove(data),
-        rejectedOrRemoveUser: (data) => teams.rejectedOrRemoveUser(data)
+        rejectedOrRemoveUser: (data) => teams.rejectedOrRemoveUser(data),
+        cancelRequestUser: (data) => teams.cancelRequestUser(data)
     };
 
     static get = (url, params = {}) => api.get(url, params);
@@ -49,7 +50,8 @@ export class Urls {
         Delete: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/delete`,
         Edit: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/edit`,
         PagingSearch: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/pagingSearch`,
-        RejectedOrRemoveUser: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/rejectedOrRemoveUser`
+        RejectedOrRemoveUser: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/rejectedOrRemoveUser`,
+        CancelRequestUser: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/cancelRequestUser`
     };
 
     static Users = {
