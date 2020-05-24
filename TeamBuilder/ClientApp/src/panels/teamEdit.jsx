@@ -107,6 +107,14 @@ class TeamEdit extends React.Component {
             })
     };
 
+    async cancelUser(e, userTeam) {
+        await Api.Teams.cancelRequestUser({ teamId: userTeam.teamId, userId: userTeam.userId })
+            .then(json => {
+                console.log('on cancel click ', JSON.stringify(json))
+                this.setState({ userTeams: json })
+            })
+    };
+
     render() {
         return (
             <Panel id={this.state.id}>
@@ -175,7 +183,7 @@ class TeamEdit extends React.Component {
                                             console.log('userAction', members.userAction)
                                             return (
                                                 (members.userAction === 1 || members.userAction === 2 || members.userAction === 5) &&
-                                                <RichCell
+                                                <RichCell key={i}
                                                     before={<Avatar size={48} />}
                                                     after={members.userAction === 2 && <Icon24DismissDark
                                                         onClick={(e) => this.dropUser(e, members)} />}
@@ -190,7 +198,7 @@ class TeamEdit extends React.Component {
                                                         members.userAction === 5 &&
                                                         <React.Fragment>
                                                             <Button mode="secondary"
-                                                                onClick={(e) => this.dropUser(e, members)}>Отозвать предложение</Button>
+                                                                onClick={(e) => this.cancelUser(e, members)}>Отозвать предложение</Button>
                                                         </React.Fragment>
                                                     }
                                                 >
