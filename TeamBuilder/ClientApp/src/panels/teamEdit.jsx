@@ -163,7 +163,7 @@ class TeamEdit extends React.Component {
                                     })}
 
                                 </Select>
-                                <Button>Создать Событие</Button>
+                                <Button onClick={() => { setPage('teams','eventCreate') }}>Создать Событие</Button>
                             </FormLayout>
                             :
                             <Cell>
@@ -223,7 +223,7 @@ class TeamEdit extends React.Component {
                         onClick={(e) => { this.postEdit(); goBack() }}
                         data-to={'teaminfo'}
                         data-id={this.props.teamId} >
-                        Применить Изменения
+                        Сохранить
                         </Button>
                 </Div>
                 </ Group>

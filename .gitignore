@@ -353,3 +353,4 @@ MigrationBackup/
 bin
 obj
 *.exe
+/TeamBuilder/ClientApp/src/infrastructure/secret.js

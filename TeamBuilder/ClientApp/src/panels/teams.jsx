@@ -136,7 +136,7 @@ class Teams extends React.Component {
                     <RichCell
                         before={<Avatar size={64} src={team.photo100} />}
                         text={team.description}
-                        caption={team.event.name}
+                        caption={team.event && team.event.name}
                         after={team.userTeams.length + '/' + team.numberRequiredMembers}
                         onClick={() => { setPage('teams', 'teaminfo'); setTeam(team) }}
                     >

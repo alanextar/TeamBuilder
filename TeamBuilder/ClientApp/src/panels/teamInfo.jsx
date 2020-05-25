@@ -144,7 +144,6 @@ const mapStateToProps = (state) => {
     };
 };
 
-
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,

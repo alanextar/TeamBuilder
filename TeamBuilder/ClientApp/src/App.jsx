@@ -165,12 +165,12 @@ const App = (props) => {
                 //    </ModalRoot>}
             >
                 <Teams id='teams' activeStory={activeStory} href={teamHref} />
-                <TeamInfo id='teaminfo' return='teams' profile={props.profile} />
+                <TeamInfo id='teaminfo' return='teams' />
                 <TeamCreate id='teamCreate' />
                 <TeamEdit id='teamEdit' />
                 <User id='user' activeStory={activeStory} />
                 <SetUserTeam id='setUserTeam' />
-                <EventCreate id='eventCreate' owner={props.profile} />
+                <EventCreate id='eventCreate' />
                 {/*<EventsFilter id='eventsFilter' go={goTeam} back={back}
                     setActiveTeamPanel={setActiveTeamPanel}
                     activeModal={() => setactiveModal('filters')}
