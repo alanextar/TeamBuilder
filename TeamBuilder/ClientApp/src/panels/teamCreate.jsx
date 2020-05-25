@@ -182,7 +182,7 @@ class TeamCreate extends React.Component {
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
-        ...bindActionCreators({ setPage, createTeam, goBack }, dispatch)
+        ...bindActionCreators({ setPage, goBack }, dispatch)
     }
 }
 

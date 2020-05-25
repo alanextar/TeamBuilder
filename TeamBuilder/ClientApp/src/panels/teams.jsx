@@ -123,7 +123,7 @@ class Teams extends React.Component {
     }
 
     render() {
-        const { id, goBack, createTeam, setPage } = this.props;
+        const { id, goBack, createTeam, setPage, setTeam } = this.props;
         var self = this;
         //var href = self.state.href === api.baseUrl + api.getTeams ? self.state.href : self.state.href + '&prev=true';
         const loader = <div key={0}>Loading ...</div>;
@@ -145,13 +145,11 @@ class Teams extends React.Component {
             );
         });
 
-        const { setPage, setTeam } = this.props;
-
         return (
             <Panel id={this.state.page_id}>
                 <PanelHeader left={
                     <PanelHeaderButton>
-                        <Icon28AddOutline onClick={() => { createTeam(); setPage('teams', 'createteam'); }} data-to='teamCreate' />
+                        <Icon28AddOutline onClick={() => { createTeam(); setPage('teams', 'teamCreate'); }} />
                     </PanelHeaderButton>}>
                     Команды
                 </PanelHeader>

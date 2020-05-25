@@ -9,7 +9,6 @@ import {
     PanelHeaderBack, Input, FormLayout
 } from '@vkontakte/vkui';
 import { Api } from '../infrastructure/api';
-import { goBack } from '../store/router/actions';
 
 const EventEdit = props => {
     const [changedEvent, setChangedEvent] = useState(props.event.name);

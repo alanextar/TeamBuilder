@@ -15,7 +15,6 @@ export const createEvent = () => {
     return {
         type: CREATE_EVENT,
             payload: {
-            event: event
         }
     }
 };

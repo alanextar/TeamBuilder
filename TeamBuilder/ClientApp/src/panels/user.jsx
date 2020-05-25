@@ -24,7 +24,7 @@ class User extends React.Component {
     constructor(props) {
         super(props);
 
-        let userSkills = props.user.userSkills && props.user.userSkills.map(function (userSkill) {
+        let userSkills = props.user && props.user.userSkills && props.user.userSkills.map(function (userSkill) {
             return { id: userSkill.skillId, label: userSkill.skill.name };
         })
         let selectedSkills = userSkills;
@@ -39,6 +39,7 @@ class User extends React.Component {
             selected: false,
             selectedSkills: selectedSkills,
             isConfirmed: false,
+            isSearchable: props.user.isSearchable ? props.user.isSearchable : false,
             readOnlyMode: props.activeStory != 'user',
             recruitTeams: []
         }
@@ -49,7 +50,9 @@ class User extends React.Component {
 
     componentDidMount() {
         this.fetchVkUser();
-        this.isUserConfirmed(this.state.user.id);
+        if (this.state.user != null && this.state.user != undefined) {
+            this.isUserConfirmed(this.state.user.id);
+		}
     }
 
     isUserConfirmed(id) {
@@ -74,7 +77,6 @@ class User extends React.Component {
         };
 
         const request = await bridge.send("VKWebAppCallAPIMethod", { "method": "users.get", "request_id": "32test", "params": params });
-        console.log('fetched vk user -----------------', request.response[0].first_name);
         this.setState({ vkUser: request.response[0] });
     }
 
@@ -108,9 +110,11 @@ class User extends React.Component {
     };
 
     handleCheckboxClick(event) {
-        var user = { ...this.state.user }
-        user.isSearchable = event.target.checked;
-        this.setState({ user });
+        if (this.state.user != null && this.state.user != undefined) {
+            var user = { ...this.state.user }
+            user.isSearchable = event.target.checked;
+            this.setState({ user });
+		}
     };
 
     render() {
