@@ -188,27 +188,27 @@ class TeamEdit extends React.Component {
                                     {this.state.team.userTeams &&
                                         this.state.team.userTeams.map((userTeam, i) => {
                                             return (
-                                                (members.userAction === 1 || members.userAction === 2 || members.userAction === 5) &&
+                                                (userTeam.userAction === 1 || userTeam.userAction === 2 || userTeam.userAction === 5) &&
                                                 <RichCell key={i}
                                                     before={<Avatar size={48} />}
-                                                    after={members.userAction === 2 && <Icon24DismissDark
-                                                        onClick={(e) => this.dropUser(e, members)} />}
+                                                    after={userTeam.userAction === 2 && <Icon24DismissDark
+                                                        onClick={(e) => this.dropUser(e, userTeam)} />}
                                                     actions={
-                                                        members.userAction === 1 &&
+                                                        userTeam.userAction === 1 &&
                                                         <React.Fragment>
                                                             <Button
-                                                                onClick={(e) => this.handleJoin(e, members)}>Принять</Button>
+                                                                onClick={(e) => this.handleJoin(e, userTeam)}>Принять</Button>
                                                             <Button mode="secondary"
-                                                                onClick={(e) => this.dropUser(e, members)}>Отклонить</Button>
+                                                                onClick={(e) => this.dropUser(e, userTeam)}>Отклонить</Button>
                                                         </React.Fragment> ||
-                                                        members.userAction === 5 &&
+                                                        userTeam.userAction === 5 &&
                                                         <React.Fragment>
                                                             <Button mode="secondary"
-                                                                onClick={(e) => this.cancelUser(e, members)}>Отозвать предложение</Button>
+                                                                onClick={(e) => this.cancelUser(e, userTeam)}>Отозвать предложение</Button>
                                                         </React.Fragment>
                                                     }
                                                 >
-                                                    { members.user.fullName }
+                                                    {userTeam.user.fullName }
                                                 </RichCell>
                                             )
                                         }
