@@ -27,6 +27,7 @@ class TeamInfo extends React.Component {
             activeTab: 'teamDescription',
             edit: true,
             contextOpened: false,
+            vkProfile: props.profile,
         };
 
         this.onRefresh = async () => {
@@ -61,12 +62,16 @@ class TeamInfo extends React.Component {
         return (
             <Panel id={this.state.id}>
                 <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
-                    <PanelHeaderContent
-                        aside={<Icon16Dropdown style={{ transform: `rotate(${this.state.contextOpened ? '180deg' : '0'})` }} />}
-                        onClick={this.toggleContext}
-                    >
-                        {this.state.team && this.state.team.name}
-                    </PanelHeaderContent>
+                    {/* {this.state.team.userTeams.find(user => user.isOwner) && this.state.team.userTeams.find(user => user.isOwner).userId === this.state.vkProfile.id ? */}
+                    {true ?
+                        <PanelHeaderContent
+                            aside={<Icon16Dropdown style={{ transform: `rotate(${this.state.contextOpened ? '180deg' : '0'})` }} />}
+                            onClick={this.toggleContext}
+                        >
+                            {this.state.team && this.state.team.name}
+                        </PanelHeaderContent> :
+                        this.state.team && this.state.team.name
+                    }
                 </PanelHeader>
                 <PanelHeaderContext opened={this.state.contextOpened} onClose={this.toggleContext}>
                     <List>
@@ -155,7 +160,7 @@ class TeamInfo extends React.Component {
 const mapStateToProps = (state) => {
     return {
         activeTeam: state.team.activeTeam,
-        teamUser: state.user.teamUser
+        profile: state.user.profile
     };
 };
 

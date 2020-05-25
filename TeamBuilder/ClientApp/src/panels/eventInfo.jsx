@@ -26,13 +26,18 @@ const EventInfo = props => {
 
     return (
         <Panel id={props.id}>
+            {console.log('profile =====', props.profile)}
+            {console.log('event =====', props.event)}
             <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
-                <PanelHeaderContent
-                    aside={<Icon16Dropdown style={{ transform: `rotate(${contextOpened ? '180deg' : '0'})` }} />}
-                    onClick={toggleContext}
-                >
-                    {props.event && props.event.name}
-                </PanelHeaderContent>
+                {/* {props.event.owner && props.profile.id === props.event.owner.id ? */}
+                {true ?
+                    <PanelHeaderContent
+                        aside={<Icon16Dropdown style={{ transform: `rotate(${contextOpened ? '180deg' : '0'})` }} />}
+                        onClick={toggleContext}
+                    >
+                        {props.event && props.event.name}
+                    </PanelHeaderContent> :
+                    props.event && props.event.name}
             </PanelHeader>
             <PanelHeaderContext opened={contextOpened} onClose={toggleContext}>
                 <List>
@@ -83,6 +88,7 @@ const EventInfo = props => {
 const mapStateToProps = (state) => {
     return {
         event: state.event.event,
+        profile: state.user.profile
     };
 };
 
