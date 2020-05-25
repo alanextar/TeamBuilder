@@ -23,6 +23,7 @@ const EventInfo = props => {
                 {props.event && props.event.name}
             </PanelHeader>
             <Group>
+                {console.log('props in info ', props)}
                 <Header mode="primary">Информация о мероприятии</Header>
                 <SimpleCell multiline>
                     <InfoRow header="Название">
