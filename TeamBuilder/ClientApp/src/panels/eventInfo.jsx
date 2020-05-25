@@ -3,7 +3,6 @@
 import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
 import { goBack, setPage } from "../store/router/actions";
-import { setEvent } from "../store/events/actions";
 
 import {
     Panel, PanelHeader, Group, SimpleCell, InfoRow, Header, FixedLayout,
@@ -14,8 +13,9 @@ import { Api } from '../infrastructure/api';
 
 const EventInfo = props => {
     const [edit, setEdit] = useState(true);
-
-    const { goBack } = props;
+    Api.Users.getPage().then(x => setEdit)
+    const { goBack, setPage } = props;
+    console.log('eventInfo ', props);
 
     return (
         <Panel id={props.id}>
@@ -23,6 +23,7 @@ const EventInfo = props => {
                 {props.event && props.event.name}
             </PanelHeader>
             <Group>
+                {console.log('props in info ', props)}
                 <Header mode="primary">Информация о мероприятии</Header>
                 <SimpleCell multiline>
                     <InfoRow header="Название">
@@ -49,7 +50,7 @@ const EventInfo = props => {
                     <FixedLayout vertical="bottom">
                         <SimpleCell
                         after={<Icon28EditOutline />}
-                        onClick={() => { setPage('events', '') }}
+                        onClick={() => { setPage('events', 'eventEdit') }}
                     >
                         </SimpleCell>
                     </FixedLayout>}
