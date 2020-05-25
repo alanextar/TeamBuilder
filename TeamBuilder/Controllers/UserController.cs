@@ -105,7 +105,7 @@ namespace TeamBuilder.Controllers
 				.ThenInclude(y => y.Skill)
 				.FirstOrDefault(u => u.Id == id);
 
-			user.IsOwnerAnyTeam = user.UserTeams.Any(x => x.IsOwner);
+			user.AnyTeamOwner = user.UserTeams.Any(x => x.IsOwner);
 
 			return Json(user);
 		}
