@@ -114,7 +114,7 @@ class Teams extends React.Component {
             search: e.target.value,
             nextHref: null
         })
-        this.delayedSearchEvents(e.target.value)
+        this.delayedSearchEvents(e.target.value);
     }
 
     getRandomInt() {

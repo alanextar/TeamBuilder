@@ -24,7 +24,7 @@ export class Api {
         pagingSearch: (value, filter = {}) => teams.pagingSearch(value, filter),
         getPage: () => teams.getPage(),
         get: (id) => teams.get(id),
-        create: (data) => teams.create(data),
+        create: async (data) => await teams.create(data),
         edit: (data) => teams.edit(data),
         delete: (data) => teams.remove(data),
         rejectedOrRemoveUser: (data) => teams.rejectedOrRemoveUser(data),

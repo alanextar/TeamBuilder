@@ -17,9 +17,9 @@ export function get(id) {
     return api.get(Urls.Teams.Get, {id: id});
 };
 
-export function create(data) {
+export async function create(data) {
     console.log(`teams.create`);
-    return api.post(Urls.Teams.Create, data);
+    return await api.post(Urls.Teams.Create, data);
 };
 
 export function edit(data) {

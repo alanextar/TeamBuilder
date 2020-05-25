@@ -19,9 +19,11 @@ class TeamInfo extends React.Component {
     constructor(props) {
         super(props);
 
+        console.log(`props.activeTeam ${props.activeTeam}`);
+        console.log(`props.activeTeam.str ${JSON.stringify(props.activeTeam)}`);
         this.state = {
             team: props.activeTeam,
-            id: props.id,
+            panelId: props.id,
             activeTab: 'teamDescription',
             edit: true
         };
@@ -36,9 +38,9 @@ class TeamInfo extends React.Component {
         };
     }
 
-    componentDidMount() {
-        this.populateTeamData();
-    }
+    // componentDidMount() {
+    //     this.populateTeamData();
+    // }
 
     async populateTeamData() {
         Api.Teams.get(this.state.team.id)
@@ -47,10 +49,10 @@ class TeamInfo extends React.Component {
 
     render() {
         const { id, goBack, setTeam, setTeamUser, setUser, setPage } = this.props;
-
-        var self = this;
+        console.log(`teamId: ${this.state.team && this.state.team.id}`);
+        // var self = this;
         return (
-            <Panel id={this.state.id}>
+            <Panel id={this.state.panelId}>
                 <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
                     {this.state.team && this.state.team.name}
                 </PanelHeader>
@@ -125,8 +127,7 @@ class TeamInfo extends React.Component {
                             <FixedLayout vertical="bottom" >
                                 <SimpleCell
                                 after={<Icon28EditOutline />}
-                                onClick={() => setPage('teams', 'teamEdit')}
-                                >
+                                onClick={() => setPage('teams', 'teamEdit')}>
                                 </SimpleCell>
                             </FixedLayout>}
                     </Group>

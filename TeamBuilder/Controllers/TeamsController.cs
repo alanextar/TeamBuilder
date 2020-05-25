@@ -107,7 +107,7 @@ namespace TeamBuilder.Controllers
 			await context.Teams.AddAsync(team);
 			await context.SaveChangesAsync();
 
-			return Ok("Created");
+			return Ok(team);
 		}
 
 		[HttpPost]
