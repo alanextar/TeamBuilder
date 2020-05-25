@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
 import { goBack, setPage } from "../store/router/actions";
 import { setTeam } from "../store/teams/actions";
-import { setUser, setTeamUser } from "../store/user/actions";
 
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell,
@@ -20,16 +19,16 @@ class TeamCreate extends React.Component {
         this.state = {
             name: '',
             description: '',
-            membersDescription:'',
-            events: null,
-            check: null,
+            membersDescription: '',
+            events: [],
+            eventId: null,
             usersNumber: 2,
             go: props.go,
             id: props.id,
             activeTab: 'teamDescription'
         };
 
-        this.onChange = this.onChange.bind(this);
+        this.onEventChange = this.onEventChange.bind(this);
         this.onDescriptionChange = this.onDescriptionChange.bind(this);
         this.onMembersDescriptionChange = this.onMembersDescriptionChange.bind(this);
         this.onNameChange = this.onNameChange.bind(this);
@@ -41,61 +40,46 @@ class TeamCreate extends React.Component {
     }
 
     async populateTeamData() {
-        var self = this;
-        qwest.get(Api.Events.GetAll,
-            {},
-            {
-                cache: true
-            })
-            .then((xhr, resp) => {
-                if (resp) {
-                    console.log("events getall", resp)
-                    self.setState({ events: resp });
-                }
-            })
-            .catch((error) =>
-                console.log(`Error for get all events: Details: ${error}`));
+        Api.Events.getAll()
+            .then(result => this.setState({ events: result, }));
     }
 
-    onChange(e) {
-        const { check, value } = e.currentTarget;
-        this.setState({ check: value });
+    onEventChange(e) {
+        this.setState({ eventId: e.target.value });
     }
 
     onNameChange(e) {
-        const { name, value } = e.currentTarget;
-        this.setState({ name: value })
+        this.setState({ name: e.target.value })
     }
 
     onDescriptionChange(e) {
-        const { description, value } = e.currentTarget;
-        this.setState({ description: value })
+        this.setState({ description: e.target.value })
     }
 
     onMembersDescriptionChange(e) {
-        const { membersDescription, value } = e.currentTarget;
-        this.setState({ membersDescription: value })
+        this.setState({ membersDescription: e.target.value })
     }
 
     async postCreate() {
-        let name = this.state.name;
-        let description = this.state.description;
-        let numberRequiredMembers = this.state.usersNumber;
-        let eventId = this.state.check;
-        let descriptionRequiredMembers = this.state.membersDescription;
-        var createTeamViewModel = { name, description, numberRequiredMembers, descriptionRequiredMembers, eventId };
+        const { setTeam, setPage } = this.props;
+        var createTeamViewModel = {
+            name: this.state.name,
+            description: this.state.description,
+            numberRequiredMembers: this.state.usersNumber,
+            descriptionRequiredMembers: this.state.membersDescription,
+            eventId: this.state.eventId
+        }
+        let result = await Api.Teams.create(createTeamViewModel)
 
-        let response = await fetch('/api/teams/create', {
-            method: 'post',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(createTeamViewModel)
-        });
+        console.log(`result: ${result}`);
+        console.log(`result.str: ${JSON.stringify(result)}`);
+        setTeam(result);
+        console.log(`End PostCreate`);
+        setPage('teams', 'teaminfo');
     }
 
     render() {
-        const { id, goBack, createTeam, setPage } = this.props;
-        const check = this.state.check;
-
+        const { id, goBack, setPage, setTeam } = this.props;
         return (
             <Panel id={this.state.id}>
                 <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
@@ -127,17 +111,14 @@ class TeamCreate extends React.Component {
                             <Select
                                 top="Выберете событие"
                                 placeholder="Событие"
-                                status={check ? 'valid' : 'error'}
-                                bottom={check ? '' : 'Пожалуйста, выберите или создайте событие'}
-                                onChange={this.onChange}
-                                value={check}
-                                name="check"
-                            >
+                                onChange={this.onEventChange}
+                                value={this.state.eventId ? this.state.eventId : ''}
+                                name="eventId">
                                 {this.state.events && this.state.events.map((ev, i) => {
                                     return (
-                                        <option value={ev.id}>
+                                        <option value={ev.id} key={i}>
                                             {ev.name}
-                                        </ option>
+                                        </option>
                                     )
                                 })}
 
@@ -145,7 +126,7 @@ class TeamCreate extends React.Component {
                             <Button onClick={this.state.go}
                                 data-to={'eventCreate'}
                                 data-from={this.state.id}>Создать Событие</Button>
-                        </ FormLayout>
+                        </FormLayout>
                         :
                         <Cell>
                             <FormLayout >
@@ -159,20 +140,21 @@ class TeamCreate extends React.Component {
                                 />
                                 <Input value={String(this.state.usersNumber)} onChange={e => this.setState({ usersNumber: e.target.value })} type="number" />
                                 <Textarea top="Описание участников и их задач" onChange={this.onMembersDescriptionChange} defaultValue={this.state.membersDescription} />
-                            </ FormLayout>
-                        </ Cell>}
-                </ Group>
+                            </FormLayout>
+                        </Cell>}
+                </Group>
                 <FixedLayout vertical="bottom">
                     <Div>
-                        {this.state.check && (
-                        <Button 
-                            stretched={ true }
-                                onClick={(e) => { this.postCreate(); goBack() }}
-                            >
-                                Создать Команду
-                        </Button> )}
+                        <Button
+                            stretched={true}
+                            onClick={(e) => {
+                                this.postCreate();
+                                
+                            }}>
+                            Создать Команду
+                            </Button>
                     </Div>
-                </ FixedLayout>
+                </FixedLayout>
             </Panel>
         );
     }
@@ -182,7 +164,7 @@ class TeamCreate extends React.Component {
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
-        ...bindActionCreators({ setPage, goBack }, dispatch)
+        ...bindActionCreators({ setPage, goBack, setTeam }, dispatch)
     }
 }
 

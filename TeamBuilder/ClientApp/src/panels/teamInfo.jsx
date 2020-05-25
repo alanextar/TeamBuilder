@@ -21,9 +21,11 @@ class TeamInfo extends React.Component {
     constructor(props) {
         super(props);
 
+        console.log(`props.activeTeam ${props.activeTeam}`);
+        console.log(`props.activeTeam.str ${JSON.stringify(props.activeTeam)}`);
         this.state = {
             team: props.activeTeam,
-            id: props.id,
+            panelId: props.id,
             activeTab: 'teamDescription',
             edit: true,
             contextOpened: false,
@@ -42,9 +44,9 @@ class TeamInfo extends React.Component {
         this.toggleContext = this.toggleContext.bind(this);
     }
 
-    componentDidMount() {
-        this.populateTeamData();
-    }
+    // componentDidMount() {
+    //     this.populateTeamData();
+    // }
 
     async populateTeamData() {
         Api.Teams.get(this.state.team.id)
@@ -57,10 +59,10 @@ class TeamInfo extends React.Component {
 
     render() {
         const { id, goBack, setTeam, setTeamUser, setUser, setPage } = this.props;
-
-        var self = this;
+        console.log(`teamId: ${this.state.team && this.state.team.id}`);
+        // var self = this;
         return (
-            <Panel id={this.state.id}>
+            <Panel id={this.state.panelId}>
                 <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
                     {/* {this.state.team.userTeams.find(user => user.isOwner) && this.state.team.userTeams.find(user => user.isOwner).userId === this.state.vkProfile.id ? */}
                     {true ?

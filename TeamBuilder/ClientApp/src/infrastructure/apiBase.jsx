@@ -32,14 +32,16 @@ export function get(url, params = {}) {
         });
 }
 
-export function post(url, data = {}) {
+export async function post(url, data = {}) {
     var init = initPost;
     init.body = JSON.stringify(data);
-    return fetch(url, init)
-        .then(resp => resp.json())
-        .then(json => json)
-        .catch(error => {
-            console.log(`Error for post request '${url}' with body ${JSON.stringify(data)}.  Details: ${error}`);
-            return {};
-        });
+    try {
+        const resp = await fetch(url, init);
+        const json = await resp.json();
+        return json;
+    }
+    catch (error) {
+        console.log(`Error for post request '${url}' with body ${JSON.stringify(data)}.  Details: ${error}`);
+        return {};
+    }
 }
