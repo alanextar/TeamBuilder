@@ -123,10 +123,9 @@ class TeamInfo extends React.Component {
                         {this.state.team && this.state.edit &&
                             <FixedLayout vertical="bottom" >
                                 <SimpleCell
-                                    after={<Icon28EditOutline />}
-                                    onClick={this.state.go}
-                                    data-to='teamEdit'
-                                    data-id={this.state.team.id}>
+                                after={<Icon28EditOutline />}
+                                onClick={() => setPage('teams', 'teamEdit')}
+                                >
                                 </SimpleCell>
                             </FixedLayout>}
                     </Group>
