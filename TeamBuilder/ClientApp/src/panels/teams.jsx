@@ -11,6 +11,7 @@ import debounce from 'lodash.debounce';
 import { setTeam, createTeam } from "../store/teams/actions";
 
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
+import Icon24Filter from '@vkontakte/icons/dist/24/filter';
 
 class Teams extends React.Component {
     constructor(props) {
@@ -39,7 +40,7 @@ class Teams extends React.Component {
     }
 
     componentDidMount() {
-        //this.populateTeamData();
+        this.searchTeams('');
     }
 
     async populateTeamData() {
@@ -98,7 +99,7 @@ class Teams extends React.Component {
     }
 
     async searchTeams(value) {
-        await Api.Teams.pagingSearch(value).then(result =>
+        await Api.Teams.pagingSearch({ search: value, eventId: this.props.filtredByEvent }).then(result =>
             this.setState({
                 teams: result.collection,
                 hasMoreItems: result.nextHref ? true : false,
@@ -135,11 +136,11 @@ class Teams extends React.Component {
                     <RichCell
                         before={<Avatar size={64} src={team.photo100} />}
                         text={team.description}
-                        caption="Навыки"
+                        caption={team.event.name}
                         after={team.userTeams.length + '/' + team.numberRequiredMembers}
                         onClick={() => { setPage('teams', 'teaminfo'); setTeam(team) }}
                     >
-                        {team.name} - {team.id}
+                        {team.name}
                     </RichCell>
                 </Card>
             );
@@ -153,7 +154,9 @@ class Teams extends React.Component {
                     </PanelHeaderButton>}>
                     Команды
                 </PanelHeader>
-                <Search value={this.state.search} onChange={this.onChangeSearch} after={null} />
+                <Search value={this.state.search} onChange={this.onChangeSearch} after={null}
+                    icon={<Icon24Filter />}
+                    onIconClick={this.props.onFiltersClick} />
                 <PullToRefresh onRefresh={this.onRefresh} isFetching={this.state.fetching}>
 
                     <InfiniteScroll
