@@ -74,11 +74,11 @@ class UserEdit extends React.Component {
                 </FormLayout>
                 <Div>
                     <Button onClick={() => {
-                        this.postEdit();
+                        this.state.vkProfile && this.postEdit();
                         goBack()
                     }}
                         mode="commerce"
-                     >
+                    >
                         Принять
                      </Button>
                     <Button onClick={() => goBack()} mode="destructive">Отменить</Button>

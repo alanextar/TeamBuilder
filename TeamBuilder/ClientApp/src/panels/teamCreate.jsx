@@ -1,5 +1,11 @@
 ﻿import React from 'react';
 
+import { connect } from 'react-redux';
+import { bindActionCreators } from "redux";
+import { goBack, setPage } from "../store/router/actions";
+import { setTeam } from "../store/teams/actions";
+import { setUser, setTeamUser } from "../store/user/actions";
+
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell,
     Div, Button, Textarea, FormLayout, Select, Input, Slider, FixedLayout
@@ -87,10 +93,12 @@ class TeamCreate extends React.Component {
     }
 
     render() {
+        const { id, goBack, createTeam, setPage } = this.props;
         const check = this.state.check;
+
         return (
             <Panel id={this.state.id}>
-                <PanelHeader separator={false} left={<PanelHeaderBack onClick={this.state.go} data-to='teams' />}>
+                <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
                     Новая команда
                 </PanelHeader>
                 <Tabs>
@@ -120,7 +128,7 @@ class TeamCreate extends React.Component {
                                 top="Выберете событие"
                                 placeholder="Событие"
                                 status={check ? 'valid' : 'error'}
-                                bottom={check ? '' : 'Пожалуйста, выберете или создайте событие'}
+                                bottom={check ? '' : 'Пожалуйста, выберите или создайте событие'}
                                 onChange={this.onChange}
                                 value={check}
                                 name="check"
@@ -159,8 +167,9 @@ class TeamCreate extends React.Component {
                         {this.state.check && (
                         <Button 
                             stretched={ true }
-                            onClick={(e) => { this.postCreate(); this.state.go(e) }}
-                            data-to={'teams'}>Создать Команду
+                                onClick={(e) => { this.postCreate(); goBack() }}
+                            >
+                                Создать Команду
                         </Button> )}
                     </Div>
                 </ FixedLayout>
@@ -170,4 +179,11 @@ class TeamCreate extends React.Component {
 
 };
 
-export default TeamCreate;
+function mapDispatchToProps(dispatch) {
+    return {
+        dispatch,
+        ...bindActionCreators({ setPage, goBack }, dispatch)
+    }
+}
+
+export default connect(null, mapDispatchToProps)(TeamCreate);

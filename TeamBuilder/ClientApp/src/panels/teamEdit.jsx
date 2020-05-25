@@ -1,6 +1,11 @@
 ﻿import React from 'react';
 import { Api } from '../infrastructure/api';
 
+import { connect } from 'react-redux';
+import { bindActionCreators } from "redux";
+import { goBack, setPage } from "../store/router/actions";
+import { setTeam } from "../store/teams/actions";
+
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell,
     Div, Button, Textarea, FormLayout, Select, Input, Slider, InfoRow, Avatar,
@@ -17,7 +22,7 @@ class TeamEdit extends React.Component {
             name: '',
             description: '',
             membersDescription: '',
-            team: null,
+            team: this.props.activeTeam,
             events: [],
             eventId: null,
             usersNumber: 2,
@@ -116,9 +121,11 @@ class TeamEdit extends React.Component {
     };
 
     render() {
+        const { id, goBack, setTeam, setPage } = this.props;
+
         return (
             <Panel id={this.state.id}>
-                <PanelHeader separator={false} left={<PanelHeaderBack onClick={this.state.go} data-to={'teaminfo'} data-id={this.props.teamId} />}>
+                <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
                     {this.state.team && this.state.name}
                 </PanelHeader>
                 <Tabs>
@@ -137,9 +144,9 @@ class TeamEdit extends React.Component {
                     {this.state.team && (
                         this.state.activeTab === 'teamDescription' ?
                             <FormLayout >
-                                <Input top="Название команды" type="text" defaultValue={this.state.name} onChange={this.onNameChange} />
+                                <Input top="Название команды" type="text" defaultValue={this.state.team.name} onChange={this.onNameChange} />
 
-                                <Textarea top="Описание команды" defaultValue={this.state.description} onChange={this.onDescriptionChange} />
+                                <Textarea top="Описание команды" defaultValue={this.state.team.description} onChange={this.onDescriptionChange} />
                                 <Select
                                     top="Выберете событие"
                                     placeholder="Событие"
@@ -172,15 +179,14 @@ class TeamEdit extends React.Component {
                                     <Input value={String(this.state.usersNumber)} onChange={e => this.setState({ usersNumber: e.target.value })} type="number" />
                                     <Textarea
                                         top="Описание участников и их задач"
-                                        defaultValue={this.state.membersDescription}
+                                        defaultValue={this.state.team.membersDescription}
                                         onChange={this.onMembersDescriptionChange} />
                                 </FormLayout>
 
                                 <InfoRow header='Участники'>
-                                    {console.log('userTeams ', this.state.userTeams)}
-                                    {this.state.userTeams &&
-                                        this.state.userTeams.map((members, i) => {
-                                            console.log('userAction', members.userAction)
+                                    {console.log('userTeams ', this.state.team.userTeams)}
+                                    {this.state.team.userTeams &&
+                                        this.state.team.userTeams.map((userTeam, i) => {
                                             return (
                                                 (members.userAction === 1 || members.userAction === 2 || members.userAction === 5) &&
                                                 <RichCell key={i}
@@ -214,7 +220,7 @@ class TeamEdit extends React.Component {
                 <Div>
                     <Button
                         stretched
-                        onClick={(e) => { this.postEdit(); this.state.go(e) }}
+                        onClick={(e) => { this.postEdit(); goBack() }}
                         data-to={'teaminfo'}
                         data-id={this.props.teamId} >
                         Применить Изменения
@@ -228,4 +234,18 @@ class TeamEdit extends React.Component {
 
 };
 
-export default TeamEdit;
+const mapStateToProps = (state) => {
+    return {
+        activeTeam: state.team.activeTeam,
+    };
+};
+
+
+function mapDispatchToProps(dispatch) {
+    return {
+        dispatch,
+        ...bindActionCreators({ setPage, setTeam, goBack }, dispatch)
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(TeamEdit);
