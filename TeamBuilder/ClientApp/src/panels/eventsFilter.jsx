@@ -13,28 +13,62 @@ const EventsFilter = props => {
     const [nextHref, setNextHref] = useState(null);
     const [events, setEvents] = useState([]);
 
-    const [search, setSearch] = useState('');
+    const debouncedSearchTerm = useDebounce(searchTerm, 500);
+    const [isSearching, setIsSearching] = useState(false);
+    const [items, setItems] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
 
     //#region Search
 
-    const searchEvents = value => {
-        fetch(`${Api.Events.PagingSearch}?search=${value}`)
-            .then((resp) => resp.json())
-            .then(json => {
-                setEvents(json.collection);
-                setNextHref(json.nextHref);
-                setHasMoreItems(json.nextHref ? true : false);
-            })
-            .catch((error) => console.log(`Error for get filtered events page. Details: ${error}`));
-    }
+    useEffect(
+        () => {
+            if (debouncedSearchTerm) {
 
-    const delayedSearchEvents = debounce(searchEvents, 250);
+                console.log("search if")
+                setIsSearching(true);
+                Api.Events.pagingSearch(debouncedSearchTerm)
+                    .then(result => {
+                        setItems(result.collection);
+                        setNextHref(result.nextHref);
+                        setHasMoreItems(result.nextHref ? true : false);
+                        setIsSearching(false);
+                    });
+            }
+            else {
+                console.log("search else")
 
-    const onChangeSearch = e => {
-        setSearch(e.target.value);
-        setNextHref(null);
-        delayedSearchEvents(e.target.value);
-    }
+                setIsSearching(true);
+                Api.Events.getPage()
+                    .then(result => {
+                        setItems(result.collection);
+                        setNextHref(result.nextHref);
+                        setIsSearching(false);
+                    })
+            }
+        },
+        [debouncedSearchTerm]
+    )
+
+    const onRefresh = () => {
+        setFetching(true);
+        if (searchTerm) {
+            Api.Events.pagingSearch(debouncedSearchTerm)
+                .then(result => {
+                    setItems(result.collection);
+                    setNextHref(result.nextHref);
+                    setFetching(false);
+                });
+        }
+        else {
+            console.log("refresh")
+            Api.Events.getPage()
+                .then(result => {
+                    setItems(result.collection);
+                    setNextHref(result.nextHref);
+                    setFetching(false);
+                })
+        }
+    };
 
     //#endregion
 
@@ -45,11 +79,10 @@ const EventsFilter = props => {
             .catch((error) => console.log(`Error for get events page. Details: ${error}`));
     }
 
-    const onRefresh = () => {
-        setFetching(true);
-        search.length === 0 ? getEvents() : searchEvents(search);
-        setFetching(false);
-    };
+    const async getEvents = () => {
+        await Api.Events.getPage().then(result => setEvents(result));
+    }
+
 
     //#region Scroll
 
