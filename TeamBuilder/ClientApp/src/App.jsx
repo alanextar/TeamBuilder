@@ -77,28 +77,30 @@ const App = (props) => {
         };
 	}, []);
 
-    const goTeam = e => {
-        if (e.currentTarget.dataset.href)
-            setTeamNextHref(e.currentTarget.dataset.href);
-
-        console.log(`dataset.href: ${e.currentTarget.dataset.href}`);
-    };
-
 	return (
         <Epic activeStory={activeStory} tabbar={
             <Tabbar>
                 <TabbarItem
-                    onClick={() => { console.log('go teams', teamUser); setUser(teamUser); setStory('teams', 'teams') }}
+                    onClick={() => {
+                        setUser(teamUser);
+                        setStory('teams', 'teams')
+                    }}
                     selected={activeStory === 'teams'}
                     text="Команды"
                 ><Icon28Users3Outline /></TabbarItem>
                 <TabbarItem
-                    onClick={() => { setStory('users', 'users'); setUser(participant) }}
+                    onClick={() => {
+                        setStory('users', 'users');
+                        setUser(participant)
+                    }}
                     selected={activeStory === 'users'}
                     text="Участники"
                 ><Icon28Users /></TabbarItem>
                 <TabbarItem
-                    onClick={() => { setStory('events', 'events'); setUser(eventUser) } }
+                    onClick={() => {
+                        setStory('events', 'events');
+                        setUser(eventUser)
+                    }}
                     selected={activeStory === 'events'}
                     text="События"
                 ><Icon28FavoriteOutline /></TabbarItem>

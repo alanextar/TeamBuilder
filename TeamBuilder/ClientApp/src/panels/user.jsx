@@ -67,7 +67,7 @@ class User extends React.Component {
             { "app_id": 7448436, "scope": "" });
 
         let params = {
-            user_id: this.state.userId,
+            user_id: this.state.user.id,
             fields: 'city,photo_200,contacts',
             v: '5.103',
             access_token: t.access_token
@@ -108,7 +108,6 @@ class User extends React.Component {
     };
 
     handleCheckboxClick(event) {
-        console.log('checkbox clicked value', event.target.checked);
         var user = { ...this.state.user }
         user.isSearchable = event.target.checked;
         this.setState({ user });

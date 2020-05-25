@@ -41,7 +41,7 @@ class TeamInfo extends React.Component {
     }
 
     async populateTeamData() {
-        Api.Teams.get(this.props.teamId)
+        Api.Teams.get(this.state.team.id)
             .then(result => this.setState({ team: result }))
     }
 
@@ -51,7 +51,7 @@ class TeamInfo extends React.Component {
         var self = this;
         return (
             <Panel id={this.state.id}>
-                <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} data-to={this.state.return} />}>
+                <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
                     {this.state.team && this.state.team.name}
                 </PanelHeader>
                 <Tabs>
