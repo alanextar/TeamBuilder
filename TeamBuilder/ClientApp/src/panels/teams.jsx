@@ -1,4 +1,6 @@
 ﻿import React from 'react';
+import { connect } from 'react-redux';
+import { goBack, setPage } from '../store/router/actions';
 import {
     Panel, PanelHeader, Avatar, Search, List, RichCell, PullToRefresh,
     PanelHeaderButton, CardGrid, Card
@@ -6,6 +8,7 @@ import {
 import InfiniteScroll from 'react-infinite-scroller';
 import { Api, Urls } from '../infrastructure/api';
 import debounce from 'lodash.debounce';
+import { setTeam } from "../store/teams/actions";
 
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import Icon24Filter from '@vkontakte/icons/dist/24/filter';
@@ -134,14 +137,15 @@ class Teams extends React.Component {
                         text={team.description}
                         caption={team.event.name}
                         after={team.userTeams.length + '/' + team.numberRequiredMembers}
-                        onClick={self.state.go}
-                        data-to='teaminfo'
-                        data-id={team.id}>
+                        onClick={() => { setPage('teams', 'teaminfo'); setTeam(team) }}
+                    >
                         {team.name}
                     </RichCell>
                 </Card>
             );
         });
+
+        const { setPage, setTeam } = this.props;
 
         return (
             <Panel id={this.state.page_id}>
@@ -171,4 +175,10 @@ class Teams extends React.Component {
     }
 };
 
-export default Teams;
+const mapDispatchToProps = {
+    setPage,
+    setTeam,
+    goBack
+};
+
+export default connect(null, mapDispatchToProps)(Teams);

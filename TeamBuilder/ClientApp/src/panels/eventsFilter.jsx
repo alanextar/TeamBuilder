@@ -72,15 +72,15 @@ const EventsFilter = props => {
 
     //#endregion
 
-    const getEvents = () => {
-        fetch(`${Api.Events.GetPage}`)
-            .then((resp) => resp.json())
-            .then(json => setEvents(json.collection))
-            .catch((error) => console.log(`Error for get events page. Details: ${error}`));
-    }
+    //const getEvents = () => {
+    //    fetch(`${Api.Events.GetPage}`)
+    //        .then((resp) => resp.json())
+    //        .then(json => setEvents(json.collection))
+    //        .catch((error) => console.log(`Error for get events page. Details: ${error}`));
+    //}
 
-    const async getEvents = () => {
-        await Api.Events.getPage().then(result => setEvents(result));
+    const getEvents = () => {
+        Api.Events.getPage().then(result => setEvents(result));
     }
 
 
