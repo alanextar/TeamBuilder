@@ -46,7 +46,7 @@ const EventCreate = props => {
         let finishDate = eventFinishDate;
         let ownerId = props.owner ? props.owner.id : -1;
         var createEventViewModel = { name, description, startDate, finishDate, link, ownerId }
-        fetch(`${Api.Events.Create}`,
+        fetch(`${Api.Events.create}`,
             {
                 method: 'post',
                 headers: { 'Content-Type': 'application/json' },
@@ -77,7 +77,7 @@ const EventCreate = props => {
                     stretched={true}
                     onClick={() => { eventCreate(); goBack() }}
                     >
-                    Создать оревнование
+                    Создать соревнование
                 </Button>
             </ FixedLayout>
         </Panel>

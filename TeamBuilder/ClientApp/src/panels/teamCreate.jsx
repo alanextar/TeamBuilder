@@ -128,7 +128,7 @@ class TeamCreate extends React.Component {
                                 top="Выберете событие"
                                 placeholder="Событие"
                                 status={check ? 'valid' : 'error'}
-                                bottom={check ? '' : 'Пожалуйста, выберете или создайте событие'}
+                                bottom={check ? '' : 'Пожалуйста, выберите или создайте событие'}
                                 onChange={this.onChange}
                                 value={check}
                                 name="check"

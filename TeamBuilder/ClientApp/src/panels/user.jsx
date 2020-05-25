@@ -18,7 +18,7 @@ import UserSkills from './userSkills'
 import bridge from '@vkontakte/vk-bridge';
 import { Api, Urls } from '../infrastructure/api';
 import { goBack, setPage } from '../store/router/actions';
-import { setUser } from '../store/user/actions';
+import { setUser, setProfileUser } from '../store/user/actions';
 
 class User extends React.Component {
     constructor(props) {
@@ -28,18 +28,20 @@ class User extends React.Component {
             return { id: userSkill.skillId, label: userSkill.skill.name };
         })
         let selectedSkills = userSkills;
+        let isSearchable = props.user && props.user.isSearchable;
 
         this.state = {
             skills: null,
             vkUser: null,
             vkProfile: props.profile,
+            profileUser: props.profileUser,
             user: props.user,
             userSkills: userSkills,
             activeTabProfile: 'main',
             selected: false,
             selectedSkills: selectedSkills,
             isConfirmed: false,
-            isSearchable: props.user.isSearchable ? props.user.isSearchable : false,
+            isSearchable: isSearchable,
             readOnlyMode: props.activeStory != 'user',
             recruitTeams: []
         }
@@ -49,15 +51,12 @@ class User extends React.Component {
     }
 
     componentDidMount() {
-        this.fetchVkUser();
-        if (this.state.user != null && this.state.user != undefined) {
-            this.isUserConfirmed(this.state.user.id);
-		}
+        this.state.user && this.fetchVkUser();
+        this.state.user && this.fetchUserData(this.state.user.id);
     }
 
-    isUserConfirmed(id) {
-        console.log('into isUserConfirmed');
-        if (this.state.user && this.state.user.isSearchable) {
+    fetchUserData(id) {
+        if (this.state.profileUser && this.state.profileUser.ownerAnyTeam && this.state.user.isSearchable) {
             fetch(`/api/user/getRecruitTeams?vkProfileId=${this.state.vkProfile.id}&&id=${id}`)
                 .then(response => response.json())
                 .then(data => this.setState({ recruitTeams: data }));
@@ -173,7 +172,7 @@ class User extends React.Component {
                 <Div>
                     <Checkbox disabled={this.state.readOnlyMode} onChange={(e) => this.handleCheckboxClick(e)}
                         checked={this.state.user && this.state.user.isSearchable ? 'checked' : ''}>в поиске команды</Checkbox>
-                    {!this.state.readOnlyMode && <Button mode={this.state.user ? "primary" : "destructive"} size='xl'
+                    {this.state.user && !this.state.readOnlyMode && <Button mode={this.state.user ? "primary" : "destructive"} size='xl'
                         onClick={() => this.confirmUser(this.state.user && this.state.user.id, this.state.user.userSkills)}>
                         {this.state.user ? "Сохранить" : "Подтвердить"}
                     </Button>}
@@ -195,6 +194,7 @@ const mapStateToProps = (state) => {
 
     return {
         user: state.user.user,
+        profileUser: state.user.profileUser,
         profile: state.user.profile
     };
 };
@@ -202,6 +202,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
     setPage,
     setUser,
+    setProfileUser,
     goBack
 };
 
