@@ -27,7 +27,7 @@ class TeamEdit extends React.Component {
             eventId: null,
             usersNumber: 2,
             go: props.go,
-            id: props.id,
+            panelId: props.id,
             activeTab: 'teamDescription'
         };
 
@@ -62,17 +62,14 @@ class TeamEdit extends React.Component {
     }
 
     onEventChange(e) {
-        console.log(`event.team: ${e.target.value}`)
         this.setState({ eventId: e.target.value })
     }
 
     onNameChange(e) {
-        console.log(`event.Name: ${e.target.value}`)
         this.setState({ name: e.target.value })
     }
 
     onDescriptionChange(e) {
-        console.log(`event.Description: ${e.target.value}`)
         this.setState({ description: e.target.value })
     }
 
@@ -80,7 +77,7 @@ class TeamEdit extends React.Component {
         this.setState({ membersDescription: e.target.value })
     }
 
-    async postEdit(e) {
+    async postEdit() {
         var editTeamViewModel = {
             id: this.state.team.id,
             name: this.state.name,
@@ -96,7 +93,7 @@ class TeamEdit extends React.Component {
         const { id, goBack, setTeam, setPage } = this.props;
 
         return (
-            <Panel id={this.state.id}>
+            <Panel id={this.state.panelId}>
                 <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
                     {this.state.team && this.state.name}
                 </PanelHeader>
@@ -117,15 +114,13 @@ class TeamEdit extends React.Component {
                         this.state.activeTab === 'teamDescription' ?
                             <FormLayout >
                                 <Input top="Название команды" type="text" defaultValue={this.state.team.name} onChange={this.onNameChange} />
-
                                 <Textarea top="Описание команды" defaultValue={this.state.team.description} onChange={this.onDescriptionChange} />
                                 <Select
                                     top="Выберете событие"
                                     placeholder="Событие"
                                     onChange={this.onEventChange}
                                     value={this.state.eventId ? this.state.eventId : ''}
-                                    name="eventId"
-                                >
+                                    name="eventId">
                                     {this.state.events && this.state.events.map((ev, i) => {
                                         return (
                                             <option value={ev.id} key={i}>
@@ -177,8 +172,7 @@ class TeamEdit extends React.Component {
                     <Div>
                         <Button
                             stretched
-                            onClick={e => { this.postEdit(e); goBack() }}
-                        >
+                            onClick={e => { this.postEdit(); goBack() }}>
                             Сохранить
                         </Button>
                     </Div>

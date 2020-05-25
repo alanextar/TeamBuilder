@@ -113,7 +113,7 @@ class Teams extends React.Component {
             search: e.target.value,
             nextHref: null
         })
-        this.delayedSearchEvents(e.target.value)
+        this.delayedSearchEvents(e.target.value);
     }
 
     getRandomInt() {
@@ -135,7 +135,7 @@ class Teams extends React.Component {
                     <RichCell
                         before={<Avatar size={64} src={team.photo100} />}
                         text={team.description}
-                        caption="Навыки"
+                        caption={team.event && team.event.name}
                         after={team.userTeams.length + '/' + team.numberRequiredMembers}
                         onClick={() => { setPage('teams', 'teaminfo'); setTeam(team) }}
                     >
