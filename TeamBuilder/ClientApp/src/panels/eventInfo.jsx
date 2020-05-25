@@ -7,9 +7,10 @@ import { setEvent } from "../store/events/actions";
 
 import {
     Panel, PanelHeader, Group, SimpleCell, InfoRow, Header, FixedLayout,
-    PanelHeaderBack, CardGrid, Card
+    PanelHeaderBack, Cell, List, PanelHeaderContent, PanelHeaderContext
 } from '@vkontakte/vkui';
 import Icon28EditOutline from '@vkontakte/icons/dist/28/edit_outline';
+import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
 import { Api } from '../infrastructure/api';
 
 const EventInfo = props => {
@@ -17,11 +18,31 @@ const EventInfo = props => {
 
     const { goBack } = props;
 
+    const [contextOpened, setContextOpened] = useState(false);
+
+    const toggleContext = () => {
+        setContextOpened(!contextOpened);
+    };
+
     return (
         <Panel id={props.id}>
             <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
-                {props.event && props.event.name}
+                <PanelHeaderContent
+                    aside={<Icon16Dropdown style={{ transform: `rotate(${contextOpened ? '180deg' : '0'})` }} />}
+                    onClick={toggleContext}
+                >
+                    {props.event && props.event.name}
+                </PanelHeaderContent>
             </PanelHeader>
+            <PanelHeaderContext opened={contextOpened} onClose={toggleContext}>
+                <List>
+                    <Cell
+                        onClick={() => { setPage('events', '') }}
+                    >
+                        Редактировать событие
+                        </Cell>
+                </List>
+            </PanelHeaderContext>
             <Group>
                 {console.log('props in info ', props)}
                 <Header mode="primary">Информация о мероприятии</Header>
@@ -49,9 +70,9 @@ const EventInfo = props => {
                 {props.event && edit &&
                     <FixedLayout vertical="bottom">
                         <SimpleCell
-                        after={<Icon28EditOutline />}
-                        onClick={() => { setPage('events', '') }}
-                    >
+                            after={<Icon28EditOutline />}
+                            onClick={() => { setPage('events', '') }}
+                        >
                         </SimpleCell>
                     </FixedLayout>}
             </Group>
