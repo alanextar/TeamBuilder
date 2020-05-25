@@ -18,27 +18,30 @@ import UserSkills from './userSkills'
 import bridge from '@vkontakte/vk-bridge';
 import { Api, Urls } from '../infrastructure/api';
 import { goBack, setPage } from '../store/router/actions';
-import { setUser } from '../store/user/actions';
+import { setUser, setProfileUser } from '../store/user/actions';
 
 class User extends React.Component {
     constructor(props) {
         super(props);
 
-        let userSkills = props.user.userSkills && props.user.userSkills.map(function (userSkill) {
+        let userSkills = props.user && props.user.userSkills && props.user.userSkills.map(function (userSkill) {
             return { id: userSkill.skillId, label: userSkill.skill.name };
         })
         let selectedSkills = userSkills;
+        let isSearchable = props.user && props.user.isSearchable;
 
         this.state = {
             skills: null,
             vkUser: null,
             vkProfile: props.profile,
+            profileUser: props.profileUser,
             user: props.user,
             userSkills: userSkills,
             activeTabProfile: 'main',
             selected: false,
             selectedSkills: selectedSkills,
             isConfirmed: false,
+            isSearchable: isSearchable,
             readOnlyMode: props.activeStory != 'user',
             recruitTeams: []
         }
@@ -48,13 +51,12 @@ class User extends React.Component {
     }
 
     componentDidMount() {
-        this.fetchVkUser();
-        this.isUserConfirmed(this.state.user.id);
+        this.state.user && this.fetchVkUser();
+        this.state.user && this.fetchUserData(this.state.user.id);
     }
 
-    isUserConfirmed(id) {
-        console.log('into isUserConfirmed');
-        if (this.state.user && this.state.user.isSearchable) {
+    fetchUserData(id) {
+        if (this.state.profileUser && this.state.profileUser.ownerAnyTeam && this.state.user.isSearchable) {
             fetch(`/api/user/getRecruitTeams?vkProfileId=${this.state.vkProfile.id}&&id=${id}`)
                 .then(response => response.json())
                 .then(data => this.setState({ recruitTeams: data }));
@@ -74,7 +76,6 @@ class User extends React.Component {
         };
 
         const request = await bridge.send("VKWebAppCallAPIMethod", { "method": "users.get", "request_id": "32test", "params": params });
-        console.log('fetched vk user -----------------', request.response[0].first_name);
         this.setState({ vkUser: request.response[0] });
     }
 
@@ -108,9 +109,11 @@ class User extends React.Component {
     };
 
     handleCheckboxClick(event) {
-        var user = { ...this.state.user }
-        user.isSearchable = event.target.checked;
-        this.setState({ user });
+        if (this.state.user != null && this.state.user != undefined) {
+            var user = { ...this.state.user }
+            user.isSearchable = event.target.checked;
+            this.setState({ user });
+		}
     };
 
     render() {
@@ -169,7 +172,7 @@ class User extends React.Component {
                 <Div>
                     <Checkbox disabled={this.state.readOnlyMode} onChange={(e) => this.handleCheckboxClick(e)}
                         checked={this.state.user && this.state.user.isSearchable ? 'checked' : ''}>в поиске команды</Checkbox>
-                    {!this.state.readOnlyMode && <Button mode={this.state.user ? "primary" : "destructive"} size='xl'
+                    {this.state.user && !this.state.readOnlyMode && <Button mode={this.state.user ? "primary" : "destructive"} size='xl'
                         onClick={() => this.confirmUser(this.state.user && this.state.user.id, this.state.user.userSkills)}>
                         {this.state.user ? "Сохранить" : "Подтвердить"}
                     </Button>}
@@ -191,6 +194,7 @@ const mapStateToProps = (state) => {
 
     return {
         user: state.user.user,
+        profileUser: state.user.profileUser,
         profile: state.user.profile
     };
 };
@@ -198,6 +202,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
     setPage,
     setUser,
+    setProfileUser,
     goBack
 };
 

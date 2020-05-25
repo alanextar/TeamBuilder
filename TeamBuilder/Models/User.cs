@@ -24,6 +24,8 @@ namespace TeamBuilder.Models
 
 		[NotMapped]
 		public List<Team> TeamsToRecruit { get; set; }
+		[NotMapped]
+		public bool AnyTeamOwner { get; set; }
 	}
 
 	public class UserDto : IDbItem

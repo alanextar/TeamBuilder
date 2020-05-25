@@ -8,7 +8,7 @@ import {
 import InfiniteScroll from 'react-infinite-scroller';
 import { Api, Urls } from '../infrastructure/api';
 import debounce from 'lodash.debounce';
-import { setTeam } from "../store/teams/actions";
+import { setTeam, createTeam } from "../store/teams/actions";
 
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 
@@ -123,6 +123,7 @@ class Teams extends React.Component {
     }
 
     render() {
+        const { id, goBack, createTeam, setPage, setTeam } = this.props;
         var self = this;
         //var href = self.state.href === api.baseUrl + api.getTeams ? self.state.href : self.state.href + '&prev=true';
         const loader = <div key={0}>Loading ...</div>;
@@ -144,13 +145,11 @@ class Teams extends React.Component {
             );
         });
 
-        const { setPage, setTeam } = this.props;
-
         return (
             <Panel id={this.state.page_id}>
                 <PanelHeader left={
                     <PanelHeaderButton>
-                        <Icon28AddOutline onClick={this.state.go} data-to='teamCreate' />
+                        <Icon28AddOutline onClick={() => { createTeam(); setPage('teams', 'teamCreate'); }} />
                     </PanelHeaderButton>}>
                     Команды
                 </PanelHeader>
@@ -175,6 +174,7 @@ class Teams extends React.Component {
 const mapDispatchToProps = {
     setPage,
     setTeam,
+    createTeam,
     goBack
 };
 

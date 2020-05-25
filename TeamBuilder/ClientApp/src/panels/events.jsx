@@ -115,7 +115,7 @@ const Events = props => {
             <PanelHeader
                 left={
                     <PanelHeaderButton>
-                        <Icon28AddOutline onClick={props.go} data-to='eventCreate' data-from={props.id} />
+                        <Icon28AddOutline onClick={() => { setPage('events', 'eventCreate'); }} />
                     </PanelHeaderButton>}>
                 Мероприятия
                 </PanelHeader>

@@ -1,4 +1,4 @@
-import {SET_EVENT} from './actionTypes';
+import {SET_EVENT, CREATE_EVENT} from './actionTypes';
 
 export const setEvent = (event) => {
 
@@ -6,6 +6,15 @@ export const setEvent = (event) => {
         type: SET_EVENT,
             payload: {
             event: event
+        }
+    }
+};
+
+export const createEvent = () => {
+
+    return {
+        type: CREATE_EVENT,
+            payload: {
         }
     }
 };
