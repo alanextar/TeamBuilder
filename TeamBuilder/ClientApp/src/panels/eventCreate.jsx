@@ -1,5 +1,10 @@
 ﻿import React, { useState } from 'react';
 
+
+import { connect } from 'react-redux';
+import { bindActionCreators } from "redux";
+import { goBack, setPage } from "../store/router/actions";
+
 import {
     Panel, PanelHeader, Group, Button, Textarea, FixedLayout,
     PanelHeaderBack, Input, FormLayout
@@ -54,7 +59,7 @@ const EventCreate = props => {
     return (
 
         <Panel id={props.id}>
-            <PanelHeader separator={false} left={<PanelHeaderBack onClick={props.go} data-to={props.back} />}>
+            <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
                 Создать мероприятие
         </PanelHeader>
 
@@ -70,9 +75,8 @@ const EventCreate = props => {
             <FixedLayout vertical="bottom">
                 <Button
                     stretched={true}
-                    onClick={(e) => { eventCreate(); props.go(e) }}
-                    data-to={'events'}
-                    data-from={props.id}>
+                    onClick={() => { eventCreate(); goBack() }}
+                    >
                     Создать оревнование
                 </Button>
             </ FixedLayout>
@@ -80,4 +84,11 @@ const EventCreate = props => {
     );
 }
 
-export default EventCreate;
+function mapDispatchToProps(dispatch) {
+    return {
+        dispatch,
+        ...bindActionCreators({ setPage, goBack }, dispatch)
+    }
+}
+
+export default connect(null, mapDispatchToProps)(EventCreate);

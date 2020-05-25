@@ -48,11 +48,9 @@ const EventInfo = props => {
                 {props.event && edit &&
                     <FixedLayout vertical="bottom">
                         <SimpleCell
-                            after={<Icon28EditOutline />}
-                            onClick={props.go}
-                            data-to='eventEdit'
-                            data-event={JSON.stringify(props.event)}
-                            data-from={props.id}>
+                        after={<Icon28EditOutline />}
+                        onClick={() => { setPage('events', '') }}
+                    >
                         </SimpleCell>
                     </FixedLayout>}
             </Group>
@@ -70,7 +68,7 @@ const mapStateToProps = (state) => {
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
-        ...bindActionCreators({ setPage, setEvent, goBack }, dispatch)
+        ...bindActionCreators({ setPage, goBack }, dispatch)
     }
 }
 
