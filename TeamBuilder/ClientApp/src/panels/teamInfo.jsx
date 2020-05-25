@@ -1,6 +1,12 @@
 ﻿import React from 'react';
 import { Api } from '../infrastructure/api';
 
+import { connect } from 'react-redux';
+import { bindActionCreators } from "redux";
+import { goBack, setPage } from "../store/router/actions";
+import { setTeam } from "../store/teams/actions";
+import { setUser, setTeamUser } from "../store/user/actions";
+
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell, InfoRow,
     SimpleCell, Avatar, Div, PullToRefresh, FixedLayout
@@ -14,13 +20,10 @@ class TeamInfo extends React.Component {
         super(props);
 
         this.state = {
-            team: null,
-            go: props.go,
+            team: props.activeTeam,
             id: props.id,
             activeTab: 'teamDescription',
-            return: props.return,
-            edit: true,
-            fetching: false
+            edit: true
         };
 
         this.onRefresh = async () => {
@@ -38,15 +41,17 @@ class TeamInfo extends React.Component {
     }
 
     async populateTeamData() {
-        Api.Teams.get(this.props.teamId)
+        Api.Teams.get(this.state.team.id)
             .then(result => this.setState({ team: result }))
     }
 
     render() {
+        const { id, goBack, setTeam, setTeamUser, setUser, setPage } = this.props;
+
         var self = this;
         return (
             <Panel id={this.state.id}>
-                <PanelHeader separator={false} left={<PanelHeaderBack onClick={this.state.go} data-to={this.state.return} />}>
+                <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
                     {this.state.team && this.state.team.name}
                 </PanelHeader>
                 <Tabs>
@@ -74,7 +79,7 @@ class TeamInfo extends React.Component {
                                 <Cell>
                                     {console.log('==== ', this.state.team)}
                                     <SimpleCell>
-                                        <InfoRow header='Описаноие команды'>
+                                        <InfoRow header='Описание команды'>
                                             {this.state.team.description}
                                         </InfoRow>
                                     </SimpleCell>
@@ -95,10 +100,11 @@ class TeamInfo extends React.Component {
                                                     //{ members.isOwner && (members.id === self.props.vkProfile.id) && self.setState({ edit: true }) }
                                                     return (
                                                         <SimpleCell key={i}
-                                                            onClick={this.state.go}
-                                                            data-to='user'
-                                                            data-id={userTeam.userId}
-                                                            data-user={JSON.stringify(userTeam.user)}
+                                                            onClick={() => {
+                                                                setPage('teams', 'user');
+                                                                setUser(userTeam.user);
+                                                                setTeamUser(userTeam.user)
+                                                            }}
                                                             before={<Avatar size={48} src={userTeam.user.photo100} />}
                                                             after={<Icon28MessageOutline />}>
                                                             {userTeam.user.firstName, userTeam.user.fullName}
@@ -131,4 +137,19 @@ class TeamInfo extends React.Component {
 
 };
 
-export default TeamInfo;
+const mapStateToProps = (state) => {
+    return {
+        activeTeam: state.team.activeTeam,
+        teamUser: state.user.teamUser
+    };
+};
+
+
+function mapDispatchToProps(dispatch) {
+    return {
+        dispatch,
+        ...bindActionCreators({ setPage, setTeam, setUser, goBack, setTeamUser }, dispatch)
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(TeamInfo);

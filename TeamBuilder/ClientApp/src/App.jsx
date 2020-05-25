@@ -1,7 +1,16 @@
 ﻿import React, { useState, useEffect } from 'react';
+import { connect } from 'react-redux';
 import { View, Epic, Tabbar, TabbarItem } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import bridge from '@vkontakte/vk-bridge';
+import { bindActionCreators } from 'redux'
+import { goBack, closeModal, setStory } from "./store/router/actions";
+import { setParticipant } from "./store/participants/actions";
+import {
+    setUser, setProfile, getUser, setProfileUser, setTeamUser,
+    setEventUser, setParticipantsUser
+} from "./store/user/actions";
+import { getActivePanel } from "./services/_functions";
 
 import Icon28Users from '@vkontakte/icons/dist/28/users';
 import Icon28Profile from '@vkontakte/icons/dist/28/profile';
@@ -23,27 +32,14 @@ import User from './panels/user'
 import UserEdit from './panels/userEdit'
 import SetUserTeam from './panels/setUserTeam'
 
-const App = () => {
-    const [activeStory, setActiveStore] = useState('events');
-    const [back, setBack] = useState(null);
-
-    const [activeTeamPanel, setActiveTeamPanel] = useState('teams');
-    const [activeTeam, setActiveTeam] = useState(null);
+const App = (props) => {
+    let lastAndroidBackAction = 0;
     const [teamHref, setTeamNextHref] = useState(null);
 
-    const [activeUserPanel, setActiveUserPanel] = useState('user');
-    const [vkProfile, setProfile] = useState(null);
-    const [user, setUser] = useState(null);
-    const [userId, setUserId] = useState(null);
-
-    const [activeEventPanel, setActiveEventPanel] = useState('events');
-    const [event, setEvent] = useState(null);
-
-    const [activeUsersPanel, setActiveUsersPanel] = useState('users');
-
-    const [city, setCity] = useState(null);
-    const [about, setAbout] = useState(null);
-
+    const { setStory, activeView, activeStory, panelsHistory, setProfile, setUser,
+        setProfileUser, profileUser, teamUser, eventUser, participant, user
+    } = props;
+    let history = (panelsHistory[activeView] === undefined) ? [activeView] : panelsHistory[activeView];
 
 	useEffect(() => {
 		bridge.subscribe(({ detail: { type, data } }) => {
@@ -53,117 +49,133 @@ const App = () => {
 				document.body.attributes.setNamedItem(schemeAttribute);
 			}
 		});
+
         async function fetchData() {
-            const user = await bridge.send('VKWebAppGetUserInfo');
-            setProfile(user);
-            setUserId(user.id);
+            const profile = await bridge.send('VKWebAppGetUserInfo');
+            setProfile(profile);
+
+            let response = await fetch(`/api/user/get/?id=${profile.id}`);
+            let user = await response.json();
+            setUser(user);
+            setProfileUser(user);
         }
-		fetchData();
+        fetchData();
+
+        const { activeView, activeStory, activePanel } = props;
+        const { goBack, dispatch } = props;
+
+        window.onpopstate = () => {
+            let timeNow = +new Date();
+
+            if (timeNow - this.lastAndroidBackAction > 500) {
+                lastAndroidBackAction = timeNow;
+
+                goBack();
+            } else {
+                window.history.pushState(null, null);
+            }
+        };
 	}, []);
-
-    const goTeam = e => {
-        setActiveTeamPanel(e.currentTarget.dataset.to);
-        if (e.currentTarget.dataset.href)
-            setTeamNextHref(e.currentTarget.dataset.href);
-        setActiveTeam(e.currentTarget.dataset.id);
-        setBack(e.currentTarget.dataset.from);
-        let userId = e.currentTarget.dataset.id;
-        console.log('!!!!!!!into goTeam', userId);
-        setUserId(userId);
-        console.log(`dataset.href: ${e.currentTarget.dataset.href}`);
-    };
-
-    const goUsers = e => {
-        setActiveUsersPanel(e.currentTarget.dataset.to);
-        setBack(e.currentTarget.dataset.from);
-    };
-
-    const goEvent = e => {
-        setEvent(e.currentTarget.dataset.event && JSON.parse(e.currentTarget.dataset.event));
-        setActiveEventPanel(e.currentTarget.dataset.to);
-        setBack(e.currentTarget.dataset.from);
-    };
-
-    const goUserEdit = e => {
-        console.log('into go', e.currentTarget.dataset.to, e.currentTarget.dataset.id);
-        let user = e.currentTarget.dataset.user && JSON.parse(e.currentTarget.dataset.user);
-        setActiveTeam(e.currentTarget.dataset.id);
-        setActiveUserPanel(e.currentTarget.dataset.to);
-        //setUser(user);
-        console.log('userId', e.currentTarget.dataset.userId);
-        setUserId(e.currentTarget.dataset.id);
-    }
-     
-    const goSetUserTeam = e => {
-        let user = e.currentTarget.dataset.user && JSON.parse(e.currentTarget.dataset.user);
-        console.log('goSetUserTeam', user);
-        setUser(user);
-        setUserId(e.currentTarget.dataset.user.id);
-        console.log('dataset', e.currentTarget.dataset);
-        setActiveUserPanel(e.currentTarget.dataset.to);
-    }
-
-    const goFoot = e => {
-        setActiveStore(e.currentTarget.dataset.story);
-    }
 
 	return (
         <Epic activeStory={activeStory} tabbar={
             <Tabbar>
                 <TabbarItem
-                    onClick={goFoot}
+                    onClick={() => {
+                        setUser(teamUser);
+                        setStory('teams', 'teams')
+                    }}
                     selected={activeStory === 'teams'}
-                    data-story="teams"
                     text="Команды"
                 ><Icon28Users3Outline /></TabbarItem>
                 <TabbarItem
-                    onClick={goFoot}
+                    onClick={() => {
+                        setStory('users', 'users');
+                        setUser(participant)
+                    }}
                     selected={activeStory === 'users'}
-                    data-story="users"
                     text="Участники"
                 ><Icon28Users /></TabbarItem>
                 <TabbarItem
-                    onClick={goFoot}
+                    onClick={() => {
+                        setStory('events', 'events');
+                        setUser(eventUser)
+                    }}
                     selected={activeStory === 'events'}
-                    data-story="events"
                     text="События"
                 ><Icon28FavoriteOutline /></TabbarItem>
                 <TabbarItem
-                    onClick={goFoot}
+                    onClick={() =>
+                    {
+                        setStory('user', 'user');
+                        setUser(profileUser);
+                    }}
                     selected={activeStory === 'user'}
-                    data-story="user"
                     text="Профиль"
                 ><Icon28Profile /></TabbarItem>
             </Tabbar>
         }>
-            <View id='teams' activePanel={activeTeamPanel} >
-                <Teams id='teams' go={goTeam} href={teamHref} />
-                <TeamInfo id='teaminfo' go={goTeam} teamId={activeTeam} return='teams' vkProfile={vkProfile} />
-                <TeamCreate id='teamCreate' go={goTeam} back={back}/>
-                <TeamEdit id='teamEdit' go={goTeam} teamId={activeTeam} back={back} />
-                <User id='user' userId={userId} vkProfile={vkProfile} goUserEdit={goTeam}
-                    activeStory={activeStory} goSetUserTeam={goTeam} return='teaminfo' />
-                <SetUserTeam id='setUserTeam' goSetUserTeam={goTeam} user={user} userId={userId} vkProfile={vkProfile} />
-                <EventCreate id='eventCreate' go={goTeam} back={back} owner={vkProfile} />
+            <View id='teams' activePanel={getActivePanel("teams")}
+                history={history} >
+                <Teams id='teams' activeStory={activeStory} href={teamHref} />
+                <TeamInfo id='teaminfo' return='teams' profile={props.profile} />
+                <TeamCreate id='teamCreate'/>
+                <TeamEdit id='teamEdit' />
+                <User id='user' activeStory={activeStory} />
+                <SetUserTeam id='setUserTeam' />
+                <EventCreate id='eventCreate' owner={props.profile} />
             </View>
-            <View id='users' activePanel={activeUsersPanel}>
-                <Users id='users' go={goUsers} />
+            <View id='users' activePanel={getActivePanel("users")}
+                history={history}
+            >
+                <Users id='users' />
+                <User id='user' activeStory={activeStory} />
             </View>
-            <View id='events' activePanel={activeEventPanel}>
-                <Events id='events' go={goEvent} />
-                <EventCreate id='eventCreate' go={goEvent} back={back} owner={vkProfile} />
-                <EventInfo id='eventInfo' event={event} go={goEvent} back={back} />
-                <EventEdit id='eventEdit' event={event} go={goEvent} back={back} owner={vkProfile} />
+            <View id='events' activePanel={getActivePanel("events")}
+                history={history}>
+                <Events id='events' />
+                <EventCreate id='eventCreate' owner={props.profile} />
+                <EventInfo id='eventInfo' />
+                <EventEdit id='eventEdit' owner={props.profile} />
             </View>
-            <View id='user' activePanel={activeUserPanel}>
-                <User id='user' vkProfile={vkProfile} userId={userId} goUserEdit={goUserEdit} activeStory={activeStory} goSetUserTeam={goSetUserTeam} />
-                <UserEdit id='userEdit' goUserEdit={goUserEdit} vkProfile={vkProfile} user={user} />
-                <TeamInfo id='teaminfo' go={goUserEdit} teamId={activeTeam} return='user' />
-                <SetUserTeam id='setUserTeam' goSetUserTeam={goSetUserTeam} user={user} userId={userId} vkProfile={vkProfile}/>
+            <View id='user' activePanel={getActivePanel("user")}
+                history={history}
+            >
+                <User id='user' activeStory={activeStory} />
+                <UserEdit id='userEdit' />
+                <TeamInfo id='teaminfo' />
+                <SetUserTeam id='setUserTeam' />
             </View>
         </Epic>
 
     );
 }
 
-export default App;
+const mapStateToProps = (state) => {
+    return {
+        activeView: state.router.activeView,
+        activeStory: state.router.activeStory,
+        panelsHistory: state.router.panelsHistory,
+        scrollPosition: state.router.scrollPosition,
+        profile: state.user.profile,
+        user: state.user.user,
+        profileUser: state.user.profileUser,
+        eventUser: state.user.eventUser,
+        teamUser: state.user.teamUser,
+        participant: state.participant.participant
+        // colorScheme: state.vkui.colorScheme
+    };
+};
+
+
+function mapDispatchToProps(dispatch) {
+    return {
+        dispatch,
+        ...bindActionCreators({
+            setStory, goBack, closeModal, setProfile,
+            setUser, setProfileUser, setEventUser, setTeamUser, setParticipant
+        }, dispatch)
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);

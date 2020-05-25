@@ -1,5 +1,10 @@
 ﻿import React, { useState } from 'react';
 
+import { connect } from 'react-redux';
+import { bindActionCreators } from "redux";
+import { goBack, setPage } from "../store/router/actions";
+import { setEvent } from "../store/events/actions";
+
 import {
     Panel, PanelHeader, Group, SimpleCell, InfoRow, Header, FixedLayout,
     PanelHeaderBack, CardGrid, Card
@@ -10,9 +15,11 @@ import { Api } from '../infrastructure/api';
 const EventInfo = props => {
     const [edit, setEdit] = useState(true);
 
+    const { goBack } = props;
+
     return (
         <Panel id={props.id}>
-            <PanelHeader separator={false} left={<PanelHeaderBack onClick={props.go} data-to={props.back} />}>
+            <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
                 {props.event && props.event.name}
             </PanelHeader>
             <Group>
@@ -52,4 +59,19 @@ const EventInfo = props => {
         </Panel>
     );
 }
-export default EventInfo;
+
+const mapStateToProps = (state) => {
+    return {
+        event: state.event.event,
+    };
+};
+
+
+function mapDispatchToProps(dispatch) {
+    return {
+        dispatch,
+        ...bindActionCreators({ setPage, setEvent, goBack }, dispatch)
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(EventInfo);

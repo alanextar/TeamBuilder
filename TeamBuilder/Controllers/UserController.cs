@@ -54,7 +54,7 @@ namespace TeamBuilder.Controllers
 
 			await context.SaveChangesAsync();
 
-			return Ok("Confirmed");
+			return Json(user);
 		}
 
 		[HttpGet]

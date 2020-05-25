@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators } from "redux";
 import useDebounce from '../infrastructure/use-debounce';
 import {
     Panel, PanelHeader, Avatar, Search, PanelSpinner, RichCell, PullToRefresh,
@@ -9,7 +11,12 @@ import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import Icon24Work from '@vkontakte/icons/dist/24/work';
 import { Api, Urls } from '../infrastructure/api';
 
+import { setUser } from "../store/user/actions";
+import { setParticipant } from "../store/participants/actions";
+import { goBack, setPage } from '../store/router/actions';
+
 const Users = props => {
+    const { setParticipant, setUser, setPage } = props;
     const [isSearching, setIsSearching] = useState(false);
     const [fetching, setFetching] = useState(false);
 
@@ -136,9 +143,12 @@ const Users = props => {
                                         caption={user.city ? user.city : 'Ekaterinburg'}
                                         bottom={stringfySkills(user.skills)}
                                         text={user.about ? user.about : 'Хороший человек'}
-                                        onClick={props.go}
-                                        data-to='user'
-                                        data-from={props.id}>
+                                        onClick={() => {
+                                            setPage('users', 'user');
+                                            setUser(user);
+                                            setParticipant(user)
+                                        }}
+                                    >
                                         {user.firstName} {user.lastName}
                                     </RichCell>
                                 </Card>
@@ -150,4 +160,18 @@ const Users = props => {
     );
 };
 
-export default Users;
+const mapStateToProps = (state) => {
+    return {
+        participant: state.participant.participant
+    };
+};
+
+
+function mapDispatchToProps(dispatch) {
+    return {
+        dispatch,
+        ...bindActionCreators({ setPage, setUser, setParticipant }, dispatch)
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Users);
