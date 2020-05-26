@@ -3,6 +3,7 @@
 import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
 import { goBack, setPage } from "../store/router/actions";
+import { setEvent } from "../store/events/actions";
 
 import {
     Panel, PanelHeader, Group, SimpleCell, InfoRow, Header, FixedLayout,
@@ -14,9 +15,8 @@ import { Api } from '../infrastructure/api';
 
 const EventInfo = props => {
     const [edit, setEdit] = useState(true);
-    Api.Users.getPage().then(x => setEdit)
-    const { goBack, setPage } = props;
-    console.log('eventInfo ', props);
+
+    const { goBack } = props;
 
     const [contextOpened, setContextOpened] = useState(false);
 
@@ -72,14 +72,6 @@ const EventInfo = props => {
                     </InfoRow>
                 </SimpleCell>
                 Добавить команды
-                {props.event && edit &&
-                    <FixedLayout vertical="bottom">
-                        <SimpleCell
-                        after={<Icon28EditOutline />}
-                        onClick={() => { setPage('events', 'eventEdit') }}
-                    >
-                        </SimpleCell>
-                    </FixedLayout>}
             </Group>
         </Panel>
     );
