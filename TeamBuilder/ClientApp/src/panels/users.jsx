@@ -17,6 +17,7 @@ import { goBack, setPage } from '../store/router/actions';
 
 const Users = props => {
     const { setParticipant, setUser, setPage } = props;
+    
     const [isSearching, setIsSearching] = useState(false);
     const [fetching, setFetching] = useState(false);
 
@@ -112,7 +113,7 @@ const Users = props => {
 
     return (
         <Panel id={props.id}>
-            <PanelHeader>Пользователи</PanelHeader>
+            <PanelHeader separator={false}>Пользователи</PanelHeader>
             <Search value={searchTerm} onChange={e => setSearchTerm(e.target.value)} after={null} />
             <PullToRefresh onRefresh={onRefresh} isFetching={fetching}>
                 {isSearching ? loader :

@@ -16,7 +16,6 @@ import Icon24Filter from '@vkontakte/icons/dist/24/filter';
 const Teams = props => {
     const { createTeam, setPage, setTeam } = props;
 
-    const [isFirstEnter, setIsFirstEnter] = useState(true);
     const [isSearching, setIsSearching] = useState(false);
     const [fetching, setFetching] = useState(false);
 
@@ -97,10 +96,11 @@ const Teams = props => {
 
     return (
         <Panel id={props.id}>
-            <PanelHeader left={
-                <PanelHeaderButton>
-                    <Icon28AddOutline onClick={() => { createTeam(); setPage('teams', 'teamCreate'); }} />
-                </PanelHeaderButton>}>
+            <PanelHeader separator={false}
+                left={
+                    <PanelHeaderButton>
+                        <Icon28AddOutline onClick={() => { createTeam(); setPage('teams', 'teamCreate'); }} />
+                    </PanelHeaderButton>}>
                 Команды
                 </PanelHeader>
             <Search value={searchTerm} onChange={e => setSearchTerm(e.target.value)} after={null}

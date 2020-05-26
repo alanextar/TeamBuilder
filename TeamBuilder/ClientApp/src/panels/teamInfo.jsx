@@ -70,7 +70,7 @@ class TeamInfo extends React.Component {
                             aside={<Icon16Dropdown style={{ transform: `rotate(${this.state.contextOpened ? '180deg' : '0'})` }} />}
                             onClick={this.toggleContext}
                         >
-                            {this.state.team && this.state.team.name}
+                            {this.state.team && this.state.team.name.length > 15 ? `${this.state.team.name.substring(0, 15)}...` : this.state.team.name}
                         </PanelHeaderContent> :
                         this.state.team && this.state.team.name
                     }
