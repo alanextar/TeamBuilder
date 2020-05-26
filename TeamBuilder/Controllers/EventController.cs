@@ -43,7 +43,7 @@ namespace TeamBuilder.Controllers
 				return NoContent();
 
 			bool Filter(Event @event) => @event.Name.ToLowerInvariant().Contains(search?.ToLowerInvariant() ?? string.Empty);
-			var result = context.Events.GetPage(pageSize, HttpContext.Request, page, prev, Filter);
+			var result = context.Events.Include(e => e.Teams).GetPage(pageSize, HttpContext.Request, page, prev, Filter);
 			result.NextHref = result.NextHref == null ? null : $"{result.NextHref}&search={search}";
 			logger.LogInformation($"Response EventsCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
 			                      $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
@@ -58,7 +58,7 @@ namespace TeamBuilder.Controllers
 			if (!context.Events.Any())
 				await Initialize();
 
-			var result = context.Events.GetPage(pageSize, HttpContext.Request, page, prev);
+			var result = context.Events.Include(e => e.Teams).GetPage(pageSize, HttpContext.Request, page, prev);
 			logger.LogInformation($"Response EventsCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
 			                      $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
 

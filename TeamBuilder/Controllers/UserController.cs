@@ -142,12 +142,15 @@ namespace TeamBuilder.Controllers
 
 			var dbUser = context.Users.FirstOrDefault(u => u.Id == user.Id);
 			dbUser.City = user.City;
+			dbUser.Mobile = user.Mobile;
+			dbUser.Email = user.Email;
 			dbUser.About = user.About;
+			dbUser.Telegram = user.Telegram;
 
 			context.Update(dbUser);
 			context.SaveChanges();
 
-			return Ok("Saved");
+			return Json(dbUser);
 		}
 
 		public IActionResult JoinTeam(long id, long teamId)

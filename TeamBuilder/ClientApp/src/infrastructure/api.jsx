@@ -13,7 +13,7 @@ export class Api {
         getSkills: (id) => users.getSkills(id),
         getTeams: (id) => users.getTeams(id),
         get: (id) => users.get(id),
-        // getRecruitTeams,
+        getRecruitTeams: (vkProfileId, id) => users.getRecruitTeams(vkProfileId, id),
         edit: (data) => users.edit(data),
         joinTeam: (userId, teamId) => users.joinTeam(userId, teamId),
         quitOrDeclineTeam: (userId, teamId) => users.quitOrDeclineTeam(userId, teamId),

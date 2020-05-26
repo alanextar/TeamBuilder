@@ -12,6 +12,9 @@ namespace TeamBuilder.Models
 		public string LastName { get; set; }
 		public string City { get; set; }
 		public string About { get; set; }
+		public string Telegram { get; set; }
+		public string Email { get; set; }
+		public string Mobile { get; set; }
 		public string FullName => FirstName + " " + SecondName + " " + LastName;
 		public string Photo100 { get; set; }
 		public string Photo200 { get; set; }
@@ -36,6 +39,9 @@ namespace TeamBuilder.Models
 		public string LastName { get; set; }
 		public string City { get; set; }
 		public string About { get; set; }
+		public string Telegram { get; set; }
+		public string Email { get; set; }
+		public string Mobile { get; set; }
 		public string FullName => FirstName + " " + SecondName + " " + LastName;
 		public string Photo100 { get; set; }
 		public string Photo200 { get; set; }
@@ -45,5 +51,6 @@ namespace TeamBuilder.Models
 		public List<SkillDto> Skills { get; set; }
 		public List<Event> OwnEvents { get; set; }
 		public List<Team> TeamsToRecruit { get; set; }
+		public bool AnyTeamOwner { get; set; }
 	}
 }

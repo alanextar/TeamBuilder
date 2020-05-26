@@ -15,7 +15,7 @@ import { Api } from '../infrastructure/api';
 
 const EventInfo = props => {
     const [edit, setEdit] = useState(true);
-
+    Api.Users.getPage().then(x => setEdit)
 
     const { goBack, setPage } = props;
 
