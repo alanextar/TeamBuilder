@@ -4,128 +4,122 @@ import { connect } from 'react-redux';
 import { goBack, setPage } from '../store/router/actions';
 import { setEvent } from "../store/events/actions";
 
-import debounce from 'lodash.debounce';
+import useDebounce from '../infrastructure/use-debounce';
 import {
-    Panel, PanelHeader, Group, Search, List, RichCell, PullToRefresh,
-    PanelHeaderButton, CardGrid, Card, Div
+    Panel, PanelHeader, PanelSpinner, Search, RichCell, PullToRefresh,
+    PanelHeaderButton, CardGrid, Card
 } from '@vkontakte/vkui';
 import InfiniteScroll from 'react-infinite-scroller';
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import { Api, Urls } from '../infrastructure/api';
 
 const Events = props => {
+    const { setPage, setEvent } = props;
+
+    const [isSearching, setIsSearching] = useState(false);
     const [fetching, setFetching] = useState(false);
+
     const [hasMoreItems, setHasMoreItems] = useState(true);
     const [nextHref, setNextHref] = useState(null);
-    const [events, setEvents] = useState([]);
 
-    const [search, setSearch] = useState('');
+    const [items, setItems] = useState([]);
 
-    //#region Search
+    const [searchTerm, setSearchTerm] = useState('');
+    const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
-    const searchEvents = value => {
-        Api.Events.pagingSearch(value)
-            .then(json => {
-                setEvents(json.collection);
-                setNextHref(json.nextHref);
-                setHasMoreItems(json.nextHref ? true : false);
-            });
-    }
+    useEffect(
+        () => {
+            setIsSearching(true);
+            Api.Events.pagingSearch(debouncedSearchTerm)
+                .then(result => {
+                    setItems(result.collection);
+                    setNextHref(result.nextHref);
+                    setHasMoreItems(result.nextHref ? true : false);
+                    setIsSearching(false);
+                });
+        },
+        [debouncedSearchTerm]
+    )
 
-    const delayedSearchEvents = debounce(searchEvents, 250);
-
-    const onChangeSearch = e => {
-        setSearch(e.target.value);
-        setNextHref(null);
-        delayedSearchEvents(e.target.value);
-    }
-
-    //#endregion
-
-    const getEvents = () => {
-        Api.Events.GetPage()
-            .then(json => setEvents(json.collection));
-    }
-
-    // const onRefresh = () => {
-    //     setFetching(true);
-    //     search.length === 0 ? getEvents() : searchEvents(search);
-    //     setFetching(false);
-    // };
-
-    //#region Scroll
+    const onRefresh = () => {
+        setFetching(true);
+        if (searchTerm) {
+            Api.Events.pagingSearch(debouncedSearchTerm)
+                .then(result => {
+                    setItems(result.collection);
+                    setNextHref(result.nextHref);
+                    setHasMoreItems(result.nextHref ? true : false);
+                    setFetching(false);
+                });
+        }
+        else {
+            console.log("refresh")
+            Api.Events.getPage()
+                .then(result => {
+                    setItems(result.collection);
+                    setNextHref(result.nextHref);
+                    setHasMoreItems(result.nextHref ? true : false);
+                    setFetching(false);
+                })
+        }
+    };
 
     const loadItems = page => {
         var url = `${Urls.Events.GetPage}`;
         if (nextHref) {
             url = nextHref;
         }
-
-        console.log(`event.loadItems.url: ${url}`);
-
+        console.log(`load.url: ${url}`);
         Api.get(url)
             .then(e => {
-                var eventsTemp = events;
-                e.collection.map((event) => {
-                    eventsTemp.push(event);
+                var itemsTemp = items;
+                e.collection.map((item) => {
+                    itemsTemp.push(item);
                 });
-
                 if (e.nextHref) {
                     setNextHref(e.nextHref);
-                    setEvents(eventsTemp);
+                    setItems(itemsTemp);
                 } else {
                     setHasMoreItems(false);
                 }
-            })
-            .catch((error) => console.log(`Error for get events page. Details: ${error}`));
+            });
     };
 
-    const loader = <div key={0}>Loading ...</div>;
-
-    const getItems = () => {
-        var items = [];
-        events && events.map((event, i) => {
-            items.push(
-                <Card size="l" mode="shadow" key={event.id}>
-                    <RichCell
-                        bottom={`${Math.floor(Math.random() * (+50 - +0)) + +0} команд`}
-                        caption={`${event.startDate} - ${event.startDate}`}
-                        onClick={() => { setPage('events', 'eventInfo'); setEvent(event) }}
-                    >
-                        {event.name}
-                    </RichCell>
-                </Card>
-            );
-        });
-
-        return items;
-    }
-
-    //#endregion
-
-    const { setPage, setEvent } = props;
+    const loader = <PanelSpinner key={0} size="large" />
 
     return (
         <Panel id={props.id}>
-            <PanelHeader
+            <PanelHeader separator={false}
                 left={
                     <PanelHeaderButton>
                         <Icon28AddOutline onClick={() => { setPage('events', 'eventCreate'); }} />
                     </PanelHeaderButton>}>
                 Мероприятия
                 </PanelHeader>
-            <Search value={search} onChange={onChangeSearch} after={null} />
-            {/*<PullToRefresh onRefresh={onRefresh} isFetching={fetching}>*/}
-                <InfiniteScroll
-                    pageStart={0}
-                    loadMore={loadItems}
-                    hasMore={hasMoreItems}
-                    loader={loader}>
-                    <CardGrid style={{ marginBottom: 10 }}>
-                        {getItems()}
-                    </CardGrid>
-                </InfiniteScroll>
-                {/*</PullToRefresh>*/}
+            <Search value={searchTerm} onChange={e => setSearchTerm(e.target.value)} after={null} />
+            <PullToRefresh onRefresh={onRefresh} isFetching={fetching}>
+                {isSearching ? loader :
+                    <InfiniteScroll
+                        pageStart={0}
+                        loadMore={loadItems}
+                        hasMore={hasMoreItems}
+                        loader={loader}>
+                        <CardGrid style={{ marginBottom: 10 }}>
+                            {items && items.map(event => (
+                                <Card size="l" mode="shadow" key={event.id}>
+                                    <RichCell
+                                        bottom={`Участвуют ${event.teams && event.teams.length} команд`}
+                                        caption={`${event.startDate} - ${event.startDate}`}
+                                        onClick={() => { setPage('events', 'eventInfo'); setEvent(event) }}
+                                    >
+                                        {event.name}
+                                    </RichCell>
+                                </Card>
+                            ))}
+                        </CardGrid>
+                    </InfiniteScroll>
+                }
+            </PullToRefresh>
         </Panel>
     );
 };

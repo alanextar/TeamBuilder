@@ -198,16 +198,14 @@ class TeamEdit extends React.Component {
 
                             </Cell>
                     )}
-                </Group>
-                <FixedLayout vertical="bottom">
-                    <Div>
-                        <Button
-                            stretched
-                            onClick={e => { this.postEdit(); goBack() }}>
-                            Сохранить
+                <Div>
+                    <Button
+                        stretched
+                        onClick={(e) => { this.postEdit(); goBack() }}>
+                        Применить Изменения
                         </Button>
                     </Div>
-                </FixedLayout>
+                </Group>
             </Panel >
         );
     }
