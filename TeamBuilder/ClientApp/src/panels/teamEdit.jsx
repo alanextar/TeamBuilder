@@ -25,7 +25,7 @@ class TeamEdit extends React.Component {
             team: this.props.activeTeam,
             events: [],
             eventId: null,
-            usersNumber: 2,
+            usersNumber: this.props.activeTeam.numberRequiredMembers,
             go: props.go,
             panelId: props.id,
             activeTab: 'teamDescription',
