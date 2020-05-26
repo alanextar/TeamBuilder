@@ -21,8 +21,6 @@ class TeamInfo extends React.Component {
     constructor(props) {
         super(props);
 
-        console.log(`props.activeTeam ${props.activeTeam}`);
-        console.log(`props.activeTeam.str ${JSON.stringify(props.activeTeam)}`);
         this.state = {
             team: props.activeTeam,
             panelId: props.id,
@@ -83,15 +81,15 @@ class TeamInfo extends React.Component {
     };
 
     render() {
-        const { id, goBack, setTeam, setTeamUser, setUser, setPage } = this.props;
+        const { goBack, setTeamUser, setUser, setPage } = this.props;
 
         return (
             <Panel id={this.state.panelId}>
-                <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
+                <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => { console.log('goback'); goBack(); }} />}>
                     {this.state.profileUser ?
                         <PanelHeaderContent
                             aside={<Icon16Dropdown style={{ transform: `rotate(${this.state.contextOpened ? '180deg' : '0'})` }} />}
-                            onClick={this.toggleContext}
+                            onClick={(e) => { console.log('Dropdown'); this.toggleContext(); }}
                         >
                             {this.state.team && this.state.team.name.length > 15 ? `${this.state.team.name.substring(0, 15)}...` : this.state.team.name}
                         </PanelHeaderContent> :

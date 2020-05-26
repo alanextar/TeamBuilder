@@ -43,7 +43,7 @@ class TeamEdit extends React.Component {
 
     onEventChange(e) {
         var team = this.state.team;
-        team.event = e.target.value;
+        team.eventId = e.target.value;
         this.setState({ team: team })
     }
 
@@ -201,7 +201,7 @@ class TeamEdit extends React.Component {
                 <Div>
                     <Button
                         stretched
-                        onClick={(e) => { this.postEdit(); goBack() }}>
+                        onClick={() => { this.postEdit(); goBack() }}>
                         Применить Изменения
                         </Button>
                     </Div>
