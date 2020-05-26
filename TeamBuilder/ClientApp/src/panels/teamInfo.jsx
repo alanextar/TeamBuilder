@@ -60,29 +60,71 @@ class TeamInfo extends React.Component {
     render() {
         const { id, goBack, setTeam, setTeamUser, setUser, setPage } = this.props;
         console.log(`teamId: ${this.state.team && this.state.team.id}`);
-        // var self = this;
         return (
             <Panel id={this.state.panelId}>
                 <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
-                    {/* {this.state.team.userTeams.find(user => user.isOwner) && this.state.team.userTeams.find(user => user.isOwner).userId === this.state.vkProfile.id ? */}
-                    {true ?
-                        <PanelHeaderContent
-                            aside={<Icon16Dropdown style={{ transform: `rotate(${this.state.contextOpened ? '180deg' : '0'})` }} />}
-                            onClick={this.toggleContext}
-                        >
-                            {this.state.team && this.state.team.name}
-                        </PanelHeaderContent> :
-                        this.state.team && this.state.team.name
-                    }
+                    <PanelHeaderContent
+                        aside={<Icon16Dropdown style={{ transform: `rotate(${this.state.contextOpened ? '180deg' : '0'})` }} />}
+                        onClick={this.toggleContext}
+                    >
+                        {this.state.team && this.state.team.name}
+                    </PanelHeaderContent>
                 </PanelHeader>
                 <PanelHeaderContext opened={this.state.contextOpened} onClose={this.toggleContext}>
-                    <List>
-                        <Cell
-                            onClick={() => setPage('teams', 'teamEdit')}
-                        >
-                            Редактировать команду
+                    {/* {this.state.team.userTeams.find(user => user.isOwner).userId === this.state.vkProfile.id && */}
+                    {true &&
+                        <List>
+                            <Cell
+                                onClick={() => setPage('teams', 'teamEdit')}
+                            >
+                                Редактировать команду
+                            </Cell>
+                        </List>
+                        || this.state.team.userTeams.find(user => user.userId === this.state.vkProfile.id).userAction === 1 &&
+                        <List>
+                            <Cell>
+                                Заявка на рассмотрении
+                            </Cell>
+                        </List>
+                        || this.state.team.userTeams.find(user => user.userId === this.state.vkProfile.id).userAction === 2 &&
+                        <List>
+                            <Cell>
+                                удалиться из команды
+                            </Cell>
+                        </List>
+                        || this.state.team.userTeams.find(user => user.userId === this.state.vkProfile.id).userAction === 5 &&
+                        <List>
+                            <Cell
+                                onClick={() => setPage('teams', 'teamEdit')}
+                            >
+                                Принять заявку
+                            </Cell>
+                            <Cell
+                                onClick={() => setPage('teams', 'teamEdit')}
+                            >
+                                Отклонить заявку
+                            </Cell>
+                        </List>
+                        || (this.state.team.userTeams.length < this.state.team.numberRequiredMembers
+                            && (this.state.team.userTeams.find(user => user.userId === this.state.vkProfile.id).userAction === 0
+                                || this.state.team.userTeams.find(user => user.userId === this.state.vkProfile.id).userAction === 3
+                                || this.state.team.userTeams.find(user => user.userId === this.state.vkProfile.id).userAction === 4)) &&
+                        <List>
+                            <Cell onClick={() => setPage('teams', 'teamEdit')}>
+                                Подать заявку в команду
+                            </Cell>
+                        </List>
+                        || this.state.team.userTeams.length < this.state.team.numberRequiredMembers &&
+                        <List>
+                            <Cell onClick={() => setPage('teams', 'teamEdit')}>
+                                Подать заявку в команду
+                            </Cell>
+                        </List>
+                        ||
+                        <Cell>
+                        В команде нет мест
                         </Cell>
-                    </List>
+                        }
                 </PanelHeaderContext>
                 <Tabs>
                     <TabsItem
