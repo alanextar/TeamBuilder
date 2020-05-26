@@ -175,7 +175,6 @@ class User extends React.Component {
                                 </Cell>
                                 <Cell before={<Icon28Send />}>
                                     telegram: {this.state.user && <Link href={"tg://resolve?domain=" + this.state.user.telegram}>{this.state.user.telegram}</Link>}
-                                {this.state.user && this.state.user.telegram}
                                 </Cell>
                                 <Cell before={<Icon28MailOutline />}>
                                     email: {this.state.user && <Link href={"mailto:" + this.state.user.email}>{this.state.user.email}</Link>}

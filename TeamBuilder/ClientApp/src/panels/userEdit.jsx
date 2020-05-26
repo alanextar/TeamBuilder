@@ -60,7 +60,7 @@ class UserEdit extends React.Component {
         let email = this.state.user.email;
         let about = this.state.user.about;
         let telegram = this.state.user.telegram;
-        var user = { id, email, about, mobile };
+        var user = { id, email, about, mobile, telegram };
 
         let updatedUser = await Api.post(Urls.Users.Edit, user);
 
