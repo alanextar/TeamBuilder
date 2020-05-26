@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import {
     Panel, PanelHeader, Group, Cell, Avatar, Button, Div, PanelHeaderBack,
-    Tabs, TabsItem, Separator, Checkbox, List, Header, Title
+    Tabs, TabsItem, Separator, Checkbox, List, Header, Title, Link
 } from '@vkontakte/vkui';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { } from '@vkontakte/vkui';
@@ -13,6 +13,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import Icon28PhoneOutline from '@vkontakte/icons/dist/28/phone_outline';
 import Icon28ArticleOutline from '@vkontakte/icons/dist/28/article_outline';
+import Icon28MailOutline from '@vkontakte/icons/dist/28/mail_outline';
 import Icon24Write from '@vkontakte/icons/dist/24/write';
 import UserTeams from './userTeams'
 import bridge from '@vkontakte/vk-bridge';
@@ -52,6 +53,13 @@ class User extends React.Component {
         this.populateSkills();
         this.state.user && this.fetchVkUser();
         this.state.user && this.fetchUserData(this.state.user.id);
+    }
+
+    componentDidUpdate(prevProps) {
+        // Typical usage (don't forget to compare props):
+        if (this.props.user !== prevProps.user) {
+            this.setState({ user: this.props.user });
+        }
     }
 
     fetchUserData(id) {
@@ -129,13 +137,15 @@ class User extends React.Component {
         return (
             <Panel id="user">
                 <PanelHeader separator={false} left={this.state.readOnlyMode &&
-                    <PanelHeaderBack onClick={() => goBack()} />}>Профиль</PanelHeader>
+                    <PanelHeaderBack onClick={() => goBack()} />}> {this.state.readOnlyMode ? 'Информация об участнике' : 'Профиль'}</PanelHeader>
                 {this.state.vkUser &&
                     <Group title="VK Connect">
+                    <Link href={"https://m.vk.com/id" + this.state.user.id} target="_blank">
                         <Cell description={this.state.vkUser.city && this.state.vkUser.city.title ? this.state.vkUser.city.title : ''}
                             before={this.state.vkUser.photo_200 ? <Avatar src={this.state.vkUser.photo_200} /> : null}>
                             {`${this.state.vkUser.first_name} ${this.state.vkUser.last_name}`}
                         </Cell>
+                    </Link>
                     </Group>}
                 <Separator />
                 <Tabs>
@@ -160,7 +170,10 @@ class User extends React.Component {
                                     }>
                                 </Cell>}
                                 <Cell before={<Icon28PhoneOutline />}>
-                                    тел.:
+                                    тел.: {this.state.user && this.state.user.mobile}
+                                </Cell>
+                                <Cell before={<Icon28MailOutline />}>
+                                    email: {this.state.user && this.state.user.email}
                                 </Cell>
                                 <Cell before={<Icon28ArticleOutline />}>
                                     дополнительно: {this.state.user && this.state.user.about}

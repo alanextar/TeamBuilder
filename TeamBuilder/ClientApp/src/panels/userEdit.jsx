@@ -5,11 +5,11 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
 
 import { goBack, setPage } from "../store/router/actions";
-import * as VK from '../services/VK';
+import { setUser, setProfileUser } from "../store/user/actions";
 
 import {
-    Panel, PanelHeader, Group, Cell, Avatar, Search, Button, Div, Input,
-    FormLayoutGroup, Textarea, Separator, FormLayout, Select, RichCell, PanelHeaderBack
+    Panel, PanelHeader, Group, Cell, Avatar, Button, Div, Input,
+    FormLayoutGroup, Textarea, Separator, FormLayout, PanelHeaderBack
 } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import '../../src/styles/style.css';
@@ -26,7 +26,8 @@ class UserEdit extends React.Component {
         }
 
         this.handleAboutChange = this.handleAboutChange.bind(this);
-        this.handleCityChange = this.handleCityChange.bind(this);
+        this.handleMobileChange = this.handleMobileChange.bind(this);
+        this.handleEmailChange = this.handleEmailChange.bind(this);
         this.postEdit = this.postEdit.bind(this);
     }
 
@@ -35,20 +36,29 @@ class UserEdit extends React.Component {
         user.about = event.target.value;
         this.setState({ user });
     }
-
-    handleCityChange(event) {
+    handleEmailChange(event) {
         var user = { ...this.state.user };
-        user.city = event.target.value;
+        user.email = event.target.value;
+        this.setState({ user })
+    }
+    handleMobileChange(event) {
+        var user = { ...this.state.user };
+        user.mobile = event.target.value;
         this.setState({ user })
     }
 
     async postEdit() {
+        const { setUser, setProfileUser } = this.props;
         let id = this.state.vkProfile.id;
-        let city = this.state.user.city;
+        let mobile = this.state.user.mobile;
+        let email = this.state.user.email;
         let about = this.state.user.about;
-        var user = { id, city, about };
+        var user = { id, email, about, mobile };
 
-        await Api.post(Urls.Users.Edit, user);
+        let updatedUser = await Api.post(Urls.Users.Edit, user);
+
+        setUser(updatedUser);
+        setProfileUser(updatedUser);
     }
 
     render() {
@@ -68,7 +78,8 @@ class UserEdit extends React.Component {
                 <Separator />
                 <FormLayout>
                     <FormLayoutGroup top="Редактирование">
-                        <Input value={this.state.user && this.state.user.city} onChange={this.handleCityChange} type="text" top="город" />
+                        <Input value={this.state.user && this.state.user.mobile} onChange={this.handleMobileChange} type="text" top="телефон" />
+                        <Input value={this.state.user && this.state.user.email} onChange={this.handleEmailChange} type="text" top="почта" />
                         <Textarea value={this.state.user && this.state.user.about} onChange={this.handleAboutChange} top="Дополнительно" placeholder="О себе" />
                     </FormLayoutGroup>
                 </FormLayout>
@@ -100,7 +111,7 @@ function mapDispatchToProps(dispatch) {
     return {
         setPage,
         dispatch,
-        ...bindActionCreators({ goBack }, dispatch)
+        ...bindActionCreators({ goBack, setUser, setProfileUser }, dispatch)
     }
 }
 
