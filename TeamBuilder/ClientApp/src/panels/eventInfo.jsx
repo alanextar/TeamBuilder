@@ -30,8 +30,7 @@ const EventInfo = props => {
             {console.log('profile =====', props.profile)}
             {console.log('event =====', props.event)}
             <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
-                {/* {props.event.owner && props.profile.id === props.event.owner.id ? */}
-                {true ?
+                {props.profile.id === props.event.owner.id ?
                     <PanelHeaderContent
                         aside={<Icon16Dropdown style={{ transform: `rotate(${contextOpened ? '180deg' : '0'})` }} />}
                         onClick={toggleContext}
