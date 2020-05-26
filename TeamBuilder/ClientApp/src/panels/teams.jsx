@@ -1,177 +1,138 @@
-﻿import React from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { goBack, setPage } from '../store/router/actions';
 import {
-    Panel, PanelHeader, Avatar, Search, List, RichCell, PullToRefresh,
+    Panel, PanelHeader, Avatar, Search, PanelSpinner, RichCell, PullToRefresh,
     PanelHeaderButton, CardGrid, Card
 } from '@vkontakte/vkui';
 import InfiniteScroll from 'react-infinite-scroller';
 import { Api, Urls } from '../infrastructure/api';
-import debounce from 'lodash.debounce';
+import useDebounce from '../infrastructure/use-debounce';
 import { setTeam, createTeam } from "../store/teams/actions";
 
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import Icon24Filter from '@vkontakte/icons/dist/24/filter';
 
-class Teams extends React.Component {
-    constructor(props) {
-        super(props);
+const Teams = props => {
+    const { createTeam, setPage, setTeam } = props;
 
-        this.state = {
-            hasMoreItems: true,
-            nextHref: null,
-            teams: [],
-            go: props.go,
-            page_id: props.id,
-            fetching: false,
-            search: '',
-        };
+    const [isFirstEnter, setIsFirstEnter] = useState(true);
+    const [isSearching, setIsSearching] = useState(false);
+    const [fetching, setFetching] = useState(false);
 
-        this.onRefresh = () => {
-            this.setState({ fetching: true });
-            this.populateTeamData();
-            this.setState({
-                fetching: false
-            });
+    const [hasMoreItems, setHasMoreItems] = useState(true);
+    const [nextHref, setNextHref] = useState(null);
 
-        };
+    const [items, setItems] = useState([]);
 
-        this.onChangeSearch = this.onChangeSearch.bind(this);
-    }
+    const [searchTerm, setSearchTerm] = useState('');
+    const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
-    componentDidMount() {
-        this.searchTeams('');
-    }
+    useEffect(
+        () => {
+            console.log("search if")
+            console.log(`search.debouncedSearchTerm ${debouncedSearchTerm}`)
+            setIsSearching(true);
+            Api.Teams.pagingSearch(debouncedSearchTerm)
+                .then(result => {
+                    setItems(result.collection);
+                    setNextHref(result.nextHref);
+                    setHasMoreItems(result.nextHref ? true : false);
+                    setIsSearching(false);
+                });
+        },
+        [debouncedSearchTerm]
+    )
 
-    async populateTeamData() {
-        var self = this;
-        Api.Teams.GetPage()
-            .then(result => {
-                if (result) {
-                    var teamsT = [];
-                    result.collection.map((team) => {
-                        teamsT.push(team);
-                    });
-
-                    if (result.nextHref) {
-                        self.setState({
-                            teams: teamsT,
-                            nextHref: result.nextHref
-                        });
-                    } else {
-                        self.setState({
-                            hasMoreItems: false
-                        });
-                    }
-                }
-            });
-    }
-
-    loadItems(page) {
-        var self = this;
-        var url = `${Urls.Teams.GetPage}`;
-        if (this.state.nextHref) {
-            url = this.state.nextHref;
+    const onRefresh = () => {
+        setFetching(true);
+        if (searchTerm) {
+            console.log(`Refresh if`)
+            Api.Teams.pagingSearch(debouncedSearchTerm)
+                .then(result => {
+                    setItems(result.collection);
+                    setNextHref(result.nextHref);
+                    setHasMoreItems(result.nextHref ? true : false);
+                    setFetching(false);
+                });
         }
+        else {
+            console.log(`Refresh else`)
+            Api.Teams.getPage()
+                .then(result => {
 
-        console.log(`loadItems.Url: ${url}`);
+                    console.log(`Refresh result.collection ${result.collection.length}`)
+                    console.log(`Refresh result.nextHref ${result.nextHref}`)
+                    setItems(result.collection);
+                    setNextHref(result.nextHref);
+                    setHasMoreItems(result.nextHref ? true : false);
+                    setFetching(false);
+                })
+        }
+    };
 
+    const loadItems = page => {
+        var url = `${Urls.Teams.GetPage}`;
+        if (nextHref) {
+            url = nextHref;
+        }
+        console.log(`teams.loadItems.url: ${url}`)
+        console.log(`teams.loadItems.items: ${items.length}`)
         Api.get(url)
-            .then(result => {
-                if (result) {
-                    var teamsT = self.state.teams;
-                    result.collection.map((team) => {
-                        teamsT.push(team);
-                    });
-
-                    if (result.nextHref) {
-                        self.setState({
-                            teams: teamsT,
-                            nextHref: result.nextHref
-                        });
-                    } else {
-                        self.setState({
-                            hasMoreItems: false
-                        });
-                    }
+            .then(e => {
+                var itemsTemp = items;
+                e.collection.map((item) => {
+                    itemsTemp.push(item);
+                });
+                if (e.nextHref) {
+                    setNextHref(e.nextHref);
+                    setItems(itemsTemp);
+                } else {
+                    setHasMoreItems(false);
                 }
             });
-    }
+    };
 
-    async searchTeams(value) {
-        await Api.Teams.pagingSearch({ search: value, eventId: this.props.filtredByEvent }).then(result =>
-            this.setState({
-                teams: result.collection,
-                hasMoreItems: result.nextHref ? true : false,
-                nextHref: result.nextHref
-            }));
-    }
+    const loader = <PanelSpinner key={0} size="large" />
 
-    delayedSearchEvents = debounce(this.searchTeams, 250);
-
-    onChangeSearch(e) {
-        this.setState({
-            search: e.target.value,
-            nextHref: null
-        })
-        this.delayedSearchEvents(e.target.value);
-    }
-
-    getRandomInt() {
-        var min = 0;
-        var max = 1000;
-        return Math.floor(Math.random() * (+max - +min)) + +min;
-    }
-
-    render() {
-        const { id, goBack, createTeam, setPage, setTeam } = this.props;
-        var self = this;
-        //var href = self.state.href === api.baseUrl + api.getTeams ? self.state.href : self.state.href + '&prev=true';
-        const loader = <div key={0}>Loading ...</div>;
-
-        var items = [];
-        this.state.teams && this.state.teams.map((team, i) => {
-            items.push(
-                <Card size="l" mode="shadow" key={team.id}>
-                    <RichCell
-                        before={<Avatar size={64} src={team.photo100} />}
-                        text={team.description}
-                        caption={team.event && team.event.name}
-                        after={team.userTeams.length + '/' + team.numberRequiredMembers}
-                        onClick={() => { setPage('teams', 'teaminfo'); setTeam(team) }}
-                    >
-                        {team.name}
-                    </RichCell>
-                </Card>
-            );
-        });
-
-        return (
-            <Panel id={this.state.page_id}>
-                <PanelHeader left={
-                    <PanelHeaderButton>
-                        <Icon28AddOutline onClick={() => { createTeam(); setPage('teams', 'teamCreate'); }} />
-                    </PanelHeaderButton>}>
-                    Команды
+    return (
+        <Panel id={props.id}>
+            <PanelHeader left={
+                <PanelHeaderButton>
+                    <Icon28AddOutline onClick={() => { createTeam(); setPage('teams', 'teamCreate'); }} />
+                </PanelHeaderButton>}>
+                Команды
                 </PanelHeader>
-                <Search value={this.state.search} onChange={this.onChangeSearch} after={null}
-                    icon={<Icon24Filter />}
-                    onIconClick={this.props.onFiltersClick} />
-                <PullToRefresh onRefresh={this.onRefresh} isFetching={this.state.fetching}>
-
+            <Search value={searchTerm} onChange={e => setSearchTerm(e.target.value)} after={null}
+                icon={<Icon24Filter />}
+                onIconClick={props.onFiltersClick} />
+            <PullToRefresh onRefresh={onRefresh} isFetching={fetching}>
+                {isSearching ? loader :
                     <InfiniteScroll
                         pageStart={0}
-                        loadMore={this.loadItems.bind(this)}
-                        hasMore={this.state.hasMoreItems}
+                        loadMore={loadItems}
+                        hasMore={hasMoreItems}
                         loader={loader}>
                         <CardGrid style={{ marginBottom: 10 }}>
-                            {items}
+                            {items && items.map(team => (
+                                <Card size="l" mode="shadow" key={team.id}>
+                                    <RichCell
+                                        before={<Avatar size={64} src={team.photo100} />}
+                                        text={team.description}
+                                        caption={team.event && team.event.name}
+                                        after={team.userTeams.length + '/' + team.numberRequiredMembers}
+                                        onClick={() => { setPage('teams', 'teaminfo'); setTeam(team) }}
+                                    >
+                                        {team.name}
+                                    </RichCell>
+                                </Card>
+                            ))}
                         </CardGrid>
                     </InfiniteScroll>
-                </PullToRefresh>
-            </Panel>)
-
-    }
+                }
+            </PullToRefresh>
+        </Panel>
+    )
 };
 
 const mapDispatchToProps = {

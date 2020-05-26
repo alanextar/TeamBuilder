@@ -4,7 +4,7 @@ import { bindActionCreators } from "redux";
 import useDebounce from '../infrastructure/use-debounce';
 import {
     Panel, PanelHeader, Avatar, Search, PanelSpinner, RichCell, PullToRefresh,
-    PanelHeaderButton, CardGrid, Card, Div, SimpleCell
+    CardGrid, Card
 } from '@vkontakte/vkui';
 import InfiniteScroll from 'react-infinite-scroller';
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
@@ -30,29 +30,15 @@ const Users = props => {
 
     useEffect(
         () => {
-            if (debouncedSearchTerm) {
-                
             console.log("search if")
-                setIsSearching(true);
-                Api.Users.pagingSearch(debouncedSearchTerm)
-                    .then(result => {
-                        setItems(result.collection);
-                        setNextHref(result.nextHref);
-                        setHasMoreItems(result.nextHref ? true : false);
-                        setIsSearching(false);
-                    });
-            }
-            else {
-            console.log("search else")
-
-                setIsSearching(true);
-                Api.Users.getPage()
-                    .then(result => {
-                        setItems(result.collection);
-                        setNextHref(result.nextHref);
-                        setIsSearching(false);
-                    })
-            }
+            setIsSearching(true);
+            Api.Users.pagingSearch(debouncedSearchTerm)
+                .then(result => {
+                    setItems(result.collection);
+                    setNextHref(result.nextHref);
+                    setHasMoreItems(result.nextHref ? true : false);
+                    setIsSearching(false);
+                });
         },
         [debouncedSearchTerm]
     )
@@ -66,6 +52,7 @@ const Users = props => {
                 .then(result => {
                     setItems(result.collection);
                     setNextHref(result.nextHref);
+                    setHasMoreItems(result.nextHref ? true : false);
                     setFetching(false);
                 });
         }
@@ -75,6 +62,7 @@ const Users = props => {
                 .then(result => {
                     setItems(result.collection);
                     setNextHref(result.nextHref);
+                    setHasMoreItems(result.nextHref ? true : false);
                     setFetching(false);
                 })
         }
@@ -102,8 +90,7 @@ const Users = props => {
                 } else {
                     setHasMoreItems(false);
                 }
-            })
-            .catch((error) => console.log(`Error for get users page. Details: ${error}`));
+            });
     };
 
     const loader = <PanelSpinner key={0} size="large" />

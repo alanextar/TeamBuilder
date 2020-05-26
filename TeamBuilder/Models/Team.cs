@@ -29,7 +29,6 @@ namespace TeamBuilder.Models
 		public int NumberRequiredMembers { get; set; }
 		public string DescriptionRequiredMembers { get; set; }
 		public Event Event { get; set; }
-		public bool? IsConfirmed { get; set; }
 		public bool IsOwner { get; set; }
 		public UserActionEnum UserAction { get; set; }
 	}
