@@ -24,7 +24,6 @@ class User extends React.Component {
     constructor(props) {
         super(props);
 
-        console.log('into user constructor', props.user);
         let selectedSkills = props.user && props.user.userSkills && props.user.userSkills.map(function (userSkill) {
             return { id: userSkill.skillId, label: userSkill.skill.name };
         })
@@ -82,7 +81,6 @@ class User extends React.Component {
     async confirmUser(id) {
         const { setUser, setProfileUser } = this.props;
         let skillsIds = this.state.selectedSkills.map((s, i) => s.id);
-        console.log('into confirm user', skillsIds);
 
         var isSearchable = this.state.user.isSearchable;
         var profileViewModel = { id, skillsIds, isSearchable };
@@ -99,7 +97,6 @@ class User extends React.Component {
     }
 
     onSkillsChange(selectedSkills) {
-        console.log('onSkillsChange', selectedSkills);
 
         this.setState({
             selectedSkills: selectedSkills

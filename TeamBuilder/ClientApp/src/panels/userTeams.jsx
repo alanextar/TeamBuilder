@@ -26,8 +26,6 @@ class UserTeams extends React.Component {
 
     async handleJoin(e, userTeam) {
         e.stopPropagation();
-        console.log('into handleJoin');
-        console.log(userTeam);
         const response = await fetch(`/api/user/joinTeam/?id=${userTeam.userId}&&teamId=${userTeam.teamId}`);
         const data = await response.json();
         console.log(data);
@@ -36,22 +34,18 @@ class UserTeams extends React.Component {
 
     async handleQuitOrDecline(e,userTeam) {
         e.stopPropagation();
-        console.log('into handleQuiteOrDecline');
         const response = await fetch(`/api/user/quitOrDeclineTeam/?id=${userTeam.userId}&&teamId=${userTeam.teamId}`);
         const data = await response.json();
-        console.log(data);
         this.setState({ userTeams: data });
     }
 
     render() {
-        console.log('into userTeams', '------------', this.state.userTeams)
         return (
             <Group>
                 <List>
                     {
                         this.state.userTeams &&
                         this.state.userTeams.map((userTeam, i) => {
-                            console.log('team params', userTeam.team.id);
                             return (
                                 <CardGrid>
                                     <Card size="l" mode="shadow">
