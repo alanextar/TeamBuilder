@@ -102,8 +102,8 @@ const App = (props) => {
             <Tabbar>
                 <TabbarItem
                     onClick={() => {
-                        setUser(teamUser);
                         setStory('teams', 'teams')
+                        teamUser && setUser(teamUser);
                     }}
                     selected={activeStory === 'teams'}
                     text="Команды"
@@ -111,7 +111,7 @@ const App = (props) => {
                 <TabbarItem
                     onClick={() => {
                         setStory('users', 'users');
-                        setUser(participant)
+                        participant && setUser(participant)
                     }}
                     selected={activeStory === 'users'}
                     text="Участники"
@@ -119,7 +119,7 @@ const App = (props) => {
                 <TabbarItem
                     onClick={() => {
                         setStory('events', 'events');
-                        setUser(eventUser)
+                        eventUser && setUser(eventUser)
                     }}
                     selected={activeStory === 'events'}
                     text="События"
@@ -165,12 +165,12 @@ const App = (props) => {
                 //    </ModalRoot>}
             >
                 <Teams id='teams' activeStory={activeStory} href={teamHref} />
-                <TeamInfo id='teaminfo' return='teams' profile={props.profile} />
+                <TeamInfo id='teaminfo' return='teams' />
                 <TeamCreate id='teamCreate' />
                 <TeamEdit id='teamEdit' />
                 <User id='user' activeStory={activeStory} />
                 <SetUserTeam id='setUserTeam' />
-                <EventCreate id='eventCreate' owner={props.profile} />
+                <EventCreate id='eventCreate' />
                 {/*<EventsFilter id='eventsFilter' go={goTeam} back={back}
                     setActiveTeamPanel={setActiveTeamPanel}
                     activeModal={() => setactiveModal('filters')}

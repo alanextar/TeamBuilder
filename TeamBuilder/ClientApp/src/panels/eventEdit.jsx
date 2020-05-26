@@ -3,6 +3,7 @@
 import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
 import { goBack, setPage } from "../store/router/actions";
+import { setEvent } from "../store/events/actions";
 
 import {
     Panel, PanelHeader, Group, Button, Textarea, FixedLayout,
@@ -18,8 +19,10 @@ const EventEdit = props => {
     const [eventLink, setEventLink] = useState(props.event.link);
     const [eventStartDate, setEventStartDate] = useState(props.event.startDate);
     const [eventFinishDate, setEventFinishDate] = useState(props.event.finishDate);
+    const { goBack, setEvent } = props;
 
     const onNameChange = (e) => {
+
         setEventName(e.target.value);
     };
 
@@ -51,7 +54,7 @@ const EventEdit = props => {
         }
         Api.Events.edit(editEventViewModel)
             .then(result => {
-                setChangedEvent(result);
+                setEvent(result);
                 console.log(result);
             });
     }
@@ -77,18 +80,24 @@ const EventEdit = props => {
                     stretched
                     onClick={() => { eventEdit(); goBack() }}
                     >
-                    Изменить мероприятие
+                    Сохранить
                 </Button>
             </FixedLayout>
         </Panel>
     );
 }
 
+const mapStateToProps = (state) => {
+    return {
+        event: state.event.event,
+    };
+};
+
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
-        ...bindActionCreators({ setPage, goBack }, dispatch)
+        ...bindActionCreators({ setPage, goBack, setEvent }, dispatch)
     }
 }
 
-export default connect(null, mapDispatchToProps)(EventEdit);
+export default connect(mapStateToProps, mapDispatchToProps)(EventEdit);
