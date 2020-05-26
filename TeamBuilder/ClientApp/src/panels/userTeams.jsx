@@ -1,13 +1,15 @@
 ﻿import React from 'react';
-import ReactDOM from 'react-dom';
+import { connect } from 'react-redux';
+import { bindActionCreators } from "redux";
 import {
     Panel, PanelHeader, Group, Search, List, RichCell, Avatar, PullToRefresh,
     PanelHeaderButton, Cell, CardGrid, Card, Button
 } from '@vkontakte/vkui';
-import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import '@vkontakte/vkui/dist/vkui.css';
 import Icon28CheckCircleOutline from '@vkontakte/icons/dist/28/check_circle_outline';
 import Icon28InfoOutline from '@vkontakte/icons/dist/28/info_outline';
+import { setTeam } from '../store/teams/actions';
+import { setPage } from '../store/router/actions';
 
 class UserTeams extends React.Component {
     constructor(props) {
@@ -28,7 +30,6 @@ class UserTeams extends React.Component {
         e.stopPropagation();
         const response = await fetch(`/api/user/joinTeam/?id=${userTeam.userId}&&teamId=${userTeam.teamId}`);
         const data = await response.json();
-        console.log(data);
         this.setState({ userTeams: data });
     }
 
@@ -40,6 +41,8 @@ class UserTeams extends React.Component {
     }
 
     render() {
+        const { setPage, setTeam } = this.props;
+
         return (
             <Group>
                 <List>
@@ -54,7 +57,7 @@ class UserTeams extends React.Component {
                                             caption={"Событие: " + (userTeam.team.event ? userTeam.team.event.name : '')}
                                             after={userTeam.userAction === 2 ? < Icon28CheckCircleOutline /> :
                                                 (userTeam.userAction === 1 && <Icon28InfoOutline />)}
-                                            onClick={this.state.goUserEdit}
+                                            onClick={() => { setTeam(userTeam.team); setPage('user', 'teaminfo') }}
                                             data-to='teaminfo'
                                             data-id={userTeam.team.id}
                                             actions={!this.props.readOnlyMode && (userTeam.userAction === 5 ?
@@ -84,4 +87,11 @@ class UserTeams extends React.Component {
 
 }
 
-export default UserTeams;
+function mapDispatchToProps(dispatch) {
+    return {
+        dispatch,
+        ...bindActionCreators({ setPage, setTeam }, dispatch)
+    }
+}
+
+export default connect(null, mapDispatchToProps)(UserTeams);
