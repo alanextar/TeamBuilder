@@ -102,8 +102,8 @@ const App = (props) => {
             <Tabbar>
                 <TabbarItem
                     onClick={() => {
-                        setUser(teamUser);
                         setStory('teams', 'teams')
+                        teamUser && setUser(teamUser);
                     }}
                     selected={activeStory === 'teams'}
                     text="Команды"
@@ -111,7 +111,7 @@ const App = (props) => {
                 <TabbarItem
                     onClick={() => {
                         setStory('users', 'users');
-                        setUser(participant)
+                        participant && setUser(participant)
                     }}
                     selected={activeStory === 'users'}
                     text="Участники"
@@ -119,7 +119,7 @@ const App = (props) => {
                 <TabbarItem
                     onClick={() => {
                         setStory('events', 'events');
-                        setUser(eventUser)
+                        eventUser && setUser(eventUser)
                     }}
                     selected={activeStory === 'events'}
                     text="События"
