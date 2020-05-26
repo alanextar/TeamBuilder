@@ -16,7 +16,8 @@ import { Api } from '../infrastructure/api';
 const EventInfo = props => {
     const [edit, setEdit] = useState(true);
 
-    const { goBack } = props;
+
+    const { goBack, setPage } = props;
 
     const [contextOpened, setContextOpened] = useState(false);
 
@@ -42,7 +43,7 @@ const EventInfo = props => {
             <PanelHeaderContext opened={contextOpened} onClose={toggleContext}>
                 <List>
                     <Cell
-                        onClick={() => { setPage('events', '') }}
+                        onClick={() => { setPage('events', 'eventEdit') }}
                     >
                         Редактировать событие
                         </Cell>
