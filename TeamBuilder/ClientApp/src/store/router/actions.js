@@ -11,7 +11,6 @@ export const setStory = (story, initial_panel) => (
 );
 
 export const setPage = (view, panel) => {
-    console.log('setPage (view,panel) =======', view, panel);
     return {
         type: SET_PAGE,
             payload: {

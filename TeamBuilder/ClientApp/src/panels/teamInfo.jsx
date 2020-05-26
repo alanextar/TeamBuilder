@@ -38,18 +38,19 @@ class TeamInfo extends React.Component {
         };
     }
 
-    // componentDidMount() {
-    //     this.populateTeamData();
-    // }
+     componentDidMount() {
+         this.populateTeamData();
+     }
 
     async populateTeamData() {
+        const { setTeam } = this.props;
         Api.Teams.get(this.state.team.id)
-            .then(result => this.setState({ team: result }))
+            .then(result => { setTeam(result); this.setState({ team: result }) });
     }
 
     render() {
         const { id, goBack, setTeam, setTeamUser, setUser, setPage } = this.props;
-        console.log(`teamId: ${this.state.team && this.state.team.id}`);
+
         // var self = this;
         return (
             <Panel id={this.state.panelId}>
