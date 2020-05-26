@@ -6,19 +6,8 @@ import * as events from "./apiEvents";
 export class Api {
 
     static Users = {
-        pagingSearch: (value, filter = {}) => users.pagingSearch(value, filter),
-        getPage: (params = {}) => users.getPage(params),
-        confirm: (data) => users.confirm(data),
-        checkConfirmation: (id) => users.checkConfirmation(id),
-        getSkills: (id) => users.getSkills(id),
-        getTeams: (id) => users.getTeams(id),
-        get: (id) => users.get(id),
-        // getRecruitTeams,
-        edit: (data) => users.edit(data),
-        joinTeam: (userId, teamId) => users.joinTeam(userId, teamId),
-        quitOrDeclineTeam: (userId, teamId) => users.quitOrDeclineTeam(userId, teamId),
-        setTeam: (userId, teamId) => users.setTeam(userId, teamId),
-        getOwnerTeams: (id) => users.getOwnerTeams(id)
+        pagingSearch: (value) => users.pagingSearch(value),
+        getPage: () => users.getPage()
     };
 
     static Events = {
@@ -33,7 +22,7 @@ export class Api {
     
     static Teams = {
         pagingSearch: (value, filter = {}) => teams.pagingSearch(value, filter),
-        getPage: (params = {}) => teams.getPage(params),
+        getPage: () => teams.getPage(),
         get: (id) => teams.get(id),
         create: async (data) => await teams.create(data),
         edit: (data) => teams.edit(data),
@@ -78,8 +67,6 @@ export class Urls {
         GetTeams: `${this.baseUrl}/${this.prefix}/${this.userStr}/getTeams`,
         JoinTeam: `${this.baseUrl}/${this.prefix}/${this.userStr}/joinTeam`,
         QuitOrDeclineTeam: `${this.baseUrl}/${this.prefix}/${this.userStr}/quitOrDeclineTeam`,
-        SetTeam: `${this.baseUrl}/${this.prefix}/${this.userStr}/setTeam`,
-        GetOwnerTeams: `${this.baseUrl}/${this.prefix}/${this.userStr}/getOwnerTeams`
     };
 
     static Events = {

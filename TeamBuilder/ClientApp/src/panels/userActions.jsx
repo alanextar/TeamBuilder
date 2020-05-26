@@ -21,16 +21,21 @@ class UserActions extends React.Component {
 
     async handleJoin(e, userTeam) {
         e.stopPropagation();
+        console.log('into handleJoin');
+        console.log(userTeam);
         Api.get(Urls.Users.JoinTeam, { id: userTeam.userId, teamId: userTeam.teamId })
             .then(result => {
+                console.log(result);
                 this.setState({ userTeams: result })
             });
     }
 
     async handleQuitOrDecline(e, userTeam) {
         e.stopPropagation();
+        console.log('into handleQuiteOrDecline');
         Api.get(Urls.Users.QuitOrDeclineTeam, { id: userTeam.userId, teamId: userTeam.teamId })
         .then(result => {
+            console.log(result);
             this.setState({ userTeams: result })
         });
     }

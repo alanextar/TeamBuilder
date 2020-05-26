@@ -31,8 +31,6 @@ namespace TeamBuilder.Controllers
 			var user = context.Users.Include(x => x.UserSkills)
 				.ThenInclude(y => y.Skill).FirstOrDefault(u => u.Id == profileViewModel.Id);
 
-			var loadAllSkills = context.Skills.ToList();
-
 			if (user == null)
 			{
 				user = new User { Id = profileViewModel.Id };

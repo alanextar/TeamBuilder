@@ -4,13 +4,12 @@
 import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
 import { goBack, setPage } from "../store/router/actions";
-import { setEvent } from "../store/events/actions";
 
 import {
     Panel, PanelHeader, Group, Button, Textarea, FixedLayout,
     PanelHeaderBack, Input, FormLayout
 } from '@vkontakte/vkui';
-import { Api, Urls } from '../infrastructure/api';
+import { Api } from '../infrastructure/api';
 
 const EventCreate = props => {
     const [eventName, setEventName] = useState('');
@@ -18,7 +17,6 @@ const EventCreate = props => {
     const [eventLink, setEventLink] = useState('');
     const [eventStartDate, setEventStartDate] = useState('');
     const [eventFinishDate, setEventFinishDate] = useState('');
-    const { setPage, setEvent, goBack } = props;
 
     const onNameChange = (e) => {
         setEventName(e.target.value);
@@ -48,21 +46,18 @@ const EventCreate = props => {
         let finishDate = eventFinishDate;
         let ownerId = props.owner ? props.owner.id : -1;
         var createEventViewModel = { name, description, startDate, finishDate, link, ownerId }
-        console.log('Api.Events.create ------------', `${Api.Events.create}`);
-
-        fetch(Urls.Events.Create,
+        fetch(`${Api.Events.create}`,
             {
                 method: 'post',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(createEventViewModel)
             })
-            .then(result => result.json())
-            .then(data => setEvent(data))
             .then(console.log('ok'))
             .catch((error) => console.log(`Error for create events. Details: ${error}`));
     }
 
     return (
+
         <Panel id={props.id}>
             <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
                 Создать мероприятие
@@ -80,7 +75,7 @@ const EventCreate = props => {
             <FixedLayout vertical="bottom">
                 <Button
                     stretched={true}
-                    onClick={() => { eventCreate(); setPage('events', 'eventInfo') }}
+                    onClick={() => { eventCreate(); goBack() }}
                     >
                     Создать соревнование
                 </Button>
@@ -92,7 +87,7 @@ const EventCreate = props => {
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
-        ...bindActionCreators({ setPage, setEvent, goBack }, dispatch)
+        ...bindActionCreators({ setPage, goBack }, dispatch)
     }
 }
 

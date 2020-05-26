@@ -97,20 +97,12 @@ namespace TeamBuilder.Controllers
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(createTeamViewModel)}");
 
-			var profileId = long.Parse(HttpContext.VkLaunchParams().VkUserId);
-
 			var @event = await context.Events.FirstOrDefaultAsync(e => e.Id == createTeamViewModel.EventId);
 
 			var config = new MapperConfiguration(cfg => cfg.CreateMap<CreateTeamViewModel, Team>()
 				.ForMember("Event", opt => opt.MapFrom(_ => @event)));
 			var mapper = new Mapper(config);
 			var team = mapper.Map<CreateTeamViewModel, Team>(createTeamViewModel);
-			team.UserTeams.Add(
-				new UserTeam
-				{
-					IsOwner = true,
-					UserId = profileId
-				});
 
 			await context.Teams.AddAsync(team);
 			await context.SaveChangesAsync();

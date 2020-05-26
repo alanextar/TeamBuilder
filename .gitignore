@@ -353,4 +353,3 @@ MigrationBackup/
 bin
 obj
 *.exe
-secret.js

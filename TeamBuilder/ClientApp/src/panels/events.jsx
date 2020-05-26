@@ -24,12 +24,14 @@ const Events = props => {
     //#region Search
 
     const searchEvents = value => {
-        Api.Events.pagingSearch(value)
+        fetch(`${Api.Events.PagingSearch}?search=${value}`)
+            .then((resp) => resp.json())
             .then(json => {
                 setEvents(json.collection);
                 setNextHref(json.nextHref);
                 setHasMoreItems(json.nextHref ? true : false);
-            });
+            })
+            .catch((error) => console.log(`Error for get filtered events page. Details: ${error}`));
     }
 
     const delayedSearchEvents = debounce(searchEvents, 250);
@@ -43,15 +45,17 @@ const Events = props => {
     //#endregion
 
     const getEvents = () => {
-        Api.Events.GetPage()
-            .then(json => setEvents(json.collection));
+        fetch(`${Urls.Events.GetPage}`)
+            .then((resp) => resp.json())
+            .then(json => setEvents(json.collection))
+            .catch((error) => console.log(`Error for get events page. Details: ${error}`));
     }
 
-    // const onRefresh = () => {
-    //     setFetching(true);
-    //     search.length === 0 ? getEvents() : searchEvents(search);
-    //     setFetching(false);
-    // };
+    const onRefresh = () => {
+        setFetching(true);
+        search.length === 0 ? getEvents() : searchEvents(search);
+        setFetching(false);
+    };
 
     //#region Scroll
 
@@ -63,7 +67,8 @@ const Events = props => {
 
         console.log(`event.loadItems.url: ${url}`);
 
-        Api.get(url)
+        fetch(url)
+            .then(resp => resp.json())
             .then(e => {
                 var eventsTemp = events;
                 e.collection.map((event) => {
@@ -115,7 +120,7 @@ const Events = props => {
                 Мероприятия
                 </PanelHeader>
             <Search value={search} onChange={onChangeSearch} after={null} />
-            {/*<PullToRefresh onRefresh={onRefresh} isFetching={fetching}>*/}
+            <PullToRefresh onRefresh={onRefresh} isFetching={fetching}>
                 <InfiniteScroll
                     pageStart={0}
                     loadMore={loadItems}
@@ -125,7 +130,7 @@ const Events = props => {
                         {getItems()}
                     </CardGrid>
                 </InfiniteScroll>
-                {/*</PullToRefresh>*/}
+            </PullToRefresh>
         </Panel>
     );
 };

@@ -1,7 +1,7 @@
 import {SET_EVENT, CREATE_EVENT} from './actionTypes';
 
 export const setEvent = (event) => {
-    console.log('setEvent ', event);
+
     return {
         type: SET_EVENT,
             payload: {

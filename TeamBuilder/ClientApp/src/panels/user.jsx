@@ -2,19 +2,19 @@
 import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import {
-    Panel, PanelHeader, Group, Cell, Avatar, Button, Div, PanelHeaderBack,
-    Tabs, TabsItem, Separator, Checkbox, List, Header, Title
+    Panel, PanelHeader, Group, Cell, Avatar, Search, Button, Div, Input, PanelHeaderBack,
+    Tabs, TabsItem, Separator, Checkbox, List, Header, FormLayout, Select, RichCell
 } from '@vkontakte/vkui';
-import { Typeahead } from 'react-bootstrap-typeahead';
 import { } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import '../../src/styles/style.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import Icon28PhoneOutline from '@vkontakte/icons/dist/28/phone_outline';
 import Icon28ArticleOutline from '@vkontakte/icons/dist/28/article_outline';
+import Icon20HomeOutline from '@vkontakte/icons/dist/20/home_outline';
 import Icon24Write from '@vkontakte/icons/dist/24/write';
 import UserTeams from './userTeams'
+import UserSkills from './userSkills'
 import bridge from '@vkontakte/vk-bridge';
 import { Api, Urls } from '../infrastructure/api';
 import { goBack, setPage } from '../store/router/actions';
@@ -24,17 +24,19 @@ class User extends React.Component {
     constructor(props) {
         super(props);
 
-        let selectedSkills = props.user && props.user.userSkills && props.user.userSkills.map(function (userSkill) {
+        let userSkills = props.user && props.user.userSkills && props.user.userSkills.map(function (userSkill) {
             return { id: userSkill.skillId, label: userSkill.skill.name };
         })
+        let selectedSkills = userSkills;
         let isSearchable = props.user && props.user.isSearchable;
 
         this.state = {
-            allSkills: null,
+            skills: null,
             vkUser: null,
             vkProfile: props.profile,
             profileUser: props.profileUser,
             user: props.user,
+            userSkills: userSkills,
             activeTabProfile: 'main',
             selected: false,
             selectedSkills: selectedSkills,
@@ -49,7 +51,6 @@ class User extends React.Component {
     }
 
     componentDidMount() {
-        this.populateSkills();
         this.state.user && this.fetchVkUser();
         this.state.user && this.fetchUserData(this.state.user.id);
     }
@@ -79,8 +80,8 @@ class User extends React.Component {
     }
 
     async confirmUser(id) {
-        const { setUser, setProfileUser } = this.props;
-        let skillsIds = this.state.selectedSkills.map((s, i) => s.id);
+        let skillsIds = this.state.userSkills.map((s, i) => s.id);
+        console.log('into confirm user', skillsIds);
 
         var isSearchable = this.state.user.isSearchable;
         var profileViewModel = { id, skillsIds, isSearchable };
@@ -92,14 +93,17 @@ class User extends React.Component {
         });
 
         let user = await saveOrConfirm.json()
-        setUser(user);
-        setProfileUser(user);
+
+        console.log('updated user', user);
+
+        this.props.setUser(user);
     }
 
-    onSkillsChange(selectedSkills) {
+    onSkillsChange(event, selectedSkills) {
+        console.log('onSkillsChange', selectedSkills);
 
         this.setState({
-            selectedSkills: selectedSkills
+            userSkills: selectedSkills
         })
         //event.preventDefault();
     };
@@ -112,19 +116,8 @@ class User extends React.Component {
 		}
     };
 
-    async populateSkills() {
-        const result = await fetch('/api/skill/getall');
-        const allSkillsJson = await result.json();
-
-        var options = allSkillsJson && allSkillsJson.map(function (skill) {
-            return { id: skill.id, label: skill.name };
-        });
-
-        this.setState({ allSkills: options });
-    }
-
     render() {
-        const { setPage, goBack } = this.props;
+        const { setPage, setUser, goBack } = this.props;
 
         return (
             <Panel id="user">
@@ -166,21 +159,10 @@ class User extends React.Component {
                                     дополнительно: {this.state.user && this.state.user.about}
                                 </Cell>
                             </List>
-                            <Div>
-                                <Title level="3" weight="regular" style={{ marginBottom: 16 }}>Скиллы:</Title>
-                                <Typeahead id="skills"
-                                    clearButton
-                                    onChange={(e) => {
-                                        this.onSkillsChange(e)
-                                    }}
-                                    options={this.state.allSkills}
-                                    selected={this.state.selectedSkills}
-                                    top="Skills"
-                                    multiple
-                                    className="Select__el skillsInput"
-                                    disabled={this.state.readOnlyMode}
-                                />
-                            </Div>
+                            <UserSkills userSkills={this.state.userSkills}
+                                readOnlyMode={this.state.readOnlyMode}
+                                onSkillsChange={this.onSkillsChange.bind(this, this.state.selectedSkills)}
+                            />
                         </Group> :
                         <Group>
                             <UserTeams userTeams={this.state.user && this.state.user.userTeams}
