@@ -105,7 +105,7 @@ const Teams = props => {
                 </PanelHeader>
             <Search value={searchTerm} onChange={e => setSearchTerm(e.target.value)} after={null}
                 icon={<Icon24Filter />}
-                onIconClick={props.onFiltersClick} />
+                onIconClick={e => { console.log('in oniconclick'); props.onFiltersClick(e);  }} />
             <PullToRefresh onRefresh={onRefresh} isFetching={fetching}>
                 {isSearching ? loader :
                     <InfiniteScroll

@@ -1,50 +1,42 @@
 ﻿import React, { useState, useEffect } from 'react';
-import debounce from 'lodash.debounce';
+import { connect } from 'react-redux';
+
+import { goBack, setPage } from '../store/router/actions';
+import { setEvent } from "../store/events/actions";
+
+import useDebounce from '../infrastructure/use-debounce';
 import {
-    Panel, PanelHeader, Search, RichCell, PullToRefresh,
-    PanelHeaderButton, CardGrid, Card, PanelHeaderBack
+    Panel, PanelHeader, PanelSpinner, Search, RichCell, PullToRefresh,
+    PanelHeaderBack, CardGrid, Card
 } from '@vkontakte/vkui';
 import InfiniteScroll from 'react-infinite-scroller';
-import { Api } from '../infrastructure/api';
+import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
+import { Api, Urls } from '../infrastructure/api';
 
 const EventsFilter = props => {
+    const { setPage, setEvent, goBack } = props;
+
+    const [isSearching, setIsSearching] = useState(false);
     const [fetching, setFetching] = useState(false);
+
     const [hasMoreItems, setHasMoreItems] = useState(true);
     const [nextHref, setNextHref] = useState(null);
-    const [events, setEvents] = useState([]);
 
-    const debouncedSearchTerm = useDebounce(searchTerm, 500);
-    const [isSearching, setIsSearching] = useState(false);
     const [items, setItems] = useState([]);
-    const [searchTerm, setSearchTerm] = useState('');
 
-    //#region Search
+    const [searchTerm, setSearchTerm] = useState('');
+    const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
     useEffect(
         () => {
-            if (debouncedSearchTerm) {
-
-                console.log("search if")
-                setIsSearching(true);
-                Api.Events.pagingSearch(debouncedSearchTerm)
-                    .then(result => {
-                        setItems(result.collection);
-                        setNextHref(result.nextHref);
-                        setHasMoreItems(result.nextHref ? true : false);
-                        setIsSearching(false);
-                    });
-            }
-            else {
-                console.log("search else")
-
-                setIsSearching(true);
-                Api.Events.getPage()
-                    .then(result => {
-                        setItems(result.collection);
-                        setNextHref(result.nextHref);
-                        setIsSearching(false);
-                    })
-            }
+            setIsSearching(true);
+            Api.Events.pagingSearch(debouncedSearchTerm)
+                .then(result => {
+                    setItems(result.collection);
+                    setNextHref(result.nextHref);
+                    setHasMoreItems(result.nextHref ? true : false);
+                    setIsSearching(false);
+                });
         },
         [debouncedSearchTerm]
     )
@@ -56,6 +48,7 @@ const EventsFilter = props => {
                 .then(result => {
                     setItems(result.collection);
                     setNextHref(result.nextHref);
+                    setHasMoreItems(result.nextHref ? true : false);
                     setFetching(false);
                 });
         }
@@ -65,102 +58,73 @@ const EventsFilter = props => {
                 .then(result => {
                     setItems(result.collection);
                     setNextHref(result.nextHref);
+                    setHasMoreItems(result.nextHref ? true : false);
                     setFetching(false);
                 })
         }
     };
 
-    //#endregion
-
-    //const getEvents = () => {
-    //    fetch(`${Api.Events.GetPage}`)
-    //        .then((resp) => resp.json())
-    //        .then(json => setEvents(json.collection))
-    //        .catch((error) => console.log(`Error for get events page. Details: ${error}`));
-    //}
-
-    const getEvents = () => {
-        Api.Events.getPage().then(result => setEvents(result));
-    }
-
-
-    //#region Scroll
-
     const loadItems = page => {
-        var url = `${Api.Events.GetPage}`;
+        var url = `${Urls.Events.GetPage}`;
         if (nextHref) {
             url = nextHref;
         }
-
-        console.log(`event.loadItems.url: ${url}`);
-
-        fetch(url)
-            .then(resp => resp.json())
+        console.log(`load.url: ${url}`);
+        Api.get(url)
             .then(e => {
-                var eventsTemp = events;
-                e.collection.map((event) => {
-                    eventsTemp.push(event);
+                var itemsTemp = items;
+                e.collection.map((item) => {
+                    itemsTemp.push(item);
                 });
-
                 if (e.nextHref) {
                     setNextHref(e.nextHref);
-                    setEvents(eventsTemp);
+                    setItems(itemsTemp);
                 } else {
                     setHasMoreItems(false);
                 }
-            })
-            .catch((error) => console.log(`Error for get events page. Details: ${error}`));
+            });
     };
 
-    const loader = <div key={0}>Loading ...</div>;
-
-    const getItems = () => {
-        var items = [];
-        events && events.map((event, i) => {
-            items.push(
-                <Card size="l" mode="shadow" key={event.id}>
-                    <RichCell
-                        bottom={`${Math.floor(Math.random() * (+50 - +0)) + +0} команд`}
-                        caption={`${event.startDate} - ${event.startDate}`}
-                        onClick={(e) => {
-                            console.log('sending e', e)
-                            props.setActiveTeamPanel('teams');
-                            props.activeModal();
-                            props.setEventFilter(event);
-                        }}
-                        data-event={JSON.stringify(event)}
-                        data-from={props.id}>
-                        {event.name}
-                    </RichCell>
-                </Card>
-            );
-        });
-
-        return items;
-    }
-
-    //#endregion
+    const loader = <PanelSpinner key={0} size="large" />
 
     return (
         <Panel id={props.id}>
-            <PanelHeader
-                left={<PanelHeaderBack onClick={props.go} data-to={props.back} />}>
-                Мероприятия
+            <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />} >
+                Выберите мероприятие
                 </PanelHeader>
-            <Search value={search} onChange={onChangeSearch} after={null} />
+            <Search value={searchTerm} onChange={e => setSearchTerm(e.target.value)} after={null} />
             <PullToRefresh onRefresh={onRefresh} isFetching={fetching}>
-                <InfiniteScroll
-                    pageStart={0}
-                    loadMore={loadItems}
-                    hasMore={hasMoreItems}
-                    loader={loader}>
-                    <CardGrid style={{ marginBottom: 10 }}>
-                        {getItems()}
-                    </CardGrid>
-                </InfiniteScroll>
+                {isSearching ? loader :
+                    <InfiniteScroll
+                        pageStart={0}
+                        loadMore={loadItems}
+                        hasMore={hasMoreItems}
+                        loader={loader}>
+                        <CardGrid style={{ marginBottom: 10 }}>
+                            {items && items.map(event => (
+                                <Card size="l" mode="shadow" key={event.id}>
+                                    <RichCell
+                                        bottom={`Участвуют ${event.teams && event.teams.length} команд`}
+                                        caption={`${event.startDate} - ${event.startDate}`}
+                                        //onClick={() => { setPage('events', 'eventInfo'); setEvent(event) }}
+                                        onClick={(e) => { goBack(); setEvent(event); props.openFilter(e) }}
+                                    >
+                                        {event.name}
+                                    </RichCell>
+                                </Card>
+                            ))}
+                        </CardGrid>
+                    </InfiniteScroll>
+                }
             </PullToRefresh>
         </Panel>
     );
 };
 
-export default EventsFilter;
+const mapDispatchToProps = {
+    setPage,
+    setEvent,
+    goBack
+};
+
+export default connect(null, mapDispatchToProps)(EventsFilter);

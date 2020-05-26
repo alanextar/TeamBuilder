@@ -8,12 +8,13 @@ import { connect } from 'react-redux';
 import '@vkontakte/vkui/dist/vkui.css';
 import bridge from '@vkontakte/vk-bridge';
 import { bindActionCreators } from 'redux'
-import { goBack, closeModal, setStory } from "./store/router/actions";
+import { goBack, closeModal, setStory, setPage } from "./store/router/actions";
 import { setParticipant } from "./store/participants/actions";
 import {
     setUser, setProfile, getUser, setProfileUser, setTeamUser,
     setEventUser, setParticipantsUser
 } from "./store/user/actions";
+import { setEvent } from "./store/events/actions"
 import { getActivePanel } from "./services/_functions";
 
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
@@ -32,7 +33,7 @@ import Teams from './panels/teams'
 import TeamInfo from './panels/teamInfo'
 import TeamCreate from './panels/teamCreate'
 import TeamEdit from './panels/teamEdit'
-//import EventsFilter from './panels/eventsFilter'
+import EventsFilter from './panels/eventsFilter'
 
 import Users from './panels/users'
 import User from './panels/user'
@@ -46,13 +47,12 @@ const App = (props) => {
     const [teamHref, setTeamNextHref] = useState(null);
 
     const { setStory, activeView, activeStory, panelsHistory, setProfile, setUser,
-        setProfileUser, profileUser, teamUser, eventUser, participant, user
+        setProfileUser, profileUser, teamUser, eventUser, participant, user, setPage, setEvent, event,
     } = props;
     let history = (panelsHistory[activeView] === undefined) ? [activeView] : panelsHistory[activeView];
 
     const [events, setEvents] = useState(null);
-    const [eventFilter, setEventFilter] = useState('');
-    const [activeModal, setActiveModal] = useState('');
+    const [activeModal, setActiveModal] = useState(null);
 
     useEffect(() => {
         bridge.subscribe(({ detail: { type, data } }) => {
@@ -71,6 +71,7 @@ const App = (props) => {
             let user = await response.json();
             setUser(user);
             setProfileUser(user);
+            setEvent(event);
         }
         fetchData();
 
@@ -87,6 +88,8 @@ const App = (props) => {
                 window.history.pushState(null, null);
             }
         };
+
+        getEvents();
     }, []);
 
     const hideModal = () => {
@@ -136,48 +139,43 @@ const App = (props) => {
         }>
             <View id='teams' activePanel={getActivePanel("teams")}
                 history={history}
-                //modal={
-                //    <ModalRoot activeModal={activeModal}>
-                //        <ModalPage
-                //            id="filters"
-                //            onClose={hideModal}
-                //            header={
-                //                <ModalPageHeader
-                //                    left={IS_PLATFORM_ANDROID && <PanelHeaderButton onClick={hideModal}><Icon24Cancel /></PanelHeaderButton>}
-                //                    right={<PanelHeaderButton
-                //                        onClick={() => { hideModal(); setActiveTeamPanel('teams') }}>{IS_PLATFORM_IOS ? 'Готово' : <Icon24Done />}</PanelHeaderButton>}
-                //                >
-                //                    Фильтры
-                //                </ModalPageHeader>
-                //            }>
-                //            {events &&
-                //                <FormLayout>
-                //                    {console.log('events', events)}
-                //                    <SelectMimicry top="Соревнования" placeholder="Не выбрано"
-                //                        onClick={() => {
-                //                            setActiveTeamPanel('eventsFilter');
-                //                            hideModal();
-                //                        }}>
-                //                        {eventFilter.name}
-                //                    </ SelectMimicry>
-                //                </FormLayout>}
-                //        </ModalPage>
-                //    </ModalRoot>}
+                modal={
+                    <ModalRoot activeModal={activeModal}>
+                        <ModalPage
+                            id="filters"
+                            onClose={hideModal}
+                            header={
+                                <ModalPageHeader
+                                    left={IS_PLATFORM_ANDROID && <PanelHeaderButton onClick={hideModal}><Icon24Cancel /></PanelHeaderButton>}
+                                    right={<PanelHeaderButton
+                                        onClick={() => { hideModal(); getActivePanel('teams'); console.log('click on filter') }}>{IS_PLATFORM_IOS ? 'Готово' : <Icon24Done />}</PanelHeaderButton>}
+                                >
+                                    Фильтры
+                                </ModalPageHeader>
+                            }>
+                            {console.log('event after filter', props)}
+                            {events &&
+                                <FormLayout>
+                                    {console.log('events', props)}
+                                    <SelectMimicry top="Соревнования" placeholder="Не выбрано"
+                                        onClick={() => {
+                                            setPage('teams', 'eventsFilter');
+                                            hideModal();
+                                    }}>
+                                    {props.event && props.event.name}
+                                    </ SelectMimicry>
+                                </FormLayout>}
+                        </ModalPage>
+                    </ModalRoot>}
             >
-                <Teams id='teams' activeStory={activeStory} href={teamHref} />
+                <Teams id='teams' activeStory={activeStory} href={teamHref} onFiltersClick={(e) => { console.log('onfilterclick'); setActiveModal('filters'); }}/>
                 <TeamInfo id='teaminfo' return='teams' />
                 <TeamCreate id='teamCreate' />
                 <TeamEdit id='teamEdit' />
                 <User id='user' activeStory={activeStory} />
                 <SetUserTeam id='setUserTeam' />
                 <EventCreate id='eventCreate' />
-                {/*<EventsFilter id='eventsFilter' go={goTeam} back={back}
-                    setActiveTeamPanel={setActiveTeamPanel}
-                    activeModal={() => setactiveModal('filters')}
-                    setEventFilter={(e) => {
-                        setEventFilter(e);
-                        console.log('event filtered ', e)
-                    }} /> */}
+                <EventsFilter id='eventsFilter' openFilter={(e) => setActiveModal('filters')} /> 
             </View>
             <View id='users' activePanel={getActivePanel("users")}
                 history={history}
@@ -216,7 +214,8 @@ const mapStateToProps = (state) => {
         profileUser: state.user.profileUser,
         eventUser: state.user.eventUser,
         teamUser: state.user.teamUser,
-        participant: state.participant.participant
+        participant: state.participant.participant,
+        event: state.event.event
         // colorScheme: state.vkui.colorScheme
     };
 };
@@ -226,7 +225,7 @@ function mapDispatchToProps(dispatch) {
     return {
         dispatch,
         ...bindActionCreators({
-            setStory, goBack, closeModal, setProfile,
+            setStory, goBack, closeModal, setProfile, setPage, setEvent,
             setUser, setProfileUser, setEventUser, setTeamUser, setParticipant
         }, dispatch)
     }
