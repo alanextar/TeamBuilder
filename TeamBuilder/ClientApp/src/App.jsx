@@ -1,6 +1,10 @@
 ﻿import React, { useState, useEffect } from 'react';
+import {
+    View, Epic, Tabbar, TabbarItem, ModalRoot, ModalPage, ModalPageHeader,
+    PanelHeaderButton, FormLayout, SelectMimicry,
+    IS_PLATFORM_IOS, IS_PLATFORM_ANDROID
+} from '@vkontakte/vkui';
 import { connect } from 'react-redux';
-import { View, Epic, Tabbar, TabbarItem } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import bridge from '@vkontakte/vk-bridge';
 import { bindActionCreators } from 'redux'
@@ -12,6 +16,8 @@ import {
 } from "./store/user/actions";
 import { getActivePanel } from "./services/_functions";
 
+import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
+import Icon24Done from '@vkontakte/icons/dist/24/done';
 import Icon28Users from '@vkontakte/icons/dist/28/users';
 import Icon28Profile from '@vkontakte/icons/dist/28/profile';
 import Icon28Users3Outline from '@vkontakte/icons/dist/28/users_3_outline';
@@ -23,14 +29,17 @@ import EventInfo from './panels/eventInfo'
 import EventEdit from './panels/eventEdit'
 
 import Teams from './panels/teams'
-import TeamInfo from './panels/teamInfo' 
+import TeamInfo from './panels/teamInfo'
 import TeamCreate from './panels/teamCreate'
 import TeamEdit from './panels/teamEdit'
+//import EventsFilter from './panels/eventsFilter'
 
 import Users from './panels/users'
 import User from './panels/user'
 import UserEdit from './panels/userEdit'
 import SetUserTeam from './panels/setUserTeam'
+
+import { Api } from './infrastructure/api';
 
 const App = (props) => {
     let lastAndroidBackAction = 0;
@@ -41,14 +50,18 @@ const App = (props) => {
     } = props;
     let history = (panelsHistory[activeView] === undefined) ? [activeView] : panelsHistory[activeView];
 
-	useEffect(() => {
-		bridge.subscribe(({ detail: { type, data } }) => {
-			if (type === 'VKWebAppUpdateConfig') {
-				const schemeAttribute = document.createAttribute('scheme');
-				schemeAttribute.value = data.scheme ? data.scheme : 'client_light';
-				document.body.attributes.setNamedItem(schemeAttribute);
-			}
-		});
+    const [events, setEvents] = useState(null);
+    const [eventFilter, setEventFilter] = useState('');
+    const [activeModal, setActiveModal] = useState('');
+
+    useEffect(() => {
+        bridge.subscribe(({ detail: { type, data } }) => {
+            if (type === 'VKWebAppUpdateConfig') {
+                const schemeAttribute = document.createAttribute('scheme');
+                schemeAttribute.value = data.scheme ? data.scheme : 'client_light';
+                document.body.attributes.setNamedItem(schemeAttribute);
+            }
+        });
 
         async function fetchData() {
             const profile = await bridge.send('VKWebAppGetUserInfo');
@@ -69,21 +82,28 @@ const App = (props) => {
 
             if (timeNow - this.lastAndroidBackAction > 500) {
                 lastAndroidBackAction = timeNow;
-
                 goBack();
             } else {
                 window.history.pushState(null, null);
             }
         };
-	}, []);
+    }, []);
 
-	return (
+    const hideModal = () => {
+        setActiveModal(null);
+    };
+
+    const getEvents = () => {
+        Api.Events.getAll().then(result => setEvents(result))
+    }
+
+    return (
         <Epic activeStory={activeStory} tabbar={
             <Tabbar>
                 <TabbarItem
                     onClick={() => {
-                        setUser(teamUser);
                         setStory('teams', 'teams')
+                        teamUser && setUser(teamUser);
                     }}
                     selected={activeStory === 'teams'}
                     text="Команды"
@@ -91,7 +111,7 @@ const App = (props) => {
                 <TabbarItem
                     onClick={() => {
                         setStory('users', 'users');
-                        setUser(participant)
+                        participant && setUser(participant)
                     }}
                     selected={activeStory === 'users'}
                     text="Участники"
@@ -99,14 +119,13 @@ const App = (props) => {
                 <TabbarItem
                     onClick={() => {
                         setStory('events', 'events');
-                        setUser(eventUser)
+                        eventUser && setUser(eventUser)
                     }}
                     selected={activeStory === 'events'}
                     text="События"
                 ><Icon28FavoriteOutline /></TabbarItem>
                 <TabbarItem
-                    onClick={() =>
-                    {
+                    onClick={() => {
                         setStory('user', 'user');
                         setUser(profileUser);
                     }}
@@ -116,14 +135,49 @@ const App = (props) => {
             </Tabbar>
         }>
             <View id='teams' activePanel={getActivePanel("teams")}
-                history={history} >
+                history={history}
+                //modal={
+                //    <ModalRoot activeModal={activeModal}>
+                //        <ModalPage
+                //            id="filters"
+                //            onClose={hideModal}
+                //            header={
+                //                <ModalPageHeader
+                //                    left={IS_PLATFORM_ANDROID && <PanelHeaderButton onClick={hideModal}><Icon24Cancel /></PanelHeaderButton>}
+                //                    right={<PanelHeaderButton
+                //                        onClick={() => { hideModal(); setActiveTeamPanel('teams') }}>{IS_PLATFORM_IOS ? 'Готово' : <Icon24Done />}</PanelHeaderButton>}
+                //                >
+                //                    Фильтры
+                //                </ModalPageHeader>
+                //            }>
+                //            {events &&
+                //                <FormLayout>
+                //                    {console.log('events', events)}
+                //                    <SelectMimicry top="Соревнования" placeholder="Не выбрано"
+                //                        onClick={() => {
+                //                            setActiveTeamPanel('eventsFilter');
+                //                            hideModal();
+                //                        }}>
+                //                        {eventFilter.name}
+                //                    </ SelectMimicry>
+                //                </FormLayout>}
+                //        </ModalPage>
+                //    </ModalRoot>}
+            >
                 <Teams id='teams' activeStory={activeStory} href={teamHref} />
-                <TeamInfo id='teaminfo' return='teams' profile={props.profile} />
-                <TeamCreate id='teamCreate'/>
+                <TeamInfo id='teaminfo' return='teams' />
+                <TeamCreate id='teamCreate' />
                 <TeamEdit id='teamEdit' />
                 <User id='user' activeStory={activeStory} />
                 <SetUserTeam id='setUserTeam' />
-                <EventCreate id='eventCreate' owner={props.profile} />
+                <EventCreate id='eventCreate' />
+                {/*<EventsFilter id='eventsFilter' go={goTeam} back={back}
+                    setActiveTeamPanel={setActiveTeamPanel}
+                    activeModal={() => setactiveModal('filters')}
+                    setEventFilter={(e) => {
+                        setEventFilter(e);
+                        console.log('event filtered ', e)
+                    }} /> */}
             </View>
             <View id='users' activePanel={getActivePanel("users")}
                 history={history}

@@ -90,7 +90,7 @@ const Events = props => {
                     <RichCell
                         bottom={`${Math.floor(Math.random() * (+50 - +0)) + +0} команд`}
                         caption={`${event.startDate} - ${event.startDate}`}
-                        onClick={() => { setPage('events', 'eventInfo') }}
+                        onClick={() => { setPage('events', 'eventInfo'); setEvent(event) }}
                     >
                         {event.name}
                     </RichCell>
@@ -103,7 +103,7 @@ const Events = props => {
 
     //#endregion
 
-    const { setPage } = props;
+    const { setPage, setEvent } = props;
 
     return (
         <Panel id={props.id}>
