@@ -132,11 +132,12 @@ class User extends React.Component {
                     <PanelHeaderBack onClick={() => goBack()} />}>Профиль</PanelHeader>
                 {this.state.vkUser &&
                     <Group title="VK Connect">
-                        <Link href={"https://m.vk.com/id" + this.state.user.id} target="_blank">Ссылка</Link>
+                    <Link href={"https://m.vk.com/id" + this.state.user.id} target="_blank">
                         <Cell description={this.state.vkUser.city && this.state.vkUser.city.title ? this.state.vkUser.city.title : ''}
                             before={this.state.vkUser.photo_200 ? <Avatar src={this.state.vkUser.photo_200} /> : null}>
                             {`${this.state.vkUser.first_name} ${this.state.vkUser.last_name}`}
                         </Cell>
+                    </Link>
                     </Group>}
                 <Separator />
                 <Tabs>
