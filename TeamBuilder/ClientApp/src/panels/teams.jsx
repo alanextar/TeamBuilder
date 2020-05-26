@@ -9,12 +9,13 @@ import InfiniteScroll from 'react-infinite-scroller';
 import { Api, Urls } from '../infrastructure/api';
 import useDebounce from '../infrastructure/use-debounce';
 import { setTeam, createTeam } from "../store/teams/actions";
+import { setEvent } from "./store/events/actions"
 
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import Icon24Filter from '@vkontakte/icons/dist/24/filter';
 
 const Teams = props => {
-    const { createTeam, setPage, setTeam } = props;
+    const { createTeam, setPage, setTeam, setEvent } = props;
 
     const [isSearching, setIsSearching] = useState(false);
     const [fetching, setFetching] = useState(false);
@@ -135,11 +136,18 @@ const Teams = props => {
     )
 };
 
+const mapStateToProps = (state) => {
+    return {
+        event: state.event.event
+    }
+};
+
 const mapDispatchToProps = {
     setPage,
     setTeam,
     createTeam,
-    goBack
+    goBack, 
+    setEvent
 };
 
 export default connect(null, mapDispatchToProps)(Teams);
