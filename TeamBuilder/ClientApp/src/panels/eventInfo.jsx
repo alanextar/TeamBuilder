@@ -14,11 +14,9 @@ import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
 import { Api } from '../infrastructure/api';
 
 const EventInfo = props => {
-    const [edit, setEdit] = useState(true);
-    Api.Users.getPage().then(x => setEdit)
 
-    const { goBack, setPage } = props;
-
+    const { goBack, setPage, setEvent } = props;
+    //Api.Users.getPage().then(x => setEvent(x)) ???
     const [contextOpened, setContextOpened] = useState(false);
 
     const toggleContext = () => {
@@ -27,11 +25,8 @@ const EventInfo = props => {
 
     return (
         <Panel id={props.id}>
-            {console.log('profile =====', props.profile)}
-            {console.log('event =====', props.event)}
             <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
-                {/* {props.event.owner && props.profile.id === props.event.owner.id ? */}
-                {true ?
+                {props.profile.id === props.event.ownerId ?
                     <PanelHeaderContent
                         aside={<Icon16Dropdown style={{ transform: `rotate(${contextOpened ? '180deg' : '0'})` }} />}
                         onClick={toggleContext}
@@ -89,7 +84,7 @@ const mapStateToProps = (state) => {
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
-        ...bindActionCreators({ setPage, goBack }, dispatch)
+        ...bindActionCreators({ setPage, goBack, setEvent }, dispatch)
     }
 }
 

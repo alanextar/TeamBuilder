@@ -165,7 +165,7 @@ const App = (props) => {
                 //    </ModalRoot>}
             >
                 <Teams id='teams' activeStory={activeStory} href={teamHref} />
-                <TeamInfo id='teaminfo' return='teams' />
+                <TeamInfo id='teaminfo' />
                 <TeamCreate id='teamCreate' />
                 <TeamEdit id='teamEdit' />
                 <User id='user' activeStory={activeStory} />

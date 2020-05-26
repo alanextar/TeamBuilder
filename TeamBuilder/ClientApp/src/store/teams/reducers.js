@@ -7,11 +7,9 @@ const initialState = {
 };
 
 export const teamReducer = (state = initialState, action) => {
-    console.log('REDUCER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!', action.type)
     switch (action.type) {
 
         case SET_TEAM: {
-            console.log('action.payload.team--------------', action.payload.activeTeam)
             let Team = action.payload.activeTeam;
 
             return {
