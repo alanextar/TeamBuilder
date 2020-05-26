@@ -9,7 +9,7 @@ import { setTeam } from "../store/teams/actions";
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell,
     Div, Button, Textarea, FormLayout, Select, Input, Slider, InfoRow, Avatar,
-    RichCell
+    RichCell, FixedLayout
 } from '@vkontakte/vkui';
 
 import Icon24DismissDark from '@vkontakte/icons/dist/24/dismiss_dark';
@@ -158,7 +158,7 @@ class TeamEdit extends React.Component {
                                     })}
 
                                 </Select>
-                                <Button>Создать Событие</Button>
+                                <Button onClick={() => { setPage('teams','eventCreate') }}>Создать Событие</Button>
                             </FormLayout>
                             :
                             <Cell>
@@ -215,14 +215,11 @@ class TeamEdit extends React.Component {
                 <Div>
                     <Button
                         stretched
-                        onClick={(e) => { this.postEdit(); goBack() }}
-                        data-to={'teaminfo'}
-                        data-id={this.props.teamId} >
+                        onClick={(e) => { this.postEdit(); goBack() }}>
                         Применить Изменения
                         </Button>
-                </Div>
-                </ Group>
-
+                    </Div>
+                </FixedLayout>
             </Panel >
         );
     }

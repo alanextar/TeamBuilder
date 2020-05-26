@@ -7,9 +7,9 @@ export function pagingSearch(value, filter) {
     return api.get(Urls.Teams.PagingSearch, {...search, ...filter});
 };
 
-export function getPage(params = {}) {
+export function getPage(params) {
     console.log(`teams.getPage`);
-    return api.get(Urls.Teams.GetPage, params = {});
+    return api.get(Urls.Teams.GetPage, params);
 };
 
 export function get(id) {
