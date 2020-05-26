@@ -28,6 +28,7 @@ class UserEdit extends React.Component {
         this.handleAboutChange = this.handleAboutChange.bind(this);
         this.handleMobileChange = this.handleMobileChange.bind(this);
         this.handleEmailChange = this.handleEmailChange.bind(this);
+        this.handleTelegramChange = this.handleTelegramChange.bind(this);
         this.postEdit = this.postEdit.bind(this);
     }
 
@@ -46,6 +47,11 @@ class UserEdit extends React.Component {
         user.mobile = event.target.value;
         this.setState({ user })
     }
+    handleTelegramChange(event) {
+        var user = { ...this.state.user };
+        user.telegram = event.target.value;
+        this.setState({ user })
+    }
 
     async postEdit() {
         const { setUser, setProfileUser } = this.props;
@@ -53,7 +59,8 @@ class UserEdit extends React.Component {
         let mobile = this.state.user.mobile;
         let email = this.state.user.email;
         let about = this.state.user.about;
-        var user = { id, email, about, mobile };
+        let telegram = this.state.user.telegram;
+        var user = { id, email, about, mobile, telegram };
 
         let updatedUser = await Api.post(Urls.Users.Edit, user);
 
@@ -78,9 +85,10 @@ class UserEdit extends React.Component {
                 <Separator />
                 <FormLayout>
                     <FormLayoutGroup top="Редактирование">
-                        <Input value={this.state.user && this.state.user.mobile} onChange={this.handleMobileChange} type="text" top="телефон" />
-                        <Input value={this.state.user && this.state.user.email} onChange={this.handleEmailChange} type="text" top="почта" />
-                        <Textarea value={this.state.user && this.state.user.about} onChange={this.handleAboutChange} top="Дополнительно" placeholder="О себе" />
+                        <Input value={this.state.user && this.state.user.mobile} onChange={this.handleMobileChange} type="text" top="телефон" placeholder="тел" />
+                        <Input value={this.state.user && this.state.user.telegram} onChange={this.handleTelegramChange} type="text" top="telegram" placeholder="telegram" />
+                        <Input value={this.state.user && this.state.user.email} onChange={this.handleEmailChange} type="text" top="почта" placeholder="email" />
+                        <Textarea value={this.state.user && this.state.user.about} onChange={this.handleAboutChange} top="Дополнительно" placeholder="дополнительно" />
                     </FormLayoutGroup>
                 </FormLayout>
                 <Div>

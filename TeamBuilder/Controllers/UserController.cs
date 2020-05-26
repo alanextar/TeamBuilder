@@ -145,6 +145,7 @@ namespace TeamBuilder.Controllers
 			dbUser.Mobile = user.Mobile;
 			dbUser.Email = user.Email;
 			dbUser.About = user.About;
+			dbUser.Telegram = user.Telegram;
 
 			context.Update(dbUser);
 			context.SaveChanges();

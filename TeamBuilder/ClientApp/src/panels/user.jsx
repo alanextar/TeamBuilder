@@ -15,6 +15,7 @@ import Icon28PhoneOutline from '@vkontakte/icons/dist/28/phone_outline';
 import Icon28ArticleOutline from '@vkontakte/icons/dist/28/article_outline';
 import Icon28MailOutline from '@vkontakte/icons/dist/28/mail_outline';
 import Icon24Write from '@vkontakte/icons/dist/24/write';
+import Icon28Send from '@vkontakte/icons/dist/28/send';
 import UserTeams from './userTeams'
 import bridge from '@vkontakte/vk-bridge';
 import { Api, Urls } from '../infrastructure/api';
@@ -170,10 +171,13 @@ class User extends React.Component {
                                     }>
                                 </Cell>}
                                 <Cell before={<Icon28PhoneOutline />}>
-                                    тел.: {this.state.user && this.state.user.mobile}
+                                    тел.: {this.state.user && <Link href={"tel:" + this.state.user.mobile}>{this.state.user.mobile}</Link>}
+                                </Cell>
+                                <Cell before={<Icon28Send />}>
+                                    telegram: {this.state.user && <Link href={"tg://resolve?domain=" + this.state.user.telegram}>{this.state.user.telegram}</Link>}
                                 </Cell>
                                 <Cell before={<Icon28MailOutline />}>
-                                    email: {this.state.user && this.state.user.email}
+                                    email: {this.state.user && <Link href={"mailto:" + this.state.user.email}>{this.state.user.email}</Link>}
                                 </Cell>
                                 <Cell before={<Icon28ArticleOutline />}>
                                     дополнительно: {this.state.user && this.state.user.about}
