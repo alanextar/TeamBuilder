@@ -3,25 +3,52 @@
 import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
 import { goBack, setPage } from "../store/router/actions";
+import { setEvent } from "../store/events/actions";
 
 import {
     Panel, PanelHeader, Group, SimpleCell, InfoRow, Header, FixedLayout,
-    PanelHeaderBack, CardGrid, Card
+    PanelHeaderBack, Cell, List, PanelHeaderContent, PanelHeaderContext
 } from '@vkontakte/vkui';
 import Icon28EditOutline from '@vkontakte/icons/dist/28/edit_outline';
+import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
 import { Api } from '../infrastructure/api';
 
 const EventInfo = props => {
     const [edit, setEdit] = useState(true);
     Api.Users.getPage().then(x => setEdit)
+
     const { goBack, setPage } = props;
-    console.log('eventInfo ', props);
+
+    const [contextOpened, setContextOpened] = useState(false);
+
+    const toggleContext = () => {
+        setContextOpened(!contextOpened);
+    };
 
     return (
         <Panel id={props.id}>
+            {console.log('profile =====', props.profile)}
+            {console.log('event =====', props.event)}
             <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
-                {props.event && props.event.name}
+                {/* {props.event.owner && props.profile.id === props.event.owner.id ? */}
+                {true ?
+                    <PanelHeaderContent
+                        aside={<Icon16Dropdown style={{ transform: `rotate(${contextOpened ? '180deg' : '0'})` }} />}
+                        onClick={toggleContext}
+                    >
+                        {props.event && props.event.name}
+                    </PanelHeaderContent> :
+                    props.event && props.event.name}
             </PanelHeader>
+            <PanelHeaderContext opened={contextOpened} onClose={toggleContext}>
+                <List>
+                    <Cell
+                        onClick={() => { setPage('events', 'eventEdit') }}
+                    >
+                        Редактировать событие
+                        </Cell>
+                </List>
+            </PanelHeaderContext>
             <Group>
                 {console.log('props in info ', props)}
                 <Header mode="primary">Информация о мероприятии</Header>
@@ -46,14 +73,6 @@ const EventInfo = props => {
                     </InfoRow>
                 </SimpleCell>
                 Добавить команды
-                {props.event && edit &&
-                    <FixedLayout vertical="bottom">
-                        <SimpleCell
-                        after={<Icon28EditOutline />}
-                        onClick={() => { setPage('events', 'eventEdit') }}
-                    >
-                        </SimpleCell>
-                    </FixedLayout>}
             </Group>
         </Panel>
     );
@@ -62,6 +81,7 @@ const EventInfo = props => {
 const mapStateToProps = (state) => {
     return {
         event: state.event.event,
+        profile: state.user.profile
     };
 };
 

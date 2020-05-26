@@ -9,11 +9,13 @@ import { setUser, setTeamUser } from "../store/user/actions";
 
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell, InfoRow,
-    SimpleCell, Avatar, Div, PullToRefresh, FixedLayout
+    SimpleCell, Avatar, Div, PullToRefresh, FixedLayout, PanelHeaderContent, PanelHeaderContext,
+    List,
 } from '@vkontakte/vkui';
 
 import Icon28MessageOutline from '@vkontakte/icons/dist/28/message_outline';
 import Icon28EditOutline from '@vkontakte/icons/dist/28/edit_outline';
+import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
 
 class TeamInfo extends React.Component {
     constructor(props) {
@@ -25,7 +27,9 @@ class TeamInfo extends React.Component {
             team: props.activeTeam,
             panelId: props.id,
             activeTab: 'teamDescription',
-            edit: true
+            edit: true,
+            contextOpened: false,
+            vkProfile: props.profile,
         };
 
         this.onRefresh = async () => {
@@ -36,6 +40,8 @@ class TeamInfo extends React.Component {
             });
 
         };
+
+        this.toggleContext = this.toggleContext.bind(this);
     }
 
     // componentDidMount() {
@@ -47,6 +53,10 @@ class TeamInfo extends React.Component {
             .then(result => this.setState({ team: result }))
     }
 
+    toggleContext() {
+        this.setState({ contextOpened: !this.state.contextOpened });
+    };
+
     render() {
         const { id, goBack, setTeam, setTeamUser, setUser, setPage } = this.props;
         console.log(`teamId: ${this.state.team && this.state.team.id}`);
@@ -54,8 +64,26 @@ class TeamInfo extends React.Component {
         return (
             <Panel id={this.state.panelId}>
                 <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
-                    {this.state.team && this.state.team.name}
+                    {/* {this.state.team.userTeams.find(user => user.isOwner) && this.state.team.userTeams.find(user => user.isOwner).userId === this.state.vkProfile.id ? */}
+                    {true ?
+                        <PanelHeaderContent
+                            aside={<Icon16Dropdown style={{ transform: `rotate(${this.state.contextOpened ? '180deg' : '0'})` }} />}
+                            onClick={this.toggleContext}
+                        >
+                            {this.state.team && this.state.team.name}
+                        </PanelHeaderContent> :
+                        this.state.team && this.state.team.name
+                    }
                 </PanelHeader>
+                <PanelHeaderContext opened={this.state.contextOpened} onClose={this.toggleContext}>
+                    <List>
+                        <Cell
+                            onClick={() => setPage('teams', 'teamEdit')}
+                        >
+                            Редактировать команду
+                        </Cell>
+                    </List>
+                </PanelHeaderContext>
                 <Tabs>
                     <TabsItem
                         onClick={() => {
@@ -123,13 +151,6 @@ class TeamInfo extends React.Component {
                                         </InfoRow>
                                     </Div>
                                 </Cell>)}
-                        {this.state.team && this.state.edit &&
-                            <FixedLayout vertical="bottom" >
-                                <SimpleCell
-                                after={<Icon28EditOutline />}
-                                onClick={() => setPage('teams', 'teamEdit')}>
-                                </SimpleCell>
-                            </FixedLayout>}
                     </Group>
                 </PullToRefresh>
             </Panel>
@@ -141,7 +162,7 @@ class TeamInfo extends React.Component {
 const mapStateToProps = (state) => {
     return {
         activeTeam: state.team.activeTeam,
-        teamUser: state.user.teamUser
+        profile: state.user.profile
     };
 };
 
