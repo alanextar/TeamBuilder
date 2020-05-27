@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
 import { goBack, setPage } from "../store/router/actions";
 import { setEvent } from "../store/events/actions";
+import { setTeam, setEventsTeam } from "../store/teams/actions";
 
 import {
     Panel, PanelHeader, Group, SimpleCell, InfoRow, Header, FixedLayout,
@@ -15,7 +16,7 @@ import { Api } from '../infrastructure/api';
 
 const EventInfo = props => {
 
-    const { goBack, setPage, setEvent } = props;
+    const { goBack, setPage, setEvent, setTeam, setEventsTeam } = props;
     //Api.Users.getPage().then(x => setEvent(x)) ???
     const [contextOpened, setContextOpened] = useState(false);
 
@@ -68,6 +69,7 @@ const EventInfo = props => {
                     </InfoRow>
                 </SimpleCell>
                 Добавить команды
+                //TO-DO не забыть setTeam(team); setEventsTeam(team)
             </Group>
         </Panel>
     );
@@ -84,7 +86,7 @@ const mapStateToProps = (state) => {
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
-        ...bindActionCreators({ setPage, goBack, setEvent }, dispatch)
+        ...bindActionCreators({ setPage, goBack, setEvent, setTeam, setEventsTeam }, dispatch)
     }
 }
 

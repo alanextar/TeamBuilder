@@ -40,6 +40,7 @@ import UserEdit from './panels/userEdit'
 import SetUserTeam from './panels/setUserTeam'
 
 import { Api } from './infrastructure/api';
+import { setTeam } from './infrastructure/apiUsers';
 
 const App = (props) => {
     let lastAndroidBackAction = 0;
@@ -102,8 +103,8 @@ const App = (props) => {
             <Tabbar>
                 <TabbarItem
                     onClick={() => {
-                        setStory('teams', 'teams')
-                        teamUser && setUser(teamUser);
+                        setStory('teams', 'teams');
+                        teamUser && setUser(teamUser)
                     }}
                     selected={activeStory === 'teams'}
                     text="Команды"
