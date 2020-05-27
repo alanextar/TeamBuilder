@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 using TeamBuilder.Controllers;
@@ -16,6 +17,8 @@ namespace TeamBuilder.Models
 		public string FinishDate { get; set; }
 		public string Link { get; set; }
 		public List<Team> Teams { get; set; }
+		[ForeignKey(nameof(OwnerId))]
 		public User Owner { get; set; }
+		public long? OwnerId { get; set; }
 	}
 }

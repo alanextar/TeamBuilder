@@ -19,17 +19,10 @@ class TeamEdit extends React.Component {
         super(props);
 
         this.state = {
-            name: '',
-            description: '',
-            membersDescription: '',
             team: this.props.activeTeam,
             events: [],
-            eventId: null,
-            usersNumber: this.props.activeTeam.numberRequiredMembers,
-            go: props.go,
-            panelId: props.id,
+            usersNumber: 50,
             activeTab: 'teamDescription',
-            userTeams: null,
         };
 
         this.onEventChange = this.onEventChange.bind(this);
@@ -41,7 +34,13 @@ class TeamEdit extends React.Component {
 
     componentDidMount() {
         this.populateEventsData();
-        this.populateTeamData();
+    }
+
+    componentDidUpdate(prevProps) {
+        // Typical usage (don't forget to compare props):
+        if (this.props.activeTeam !== prevProps.activeTeam) {
+            this.setState({ team: this.props.activeTeam });
+        }
     }
 
     async populateEventsData() {
@@ -49,76 +48,81 @@ class TeamEdit extends React.Component {
             .then(result => this.setState({ events: result, }));
     }
 
-    async populateTeamData() {
-        Api.Teams.get(this.props.teamId)
-            .then(result =>
-                this.setState({
-                    team: result,
-                    name: result.name,
-                    description: result.description,
-                    membersDescription: result.descriptionRequiredMembers,
-                    usersNumber: result.numberRequiredMembers,
-                    eventId: result.event && result.event.id,
-                    userTeams: result.userTeams
-                }));
-    }
-
     onEventChange(e) {
-        this.setState({ eventId: e.target.value })
+        var team = this.state.team;
+        team.eventId = e.target.value;
+        this.setState({ team: team })
     }
 
     onNameChange(e) {
-        this.setState({ name: e.target.value })
+        var team = this.state.team;
+        team.name = e.target.value;
+        this.setState({ team: team })
     }
 
     onDescriptionChange(e) {
-        this.setState({ description: e.target.value })
+        var team = this.state.team;
+        team.description = e.target.value;
+        this.setState({ team: team })
+
     }
 
     onMembersDescriptionChange(e) {
-        this.setState({ membersDescription: e.target.value })
+        var team = this.state.team;
+        team.membersDescription = e.target.value;
+        this.setState({ team: team })
     }
 
     async postEdit() {
+        const { setTeam } = this.props;
+
         var editTeamViewModel = {
             id: this.state.team.id,
-            name: this.state.name,
-            description: this.state.description,
+            name: this.state.team.name,
+            description: this.state.team.description,
             numberRequiredMembers: this.state.usersNumber,
-            descriptionRequiredMembers: this.state.membersDescription,
-            eventId: this.state.eventId
+            descriptionRequiredMembers: this.state.team.membersDescription,
+            eventId: this.state.team.eventId
         }
-        Api.Teams.edit(editTeamViewModel);
+        Api.Teams.edit(editTeamViewModel)
+            .then(t => setTeam(t));
     };
 
     async handleJoin(e, userTeam) {
         e.stopPropagation();
-        console.log('into handleJoin');
-        console.log(userTeam);
         const response = await fetch(`/api/user/joinTeam/?id=${userTeam.userId}&teamId=${userTeam.teamId}`);
-        const data = await response.json();
-        console.log(data);
-        this.setState({ userTeams: data });
+        const userTeams = await response.json();
+        this.updateUserTeamsState(userTeams)
     };
 
     async dropUser(e, userTeam) {
         await Api.Teams.rejectedOrRemoveUser({ teamId: userTeam.teamId, userId: userTeam.userId })
-            .then(json => {
-                console.log('on drop click ', JSON.stringify(json))
-                this.setState({ userTeams: json })
+            .then(userTeams => {
+                console.log('on drop click ', JSON.stringify(userTeams))
+
+                this.updateUserTeamsState(userTeams);
             })
     };
 
     async cancelUser(e, userTeam) {
         await Api.Teams.cancelRequestUser({ teamId: userTeam.teamId, userId: userTeam.userId })
-            .then(json => {
-                console.log('on cancel click ', JSON.stringify(json))
-                this.setState({ userTeams: json })
+            .then(userTeams => {
+                console.log('on cancel click ', JSON.stringify(userTeams))
+
+                this.updateUserTeamsState(userTeams)
             })
     };
 
+    updateUserTeamsState(userTeams) {
+        const { setTeam } = this.props;
+        var team = this.state.team;
+        team.userTeams = userTeams;
+        this.setState({ team: team });
+        setTeam(team);
+    }
+
     render() {
-        const { id, goBack, setTeam, setPage } = this.props;
+        const { goBack, setPage, activeView } = this.props;
 
         return (
             <Panel id={this.state.panelId}>
@@ -147,7 +151,7 @@ class TeamEdit extends React.Component {
                                     top="Выберете событие"
                                     placeholder="Событие"
                                     onChange={this.onEventChange}
-                                    value={this.state.eventId ? this.state.eventId : ''}
+                                    value={this.state.team && this.state.team.eventId}
                                     name="eventId">
                                     {this.state.events && this.state.events.map((ev, i) => {
                                         return (
@@ -158,28 +162,27 @@ class TeamEdit extends React.Component {
                                     })}
 
                                 </Select>
-                                <Button onClick={() => { setPage('teams','eventCreate') }}>Создать Событие</Button>
+                                <Button onClick={() => { setPage(activeView, 'eventCreate') }}>Создать Событие</Button>
                             </FormLayout>
                             :
                             <Cell>
                                 <FormLayout >
-                                    <Slider
+                                    {/*<Slider
                                         step={1}
-                                        min={2}
-                                        max={10}
+                                        min={0}
+                                        max={50}
                                         value={Number(this.state.usersNumber)}
                                         onChange={usersNumber => this.setState({ usersNumber })}
                                         top="Количество участников в команде"
-                                    />
+                                    />*/}
                                     <Input value={String(this.state.usersNumber)} onChange={e => this.setState({ usersNumber: e.target.value })} type="number" />
                                     <Textarea
                                         top="Описание участников и их задач"
-                                        defaultValue={this.state.team.membersDescription}
+                                        value={this.state.team.membersDescription}
                                         onChange={this.onMembersDescriptionChange} />
                                 </FormLayout>
 
                                 <InfoRow header='Участники'>
-                                    {console.log('userTeams ', this.state.team.userTeams)}
                                     {this.state.team.userTeams &&
                                         this.state.team.userTeams.map((userTeam, i) => {
                                             return (
@@ -215,7 +218,7 @@ class TeamEdit extends React.Component {
                 <Div>
                     <Button
                         stretched
-                        onClick={(e) => { this.postEdit(); goBack() }}>
+                        onClick={() => { this.postEdit(); goBack() }}>
                         Применить Изменения
                         </Button>
                     </Div>
@@ -229,6 +232,7 @@ class TeamEdit extends React.Component {
 const mapStateToProps = (state) => {
     return {
         activeTeam: state.team.activeTeam,
+        activeView: state.router.activeView
     };
 };
 

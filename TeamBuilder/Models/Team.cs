@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using TeamBuilder.Controllers.Paging;
 using TeamBuilder.Models.Enums;
 
@@ -14,7 +15,9 @@ namespace TeamBuilder.Models
 		public string Photo200 { get; set; }
 		public int NumberRequiredMembers { get; set; }
 		public string DescriptionRequiredMembers { get; set; }
+		[ForeignKey(nameof(EventId))]
 		public Event Event { get; set; }
+		public long? EventId { get; set; }
 		public List<UserTeam> UserTeams { get; set; }
 	}
 

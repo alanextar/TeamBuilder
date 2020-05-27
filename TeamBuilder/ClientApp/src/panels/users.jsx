@@ -11,12 +11,11 @@ import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import Icon24Work from '@vkontakte/icons/dist/24/work';
 import { Api, Urls } from '../infrastructure/api';
 
-import { setUser } from "../store/user/actions";
-import { setParticipant } from "../store/participants/actions";
+import { setUser, setParticipantUser } from "../store/user/actions";
 import { goBack, setPage } from '../store/router/actions';
 
 const Users = props => {
-    const { setParticipant, setUser, setPage } = props;
+    const { setParticipantUser, setUser, setPage } = props;
     
     const [isSearching, setIsSearching] = useState(false);
     const [fetching, setFetching] = useState(false);
@@ -134,7 +133,7 @@ const Users = props => {
                                         onClick={() => {
                                             setPage('users', 'user');
                                             setUser(user);
-                                            setParticipant(user)
+                                            setParticipantUser(user)
                                         }}
                                     >
                                         {user.firstName} {user.lastName}
@@ -150,7 +149,7 @@ const Users = props => {
 
 const mapStateToProps = (state) => {
     return {
-        participant: state.participant.participant
+        participantUser: state.user.participantUser
     };
 };
 
@@ -158,7 +157,7 @@ const mapStateToProps = (state) => {
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
-        ...bindActionCreators({ setPage, setUser, setParticipant }, dispatch)
+        ...bindActionCreators({ setPage, setUser, setParticipantUser }, dispatch)
     }
 }
 

@@ -21,8 +21,6 @@ class TeamInfo extends React.Component {
     constructor(props) {
         super(props);
 
-        console.log(`props.activeTeam ${props.activeTeam}`);
-        console.log(`props.activeTeam.str ${JSON.stringify(props.activeTeam)}`);
         this.state = {
             team: props.activeTeam,
             panelId: props.id,
@@ -30,7 +28,7 @@ class TeamInfo extends React.Component {
             edit: true,
             contextOpened: false,
             vkProfile: props.profile,
-            ourProfile: props.profileUser
+            profileUser: props.profileUser
         };
 
         this.onRefresh = async () => {
@@ -45,13 +43,14 @@ class TeamInfo extends React.Component {
         this.toggleContext = this.toggleContext.bind(this);
     }
 
-    // componentDidMount() {
-    //     this.populateTeamData();
-    // }
+     componentDidMount() {
+         this.populateTeamData();
+     }
 
     async populateTeamData() {
+        const { setTeam } = this.props;
         Api.Teams.get(this.state.team.id)
-            .then(result => this.setState({ team: result }))
+            .then(result => { setTeam(result); this.setState({ team: result }) });
     }
 
     toggleContext() {
@@ -82,53 +81,53 @@ class TeamInfo extends React.Component {
     };
 
     render() {
-        const { id, goBack, setTeam, setTeamUser, setUser, setPage } = this.props;
-        console.log(`teamId: ${this.state.team && this.state.team.id}`);
-        console.log('vkprofile', this.state.vkProfile);
-        console.log('profile', this.state.ourProfile);
-        console.log('team', this.state.team);
+        const { goBack, setTeamUser, setUser, setPage, activeView } = this.props;
+        let user = this.state.vkProfile && this.state.team.userTeams &&
+            this.state.team.userTeams.find(user => user.userId === this.state.vkProfile.id);
+        let userAction = user && user.userAction;
+
         return (
             <Panel id={this.state.panelId}>
-                <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
-                    {this.state.ourProfile ?
+                <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => { console.log('goback'); goBack(); }} />}>
+                    {this.state.profileUser ?
                         <PanelHeaderContent
                             aside={<Icon16Dropdown style={{ transform: `rotate(${this.state.contextOpened ? '180deg' : '0'})` }} />}
-                            onClick={this.toggleContext}
+                            onClick={(e) => { console.log('Dropdown'); this.toggleContext(); }}
                         >
                             {this.state.team && this.state.team.name.length > 15 ? `${this.state.team.name.substring(0, 15)}...` : this.state.team.name}
                         </PanelHeaderContent> :
                         this.state.team.name}
                 </PanelHeader>
-                <PanelHeaderContext opened={this.state.contextOpened} onClose={this.toggleContext}>
-                    {this.state.team.userTeams.find(user => user.isOwner).userId === this.state.vkProfile.id &&
+                {this.state.team && <PanelHeaderContext opened={this.state.contextOpened} onClose={this.toggleContext}>
+                    {user && user.userId === this.state.vkProfile.id &&
                         <List>
                             <Cell
-                                onClick={() => setPage('teams', 'teamEdit')}
+                            onClick={() => setPage(activeView, 'teamEdit')}
                             >
                                 Редактировать команду
                             </Cell>
                         </List>
-                        || this.state.team.userTeams.find(user => user.userId === this.state.vkProfile.id).userAction === 1 &&
+                        || userAction === 1 &&
                         <List>
                             <Cell>
                                 Заявка на рассмотрении
                             </Cell>
                         </List>
-                        || this.state.team.userTeams.find(user => user.userId === this.state.vkProfile.id).userAction === 2 &&
+                        || userAction === 2 &&
                         <List>
-                            <Cell onClick={(e) => this.dropUser(e, this.state.team.userTeams.find(user => user.userId === this.state.vkProfile.id))}>
+                            <Cell onClick={(e) => this.dropUser(e, user)}>
                                 удалиться из команды
                             </Cell>
                         </List>
-                        || this.state.team.userTeams.find(user => user.userId === this.state.vkProfile.id).userAction === 5 &&
+                        || userAction === 5 &&
                         <List>
-                            <Cell
-                                onClick={() => setPage('teams', 'teamEdit')}
+                        <Cell
+                            onClick={() => setPage(activeView, 'teamEdit')}
                             >
                                 Принять заявку /// nonono add teamcontroller
                             </Cell>
                             <Cell
-                                onClick={(e) => this.cancelUser(e, this.state.team.userTeams.find(user => user.userId === this.state.vkProfile.id))}
+                                onClick={(e) => this.cancelUser(e, user)}
                             >
                                 Отклонить заявку
                             </Cell>
@@ -146,7 +145,7 @@ class TeamInfo extends React.Component {
                             </Cell>
                         </List>
                     }
-                </PanelHeaderContext>
+                </PanelHeaderContext>}
                 <Tabs>
                     <TabsItem
                         onClick={() => {
@@ -170,7 +169,6 @@ class TeamInfo extends React.Component {
                         {this.state.team && (
                             this.state.activeTab === 'teamDescription' ?
                                 <Cell>
-                                    {console.log('==== ', this.state.team)}
                                     <SimpleCell>
                                         <InfoRow header='Описание команды'>
                                             {this.state.team.description}
@@ -187,14 +185,13 @@ class TeamInfo extends React.Component {
                                     <Div>
                                         <InfoRow header='Участники'>
                                             Требуется {this.state.team.numberRequiredMembers} участников
-                                        {console.log('userTeams ', this.state.team.userTeams)}
                                             {this.state.team.userTeams &&
                                                 this.state.team.userTeams.map((userTeam, i) => {
                                                     return (
                                                         userTeam.userAction === 2 &&
                                                         <SimpleCell key={i}
                                                             onClick={() => {
-                                                                setPage('teams', 'user');
+                                                                setPage(activeView, 'user');
                                                                 setUser(userTeam.user);
                                                                 setTeamUser(userTeam.user)
                                                             }}
@@ -225,6 +222,7 @@ class TeamInfo extends React.Component {
 const mapStateToProps = (state) => {
     return {
         activeTeam: state.team.activeTeam,
+        activeView: state.router.activeView,
         profile: state.user.profile,
         profileUser: state.user.profileUser
     };
