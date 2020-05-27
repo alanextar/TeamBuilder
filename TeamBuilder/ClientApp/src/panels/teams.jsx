@@ -43,7 +43,7 @@ const Teams = props => {
                     setIsSearching(false);
                 });
         },
-        [debouncedSearchTerm]
+        [debouncedSearchTerm, props.event]
     )
 
     const onRefresh = () => {

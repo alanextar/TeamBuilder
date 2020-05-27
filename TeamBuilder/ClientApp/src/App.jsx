@@ -154,7 +154,7 @@ const App = (props) => {
                             onClose={hideModal}
                             header={
                                 <ModalPageHeader
-                                    left={IS_PLATFORM_ANDROID && <PanelHeaderButton onClick={hideModal}><Icon24Cancel /></PanelHeaderButton>}
+                                    left={<PanelHeaderButton onClick={e => setEvent(null)}>Сбросить</PanelHeaderButton>}
                                     right={<PanelHeaderButton
                                         onClick={() => { hideModal();  console.log('click on filter') }}>{IS_PLATFORM_IOS ? 'Готово' : <Icon24Done />}</PanelHeaderButton>}
                                 >
