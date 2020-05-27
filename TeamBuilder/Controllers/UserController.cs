@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using TeamBuilder.Extensions;
 using TeamBuilder.Models.Enums;
 using TeamBuilder.ViewModels;
+using System;
 
 namespace TeamBuilder.Controllers
 {
@@ -173,10 +174,14 @@ namespace TeamBuilder.Controllers
 			context.Update(user);
 			context.SaveChanges();
 
-			return Json(user.UserTeams);
+			var activeUserTeams = user.UserTeams.Where(x => x.UserAction == UserActionEnum.ConsideringOffer ||
+				x.UserAction == UserActionEnum.JoinedTeam ||
+				x.UserAction == UserActionEnum.SentRequest || x.IsOwner);
+
+			return Json(activeUserTeams);
 		}
 
-		public IActionResult QuitOrDeclineTeam(long id, long teamId)
+		public IActionResult QuitOrDeclineTeam(long userId, long teamId)
 		{
 			logger.LogInformation("Request JoinTeamm");
 
@@ -184,15 +189,21 @@ namespace TeamBuilder.Controllers
 				.Include(x => x.UserTeams)
 				.ThenInclude(x => x.Team)
 				.ThenInclude(y => y.Event)
-				.FirstOrDefault(x => x.Id == id);
+				.FirstOrDefault(x => x.Id == userId);
 
-			var userTeamToDelete = user.UserTeams
-				.First(y => y.TeamId == teamId && y.UserId == id);
+			var userTeam = user.UserTeams
+				.First(y => y.TeamId == teamId);
 
-			context.UserTeams.Remove(userTeamToDelete);
+			userTeam.UserAction = userTeam.UserAction == UserActionEnum.ConsideringOffer ? 
+				UserActionEnum.RejectedTeamRequest : UserActionEnum.RejectedTeamRequest;
+
 			context.SaveChanges();
 
-			return Json(user.UserTeams);
+			var activeUserTeams = user.UserTeams.Where(x => x.UserAction == UserActionEnum.ConsideringOffer ||
+				x.UserAction == UserActionEnum.JoinedTeam ||
+				x.UserAction == UserActionEnum.SentRequest || x.IsOwner);
+
+			return Json(activeUserTeams);
 		}
 
 		[HttpGet]

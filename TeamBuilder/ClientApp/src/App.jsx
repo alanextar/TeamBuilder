@@ -208,6 +208,10 @@ const App = (props) => {
                 <UserEdit id='userEdit' />
                 <TeamInfo id='teaminfo' />
                 <SetUserTeam id='setUserTeam' />
+                <TeamEdit id='teamEdit' />
+                <EventCreate id='eventCreate' owner={props.profile} />
+                <EventInfo id='eventInfo' />
+                <EventEdit id='eventEdit' owner={props.profile} />
             </View>
         </Epic>
 

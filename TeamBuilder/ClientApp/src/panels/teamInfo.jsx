@@ -71,7 +71,7 @@ class TeamInfo extends React.Component {
         let teamId = this.state.team.id
         let isTeamOffer = false;
 
-        console.log('setTeam get request (id, teamId):', id, teamId)
+        //console.log('setTeam get request (id, teamId):', id, teamId)
         await Api.Users.setTeam(id, teamId, isTeamOffer)
             .then(json => {
                 this.setState({ team: json });
@@ -106,10 +106,9 @@ class TeamInfo extends React.Component {
 
     async cancelUser(e, userTeam) {
         let teamId = userTeam.teamId;
-        let id = userTeam.userId;
-        let isTeamOffer = false;
+        let userId = userTeam.userId;
 
-        await Api.Teams.cancelRequestUser({ teamId, id })
+        await Api.Teams.cancelRequestUser({ teamId, userId })
             .then(json => {
                 console.log('on cancel click ', JSON.stringify(json))
                 this.setState({ team: json });

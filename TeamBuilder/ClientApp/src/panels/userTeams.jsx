@@ -27,14 +27,14 @@ class UserTeams extends React.Component {
 
     async handleJoin(e, userTeam) {
         e.stopPropagation();
-        const response = await fetch(`/api/user/joinTeam/?id=${userTeam.userId}&&teamId=${userTeam.teamId}`);
+        const response = await fetch(`/api/user/joinTeam/?userId=${userTeam.userId}&&teamId=${userTeam.teamId}`);
         const data = await response.json();
         this.setState({ userTeams: data });
     }
 
     async handleQuitOrDecline(e,userTeam) {
         e.stopPropagation();
-        const response = await fetch(`/api/user/quitOrDeclineTeam/?id=${userTeam.userId}&&teamId=${userTeam.teamId}`);
+        const response = await fetch(`/api/user/quitOrDeclineTeam/?userId=${userTeam.userId}&&teamId=${userTeam.teamId}`);
         const data = await response.json();
         this.setState({ userTeams: data });
     }
