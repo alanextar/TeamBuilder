@@ -218,9 +218,11 @@ namespace TeamBuilder.Controllers
 
 			var dbTeam = context.Teams.Include(x => x.UserTeams).FirstOrDefault(x => x.Id == teamId);
 
-			if (!dbTeam.UserTeams.Any(x => x.UserId == id))
+			if (!dbTeam.UserTeams.Any(x => x.UserId == id && (x.UserAction == UserActionEnum.ConsideringOffer || 
+				x.UserAction == UserActionEnum.JoinedTeam || x.UserAction == UserActionEnum.SentRequest)))
 			{
-				dbTeam.UserTeams.Add(new UserTeam { UserId = id, UserAction = isTeamOffer ? UserActionEnum.ConsideringOffer : UserActionEnum.SentRequest });
+				dbTeam.UserTeams.Add(new UserTeam { UserId = id, UserAction = isTeamOffer ? 
+					UserActionEnum.ConsideringOffer : UserActionEnum.SentRequest });
 
 				context.Update(dbTeam);
 				context.SaveChanges();

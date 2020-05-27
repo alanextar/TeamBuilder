@@ -179,13 +179,14 @@ class TeamInfo extends React.Component {
                             </Cell>
                         </List>
                         //профиля нет в текущей команде и команда не полная
-                        || !userAction && this.state.team.userTeams.length < this.state.team.numberRequiredMembers &&
+                        || (!isUserInActiveTeam || userAction == 3 || userAction == 4) &&
+                        this.state.team.userTeams.length < this.state.team.numberRequiredMembers &&
                         <List>
                             <Cell onClick={() => this.sendRequest()}>
                                 Подать заявку в команду
                             </Cell>
                         </List>
-                        ||
+                        || this.state.team.userTeams.length >= this.state.team.numberRequiredMembers &&
                         <List>
                             <Cell>
                                 В команде нет мест
