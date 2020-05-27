@@ -1,6 +1,5 @@
 ﻿import React, { useState } from 'react';
 
-
 import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
 import { goBack, setPage } from "../store/router/actions";
@@ -10,15 +9,16 @@ import {
     Panel, PanelHeader, Group, Button, Textarea, FixedLayout,
     PanelHeaderBack, Input, FormLayout
 } from '@vkontakte/vkui';
-import { Api, Urls } from '../infrastructure/api';
+import { Api } from '../infrastructure/api';
 
 const EventCreate = props => {
+    const { setPage, setEvent, goBack } = props;
+
     const [eventName, setEventName] = useState('');
     const [eventDescription, setEventDescription] = useState('');
     const [eventLink, setEventLink] = useState('');
     const [eventStartDate, setEventStartDate] = useState('');
     const [eventFinishDate, setEventFinishDate] = useState('');
-    const { setPage, setEvent, goBack } = props;
 
     const onNameChange = (e) => {
         setEventName(e.target.value);
@@ -41,25 +41,15 @@ const EventCreate = props => {
     };
 
     const eventCreate = () => {
-        let name = eventName;
-        let description = eventDescription;
-        let link = eventLink;
-        let startDate = eventStartDate;
-        let finishDate = eventFinishDate;
-        let ownerId = props.owner ? props.owner.id : -1;
-        var createEventViewModel = { name, description, startDate, finishDate, link, ownerId }
-        console.log('Api.Events.create ------------', `${Api.Events.create}`);
+        var createEventViewModel = { 
+            name: eventName, 
+            description: eventDescription, 
+            startDate: eventStartDate, 
+            finishDate: eventFinishDate, 
+            link: eventLink }
 
-        fetch(Urls.Events.Create,
-            {
-                method: 'post',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(createEventViewModel)
-            })
-            .then(result => result.json())
-            .then(data => setEvent(data))
-            .then(console.log('ok'))
-            .catch((error) => console.log(`Error for create events. Details: ${error}`));
+        Api.Events.create(createEventViewModel)
+            .then(result => setEvent(result));
     }
 
     return (
@@ -75,16 +65,16 @@ const EventCreate = props => {
                     <Input top="Ссылка на соревнование" type="text" onChange={onLinkChange} defaultValue={eventLink} />
                     <Input top="Дата начала соревнований" type="text" onChange={onStartDateChange} defaultValue={eventStartDate} />
                     <Input top="Дата завершения соревнований" type="text" onChange={onFinishDateChange} defaultValue={eventFinishDate} />
-                </ FormLayout >
+                </FormLayout>
             </Group>
             <FixedLayout vertical="bottom">
                 <Button
                     stretched={true}
                     onClick={() => { eventCreate(); setPage('events', 'eventInfo') }}
-                    >
+                >
                     Создать соревнование
                 </Button>
-            </ FixedLayout>
+            </FixedLayout>
         </Panel>
     );
 }

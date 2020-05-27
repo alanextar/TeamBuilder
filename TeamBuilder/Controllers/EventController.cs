@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using TeamBuilder.Extensions;
 using TeamBuilder.Models;
+using TeamBuilder.Services;
 using TeamBuilder.ViewModels;
 
 namespace TeamBuilder.Controllers
@@ -17,11 +18,13 @@ namespace TeamBuilder.Controllers
 	public class EventController : Controller
 	{
 		private readonly ApplicationContext context;
+		private readonly UserAccessChecker accessChecker;
 		private readonly ILogger<EventController> logger;
 
-		public EventController(ApplicationContext context, ILogger<EventController> logger)
+		public EventController(ApplicationContext context, UserAccessChecker accessChecker, ILogger<EventController> logger)
 		{
 			this.context = context;
+			this.accessChecker = accessChecker;
 			this.logger = logger;
 		}
 
@@ -68,16 +71,15 @@ namespace TeamBuilder.Controllers
 		[HttpPost]
 		public async Task<IActionResult> Create([FromBody]CreateEventViewModel createEventViewModel)
 		{
-			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(createEventViewModel)}");
+			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(createEventViewModel)}"); ;
 
-			var user = await context.Users.FirstOrDefaultAsync(e => e.Id == createEventViewModel.OwnerId);
-
-			//if (user == null)
-			//	return Forbid();
+			if (!accessChecker.IsConfirm(out var profileId))
+				return Forbid();
 
 			var config = new MapperConfiguration(cfg => cfg.CreateMap<CreateEventViewModel, Event>()
 				.ForMember("Teams", opt => opt.Ignore())
-				.ForMember("Owner", opt => opt.MapFrom(_ => user)));
+				.ForMember("Owner", opt => opt.Ignore())
+				.ForMember("OwnerId", opt => opt.MapFrom(_ => profileId)));
 			var mapper = new Mapper(config);
 			var @event = mapper.Map<CreateEventViewModel, Event>(createEventViewModel);
 
