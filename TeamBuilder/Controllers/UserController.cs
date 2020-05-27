@@ -107,6 +107,10 @@ namespace TeamBuilder.Controllers
 				.ThenInclude(y => y.Skill)
 				.FirstOrDefault(u => u.Id == id);
 
+			user.UserTeams = user.UserTeams.Where(x => x.UserAction == UserActionEnum.ConsideringOffer || 
+				x.UserAction == UserActionEnum.JoinedTeam || 
+				x.UserAction == UserActionEnum.SentRequest || x.IsOwner).ToList();
+
 			user.AnyTeamOwner = user.UserTeams.Any(x => x.IsOwner);
 
 			return Json(user);
@@ -153,7 +157,7 @@ namespace TeamBuilder.Controllers
 			return Json(dbUser);
 		}
 
-		public IActionResult JoinTeam(long id, long teamId)
+		public IActionResult JoinTeam(long userId, long teamId)
 		{
 			logger.LogInformation("Request JoinTeamm");
 
@@ -161,7 +165,7 @@ namespace TeamBuilder.Controllers
 				.Include(x => x.UserTeams)
 				.ThenInclude(x => x.Team)
 				.ThenInclude(y => y.Event)
-				.FirstOrDefault(u => u.Id == id);
+				.FirstOrDefault(u => u.Id == userId);
 
 			var userTeamToJoin = user.UserTeams.First(x => x.TeamId == teamId);
 			userTeamToJoin.UserAction = UserActionEnum.JoinedTeam;

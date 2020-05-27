@@ -86,15 +86,18 @@ class TeamInfo extends React.Component {
         var teamId = this.state.team.id;
         var userId = this.state.profileUser.id;
 
-        await Api.Teams.joinTeam({ teamId: teamId, userId: userId })
+        await Api.Teams.joinTeam(userId, teamId)
             .then(json => {
                 console.log('on jonTeam click ', JSON.stringify(json))
-                this.setState({ team: json })
+                this.setState({ team: json });
             })
     };
 
-    async dropUser(e, userTeam) {
-        await Api.Teams.rejectedOrRemoveUser({ teamId: userTeam.teamId, userId: userTeam.userId })
+    async dropUser() {
+        var userId = this.state.profileUser.id;
+        var teamId = this.state.team.id;
+
+        await Api.Teams.rejectedOrRemoveUser({ teamId: teamId, userId : userId })
             .then(json => {
                 console.log('on drop click ', JSON.stringify(json))
                 this.setState({ team: json })
@@ -106,7 +109,7 @@ class TeamInfo extends React.Component {
         let id = userTeam.userId;
         let isTeamOffer = false;
 
-        await Api.Teams.cancelRequestUser({ teamId, id, isTeamOffer })
+        await Api.Teams.cancelRequestUser({ teamId, id })
             .then(json => {
                 console.log('on cancel click ', JSON.stringify(json))
                 this.setState({ team: json });
@@ -117,6 +120,7 @@ class TeamInfo extends React.Component {
     };
 
     render() {
+        console.log('profileUser', this.state.profileUser);
         console.log('userTeams', this.state.vkProfile.id);
         const { goBack, setTeamUser, setUser, setPage, activeView } = this.props;
         console.log('userTeams', this.state.team.userTeams);
@@ -128,8 +132,6 @@ class TeamInfo extends React.Component {
         console.log('userInActiveTeam isOwner', isOwner);
         let userAction = userInActiveTeam && userInActiveTeam.userAction;
         console.log('userInActiveTeam userAction', userAction);
-
-
 
         return (
             <Panel id={this.state.panelId}>
