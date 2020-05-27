@@ -8,17 +8,17 @@ namespace TeamBuilder.Models.Other
 {
 	public class LaunchParams
 	{
-		public string VkUserId { get; set; }
-		public string VkAppId { get; set; }
-		public string VkIsAppUser { get; set; }
-		public string VkAreNotificationsEnabled { get; set; }
+		public long VkUserId { get; set; }
+		public long VkAppId { get; set; }
+		public int VkIsAppUser { get; set; }
+		public int VkAreNotificationsEnabled { get; set; }
 		public string VkLanguage { get; set; }
 		public string VkRef { get; set; }
 		public string VkAccessTokenSettings { get; set; }
-		public string VkGroupId { get; set; }
+		public long VkGroupId { get; set; }
 		public string VkViewerGroupRole { get; set; }
 		public string VkPlatform { get; set; }
-		public string VkIsFavorite { get; set; }
+		public int VkIsFavorite { get; set; }
 		public string Sign { get; set; }
 		public string Hash { get; set; }
 
@@ -40,17 +40,17 @@ namespace TeamBuilder.Models.Other
 
 			var result = new LaunchParams
 			{
-				VkUserId = parameters.GetValueOrDefault("vk_user_id"),
-				VkAppId = parameters.GetValueOrDefault("vk_app_id"),
-				VkIsAppUser = parameters.GetValueOrDefault("vk_is_app_user"),
-				VkAreNotificationsEnabled = parameters.GetValueOrDefault("vk_are_notifications_enabled"),
+				VkUserId = parameters.TryGetValue("vk_user_id", out var vkUserId) ? long.Parse(vkUserId) : long.MinValue,
+				VkAppId = parameters.TryGetValue("vk_app_id", out var vkAppId) ? long.Parse(vkAppId) : long.MinValue,
+				VkIsAppUser = parameters.TryGetValue("vk_is_app_user", out var vkIsAppUser) ? int.Parse(vkIsAppUser) : int.MinValue,
+				VkAreNotificationsEnabled = parameters.TryGetValue("vk_are_notifications_enabled", out var vkAreNotificationsEnabled) ? int.Parse(vkAreNotificationsEnabled) : int.MinValue,
 				VkLanguage = parameters.GetValueOrDefault("vk_language"),
 				VkRef = parameters.GetValueOrDefault("vk_ref"),
 				VkAccessTokenSettings = parameters.GetValueOrDefault("vk_access_token_settings"),
-				VkGroupId = parameters.GetValueOrDefault("vk_group_id"),
+				VkGroupId = parameters.TryGetValue("vk_group_id", out var vkGroupId) ? long.Parse(vkGroupId) : long.MinValue,
 				VkViewerGroupRole = parameters.GetValueOrDefault("vk_viewer_group_role"),
 				VkPlatform = parameters.GetValueOrDefault("vk_platform"),
-				VkIsFavorite = parameters.GetValueOrDefault("vk_is_favorite"),
+				VkIsFavorite = parameters.TryGetValue("vk_is_favorite", out var vkIsFavorite) ? int.Parse(vkIsFavorite) : int.MinValue,
 				Sign = parameters.GetValueOrDefault("sign"),
 				Hash = hash,
 				ParsedQuery = parameters

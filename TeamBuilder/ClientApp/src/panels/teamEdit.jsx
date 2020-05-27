@@ -1,5 +1,5 @@
 ﻿import React from 'react';
-import { Api } from '../infrastructure/api';
+import { Api, Urls } from '../infrastructure/api';
 
 import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
@@ -91,9 +91,8 @@ class TeamEdit extends React.Component {
 
     async handleJoin(e, userTeam) {
         e.stopPropagation();
-        const response = await fetch(`/api/user/joinTeam/?id=${userTeam.userId}&teamId=${userTeam.teamId}`);
-        const userTeams = await response.json();
-        this.updateUserTeamsState(userTeams)
+        Api.Users.joinTeam(userTeam.userId, userTeam.teamId)
+            .then(result => this.updateUserTeamsState(result));
     };
 
     async dropUser(e, userTeam) {
@@ -128,7 +127,7 @@ class TeamEdit extends React.Component {
         return (
             <Panel id={this.state.panelId}>
                 <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
-                    {this.state.team && this.state.name}
+                    {this.state.team && this.state.team.name}
                 </PanelHeader>
                 <Tabs>
                     <TabsItem
@@ -207,7 +206,7 @@ class TeamEdit extends React.Component {
                                                         </React.Fragment>
                                                     }
                                                 >
-                                                    {userTeam.user.fullName }
+                                                    {userTeam.user.fullName}
                                                 </RichCell>
                                             )
                                         }
@@ -216,15 +215,15 @@ class TeamEdit extends React.Component {
 
                             </Cell>
                     )}
-                <Div>
-                    <Button
-                        stretched
-                        onClick={() => { this.postEdit(); goBack() }}>
-                        Применить Изменения
+                    <Div>
+                        <Button
+                            stretched
+                            onClick={() => { this.postEdit(); goBack() }}>
+                            Применить Изменения
                         </Button>
                     </Div>
                 </Group>
-            </Panel >
+            </Panel>
         );
     }
 

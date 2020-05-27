@@ -193,6 +193,7 @@ const App = (props) => {
                 <Users id='users' />
                 <User id='user' />
                 <TeamInfo id='teaminfo' />
+                <TeamEdit id='teamEdit' />
             </View>
             <View id='events' activePanel={getActivePanel("events")}
                 history={history}>
@@ -200,6 +201,9 @@ const App = (props) => {
                 <EventCreate id='eventCreate' owner={props.profile} />
                 <EventInfo id='eventInfo' />
                 <EventEdit id='eventEdit' owner={props.profile} />
+                <TeamInfo id='teaminfo' />
+                <TeamEdit id='teamEdit' />
+                <User id='user' />
             </View>
             <View id='user' activePanel={getActivePanel("user")}
                 history={history}

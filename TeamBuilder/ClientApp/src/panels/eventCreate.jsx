@@ -9,7 +9,7 @@ import {
     Panel, PanelHeader, Group, Button, Textarea, FixedLayout,
     PanelHeaderBack, Input, FormLayout
 } from '@vkontakte/vkui';
-import { Api, Urls } from '../infrastructure/api';
+import { Api } from '../infrastructure/api';
 
 const EventCreate = props => {
     const [eventName, setEventName] = useState('');
@@ -40,50 +40,37 @@ const EventCreate = props => {
     };
 
     const eventCreate = () => {
-        let name = eventName;
-        let description = eventDescription;
-        let link = eventLink;
-        let startDate = eventStartDate;
-        let finishDate = eventFinishDate;
-        let ownerId = props.owner ? props.owner.id : -1;
-        var createEventViewModel = { name, description, startDate, finishDate, link, ownerId }
-        console.log('Api.Events.create ------------', `${Api.Events.create}`);
+        var createEventViewModel = {
+            name: eventName,
+            description: eventDescription,
+            startDate: eventStartDate,
+            finishDate: eventFinishDate,
+            link: eventLink
+        }
 
-        fetch(Urls.Events.Create,
-            {
-                method: 'post',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(createEventViewModel)
-            })
-            .then(result => result.json())
-            .then(data => setEvent(data))
-            .then(console.log('ok'))
-            .catch((error) => console.log(`Error for create events. Details: ${error}`));
+        Api.Events.create(createEventViewModel)
+            .then(result => setEvent(result));
     }
 
     return (
         <Panel id={props.id}>
-            <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
-                Создать мероприятие
+            <PanelHeader left={<PanelHeaderBack onClick={() => goBack()} />}>
+                Создание
         </PanelHeader>
 
-            <Group>
-                <FormLayout>
-                    <Input top="Название соревнования" type="text" onChange={onNameChange} defaultValue={eventName} />
-                    <Textarea top="Описание соревнования" onChange={onDescriptionChange} defaultValue={eventDescription} />
-                    <Input top="Ссылка на соревнование" type="text" onChange={onLinkChange} defaultValue={eventLink} />
-                    <Input top="Дата начала соревнований" type="text" onChange={onStartDateChange} defaultValue={eventStartDate} />
-                    <Input top="Дата завершения соревнований" type="text" onChange={onFinishDateChange} defaultValue={eventFinishDate} />
-                </ FormLayout >
-            </Group>
-            <FixedLayout vertical="bottom">
+            <FormLayout>
+                <Input top="Название события" type="text" onChange={onNameChange} defaultValue={eventName} />
+                <Textarea top="Описание события" onChange={onDescriptionChange} defaultValue={eventDescription} />
+                <Input top="Ссылка на событие" type="text" onChange={onLinkChange} defaultValue={eventLink} />
+                <Input top="Дата начала события" type="text" onChange={onStartDateChange} defaultValue={eventStartDate} />
+                <Input top="Дата завершения события" type="text" onChange={onFinishDateChange} defaultValue={eventFinishDate} />
                 <Button
-                    stretched={true}
-                    onClick={() => { eventCreate(); setPage(activeView, 'eventInfo') }}
-                    >
-                    Создать соревнование
+                    size='xl'
+                    onClick={() => { eventCreate(); setPage(activeView, 'eventInfo') }}>
+                    Создать событие
                 </Button>
-            </ FixedLayout>
+
+            </FormLayout>
         </Panel>
     );
 }
