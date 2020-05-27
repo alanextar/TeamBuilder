@@ -16,6 +16,7 @@ import {
 import Icon28MessageOutline from '@vkontakte/icons/dist/28/message_outline';
 import Icon28EditOutline from '@vkontakte/icons/dist/28/edit_outline';
 import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
+import userTeams from './userTeams';
 
 class TeamInfo extends React.Component {
     constructor(props) {
@@ -188,7 +189,7 @@ class TeamInfo extends React.Component {
                                             {this.state.team.userTeams &&
                                                 this.state.team.userTeams.map((userTeam, i) => {
                                                     return (
-                                                        userTeam.userAction === 2 &&
+                                                        userTeam.userAction === 2 || userTeam.isOwner &&
                                                         <SimpleCell key={i}
                                                             onClick={() => {
                                                                 setPage(activeView, 'user');

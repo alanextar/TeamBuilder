@@ -51,7 +51,7 @@ const App = (props) => {
 
     const { setStory, activeView, activeStory, panelsHistory, setProfile, setUser,
         setProfileUser, profileUser, teamUser, eventUser, participantUser, teamsTeam, setPage, setEvent, event,
-        eventsTeam, userTeam, usersTeam
+        eventsTeam, userTeam, usersTeam, setTeam
     } = props;
     let history = (panelsHistory[activeView] === undefined) ? [activeView] : panelsHistory[activeView];
 
