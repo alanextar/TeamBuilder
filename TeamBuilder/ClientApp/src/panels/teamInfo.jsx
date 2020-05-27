@@ -44,9 +44,9 @@ class TeamInfo extends React.Component {
         this.toggleContext = this.toggleContext.bind(this);
     }
 
-     componentDidMount() {
-         this.populateTeamData();
-     }
+    componentDidMount() {
+        this.populateTeamData();
+    }
 
     componentDidUpdate(prevProps) {
         // Typical usage (don't forget to compare props):
@@ -130,7 +130,7 @@ class TeamInfo extends React.Component {
         let userAction = userInActiveTeam && userInActiveTeam.userAction;
         console.log('userInActiveTeam userAction', userAction);
         let confirmedUser = + this.state.team.userTeams.map(x => x.userAction === 2 || x.isOwner).reduce((a, b) => a + b);
-
+        let teamCap = this.state.team.userTeams.find(x => x.isOwner) && this.state.team.userTeams.find(x => x.isOwner).user
 
 
         return (
@@ -149,7 +149,7 @@ class TeamInfo extends React.Component {
                     {isOwner &&
                         <List>
                             <Cell
-                            onClick={() => setPage(activeView, 'teamEdit')}
+                                onClick={() => setPage(activeView, 'teamEdit')}
                             >
                                 Редактировать команду
                             </Cell>
@@ -168,8 +168,8 @@ class TeamInfo extends React.Component {
                         </List>
                         || userAction === 5 &&
                         <List>
-                        <Cell
-                            onClick={() => this.joinTeam()}
+                            <Cell
+                                onClick={() => this.joinTeam()}
                             >
                                 Принять заявку
                             </Cell>
@@ -232,10 +232,22 @@ class TeamInfo extends React.Component {
                                     <Div>
                                         <InfoRow header='Участники'>
                                             Требуется {this.state.team.numberRequiredMembers} участников
+                                        {console.log('ispwner=====', teamCap)}
+                                            {isOwner &&
+                                                <SimpleCell key={-1}
+                                                    onClick={() => {
+                                                        setPage(activeView, 'user');
+                                                        setUser(teamCap);
+                                                        setTeamUser(teamCap)
+                                                    }}
+                                                    before={<Avatar size={48} src={teamCap.photo100} />}
+                                                    after={<Icon28MessageOutline />}>
+                                                    {teamCap.fullName}
+                                                </SimpleCell>}
                                             {this.state.team.userTeams &&
                                                 this.state.team.userTeams.map((userTeam, i) => {
                                                     return (
-                                                        (userTeam.userAction === 2 || userTeam.isOwner) &&
+                                                        userTeam.userAction === 2 &&
                                                         <SimpleCell key={i}
                                                             onClick={() => {
                                                                 setPage(activeView, 'user');
