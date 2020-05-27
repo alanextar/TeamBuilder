@@ -23,6 +23,7 @@ class TeamEdit extends React.Component {
             events: [],
             usersNumber: 50,
             activeTab: 'teamDescription',
+            panelId: props.id
         };
 
         this.onEventChange = this.onEventChange.bind(this);
