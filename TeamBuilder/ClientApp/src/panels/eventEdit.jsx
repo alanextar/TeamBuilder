@@ -49,8 +49,7 @@ const EventEdit = props => {
             description: eventDescription,
             link: eventLink,
             startDate: eventStartDate,
-            finishDate: eventFinishDate,
-            userId: props.owner ? props.owner.id : -1
+            finishDate: eventFinishDate
         }
         Api.Events.edit(editEventViewModel)
             .then(result => {

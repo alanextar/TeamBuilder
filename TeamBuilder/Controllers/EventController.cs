@@ -91,11 +91,11 @@ namespace TeamBuilder.Controllers
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(editEventViewModel)}");
 
-			var @event = await context.Events.Include(e => e.Owner).FirstOrDefaultAsync(e => e.Id == editEventViewModel.Id);
+			var eventId = editEventViewModel.Id;
+			if (!await accessChecker.CanManageEvent(eventId))
+				return Forbid();
 
-			var user = await context.Users.FirstOrDefaultAsync(e => e.Id == editEventViewModel.UserId);
-			//if (user == null || @event.Owner.VkId != editEventViewModel.UserId)
-			//	return Forbid();
+			var @event = await context.Events.Include(e => e.Owner).FirstOrDefaultAsync(e => e.Id == eventId);
 
 			var config = new MapperConfiguration(cfg => cfg.CreateMap<EditEventViewModel, Event>()
 				.ForMember("Teams", opt => opt.Ignore())
@@ -113,6 +113,10 @@ namespace TeamBuilder.Controllers
 		public async Task<IActionResult> Delete(long id)
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}.");
+
+			var eventId = id;
+			if (!await accessChecker.CanManageEvent(eventId))
+				return Forbid();
 
 			var @event = await context.Events.FirstOrDefaultAsync(e => e.Id == id);
 			if (@event == null)

@@ -72,9 +72,6 @@ namespace TeamBuilder.Controllers
 			if (!context.UserTeams.Any())
 				await PashalEggs.Eggs(context);
 
-			if (!context.Teams.Any())
-				await Initialize();
-
 			if (pageSize == 0)
 				return NoContent();
 
@@ -224,20 +221,6 @@ namespace TeamBuilder.Controllers
 			await context.SaveChangesAsync();
 
 			return Json(team.UserTeams);
-		}
-
-		private async Task Initialize()
-		{
-			var file = await System.IO.File.ReadAllTextAsync(@"DemoDataSets\teams.json");
-			var teams = JsonConvert.DeserializeObject<Team[]>(file);
-			teams = teams.Select(t =>
-			{
-				t.NumberRequiredMembers = new Random().Next(0, 15);
-				return t;
-			}).ToArray();
-
-			await context.Teams.AddRangeAsync(teams);
-			await context.SaveChangesAsync();
 		}
 	}
 }
