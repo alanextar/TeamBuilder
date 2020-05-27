@@ -46,7 +46,7 @@ export const teamReducer = (state = initialState, action) => {
 
             return {
                 ...state,
-                TeamsTeam: Team
+                teamsTeam: Team
             };
         }
 
