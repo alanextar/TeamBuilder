@@ -57,9 +57,9 @@ export function quitOrDeclineTeam(userId, teamId) {
     return api.get(Urls.Users.QuitOrDeclineTeam, { id: userId, teamId: teamId });
 };
 
-export function setTeam(userId, teamId) {
+export function setTeam(id, teamId, isTeamOffer) {
     console.log(`users.setTeam`);
-    return api.get(Urls.Users.SetTeam, { id: userId, teamId: teamId });
+    return api.get(Urls.Users.SetTeam, { id: id, teamId: teamId, isTeamOffer: isTeamOffer });
 };
 
 export function getOwnerTeams(id) {
