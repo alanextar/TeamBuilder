@@ -8,13 +8,13 @@ import {
 import InfiniteScroll from 'react-infinite-scroller';
 import { Api, Urls } from '../infrastructure/api';
 import useDebounce from '../infrastructure/use-debounce';
-import { setTeam, createTeam } from "../store/teams/actions";
+import { setTeam, setTeamsTeam } from "../store/teams/actions";
 
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import Icon24Filter from '@vkontakte/icons/dist/24/filter';
 
 const Teams = props => {
-    const { createTeam, setPage, setTeam } = props;
+    const { setPage, setTeam, setTeamsTeam } = props;
 
     const [isSearching, setIsSearching] = useState(false);
     const [fetching, setFetching] = useState(false);
@@ -99,7 +99,7 @@ const Teams = props => {
             <PanelHeader separator={false}
                 left={
                     <PanelHeaderButton>
-                        <Icon28AddOutline onClick={() => { createTeam(); setPage('teams', 'teamCreate'); }} />
+                        <Icon28AddOutline onClick={() => { setPage('teams', 'teamCreate'); }} />
                     </PanelHeaderButton>}>
                 Команды
                 </PanelHeader>
@@ -121,7 +121,7 @@ const Teams = props => {
                                         text={team.description}
                                         caption={team.event && team.event.name}
                                         after={team.userTeams.length + '/' + team.numberRequiredMembers}
-                                        onClick={() => { setPage('teams', 'teaminfo'); setTeam(team) }}
+                                        onClick={() => { setPage('teams', 'teaminfo'); setTeam(team); setTeamsTeam(team) }}
                                     >
                                         {team.name}
                                     </RichCell>
@@ -138,7 +138,7 @@ const Teams = props => {
 const mapDispatchToProps = {
     setPage,
     setTeam,
-    createTeam,
+    setTeamsTeam,
     goBack
 };
 

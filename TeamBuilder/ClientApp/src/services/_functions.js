@@ -31,16 +31,12 @@ export const restoreScrollPosition = () => {
 };
 
 export const getActivePanel = (view) => {
-	console.log('getActivePanel', view);
-    console.log('store.getState()', store.getState());
     let panel = store.getState().router.activePanel;
 
     let panelsHistory = store.getState().router.panelsHistory;
     if (typeof panelsHistory[view] !== "undefined") {
         panel = panelsHistory[view][panelsHistory[view].length - 1];
     }
-
-    console.log('panel', panel);
 
     return panel;
 };

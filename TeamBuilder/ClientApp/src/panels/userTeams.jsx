@@ -8,7 +8,7 @@ import {
 import '@vkontakte/vkui/dist/vkui.css';
 import Icon28CheckCircleOutline from '@vkontakte/icons/dist/28/check_circle_outline';
 import Icon28InfoOutline from '@vkontakte/icons/dist/28/info_outline';
-import { setTeam } from '../store/teams/actions';
+import { setTeam, setUserTeam } from '../store/teams/actions';
 import { setPage } from '../store/router/actions';
 
 class UserTeams extends React.Component {
@@ -41,7 +41,7 @@ class UserTeams extends React.Component {
     }
 
     render() {
-        const { setPage, setTeam } = this.props;
+        const { setPage, setTeam, activeView, setUserTeam } = this.props;
 
         return (
             <Group>
@@ -57,7 +57,7 @@ class UserTeams extends React.Component {
                                             caption={"Событие: " + (userTeam.team.event ? userTeam.team.event.name : '')}
                                             after={userTeam.userAction === 2 ? < Icon28CheckCircleOutline /> :
                                                 (userTeam.userAction === 1 && <Icon28InfoOutline />)}
-                                            onClick={() => { setTeam(userTeam.team); setPage('user', 'teaminfo') }}
+                                            onClick={() => { setTeam(userTeam.team); setUserTeam(userTeam.team); setPage(activeView, 'teaminfo') }}
                                             data-to='teaminfo'
                                             data-id={userTeam.team.id}
                                             actions={!this.props.readOnlyMode && (userTeam.userAction === 5 ?
@@ -87,11 +87,18 @@ class UserTeams extends React.Component {
 
 }
 
+const mapStateToProps = (state) => {
+
+    return {
+        activeView: state.router.activeView
+    };
+};
+
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
-        ...bindActionCreators({ setPage, setTeam }, dispatch)
+        ...bindActionCreators({ setPage, setTeam, setUserTeam }, dispatch)
     }
 }
 
-export default connect(null, mapDispatchToProps)(UserTeams);
+export default connect(mapStateToProps, mapDispatchToProps)(UserTeams);

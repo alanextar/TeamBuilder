@@ -98,7 +98,7 @@ namespace TeamBuilder.Controllers
 		[HttpGet]
 		public IActionResult Get(long id)
 		{
-			logger.LogInformation("Request ConfirmUser");
+			logger.LogInformation($"Request Get/{id}");
 
 			var user = context.Users.Include(x => x.UserTeams)
 				.ThenInclude(y => y.Team)
@@ -115,7 +115,7 @@ namespace TeamBuilder.Controllers
 		[HttpGet]
 		public IActionResult GetRecruitTeams(long vkProfileId, long id)
 		{
-			logger.LogInformation("Request ConfirmUser");
+			logger.LogInformation($"Request GetRecruitTeams/?vkProfielId={vkProfileId}&id={id}");
 
 			var user = context.Users.Include(x => x.UserTeams)
 				.ThenInclude(y => y.Team)
@@ -138,7 +138,7 @@ namespace TeamBuilder.Controllers
 		[HttpPost]
 		public IActionResult Edit([FromBody]User user)
 		{
-			logger.LogInformation("Request ConfirmUser");
+			logger.LogInformation("Request Edit");
 
 			var dbUser = context.Users.FirstOrDefault(u => u.Id == user.Id);
 			dbUser.City = user.City;
