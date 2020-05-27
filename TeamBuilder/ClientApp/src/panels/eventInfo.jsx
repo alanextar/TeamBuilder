@@ -27,7 +27,7 @@ const EventInfo = props => {
     return (
         <Panel id={props.id}>
             <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
-                {props.profile.id === props.event.ownerId ?
+                {props.event && props.profile.id === props.event.ownerId ?
                     <PanelHeaderContent
                         aside={<Icon16Dropdown style={{ transform: `rotate(${contextOpened ? '180deg' : '0'})` }} />}
                         onClick={toggleContext}
@@ -39,7 +39,7 @@ const EventInfo = props => {
             <PanelHeaderContext opened={contextOpened} onClose={toggleContext}>
                 <List>
                     <Cell
-                        onClick={() => { setPage('events', 'eventEdit') }}
+                        onClick={() => { setPage(activeView, 'eventEdit') }}
                     >
                         Редактировать событие
                         </Cell>
