@@ -233,7 +233,8 @@ const mapStateToProps = (state) => {
     return {
         user: state.user.user,
         profileUser: state.user.profileUser,
-        profile: state.user.profile
+        profile: state.user.profile,
+        activeStory: state.router.activeStory
     };
 };
 
