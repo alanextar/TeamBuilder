@@ -122,7 +122,7 @@ class TeamEdit extends React.Component {
     }
 
     render() {
-        const { goBack, setPage } = this.props;
+        const { goBack, setPage, activeView } = this.props;
 
         return (
             <Panel id={this.state.panelId}>
@@ -162,7 +162,7 @@ class TeamEdit extends React.Component {
                                     })}
 
                                 </Select>
-                                <Button onClick={() => { setPage('teams','eventCreate') }}>Создать Событие</Button>
+                                <Button onClick={() => { setPage(activeView, 'eventCreate') }}>Создать Событие</Button>
                             </FormLayout>
                             :
                             <Cell>
@@ -232,6 +232,7 @@ class TeamEdit extends React.Component {
 const mapStateToProps = (state) => {
     return {
         activeTeam: state.team.activeTeam,
+        activeView: state.router.activeView
     };
 };
 
