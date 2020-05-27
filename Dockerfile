@@ -22,4 +22,4 @@ FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-buster-slim AS runtime
 WORKDIR /app
 COPY --from=build /app/TeamBuilder/out ./
 
-CMD ASPNETCORE_URLS=http://*:$PORT dotnet Colors.API.dll
+CMD ASPNETCORE_URLS=http://*:$PORT dotnet TeamBuilder.dll
