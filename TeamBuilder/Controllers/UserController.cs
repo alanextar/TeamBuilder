@@ -191,7 +191,8 @@ namespace TeamBuilder.Controllers
 			return Json(user.UserTeams);
 		}
 
-		public IActionResult SetTeam(long id, long teamId)
+		[HttpGet]
+		public IActionResult SetTeam(long id, long teamId, bool isTeamOffer = true)
 		{
 			logger.LogInformation("Request SetTeam");
 
@@ -204,13 +205,13 @@ namespace TeamBuilder.Controllers
 
 			if (!dbTeam.UserTeams.Any(x => x.UserId == id))
 			{
-				dbTeam.UserTeams.Add(new UserTeam { UserId = id, UserAction = UserActionEnum.ConsideringOffer });
+				dbTeam.UserTeams.Add(new UserTeam { UserId = id, UserAction = isTeamOffer ? UserActionEnum.ConsideringOffer : UserActionEnum.SentRequest });
 
 				context.Update(dbTeam);
 				context.SaveChanges();
 			}
 
-			return Ok("Request was sent to user");
+			return Json(dbTeam);
 		}
 
 		public IEnumerable<Team> GetOwnerTeams(long id)
