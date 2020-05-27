@@ -54,12 +54,9 @@ namespace TeamBuilder.Controllers
 			return Json(result);
 		}
 
-		public async Task<IActionResult> GetPage(int pageSize = 20, int page = 0, bool prev = false)
+		public IActionResult GetPage(int pageSize = 20, int page = 0, bool prev = false)
 		{
 			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
-
-			if (!context.Events.Any())
-				await Initialize();
 
 			var result = context.Events.Include(e => e.Teams).GetPage(pageSize, HttpContext.Request, page, prev);
 			logger.LogInformation($"Response EventsCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
@@ -125,15 +122,6 @@ namespace TeamBuilder.Controllers
 			await context.SaveChangesAsync();
 
 			return Ok("Deleted");
-		}
-
-		private async Task Initialize()
-		{
-			var file = await System.IO.File.ReadAllTextAsync(@"DemoDataSets\events.json");
-			var events = JsonConvert.DeserializeObject<Event[]>(file);
-
-			await context.Events.AddRangeAsync(events);
-			await context.SaveChangesAsync();
 		}
 	}
 }

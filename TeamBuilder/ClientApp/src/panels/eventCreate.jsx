@@ -12,8 +12,6 @@ import {
 import { Api } from '../infrastructure/api';
 
 const EventCreate = props => {
-    const { setPage, setEvent, goBack } = props;
-
     const [eventName, setEventName] = useState('');
     const [eventDescription, setEventDescription] = useState('');
     const [eventLink, setEventLink] = useState('');
