@@ -7,7 +7,7 @@ import { setEvent } from "../store/events/actions";
 import useDebounce from '../infrastructure/use-debounce';
 import {
     Panel, PanelHeader, PanelSpinner, Search, RichCell, PullToRefresh,
-    PanelHeaderBack, CardGrid, Card
+    PanelHeaderBack, CardGrid, Card, Cell
 } from '@vkontakte/vkui';
 import InfiniteScroll from 'react-infinite-scroller';
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
@@ -101,12 +101,12 @@ const EventsFilter = props => {
                         hasMore={hasMoreItems}
                         loader={loader}>
                         <CardGrid style={{ marginBottom: 10 }}>
+                            <Cell onClick={(e) => { goBack(); setEvent(null); props.openFilter(e) }}> Сбросить фильтр </Cell>
                             {items && items.map(event => (
                                 <Card size="l" mode="shadow" key={event.id}>
                                     <RichCell
                                         bottom={`Участвуют ${event.teams && event.teams.length} команд`}
                                         caption={`${event.startDate} - ${event.startDate}`}
-                                        //onClick={() => { setPage('events', 'eventInfo'); setEvent(event) }}
                                         onClick={(e) => { goBack(); setEvent(event); props.openFilter(e) }}
                                     >
                                         {event.name}

@@ -9,19 +9,20 @@ import InfiniteScroll from 'react-infinite-scroller';
 import { Api, Urls } from '../infrastructure/api';
 import useDebounce from '../infrastructure/use-debounce';
 import { setTeam, setTeamsTeam } from "../store/teams/actions";
-import { setEvent } from "./store/events/actions"
+import { setEvent } from "../store/events/actions"
 
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import Icon24Filter from '@vkontakte/icons/dist/24/filter';
 
 const Teams = props => {
-    const { setPage, setTeam, setTeamsTeam, setEvent } = props;
+    const { setPage, setTeam, setTeamsTeam, setEvent, event } = props;
 
     const [isSearching, setIsSearching] = useState(false);
     const [fetching, setFetching] = useState(false);
 
     const [hasMoreItems, setHasMoreItems] = useState(true);
     const [nextHref, setNextHref] = useState(null);
+    const [filtredEvent, setFiltredEvent] = useState(props.event && props.event.id);
 
     const [items, setItems] = useState([]);
 
@@ -31,9 +32,10 @@ const Teams = props => {
     useEffect(
         () => {
             console.log("search if")
+            console.log("search filtredEvent", props)
             console.log(`search.debouncedSearchTerm ${debouncedSearchTerm}`)
             setIsSearching(true);
-            Api.Teams.pagingSearch(debouncedSearchTerm)
+            Api.Teams.pagingSearch(debouncedSearchTerm, { eventId: props.event && props.event.id })
                 .then(result => {
                     setItems(result.collection);
                     setNextHref(result.nextHref);
@@ -150,4 +152,4 @@ const mapDispatchToProps = {
     setEvent
 };
 
-export default connect(null, mapDispatchToProps)(Teams);
+export default connect(mapStateToProps, mapDispatchToProps)(Teams);
