@@ -172,11 +172,11 @@ const App = (props) => {
                 //        </ModalPage>
                 //    </ModalRoot>}
             >
-                <Teams id='teams' activeStory={activeStory} href={teamHref} />
+                <Teams id='teams' href={teamHref} />
                 <TeamInfo id='teaminfo' />
                 <TeamCreate id='teamCreate' />
                 <TeamEdit id='teamEdit' />
-                <User id='user' activeStory={activeStory} />
+                <User id='user' />
                 <SetUserTeam id='setUserTeam' />
                 <EventCreate id='eventCreate' />
                 {/*<EventsFilter id='eventsFilter' go={goTeam} back={back}
@@ -191,7 +191,8 @@ const App = (props) => {
                 history={history}
             >
                 <Users id='users' />
-                <User id='user' activeStory={activeStory} />
+                <User id='user' />
+                <TeamInfo id='teaminfo' />
             </View>
             <View id='events' activePanel={getActivePanel("events")}
                 history={history}>
@@ -203,7 +204,7 @@ const App = (props) => {
             <View id='user' activePanel={getActivePanel("user")}
                 history={history}
             >
-                <User id='user' activeStory={activeStory} />
+                <User id='user' />
                 <UserEdit id='userEdit' />
                 <TeamInfo id='teaminfo' />
                 <SetUserTeam id='setUserTeam' />

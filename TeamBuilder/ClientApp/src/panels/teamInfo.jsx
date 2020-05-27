@@ -81,7 +81,7 @@ class TeamInfo extends React.Component {
     };
 
     render() {
-        const { goBack, setTeamUser, setUser, setPage } = this.props;
+        const { goBack, setTeamUser, setUser, setPage, activeView } = this.props;
         let user = this.state.team.userTeams && this.state.team.userTeams.find(user => user.userId === this.state.vkProfile.id);
         let userAction = user && user.userAction;
 
@@ -101,7 +101,7 @@ class TeamInfo extends React.Component {
                     {user && user.userId === this.state.vkProfile.id &&
                         <List>
                             <Cell
-                                onClick={() => setPage('teams', 'teamEdit')}
+                            onClick={() => setPage(activeView, 'teamEdit')}
                             >
                                 Редактировать команду
                             </Cell>
@@ -120,8 +120,8 @@ class TeamInfo extends React.Component {
                         </List>
                         || userAction === 5 &&
                         <List>
-                            <Cell
-                                onClick={() => setPage('teams', 'teamEdit')}
+                        <Cell
+                            onClick={() => setPage(activeView, 'teamEdit')}
                             >
                                 Принять заявку /// nonono add teamcontroller
                             </Cell>
@@ -191,7 +191,7 @@ class TeamInfo extends React.Component {
                                                         userTeam.userAction === 2 &&
                                                         <SimpleCell key={i}
                                                             onClick={() => {
-                                                                setPage('teams', 'user');
+                                                                setPage(activeView, 'user');
                                                                 setUser(userTeam.user);
                                                                 setTeamUser(userTeam.user)
                                                             }}
@@ -222,6 +222,7 @@ class TeamInfo extends React.Component {
 const mapStateToProps = (state) => {
     return {
         activeTeam: state.team.activeTeam,
+        activeView: state.router.activeView,
         profile: state.user.profile,
         profileUser: state.user.profileUser
     };

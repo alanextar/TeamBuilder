@@ -16,7 +16,7 @@ import { Api } from '../infrastructure/api';
 
 const EventInfo = props => {
 
-    const { goBack, setPage, setEvent, setTeam, setEventsTeam } = props;
+    const { goBack, setPage, setEvent, setTeam, setEventsTeam, activeView } = props;
     //Api.Users.getPage().then(x => setEvent(x)) ???
     const [contextOpened, setContextOpened] = useState(false);
 
@@ -78,7 +78,8 @@ const EventInfo = props => {
 const mapStateToProps = (state) => {
     return {
         event: state.event.event,
-        profile: state.user.profile
+        profile: state.user.profile,
+        activeView: state.router.activeView
     };
 };
 
