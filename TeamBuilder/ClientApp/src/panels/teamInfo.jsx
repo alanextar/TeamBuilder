@@ -168,7 +168,6 @@ class TeamInfo extends React.Component {
                         {this.state.team && (
                             this.state.activeTab === 'teamDescription' ?
                                 <Cell>
-                                    {console.log('==== ', this.state.team)}
                                     <SimpleCell>
                                         <InfoRow header='Описание команды'>
                                             {this.state.team.description}

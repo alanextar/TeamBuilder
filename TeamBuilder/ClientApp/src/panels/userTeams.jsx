@@ -41,7 +41,7 @@ class UserTeams extends React.Component {
     }
 
     render() {
-        const { setPage, setTeam, activeView } = this.props;
+        const { setPage, setTeam, activeView, setUserTeam } = this.props;
 
         return (
             <Group>
