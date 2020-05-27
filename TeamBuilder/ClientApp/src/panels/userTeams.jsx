@@ -41,7 +41,7 @@ class UserTeams extends React.Component {
     }
 
     render() {
-        const { setPage, setTeam } = this.props;
+        const { setPage, setTeam, activeView } = this.props;
 
         return (
             <Group>
@@ -57,7 +57,7 @@ class UserTeams extends React.Component {
                                             caption={"Событие: " + (userTeam.team.event ? userTeam.team.event.name : '')}
                                             after={userTeam.userAction === 2 ? < Icon28CheckCircleOutline /> :
                                                 (userTeam.userAction === 1 && <Icon28InfoOutline />)}
-                                            onClick={() => { setTeam(userTeam.team); setUserTeam(userTeam.team); setPage('user', 'teaminfo') }}
+                                            onClick={() => { setTeam(userTeam.team); setUserTeam(userTeam.team); setPage(activeView, 'teaminfo') }}
                                             data-to='teaminfo'
                                             data-id={userTeam.team.id}
                                             actions={!this.props.readOnlyMode && (userTeam.userAction === 5 ?
@@ -87,6 +87,13 @@ class UserTeams extends React.Component {
 
 }
 
+const mapStateToProps = (state) => {
+
+    return {
+        activeView: state.router.activeView
+    };
+};
+
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
@@ -94,4 +101,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(null, mapDispatchToProps)(UserTeams);
+export default connect(mapStateToProps, mapDispatchToProps)(UserTeams);
