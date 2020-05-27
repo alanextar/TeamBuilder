@@ -69,7 +69,7 @@ const EventCreate = props => {
 
             <Group>
                 <FormLayout>
-                    <Input top="Название соревнования" type="text" onChange={onNameChange} defaultValue={eventName} />
+                    <Input top="Название соревнования" type="text" onChange={onNameChange} defaultValue={eventName} placeholder="Введите название соревнований" status={eventName ? 'valid' : 'error'} />
                     <Textarea top="Описание соревнования" onChange={onDescriptionChange} defaultValue={eventDescription} />
                     <Input top="Ссылка на соревнование" type="text" onChange={onLinkChange} defaultValue={eventLink} />
                     <Input top="Дата начала соревнований" type="text" onChange={onStartDateChange} defaultValue={eventStartDate} />
@@ -79,7 +79,7 @@ const EventCreate = props => {
             <FixedLayout vertical="bottom">
                 <Button
                     stretched={true}
-                    onClick={() => { eventCreate(); setPage(activeView, 'eventInfo') }}
+                    onClick={() => { eventName && eventCreate(); setPage(activeView, 'eventInfo') }}
                     >
                     Создать соревнование
                 </Button>

@@ -145,7 +145,8 @@ class TeamEdit extends React.Component {
                     {this.state.team && (
                         this.state.activeTab === 'teamDescription' ?
                             <FormLayout >
-                                <Input top="Название команды" type="text" defaultValue={this.state.team.name} onChange={this.onNameChange} />
+                                <Input top="Название команды" type="text" defaultValue={this.state.team.name}
+                                    onChange={this.onNameChange} status={this.state.name ? 'valid' : 'error'} placeholder='Введите название команды' />
                                 <Textarea top="Описание команды" defaultValue={this.state.team.description} onChange={this.onDescriptionChange} />
                                 <Select
                                     top="Выберете событие"
@@ -218,7 +219,7 @@ class TeamEdit extends React.Component {
                 <Div>
                     <Button
                         stretched
-                        onClick={() => { this.postEdit(); goBack() }}>
+                        onClick={() => { this.state.team.name && this.postEdit(); goBack() }}>
                         Применить Изменения
                         </Button>
                     </Div>

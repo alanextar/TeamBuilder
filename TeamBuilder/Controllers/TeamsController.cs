@@ -48,7 +48,7 @@ namespace TeamBuilder.Controllers
 				var isEqual = team.Name.ToLowerInvariant().Contains(search?.ToLowerInvariant() ?? string.Empty);
 				if (eventId != null)
 				{
-					isEqual = team.Event.Id == eventId && isEqual;
+					isEqual = team.EventId == eventId && isEqual;
 				}
 				return isEqual;
 			}

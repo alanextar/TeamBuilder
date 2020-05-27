@@ -68,7 +68,7 @@ const EventEdit = props => {
 
             <Group>
                 <FormLayout>
-                    <Input top="Название соревнования" type="text" onChange={onNameChange} defaultValue={eventName} />
+                    <Input top="Название соревнования" type="text" onChange={onNameChange} defaultValue={eventName} status={this.state.name ? 'valid' : 'error'} placeholder="Введите название соревнований" />
                     <Textarea top="Описание соревнования" onChange={onDescriptionChange} defaultValue={eventDescription} />
                     <Input top="Ссылка на соревнование" type="text" onChange={onLinkChange} defaultValue={eventLink} />
                     <Input top="Дата начала соревнований" type="text" onChange={onStartDateChange} defaultValue={eventStartDate} />
@@ -78,7 +78,7 @@ const EventEdit = props => {
             <FixedLayout vertical="bottom">
                 <Button
                     stretched
-                    onClick={() => { eventEdit(); goBack() }}
+                    onClick={() => { eventName && eventEdit(); goBack() }}
                     >
                     Сохранить
                 </Button>

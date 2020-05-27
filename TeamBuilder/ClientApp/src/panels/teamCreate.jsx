@@ -106,7 +106,10 @@ class TeamCreate extends React.Component {
                 <Group>
                     {this.state.activeTab === 'teamDescription' ?
                         <FormLayout >
-                            <Input top="Название команды" type="text" placeholder="DreamTeam" onChange={this.onNameChange} defaultValue={this.state.name} />
+                            <Input top="Название команды" type="text" placeholder="Введите название команды"
+                                onChange={this.onNameChange}
+                                defaultValue={this.state.name}
+                                status={this.state.name ? 'valid' : 'error'} />
                             <Textarea top="Описание команды" onChange={this.onDescriptionChange} defaultValue={this.state.description} />
                             <Select
                                 top="Выберете событие"
@@ -148,8 +151,8 @@ class TeamCreate extends React.Component {
                         <Button
                             stretched={true}
                             onClick={(e) => {
-                                this.postCreate();
-                                
+                                this.state.name &&
+                                this.postCreate();   
                             }}>
                             Создать Команду
                             </Button>
