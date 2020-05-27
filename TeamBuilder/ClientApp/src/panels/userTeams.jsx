@@ -17,7 +17,6 @@ class UserTeams extends React.Component {
 
         this.state = {
             userTeams: props.userTeams,
-            goUserEdit: props.goUserEdit,
             fetching: false,
         }
     }
@@ -58,8 +57,6 @@ class UserTeams extends React.Component {
                                             after={userTeam.userAction === 2 ? < Icon28CheckCircleOutline /> :
                                                 (userTeam.userAction === 1 && <Icon28InfoOutline />)}
                                             onClick={() => { setTeam(userTeam.team); setUserTeam(userTeam.team); setPage(activeView, 'teaminfo') }}
-                                            data-to='teaminfo'
-                                            data-id={userTeam.team.id}
                                             actions={!this.props.readOnlyMode && (userTeam.userAction === 5 ?
                                                 <React.Fragment>
                                                     <Button onClick={(e) => this.handleJoin(e,userTeam)}>Принять</Button>

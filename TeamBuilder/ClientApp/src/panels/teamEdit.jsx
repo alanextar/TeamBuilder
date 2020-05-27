@@ -36,6 +36,13 @@ class TeamEdit extends React.Component {
         this.populateEventsData();
     }
 
+    componentDidUpdate(prevProps) {
+        // Typical usage (don't forget to compare props):
+        if (this.props.activeTeam !== prevProps.activeTeam) {
+            this.setState({ team: this.props.activeTeam });
+        }
+    }
+
     async populateEventsData() {
         Api.Events.getAll()
             .then(result => this.setState({ events: result, }));
@@ -84,25 +91,35 @@ class TeamEdit extends React.Component {
     async handleJoin(e, userTeam) {
         e.stopPropagation();
         const response = await fetch(`/api/user/joinTeam/?id=${userTeam.userId}&teamId=${userTeam.teamId}`);
-        const data = await response.json();
-        this.setState({ userTeams: data });
+        const userTeams = await response.json();
+        this.updateUserTeamsState(userTeams)
     };
 
     async dropUser(e, userTeam) {
         await Api.Teams.rejectedOrRemoveUser({ teamId: userTeam.teamId, userId: userTeam.userId })
-            .then(json => {
-                console.log('on drop click ', JSON.stringify(json))
-                this.setState({ userTeams: json })
+            .then(userTeams => {
+                console.log('on drop click ', JSON.stringify(userTeams))
+
+                this.updateUserTeamsState(userTeams);
             })
     };
 
     async cancelUser(e, userTeam) {
         await Api.Teams.cancelRequestUser({ teamId: userTeam.teamId, userId: userTeam.userId })
-            .then(json => {
-                console.log('on cancel click ', JSON.stringify(json))
-                this.setState({ userTeams: json })
+            .then(userTeams => {
+                console.log('on cancel click ', JSON.stringify(userTeams))
+
+                this.updateUserTeamsState(userTeams)
             })
     };
+
+    updateUserTeamsState(userTeams) {
+        const { setTeam } = this.props;
+        var team = this.state.team;
+        team.userTeams = userTeams;
+        this.setState({ team: team });
+        setTeam(team);
+    }
 
     render() {
         const { goBack, setPage } = this.props;

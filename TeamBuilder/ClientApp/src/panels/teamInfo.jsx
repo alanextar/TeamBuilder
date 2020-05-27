@@ -82,7 +82,8 @@ class TeamInfo extends React.Component {
 
     render() {
         const { goBack, setTeamUser, setUser, setPage, activeView } = this.props;
-        let user = this.state.team.userTeams && this.state.team.userTeams.find(user => user.userId === this.state.vkProfile.id);
+        let user = this.state.vkProfile && this.state.team.userTeams &&
+            this.state.team.userTeams.find(user => user.userId === this.state.vkProfile.id);
         let userAction = user && user.userAction;
 
         return (
