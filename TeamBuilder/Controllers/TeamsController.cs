@@ -105,6 +105,8 @@ namespace TeamBuilder.Controllers
 				.ForMember("Event", opt => opt.MapFrom(_ => @event)));
 			var mapper = new Mapper(config);
 			var team = mapper.Map<CreateTeamViewModel, Team>(createTeamViewModel);
+			team.UserTeams = new List<UserTeam>();
+
 			team.UserTeams.Add(
 				new UserTeam
 				{
