@@ -86,6 +86,7 @@ class TeamInfo extends React.Component {
         let user = this.state.vkProfile && this.state.team.userTeams &&
             this.state.team.userTeams.find(user => user.userId === this.state.vkProfile.id);
         let userAction = user && user.userAction;
+        let confirmedUser = + this.state.team.userTeams.map(x => x.userAction === 2 || x.isOwner).reduce((a, b) => a + b);
 
         return (
             <Panel id={this.state.panelId}>
@@ -133,7 +134,7 @@ class TeamInfo extends React.Component {
                                 Отклонить заявку
                             </Cell>
                         </List>
-                        || this.state.team.userTeams.length < this.state.team.numberRequiredMembers &&
+                        || confirmedUser < this.state.team.numberRequiredMembers &&
                         <List>
                             <Cell onClick={(e) => this.sendRequest(e, this.state.vkProfile, this.state.team)}>
                                 Подать заявку в команду
@@ -189,7 +190,7 @@ class TeamInfo extends React.Component {
                                             {this.state.team.userTeams &&
                                                 this.state.team.userTeams.map((userTeam, i) => {
                                                     return (
-                                                        userTeam.userAction === 2 || userTeam.isOwner &&
+                                                        (userTeam.userAction === 2 || userTeam.isOwner) &&
                                                         <SimpleCell key={i}
                                                             onClick={() => {
                                                                 setPage(activeView, 'user');
