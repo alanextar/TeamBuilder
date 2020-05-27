@@ -19,6 +19,7 @@ const EventCreate = props => {
     const [eventLink, setEventLink] = useState('');
     const [eventStartDate, setEventStartDate] = useState('');
     const [eventFinishDate, setEventFinishDate] = useState('');
+    const { activeView, setPage, setEvent, goBack } = props;
 
     const onNameChange = (e) => {
         setEventName(e.target.value);
@@ -70,7 +71,7 @@ const EventCreate = props => {
             <FixedLayout vertical="bottom">
                 <Button
                     stretched={true}
-                    onClick={() => { eventCreate(); setPage('events', 'eventInfo') }}
+                    onClick={() => { eventCreate(); setPage(activeView, 'eventInfo') }}
                 >
                     Создать соревнование
                 </Button>
@@ -79,6 +80,12 @@ const EventCreate = props => {
     );
 }
 
+const mapStateToProps = (state) => {
+    return {
+        activeView: state.router.activeView
+    };
+};
+
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
@@ -86,4 +93,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(null, mapDispatchToProps)(EventCreate);
+export default connect(mapStateToProps, mapDispatchToProps)(EventCreate);

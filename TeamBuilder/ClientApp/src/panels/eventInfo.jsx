@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
 import { goBack, setPage } from "../store/router/actions";
 import { setEvent } from "../store/events/actions";
+import { setTeam, setEventsTeam } from "../store/teams/actions";
 
 import {
     Panel, PanelHeader, Group, SimpleCell, InfoRow, Header, FixedLayout,
@@ -14,11 +15,9 @@ import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
 import { Api } from '../infrastructure/api';
 
 const EventInfo = props => {
-    const [edit, setEdit] = useState(true);
-    Api.Users.getPage().then(x => setEdit)
 
-    const { goBack, setPage } = props;
-
+    const { goBack, setPage, setEvent, setTeam, setEventsTeam, activeView } = props;
+    //Api.Users.getPage().then(x => setEvent(x)) ???
     const [contextOpened, setContextOpened] = useState(false);
 
     const toggleContext = () => {
@@ -27,11 +26,8 @@ const EventInfo = props => {
 
     return (
         <Panel id={props.id}>
-            {console.log('profile =====', props.profile)}
-            {console.log('event =====', props.event)}
             <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
-                {/* {props.event.owner && props.profile.id === props.event.owner.id ? */}
-                {true ?
+                {props.event && props.profile.id === props.event.ownerId ?
                     <PanelHeaderContent
                         aside={<Icon16Dropdown style={{ transform: `rotate(${contextOpened ? '180deg' : '0'})` }} />}
                         onClick={toggleContext}
@@ -43,7 +39,7 @@ const EventInfo = props => {
             <PanelHeaderContext opened={contextOpened} onClose={toggleContext}>
                 <List>
                     <Cell
-                        onClick={() => { setPage('events', 'eventEdit') }}
+                        onClick={() => { setPage(activeView, 'eventEdit') }}
                     >
                         Редактировать событие
                         </Cell>
@@ -73,6 +69,7 @@ const EventInfo = props => {
                     </InfoRow>
                 </SimpleCell>
                 Добавить команды
+                //TO-DO не забыть setTeam(team); setEventsTeam(team)
             </Group>
         </Panel>
     );
@@ -81,7 +78,8 @@ const EventInfo = props => {
 const mapStateToProps = (state) => {
     return {
         event: state.event.event,
-        profile: state.user.profile
+        profile: state.user.profile,
+        activeView: state.router.activeView
     };
 };
 
@@ -89,7 +87,7 @@ const mapStateToProps = (state) => {
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
-        ...bindActionCreators({ setPage, goBack }, dispatch)
+        ...bindActionCreators({ setPage, goBack, setEvent, setTeam, setEventsTeam }, dispatch)
     }
 }
 

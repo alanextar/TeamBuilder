@@ -64,6 +64,10 @@ class User extends React.Component {
     }
 
     fetchUserData(id) {
+        fetch(`/api/user/get/?id=${id}`)
+            .then(response => response.json())
+            .then(data => { setUser(data); this.setState({ user: data }) });
+
         if (this.state.profileUser && this.state.profileUser.ownerAnyTeam && this.state.user.isSearchable) {
             fetch(`/api/user/getRecruitTeams?vkProfileId=${this.state.vkProfile.id}&&id=${id}`)
                 .then(response => response.json())
@@ -200,8 +204,7 @@ class User extends React.Component {
                             </Div>
                         </Group> :
                         <Group>
-                            <UserTeams userTeams={this.state.user && this.state.user.userTeams}
-                                goUserEdit={this.state.goUserEdit} readOnlyMode={this.state.readOnlyMode} />
+                            <UserTeams userTeams={this.state.user && this.state.user.userTeams} readOnlyMode={this.state.readOnlyMode} />
                         </Group>
                 }
                 <Div>
@@ -230,7 +233,8 @@ const mapStateToProps = (state) => {
     return {
         user: state.user.user,
         profileUser: state.user.profileUser,
-        profile: state.user.profile
+        profile: state.user.profile,
+        activeStory: state.router.activeStory
     };
 };
 

@@ -1,5 +1,5 @@
 import {
-    SET_TEAM
+    SET_TEAM, SET_USER_TEAM, SET_USERS_TEAM, SET_TEAMS_TEAM, SET_EVENTS_TEAM
 } from './actionTypes';
 
 const initialState = {
@@ -7,16 +7,46 @@ const initialState = {
 };
 
 export const teamReducer = (state = initialState, action) => {
-    console.log('REDUCER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!', action.type)
     switch (action.type) {
 
         case SET_TEAM: {
-            console.log('action.payload.team--------------', action.payload.activeTeam)
             let Team = action.payload.activeTeam;
 
             return {
                 ...state,
                 activeTeam: Team
+            };
+        }
+        case SET_USER_TEAM: {
+            let Team = action.payload.userTeam;
+
+            return {
+                ...state,
+                userTeam: Team
+            };
+        }
+        case SET_USERS_TEAM: {
+            let Team = action.payload.usersTeam;
+
+            return {
+                ...state,
+                usersTeam: Team
+            };
+        }
+        case SET_EVENTS_TEAM: {
+            let Team = action.payload.eventsTeam;
+
+            return {
+                ...state,
+                eventsTeam: Team
+            };
+        }
+        case SET_TEAMS_TEAM: {
+            let Team = action.payload.teamsTeam;
+
+            return {
+                ...state,
+                teamsTeam: Team
             };
         }
 
