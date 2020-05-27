@@ -12,39 +12,39 @@ export const setTeam = (activeTeam) => {
         }
     }
 };
-export const setTeamsTeam = (activeTeam) => {
+export const setTeamsTeam = (teamsTeam) => {
 
     return {
         type: SET_TEAMS_TEAM,
         payload: {
-            activeTeam: activeTeam
+            teamsTeam: teamsTeam
         }
     }
 };
-export const setUserTeam = (activeTeam) => {
+export const setUserTeam = (userTeam) => {
 
     return {
         type: SET_USER_TEAM,
         payload: {
-            activeTeam: activeTeam
+            userTeam: userTeam
         }
     }
 };
-export const setUsersTeam = (activeTeam) => {
+export const setUsersTeam = (usersTeam) => {
 
     return {
         type: SET_USERS_TEAM,
         payload: {
-            activeTeam: activeTeam
+            usersTeam: usersTeam
         }
     }
 };
-export const setEventsTeam = (activeTeam) => {
+export const setEventsTeam = (eventsTeam) => {
 
     return {
         type: SET_EVENTS_TEAM,
         payload: {
-            activeTeam: activeTeam
+            eventsTeam: eventsTeam
         }
     }
 };

@@ -18,7 +18,7 @@ export const teamReducer = (state = initialState, action) => {
             };
         }
         case SET_USER_TEAM: {
-            let Team = action.payload.activeTeam;
+            let Team = action.payload.userTeam;
 
             return {
                 ...state,
@@ -26,7 +26,7 @@ export const teamReducer = (state = initialState, action) => {
             };
         }
         case SET_USERS_TEAM: {
-            let Team = action.payload.activeTeam;
+            let Team = action.payload.usersTeam;
 
             return {
                 ...state,
@@ -34,7 +34,7 @@ export const teamReducer = (state = initialState, action) => {
             };
         }
         case SET_EVENTS_TEAM: {
-            let Team = action.payload.activeTeam;
+            let Team = action.payload.eventsTeam;
 
             return {
                 ...state,
@@ -42,7 +42,7 @@ export const teamReducer = (state = initialState, action) => {
             };
         }
         case SET_TEAMS_TEAM: {
-            let Team = action.payload.activeTeam;
+            let Team = action.payload.teamsTeam;
 
             return {
                 ...state,
