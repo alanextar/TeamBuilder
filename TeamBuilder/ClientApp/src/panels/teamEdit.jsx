@@ -123,11 +123,11 @@ class TeamEdit extends React.Component {
 
     render() {
         const { goBack, setPage, activeView } = this.props;
-        console.log(`render`);
+
         return (
             <Panel id={this.state.panelId}>
                 <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
-                    {this.state.team && this.state.name}
+                    {this.state.team && this.state.team.name}
                 </PanelHeader>
                 <Tabs>
                     <TabsItem
@@ -142,7 +142,6 @@ class TeamEdit extends React.Component {
                         </TabsItem>
                 </Tabs>
                 <Group>
-                {console.log(`render.group`)}
                     {this.state.team && (
                         this.state.activeTab === 'teamDescription' ?
                             <FormLayout >
@@ -217,8 +216,6 @@ class TeamEdit extends React.Component {
                             </Cell>
                     )}
                     <Div>
-                    
-                {console.log(`render.down`)}
                         <Button
                             stretched
                             onClick={() => { this.postEdit(); goBack() }}>

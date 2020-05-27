@@ -63,26 +63,21 @@ const EventEdit = props => {
 
         <Panel id={props.id}>
             <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
-                Редактировать мероприятие
+                Редактировать
         </PanelHeader>
 
-            <Group>
-                <FormLayout>
-                    <Input top="Название соревнования" type="text" onChange={onNameChange} defaultValue={eventName} />
-                    <Textarea top="Описание соревнования" onChange={onDescriptionChange} defaultValue={eventDescription} />
-                    <Input top="Ссылка на соревнование" type="text" onChange={onLinkChange} defaultValue={eventLink} />
-                    <Input top="Дата начала соревнований" type="text" onChange={onStartDateChange} defaultValue={eventStartDate} />
-                    <Input top="Дата завершения соревнований" type="text" onChange={onFinishDateChange} defaultValue={eventFinishDate} />
-                </FormLayout>
-            </Group>
-            <FixedLayout vertical="bottom">
+            <FormLayout>
+                <Input top="Название соревнования" type="text" onChange={onNameChange} defaultValue={eventName} />
+                <Textarea top="Описание соревнования" onChange={onDescriptionChange} defaultValue={eventDescription} />
+                <Input top="Ссылка на соревнование" type="text" onChange={onLinkChange} defaultValue={eventLink} />
+                <Input top="Дата начала соревнований" type="text" onChange={onStartDateChange} defaultValue={eventStartDate} />
+                <Input top="Дата завершения соревнований" type="text" onChange={onFinishDateChange} defaultValue={eventFinishDate} />
                 <Button
-                    stretched
-                    onClick={() => { eventEdit(); goBack() }}
-                    >
+                    size='xl'
+                    onClick={() => { eventEdit(); goBack() }}>
                     Сохранить
                 </Button>
-            </FixedLayout>
+            </FormLayout>
         </Panel>
     );
 }
