@@ -16,8 +16,9 @@ export class Api {
         get: (id) => users.get(id),
         getRecruitTeams: (vkProfileId, id) => users.getRecruitTeams(vkProfileId, id),
         edit: (data) => users.edit(data),
-        joinTeam: (userId, teamId) => users.joinTeam(userId, teamId),
-        quitOrDeclineTeam: (userId, teamId) => users.quitOrDeclineTeam(userId, teamId),
+        joinTeam: (teamId) => users.joinTeam(teamId),
+        quitOrDeclineTeam: (teamId) => users.quitOrDeclineTeam(teamId),
+        cancelRequestTeam: (teamId) => users.cancelRequestTeam(teamId),
         setTeam: (id, teamId, isTeamOffer) => users.setTeam(id, teamId, isTeamOffer),
         getOwnerTeams: (id) => users.getOwnerTeams(id)
     };
@@ -86,6 +87,7 @@ export class Urls {
         GetTeams: `${this.baseUrl}/${this.prefix}/${this.userStr}/getTeams`,
         JoinTeam: `${this.baseUrl}/${this.prefix}/${this.userStr}/joinTeam`,
         QuitOrDeclineTeam: `${this.baseUrl}/${this.prefix}/${this.userStr}/quitOrDeclineTeam`,
+        CancelRequestTeam: `${this.baseUrl}/${this.prefix}/${this.userStr}/cancelRequestTeam`,
         SetTeam: `${this.baseUrl}/${this.prefix}/${this.userStr}/setTeam`,
         GetOwnerTeams: `${this.baseUrl}/${this.prefix}/${this.userStr}/getOwnerTeams`
     };

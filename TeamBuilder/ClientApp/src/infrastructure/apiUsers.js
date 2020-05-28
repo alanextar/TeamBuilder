@@ -47,14 +47,19 @@ export function edit(data) {
     return api.post(Urls.Users.Edit, data);
 };
 
-export function joinTeam(userId, teamId) {
+export function joinTeam(teamId) {
     console.log(`users.joinTeam`);
-    return api.get(Urls.Users.JoinTeam, { userId: userId, teamId: teamId });
+    return api.get(Urls.Users.JoinTeam, { teamId: teamId });
 };
 
-export function quitOrDeclineTeam(userId, teamId) {
+export function quitOrDeclineTeam(teamId) {
     console.log(`users.quitOrDeclineTeam`);
-    return api.get(Urls.Users.QuitOrDeclineTeam, { userId: userId, teamId: teamId });
+    return api.get(Urls.Users.QuitOrDeclineTeam, { teamId: teamId });
+};
+
+export function cancelRequestTeam(teamId) {
+    console.log(`users.cancelRequestTeam`);
+    return api.get(Urls.Users.CancelRequestTeam, { teamId: teamId });
 };
 
 export function setTeam(id, teamId, isTeamOffer) {
