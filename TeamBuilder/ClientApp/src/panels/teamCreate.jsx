@@ -7,9 +7,8 @@ import { setTeam } from "../store/teams/actions";
 
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell,
-    Div, Button, Textarea, FormLayout, Select, Input, Slider, FixedLayout
+    Div, Button, Textarea, FormLayout, Select, Input, Slider, FixedLayout, Link
 } from '@vkontakte/vkui';
-import qwest from 'qwest';
 import { Api } from '../infrastructure/api';
 
 class TeamCreate extends React.Component {
@@ -116,7 +115,8 @@ class TeamCreate extends React.Component {
                                 placeholder="Событие"
                                 onChange={this.onEventChange}
                                 value={this.state.eventId ? this.state.eventId : ''}
-                                name="eventId">
+                                name="eventId"
+                                bottom={<Link style={{ color: 'rebeccapurple', textAlign: "right" }} onClick={() => setPage(activeView, 'eventCreate')}>Создать событие</Link>}>>
                                 {this.state.events && this.state.events.map((ev, i) => {
                                     return (
                                         <option value={ev.id} key={i}>
@@ -124,9 +124,7 @@ class TeamCreate extends React.Component {
                                         </option>
                                     )
                                 })}
-
                             </Select>
-                            <Button onClick={() => setPage(activeView, 'eventCreate')}>Создать Событие</Button>
                         </FormLayout>
                         :
                         <Cell>
