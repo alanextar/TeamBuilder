@@ -1,8 +1,9 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
+import { bindActionCreators } from "redux";
 
 import { goBack, setPage } from '../store/router/actions';
-import { setEvent } from "../store/events/actions";
+import { setEvent, setTeamsEventFilter } from "../store/events/actions";
 
 import useDebounce from '../infrastructure/use-debounce';
 import {
@@ -14,7 +15,7 @@ import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import { Api, Urls } from '../infrastructure/api';
 
 const EventsFilter = props => {
-    const { setPage, setEvent, goBack } = props;
+    const { setPage, setEvent, goBack, setTeamsEventFilter } = props;
 
     const [isSearching, setIsSearching] = useState(false);
     const [fetching, setFetching] = useState(false);
@@ -106,7 +107,11 @@ const EventsFilter = props => {
                                     <RichCell
                                         bottom={`Участвуют ${event.teams && event.teams.length} команд`}
                                         caption={`${event.startDate} - ${event.startDate}`}
-                                        onClick={(e) => { goBack(); setEvent(event); props.openFilter(e) }}
+                                        onClick={(e) => {
+                                            goBack();
+                                            setTeamsEventFilter(event);
+                                            props.openFilter(e)
+                                        }}
                                     >
                                         {event.name}
                                     </RichCell>
@@ -120,10 +125,17 @@ const EventsFilter = props => {
     );
 };
 
-const mapDispatchToProps = {
-    setPage,
-    setEvent,
-    goBack
-};
+//const mapDispatchToProps = {
+//    setPage,
+//    setTeamsEventFilter,
+//    goBack
+//};
+
+function mapDispatchToProps(dispatch) {
+    return {
+        dispatch,
+        ...bindActionCreators({ setPage, setTeamsEventFilter, goBack }, dispatch)
+    }
+}
 
 export default connect(null, mapDispatchToProps)(EventsFilter);

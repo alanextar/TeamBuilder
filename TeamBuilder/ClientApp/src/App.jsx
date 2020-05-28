@@ -171,7 +171,7 @@ const App = (props) => {
                                             setPage('teams', 'eventsFilter');
                                             hideModal();
                                     }}>
-                                    {props.event && props.event.name}
+                                    {props.teamsEventFilter && props.teamsEventFilter.name}
                                     </SelectMimicry>
                                 </FormLayout>}
                         </ModalPage>
@@ -243,7 +243,8 @@ const mapStateToProps = (state) => {
         userTeam: state.team.userTeam,
         usersTeam: state.team.usersTeam,
         eventsTeam: state.team.eventsTeam,
-        event: state.event.event
+        event: state.event.event,
+        teamsEventFilter: state.event.teamsEventFilter
         // colorScheme: state.vkui.colorScheme
     };
 };

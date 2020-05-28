@@ -1,11 +1,18 @@
-import {SET_EVENT, CREATE_EVENT} from './actionTypes';
+import {SET_EVENT, SET_TEAMS_EVENT_FILTER, CREATE_EVENT} from './actionTypes';
 
 export const setEvent = (event) => {
-    console.log('setEvent ', event);
     return {
         type: SET_EVENT,
             payload: {
             event: event
+        }
+    }
+};
+export const setTeamsEventFilter = (event) => {
+    return {
+        type: SET_TEAMS_EVENT_FILTER,
+            payload: {
+            teamsEventFilter: event
         }
     }
 };
