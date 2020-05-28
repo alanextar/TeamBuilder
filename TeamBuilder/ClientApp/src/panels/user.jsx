@@ -153,7 +153,7 @@ class User extends React.Component {
         return (
             <Panel id="user">
                 <PanelHeader separator={false} left={this.state.readOnlyMode &&
-                    <PanelHeaderBack onClick={() => goBack()} />}>{this.state.readOnlyMode ? 'Информация об участнике' : 'Профиль'}</PanelHeader>
+                    <PanelHeaderBack onClick={() => goBack()} />}>{this.state.readOnlyMode ? 'Участник' : 'Профиль'}</PanelHeader>
                 {this.state.vkUser &&
                     <Group title="VK Connect">
                         <Link href={"https://m.vk.com/id" + id} target="_blank">

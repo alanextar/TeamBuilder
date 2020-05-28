@@ -178,10 +178,9 @@ namespace TeamBuilder.Controllers
 		{
 			logger.LogInformation("Request JoinTeamm");
 
-			if (!await accessChecker.CanManageTeam(teamId))
+			if (!accessChecker.IsConfirm(out var profileId))
 				return Forbid();
-
-			var profileId = HttpContext.VkLaunchParams().VkUserId;
+			
 			var user = context.Users
 				.Include(x => x.UserTeams)
 				.ThenInclude(x => x.Team)
@@ -205,10 +204,9 @@ namespace TeamBuilder.Controllers
 		{
 			logger.LogInformation("Request JoinTeamm");
 
-			if (!await accessChecker.CanManageTeam(teamId))
+			if (!accessChecker.IsConfirm(out var profileId))
 				return Forbid();
 
-			var profileId = HttpContext.VkLaunchParams().VkUserId;
 			var user = context.Users
 				.Include(x => x.UserTeams)
 				.ThenInclude(x => x.Team)
@@ -239,10 +237,9 @@ namespace TeamBuilder.Controllers
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");
 
-			if (!await accessChecker.CanManageTeam(teamId))
+			if (!accessChecker.IsConfirm(out var profileId))
 				return Forbid();
 
-			var profileId = HttpContext.VkLaunchParams().VkUserId;
 			var user = context.Users
 				.Include(x => x.UserTeams)
 				.ThenInclude(x => x.Team)
