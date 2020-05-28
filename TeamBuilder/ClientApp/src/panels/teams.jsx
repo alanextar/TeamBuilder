@@ -66,7 +66,7 @@ const Teams = props => {
     };
 
     const loadItems = page => {
-        var url = `${Urls.Teams.GetPage}`;
+        var url = `${Urls.Teams.PagingSearch}?eventId=${props.teamsEventFilter && props.teamsEventFilter.id}`;
         if (nextHref) {
             url = nextHref;
         }
@@ -92,16 +92,13 @@ const Teams = props => {
         <Panel id={props.id}>
             {props.profileUser ?
                 <PanelHeader separator={false}
-                    left={
-                        <PanelHeaderButton>
-                            <Icon28AddOutline onClick={() => { setPage('teams', 'teamCreate'); }} />
-                        </PanelHeaderButton>}>
+                    left={<PanelHeaderButton onClick={() => { setPage('events', 'eventCreate'); }}>Создать</PanelHeaderButton>}>
                     Команды
                 </PanelHeader> :
                 <PanelHeader separator={false}>
                     Команды
                 </PanelHeader>
-                }
+            }
             <Search value={searchTerm} onChange={e => setSearchTerm(e.target.value)} after={null}
                 icon={<Icon24Filter />}
                 onIconClick={e => { props.onFiltersClick(e); }} />

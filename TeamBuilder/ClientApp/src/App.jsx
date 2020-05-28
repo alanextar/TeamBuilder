@@ -155,7 +155,7 @@ const App = (props) => {
                                 <ModalPageHeader
                                     left={<PanelHeaderButton onClick={e => {setTeamsEventFilter(null); hideModal();}}>Сбросить</PanelHeaderButton>}
                                     right={<PanelHeaderButton
-                                        onClick={() => { hideModal(); }}>{platform === IOS ? 'Готово' : <Icon24Done />}</PanelHeaderButton>}
+                                        onClick={() => { hideModal(); }}>Готово</PanelHeaderButton>}
                                 >
                                     Фильтры
                                 </ModalPageHeader>
