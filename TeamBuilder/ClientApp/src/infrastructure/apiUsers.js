@@ -49,12 +49,12 @@ export function edit(data) {
 
 export function joinTeam(userId, teamId) {
     console.log(`users.joinTeam`);
-    return api.get(Urls.Users.JoinTeam, { id: userId, teamId: teamId });
+    return api.get(Urls.Users.JoinTeam, { userId: userId, teamId: teamId });
 };
 
 export function quitOrDeclineTeam(userId, teamId) {
     console.log(`users.quitOrDeclineTeam`);
-    return api.get(Urls.Users.QuitOrDeclineTeam, { id: userId, teamId: teamId });
+    return api.get(Urls.Users.QuitOrDeclineTeam, { userId: userId, teamId: teamId });
 };
 
 export function setTeam(id, teamId, isTeamOffer) {

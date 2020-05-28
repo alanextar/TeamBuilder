@@ -21,7 +21,7 @@ class UserActions extends React.Component {
 
     async handleJoin(e, userTeam) {
         e.stopPropagation();
-        Api.get(Urls.Users.JoinTeam, { id: userTeam.userId, teamId: userTeam.teamId })
+        Api.get(Urls.Users.JoinTeam, { userId: userTeam.userId, teamId: userTeam.teamId })
             .then(result => {
                 this.setState({ userTeams: result })
             });
@@ -29,7 +29,7 @@ class UserActions extends React.Component {
 
     async handleQuitOrDecline(e, userTeam) {
         e.stopPropagation();
-        Api.get(Urls.Users.QuitOrDeclineTeam, { id: userTeam.userId, teamId: userTeam.teamId })
+        Api.get(Urls.Users.QuitOrDeclineTeam, { userId: userTeam.userId, teamId: userTeam.teamId })
         .then(result => {
             this.setState({ userTeams: result })
         });
