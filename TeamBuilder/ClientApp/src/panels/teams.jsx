@@ -120,7 +120,7 @@ const Teams = props => {
                         <CardGrid style={{ marginBottom: 10 }}>
                             {items && items.map(team => (
                                 <Card size="l" mode="shadow" key={team.id}>
-                                    {console.log('maper users', team.userTeams.map(x => x.userAction === 2 || x.isOwner))}
+                                    {/*{console.log('maper users', team.userTeams.map(x => x.userAction === 2 || x.isOwner))}*/}
                                     <RichCell
                                         before={<Avatar size={64} src={team.photo100} />}
                                         text={team.description}
