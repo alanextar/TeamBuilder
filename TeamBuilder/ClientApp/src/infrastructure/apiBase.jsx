@@ -1,9 +1,9 @@
-﻿import * as secrets from './secret.js';
+﻿// import * as secrets from './secret.js';
 
 const initGet = {
     method: 'GET',
     headers: {
-        'Launch-Params': window.location.search === "" ? secrets.launchParams : window.location.search
+        'Launch-Params': window.location.search// === "" ? secrets.launchParams : window.location.search
     },
     mode: 'cors',
     cache: 'default'
@@ -12,7 +12,7 @@ const initGet = {
 const initPost = {
     method: 'POST',
     headers: {
-        'Launch-Params': window.location.search === "" ? secrets.launchParams : window.location.search,
+        'Launch-Params': window.location.search,// === "" ? secrets.launchParams : window.location.search,
         'Content-Type': 'application/json'
     },
     mode: 'cors',

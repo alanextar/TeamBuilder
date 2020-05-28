@@ -10,17 +10,20 @@ using TeamBuilder.Extensions;
 using TeamBuilder.Models.Enums;
 using TeamBuilder.ViewModels;
 using System;
+using TeamBuilder.Services;
 
 namespace TeamBuilder.Controllers
 {
 	public class UserController : Controller
 	{
 		private readonly ApplicationContext context;
+		private readonly UserAccessChecker accessChecker;
 		private readonly ILogger<UserController> logger;
 
-		public UserController(ApplicationContext context, ILogger<UserController> logger)
+		public UserController(ApplicationContext context, UserAccessChecker accessChecker, ILogger<UserController> logger)
 		{
 			this.context = context;
+			this.accessChecker = accessChecker;
 			this.logger = logger;
 		}
 
@@ -31,8 +34,6 @@ namespace TeamBuilder.Controllers
 
 			var user = context.Users.Include(x => x.UserSkills)
 				.ThenInclude(y => y.Skill).FirstOrDefault(u => u.Id == profileViewModel.Id);
-
-			var loadAllSkills = context.Skills.ToList();
 
 			if (user == null)
 			{
@@ -78,6 +79,7 @@ namespace TeamBuilder.Controllers
 			return Json(isConfirmed);
 		}
 
+		//TODO не используется
 		public List<Skill> GetSkills(long id)
 		{
 			logger.LogInformation($"Request GetSkills/{id}");
@@ -95,6 +97,7 @@ namespace TeamBuilder.Controllers
 			return userSkills;
 		}
 
+		//Команды других могут просматривать все
 		public User GetTeams(long id)
 		{
 			logger.LogInformation($"Request GetTeams/{id}");
@@ -152,9 +155,12 @@ namespace TeamBuilder.Controllers
 		}
 
 		[HttpPost]
-		public IActionResult Edit([FromBody]User user)
+		public async Task<IActionResult> Edit([FromBody]User user)
 		{
 			logger.LogInformation("Request Edit");
+
+			if (!await accessChecker.CanManageUser(user.Id))
+				return Forbid();
 
 			var dbUser = context.Users.FirstOrDefault(u => u.Id == user.Id);
 			dbUser.Mobile = user.Mobile;
@@ -163,26 +169,30 @@ namespace TeamBuilder.Controllers
 			dbUser.Telegram = user.Telegram;
 
 			context.Update(dbUser);
-			context.SaveChanges();
+			await context.SaveChangesAsync();
 
 			return Json(dbUser);
 		}
 
-		public IActionResult JoinTeam(long userId, long teamId)
+		public async Task<IActionResult> JoinTeam(long teamId)
 		{
 			logger.LogInformation("Request JoinTeamm");
 
+			if (!await accessChecker.CanManageTeam(teamId))
+				return Forbid();
+
+			var profileId = HttpContext.VkLaunchParams().VkUserId;
 			var user = context.Users
 				.Include(x => x.UserTeams)
 				.ThenInclude(x => x.Team)
 				.ThenInclude(y => y.Event)
-				.FirstOrDefault(u => u.Id == userId);
+				.FirstOrDefault(u => u.Id == profileId);
 
 			var userTeamToJoin = user.UserTeams.First(x => x.TeamId == teamId);
 			userTeamToJoin.UserAction = UserActionEnum.JoinedTeam;
 
 			context.Update(user);
-			context.SaveChanges();
+			await context.SaveChangesAsync();
 
 			var activeUserTeams = user.UserTeams.Where(x => x.UserAction == UserActionEnum.ConsideringOffer ||
 				x.UserAction == UserActionEnum.JoinedTeam ||
@@ -191,23 +201,32 @@ namespace TeamBuilder.Controllers
 			return Json(activeUserTeams);
 		}
 
-		public IActionResult QuitOrDeclineTeam(long userId, long teamId)
+		public async Task<IActionResult> QuitOrDeclineTeam(long teamId)
 		{
 			logger.LogInformation("Request JoinTeamm");
 
+			if (!await accessChecker.CanManageTeam(teamId))
+				return Forbid();
+
+			var profileId = HttpContext.VkLaunchParams().VkUserId;
 			var user = context.Users
 				.Include(x => x.UserTeams)
 				.ThenInclude(x => x.Team)
 				.ThenInclude(y => y.Event)
-				.FirstOrDefault(x => x.Id == userId);
+				.FirstOrDefault(x => x.Id == profileId);
 
 			var userTeam = user.UserTeams
 				.First(y => y.TeamId == teamId);
 
-			userTeam.UserAction = userTeam.UserAction == UserActionEnum.ConsideringOffer ? 
-				UserActionEnum.RejectedTeamRequest : UserActionEnum.RejectedTeamRequest;
+			userTeam.UserAction = userTeam.UserAction switch
+			{
+				UserActionEnum.ConsideringOffer => UserActionEnum.RejectedTeamRequest,
+				UserActionEnum.JoinedTeam => UserActionEnum.QuitTeam,
+				_ => throw new Exception($"User '{profileId}' have invalid userAction '{userTeam.UserAction}' for team '{teamId}'. " +
+										 $"Available value: {UserActionEnum.ConsideringOffer}, {UserActionEnum.JoinedTeam}")
+			};
 
-			context.SaveChanges();
+			await context.SaveChangesAsync();
 
 			var activeUserTeams = user.UserTeams.Where(x => x.UserAction == UserActionEnum.ConsideringOffer ||
 				x.UserAction == UserActionEnum.JoinedTeam ||
@@ -216,21 +235,52 @@ namespace TeamBuilder.Controllers
 			return Json(activeUserTeams);
 		}
 
+		public async Task<IActionResult> CancelRequestTeam(long teamId)
+		{
+			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");
+
+			if (!await accessChecker.CanManageTeam(teamId))
+				return Forbid();
+
+			var profileId = HttpContext.VkLaunchParams().VkUserId;
+			var user = context.Users
+				.Include(x => x.UserTeams)
+				.ThenInclude(x => x.Team)
+				.ThenInclude(y => y.Event)
+				.FirstOrDefault(x => x.Id == profileId);
+			var userTeam = user?.UserTeams.FirstOrDefault(ut => ut.TeamId == teamId);
+
+			if (userTeam == null)
+				return NotFound($"Not found User {profileId} or user {profileId} inside Team {teamId}");
+
+			if (userTeam.UserAction != UserActionEnum.SentRequest)
+				throw new Exception($"User '{profileId}' have invalid userAction '{userTeam.UserAction}' for team '{teamId}'. " +
+									$"Available value: {UserActionEnum.SentRequest}");
+
+			context.Remove(userTeam);
+			await context.SaveChangesAsync();
+
+			var activeUserTeams = user.UserTeams
+				.Where(x => x.UserAction == UserActionEnum.ConsideringOffer ||
+							x.UserAction == UserActionEnum.JoinedTeam ||
+							x.UserAction == UserActionEnum.SentRequest || x.IsOwner);
+			return Json(activeUserTeams);
+		}
+
+		//TODO Не понял что тут происходит :) 
 		[HttpGet]
-		public IActionResult SetTeam(long id, long teamId, bool isTeamOffer = true)
+		public async Task<IActionResult> SetTeam(long id, long teamId, bool isTeamOffer = true)
 		{
 			logger.LogInformation("Request SetTeam");
 
-			if (teamId == 0)
-			{
-				return NotFound();
-			}
-
 			var dbTeam = context.Teams.Include(x => x.UserTeams).FirstOrDefault(x => x.Id == teamId);
+			if (dbTeam == null)
+				return NotFound();
+
 			var userActionToSet = isTeamOffer ?
 					UserActionEnum.ConsideringOffer : UserActionEnum.SentRequest;
 
-			if (!dbTeam.UserTeams.Any(x => x.UserId == id))
+			if (dbTeam.UserTeams.All(x => x.UserId != id))
 			{
 				dbTeam.UserTeams.Add(new UserTeam { UserId = id, UserAction = userActionToSet });
 			}
@@ -241,11 +291,12 @@ namespace TeamBuilder.Controllers
 			}
 
 			context.Update(dbTeam);
-			context.SaveChanges();
+			await context.SaveChangesAsync();
 
 			return Json(dbTeam);
 		}
 
+		//TODO Упростить выражение
 		public IEnumerable<Team> GetOwnerTeams(long id)
 		{
 			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");

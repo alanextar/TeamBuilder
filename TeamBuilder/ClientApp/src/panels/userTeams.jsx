@@ -23,14 +23,21 @@ class UserTeams extends React.Component {
 
     }
 
-    async handleJoin(e, userTeam) {
+    async handleJoin(e, teamId) {
         e.stopPropagation();
-        Api.Users.joinTeam(userTeam.userId, userTeam.teamId).then(data => this.setState({ userTeams: data }));
+        Api.Users.joinTeam(teamId)
+            .then(data => this.setState({ userTeams: data }));
     }
 
-    async handleQuitOrDecline(e,userTeam) {
+    async handleQuitOrDecline(e, teamId) {
         e.stopPropagation();
-        Api.Users.quitOrDeclineTeam(userTeam.userId, userTeam.teamId)
+        Api.Users.quitOrDeclineTeam(teamId)
+            .then(data => this.setState({ userTeams: data }));
+    }
+
+    async handleCancelRequestTeam(e, teamId) {
+        e.stopPropagation();
+        Api.Users.cancelRequestTeam(teamId)
             .then(data => this.setState({ userTeams: data }));
     }
 
@@ -40,12 +47,13 @@ class UserTeams extends React.Component {
         return (
             <Group>
                 <List>
-                    {
-                        this.state.userTeams &&
-                        this.state.userTeams.map((userTeam, i) => {
-                            return (
-                                <CardGrid>
-                                    <Card size="l" mode="shadow">
+
+                    <CardGrid>
+                        {
+                            this.state.userTeams &&
+                            this.state.userTeams.map(userTeam => {
+                                return (
+                                    <Card key={userTeam.teamId} size="l" mode="shadow">
                                         <RichCell key={userTeam.team.id}
                                             text={userTeam.team.description}
                                             caption={"Событие: " + (userTeam.team.event ? userTeam.team.event.name : '')}
@@ -54,24 +62,32 @@ class UserTeams extends React.Component {
                                             onClick={() => { setTeam(userTeam.team); setUserTeam(userTeam.team); setPage(activeView, 'teaminfo') }}
                                             actions={!this.props.readOnlyMode && (userTeam.userAction === 5 ?
                                                 <React.Fragment>
-                                                    <Button onClick={(e) => this.handleJoin(e,userTeam)}>Принять</Button>
-                                                    <Button onClick={(e) => this.handleQuitOrDecline(e, userTeam)}
+                                                    <Button onClick={(e) => this.handleJoin(e, userTeam.teamId)}>Принять</Button>
+                                                    <Button onClick={(e) => this.handleQuitOrDecline(e, userTeam.teamId)}
                                                         mode="secondary">Отклонить</Button>
                                                 </React.Fragment> :
                                                 ((userTeam.userAction === 2 || userTeam.userAction === 1 && !userTeam.isOwner) && <React.Fragment>
-                                                    <Button onClick={(e) => this.handleQuitOrDecline(e, userTeam)}
-                                                        mode="secondary">{userTeam.userAction === 2 ? "Выйти" :
-                                                            (userTeam.userAction === 1 ? "Отозвать заявку" : '')}
-                                                    </Button>
+                                                    {
+                                                        userTeam.userAction === 2
+                                                        ?
+                                                        <Button onClick={(e) => this.handleQuitOrDecline(e, userTeam.teamId)} mode="secondary">
+                                                            Выйти
+                                                        </Button>
+                                                        :
+                                                        (userTeam.userAction === 1 ?
+                                                            <Button onClick={(e) => this.handleCancelRequestTeam(e, userTeam.teamId)} mode="secondary">
+                                                                Отозвать заявку
+                                                    </Button> : '')
+                                                    }
                                                 </React.Fragment>
-                                            ))}>
+                                                ))}>
                                             {userTeam.team.name}
                                         </RichCell>
                                     </Card>
-                                </CardGrid>
-                            )
-                        })
-                    }
+                                )
+                            })
+                        }
+                    </CardGrid>
                 </List>
             </Group>
         )
