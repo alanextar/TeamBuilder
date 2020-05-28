@@ -55,7 +55,6 @@ class User extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        // Typical usage (don't forget to compare props):
         if (this.props.user !== prevProps.user) {
             this.setState({ user: this.props.user });
         }
@@ -130,7 +129,6 @@ class User extends React.Component {
         this.setState({
             selectedSkills: selectedSkills
         })
-        //event.preventDefault();
     };
 
     handleCheckboxClick(event) {

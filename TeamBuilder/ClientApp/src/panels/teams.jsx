@@ -9,21 +9,19 @@ import InfiniteScroll from 'react-infinite-scroller';
 import { Api, Urls } from '../infrastructure/api';
 import useDebounce from '../infrastructure/use-debounce';
 import { setTeam, setTeamsTeam } from "../store/teams/actions";
-import { setEvent } from "../store/events/actions"
 
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import Icon24Filter from '@vkontakte/icons/dist/24/filter';
 import { countConfirmed } from "../infrastructure/utils";
 
 const Teams = props => {
-    const { setPage, setTeam, setTeamsTeam, setEvent, event } = props;
+    const { setPage, setTeam, setTeamsTeam } = props;
 
     const [isSearching, setIsSearching] = useState(false);
     const [fetching, setFetching] = useState(false);
 
     const [hasMoreItems, setHasMoreItems] = useState(true);
     const [nextHref, setNextHref] = useState(null);
-    const [filtredEvent, setFiltredEvent] = useState(props.event && props.event.id);
 
     const [items, setItems] = useState([]);
 
@@ -32,11 +30,8 @@ const Teams = props => {
 
     useEffect(
         () => {
-            console.log("search if")
-            console.log("search filtredEvent", props)
-            console.log(`search.debouncedSearchTerm ${debouncedSearchTerm}`)
             setIsSearching(true);
-            Api.Teams.pagingSearch(debouncedSearchTerm, { eventId: props.event && props.event.id })
+            Api.Teams.pagingSearch(debouncedSearchTerm, { eventId: props.teamsEventFilter && props.teamsEventFilter.id })
                 .then(result => {
                     setItems(result.collection);
                     setNextHref(result.nextHref);
@@ -44,13 +39,12 @@ const Teams = props => {
                     setIsSearching(false);
                 });
         },
-        [debouncedSearchTerm, props.event]
+        [debouncedSearchTerm, props.teamsEventFilter]
     )
 
     const onRefresh = () => {
         setFetching(true);
         if (searchTerm) {
-            console.log(`Refresh if`)
             Api.Teams.pagingSearch(debouncedSearchTerm)
                 .then(result => {
                     setItems(result.collection);
@@ -60,12 +54,8 @@ const Teams = props => {
                 });
         }
         else {
-            console.log(`Refresh else`)
             Api.Teams.getPage()
                 .then(result => {
-
-                    console.log(`Refresh result.collection ${result.collection.length}`)
-                    console.log(`Refresh result.nextHref ${result.nextHref}`)
                     setItems(result.collection);
                     setNextHref(result.nextHref);
                     setHasMoreItems(result.nextHref ? true : false);
@@ -79,8 +69,6 @@ const Teams = props => {
         if (nextHref) {
             url = nextHref;
         }
-        console.log(`teams.loadItems.url: ${url}`)
-        console.log(`teams.loadItems.items: ${items.length}`)
         Api.get(url)
             .then(e => {
                 var itemsTemp = items;
@@ -102,7 +90,10 @@ const Teams = props => {
         <Panel id={props.id}>
             {props.profileUser ?
                 <PanelHeader separator={false}
-                    left={<PanelHeaderButton onClick={() => { setPage('teams', 'teamCreate'); }}>Создать</PanelHeaderButton>}>
+                    left={
+                        <PanelHeaderButton>
+                            <Icon28AddOutline onClick={() => { setPage('teams', 'teamCreate'); }} />
+                        </PanelHeaderButton>}>
                     Команды
                 </PanelHeader> :
                 <PanelHeader separator={false}>
@@ -111,7 +102,7 @@ const Teams = props => {
                 }
             <Search value={searchTerm} onChange={e => setSearchTerm(e.target.value)} after={null}
                 icon={<Icon24Filter />}
-                onIconClick={e => { console.log('in oniconclick'); props.onFiltersClick(e); }} />
+                onIconClick={e => { props.onFiltersClick(e); }} />
             <PullToRefresh onRefresh={onRefresh} isFetching={fetching}>
                 {isSearching ? loader :
                     <InfiniteScroll
@@ -122,7 +113,6 @@ const Teams = props => {
                         <CardGrid style={{ marginBottom: 10 }}>
                             {items && items.map(team => (
                                 <Card size="l" mode="shadow" key={team.id}>
-                                    {/*{console.log('maper users', team.userTeams.map(x => x.userAction === 2 || x.isOwner))}*/}
                                     <RichCell
                                         before={<Avatar size={64} src={team.photo100} />}
                                         text={team.description}
@@ -145,7 +135,7 @@ const Teams = props => {
 
 const mapStateToProps = (state) => {
     return {
-        event: state.event.event,
+        teamsEventFilter: state.event.teamsEventFilter,
         profileUser: state.user.profileUser
     }
 };
@@ -154,8 +144,7 @@ const mapDispatchToProps = {
     setPage,
     setTeam,
     setTeamsTeam,
-    goBack,
-    setEvent
+    goBack
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Teams);

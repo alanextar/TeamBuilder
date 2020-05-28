@@ -6,14 +6,12 @@ import { goBack, setPage } from "../store/router/actions";
 import { setEvent } from "../store/events/actions";
 
 import {
-    Panel, PanelHeader, Group, Button, Textarea, FixedLayout,
+    Panel, PanelHeader, Button, Textarea,
     PanelHeaderBack, Input, FormLayout
 } from '@vkontakte/vkui';
 import { Api } from '../infrastructure/api';
 
 const EventEdit = props => {
-    const [changedEvent, setChangedEvent] = useState(props.event.name);
-
     const [eventName, setEventName] = useState(props.event.name);
     const [eventDescription, setEventDescription] = useState(props.event.description);
     const [eventLink, setEventLink] = useState(props.event.link);
@@ -54,7 +52,6 @@ const EventEdit = props => {
         Api.Events.edit(editEventViewModel)
             .then(result => {
                 setEvent(result);
-                console.log(result);
                 goBack();
             });
     }

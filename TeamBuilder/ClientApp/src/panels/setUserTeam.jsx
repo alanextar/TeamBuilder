@@ -1,5 +1,4 @@
 ﻿import React from 'react';
-import ReactDOM from 'react-dom';
 
 import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
@@ -11,7 +10,7 @@ import {
 import '@vkontakte/vkui/dist/vkui.css';
 import '../../src/styles/style.css';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
-import { Api, Urls } from '../infrastructure/api';
+import { Api } from '../infrastructure/api';
 
 class SetUserTeam extends React.Component {
     constructor(props) {

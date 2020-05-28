@@ -3,19 +3,16 @@
 import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
 import { goBack, setPage } from "../store/router/actions";
-import { setEvent } from "../store/events/actions";
 import { setTeam, setEventsTeam } from "../store/teams/actions";
 
 import {
-    Panel, PanelHeader, Group, SimpleCell, InfoRow, Header, Avatar, Div,
+    Panel, PanelHeader, Group, SimpleCell, InfoRow, Header, Avatar,
     PanelHeaderBack, Cell, List, PanelHeaderContent, PanelHeaderContext
 } from '@vkontakte/vkui';
-import Icon28EditOutline from '@vkontakte/icons/dist/28/edit_outline';
 import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
-import { Api } from '../infrastructure/api';
 
 const EventInfo = props => {
-    const { goBack, setPage, setEvent, setTeam, setEventsTeam, activeView } = props;
+    const { goBack, setPage, setTeam, setEventsTeam, activeView } = props;
     const [contextOpened, setContextOpened] = useState(false);
 
     const toggleContext = () => {
@@ -111,7 +108,7 @@ const mapStateToProps = (state) => {
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
-        ...bindActionCreators({ setPage, goBack, setEvent, setTeam, setEventsTeam }, dispatch)
+        ...bindActionCreators({ setPage, goBack, setTeam, setEventsTeam }, dispatch)
     }
 }
 
