@@ -62,6 +62,9 @@ const App = (props) => {
                 const schemeAttribute = document.createAttribute('scheme');
                 schemeAttribute.value = data.scheme ? data.scheme : 'client_light';
                 document.body.attributes.setNamedItem(schemeAttribute);
+                const paddingTop = document.createAttribute('padding-top');
+                paddingTop.value = 'env(safe-area-inset-top)';
+                document.body.attributes.setNamedItem(paddingTop);
             }
         });
 
