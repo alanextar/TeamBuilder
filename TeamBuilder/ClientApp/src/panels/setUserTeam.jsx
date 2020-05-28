@@ -17,13 +17,11 @@ class SetUserTeam extends React.Component {
         super(props);
 
         this.state = {
-            goSetUserTeam: props.goSetUserTeam,
             vkProfile: props.vkProfile,
-            userId: props.userId,
-            teams: null,
+            userId: props.user.id,
             selectedTeam: null,
             responseStatus: null,
-            recruitTeam: props.recruitTeams
+            recruitTeams: props.recruitTeams
         }
 
         this.post = this.post.bind(this);
@@ -40,23 +38,17 @@ class SetUserTeam extends React.Component {
         //this.populateTeamData();
     }
 
-    async populateTeamData() {
-        const response = await fetch(`/api/user/getOwnerTeams/?id=${this.state.vkProfile.id}`);
-        const data = await response.json();
-        this.setState({ teams: data }) 
-    }
-
     async post() {
         var id = this.state.userId;
         var teamId = this.state.selectedTeam;
 
-        const response = await fetch(`/api/user/setTeam/?id=${id}&&teamId=${teamId}`);
+        await fetch(`/api/user/setTeam/?id=${id}&&teamId=${teamId}`);
     }
 
     render() {
-        const { goBack, setPage } = this.props;
+        const { goBack } = this.props;
 
-        console.log('setUserTeam render', this.state.user);
+        console.log('setUserTeam render', this.state.recruitTeams);
         return (
             <Panel id="setUserTeam">
                 <PanelHeader left={<PanelHeaderBack onClick={() => goBack()} />}>Выбор команды</PanelHeader>
@@ -71,7 +63,7 @@ class SetUserTeam extends React.Component {
                             bottom={this.state.selectedTeam ? '' : 'Пожалуйста, выберете или создайте команду'}
                             name="check"
                         >
-                            {this.state.teams && this.state.teams.map((team, i) => {
+                            {this.state.recruitTeams && this.state.recruitTeams.map((team, i) => {
                                 return (
                                     <option value={team.id}>
                                         {team.name}
@@ -92,6 +84,14 @@ class SetUserTeam extends React.Component {
     }
 }
 
+const mapStateToProps = (state) => {
+
+    return {
+        recruitTeams: state.user.recruitTeams,
+        user: state.user.user
+    };
+};
+
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
@@ -99,4 +99,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(null, mapDispatchToProps)(SetUserTeam);
+export default connect(mapStateToProps, mapDispatchToProps)(SetUserTeam);

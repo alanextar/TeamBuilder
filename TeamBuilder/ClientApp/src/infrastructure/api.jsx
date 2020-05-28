@@ -63,7 +63,8 @@ export class Urls {
         Edit: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/edit`,
         PagingSearch: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/pagingSearch`,
         RejectedOrRemoveUser: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/rejectedOrRemoveUser`,
-        CancelRequestUser: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/cancelRequestUser`
+        CancelRequestUser: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/cancelRequestUser`,
+        JoinTeam: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/joinTeam`,
     };
 
     static Users = {

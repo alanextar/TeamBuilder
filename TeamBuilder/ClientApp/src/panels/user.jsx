@@ -20,7 +20,7 @@ import UserTeams from './userTeams'
 import bridge from '@vkontakte/vk-bridge';
 import { Api, Urls } from '../infrastructure/api';
 import { goBack, setPage } from '../store/router/actions';
-import { setUser, setProfileUser } from '../store/user/actions';
+import { setUser, setProfileUser, setRecruitTeams } from '../store/user/actions';
 
 class User extends React.Component {
     constructor(props) {
@@ -41,7 +41,7 @@ class User extends React.Component {
             selected: false,
             selectedSkills: selectedSkills,
             isConfirmed: false,
-            isSearchable: isSearchable,
+            isSearchable: isSearchable ? isSearchable : false,
             readOnlyMode: props.activeStory != 'user',
             recruitTeams: []
         }
@@ -51,9 +51,10 @@ class User extends React.Component {
     }
 
     componentDidMount() {
+        let id = this.state.readOnlyMode ? this.state.user.id : this.state.vkProfile.id;
         this.populateSkills();
-        this.state.user && this.fetchVkUser();
-        this.state.user && this.fetchUserData(this.state.user.id);
+        this.state.vkProfile && this.fetchVkUser(id);
+        this.state.vkProfile && this.fetchUserData(id);
     }
 
     componentDidUpdate(prevProps) {
@@ -64,24 +65,25 @@ class User extends React.Component {
     }
 
     fetchUserData(id) {
+        const { setRecruitTeams } = this.props;
         fetch(`/api/user/get/?id=${id}`)
             .then(response => response.json())
             .then(data => { setUser(data); this.setState({ user: data }) });
 
-        if (this.state.profileUser && this.state.profileUser.ownerAnyTeam && this.state.user.isSearchable) {
+        if (this.state.profileUser && this.state.profileUser.anyTeamOwner && this.state.user.isSearchable) {
             fetch(`/api/user/getRecruitTeams?vkProfileId=${this.state.vkProfile.id}&&id=${id}`)
                 .then(response => response.json())
-                .then(data => this.setState({ recruitTeams: data }));
+                .then(data => { setRecruitTeams(data); this.setState({ recruitTeams: data }) });
         }
 
     }
 
-    async fetchVkUser() {
+    async fetchVkUser(id) {
         const t = await bridge.send("VKWebAppGetAuthToken",
             { "app_id": 7448436, "scope": "" });
 
         let params = {
-            user_id: this.state.user.id,
+            user_id: id,
             fields: 'city,photo_200,contacts',
             v: '5.103',
             access_token: t.access_token
@@ -91,11 +93,12 @@ class User extends React.Component {
         this.setState({ vkUser: request.response[0] });
     }
 
-    async confirmUser(id) {
+    async confirmUser() {
         const { setUser, setProfileUser } = this.props;
-        let skillsIds = this.state.selectedSkills.map((s, i) => s.id);
+        let id = this.state.vkProfile.id;
+        let skillsIds = this.state.selectedSkills && this.state.selectedSkills.map((s, i) => s.id);
 
-        var isSearchable = this.state.user.isSearchable;
+        var isSearchable = this.state.isSearchable;
         var profileViewModel = { id, skillsIds, isSearchable };
 
         let saveOrConfirm = await fetch('/api/user/confirm', {
@@ -118,11 +121,7 @@ class User extends React.Component {
     };
 
     handleCheckboxClick(event) {
-        if (this.state.user != null && this.state.user != undefined) {
-            var user = { ...this.state.user }
-            user.isSearchable = event.target.checked;
-            this.setState({ user });
-		}
+        this.setState({ isSearchable: !this.state.isSearchable })
     };
 
     async populateSkills() {
@@ -137,7 +136,8 @@ class User extends React.Component {
     }
 
     render() {
-        const { setPage, goBack } = this.props;
+        const { setPage, goBack, activeView } = this.props;
+        let id = this.state.readOnlyMode ? this.state.user.id : this.state.vkProfile.id;
 
         return (
             <Panel id="user">
@@ -145,12 +145,12 @@ class User extends React.Component {
                     <PanelHeaderBack onClick={() => goBack()} />}> {this.state.readOnlyMode ? 'Информация об участнике' : 'Профиль'}</PanelHeader>
                 {this.state.vkUser &&
                     <Group title="VK Connect">
-                    <Link href={"https://m.vk.com/id" + this.state.user.id} target="_blank">
-                        <Cell expandable description={this.state.vkUser.city && this.state.vkUser.city.title ? this.state.vkUser.city.title : ''}
-                            before={this.state.vkUser.photo_200 ? <Avatar src={this.state.vkUser.photo_200} /> : null}>
-                            {`${this.state.vkUser.first_name} ${this.state.vkUser.last_name}`}
-                        </Cell>
-                    </Link>
+                        <Link href={"https://m.vk.com/id" + id} target="_blank">
+                            <Cell description={this.state.vkUser.city && this.state.vkUser.city.title ? this.state.vkUser.city.title : ''}
+                                before={this.state.vkUser.photo_200 ? <Avatar src={this.state.vkUser.photo_200} /> : null}>
+                                {`${this.state.vkUser.first_name} ${this.state.vkUser.last_name}`}
+                            </Cell>
+                        </Link>
                     </Group>}
                 <Separator />
                 <Tabs>
@@ -169,7 +169,7 @@ class User extends React.Component {
                     this.state.activeTabProfile === 'main' ?
                         <Group header={<Header mode="secondary">Информация о профиле участника</Header>}>
                             <List>
-                                {!this.state.readOnlyMode && <Cell asideContent=
+                                {!this.state.readOnlyMode && this.state.user && < Cell asideContent=
                                     {
                                         <Icon24Write onClick={() => setPage('user', 'userEdit')} />
                                     }>
@@ -194,7 +194,7 @@ class User extends React.Component {
                                     onChange={(e) => {
                                         this.onSkillsChange(e)
                                     }}
-                                    options={this.state.allSkills}
+                                    options={this.state.allSkills && this.state.allSkills}
                                     selected={this.state.selectedSkills}
                                     top="Skills"
                                     multiple
@@ -209,16 +209,15 @@ class User extends React.Component {
                 }
                 <Div>
                     <Checkbox disabled={this.state.readOnlyMode} onChange={(e) => this.handleCheckboxClick(e)}
-                        checked={this.state.user && this.state.user.isSearchable ? 'checked' : ''}>в поиске команды</Checkbox>
-                    {this.state.user && !this.state.readOnlyMode && <Button mode={this.state.user ? "primary" : "destructive"} size='xl'
-                        onClick={() => this.confirmUser(this.state.user && this.state.user.id, this.state.user.userSkills)}>
+                        checked={this.state.isSearchable ? 'checked' : ''}>в поиске команды</Checkbox>
+                    {!this.state.readOnlyMode && <Button mode={this.state.user ? "primary" : "destructive"} size='xl'
+                        onClick={() => this.state.vkProfile && this.confirmUser()}>
                         {this.state.user ? "Сохранить" : "Подтвердить"}
                     </Button>}
                 </Div>
                 <Div>
                     {this.state.recruitTeams && this.state.recruitTeams.length > 0 && < Button mode="primary" size='xl'
-                        onClick={() => setPage('teams', 'setUserTeam')}
-                        recruitTeams={this.state.recruitTeams}
+                        onClick={() => setPage(activeView, 'setUserTeam')}
                     >
                         Завербовать
                     </Button>}
@@ -234,7 +233,8 @@ const mapStateToProps = (state) => {
         user: state.user.user,
         profileUser: state.user.profileUser,
         profile: state.user.profile,
-        activeStory: state.router.activeStory
+        activeStory: state.router.activeStory,
+        activeView: state.router.activeView
     };
 };
 
@@ -242,7 +242,8 @@ const mapDispatchToProps = {
     setPage,
     setUser,
     setProfileUser,
-    goBack
+    goBack,
+    setRecruitTeams
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(User);

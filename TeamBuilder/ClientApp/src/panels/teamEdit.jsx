@@ -86,7 +86,7 @@ class TeamEdit extends React.Component {
             eventId: this.state.team.eventId
         }
         Api.Teams.edit(editTeamViewModel)
-            .then(t => setTeam(t));
+            .then(t => { setTeam(t) });
     };
 
     async handleJoin(e, userTeam) {
@@ -98,8 +98,7 @@ class TeamEdit extends React.Component {
     async dropUser(e, userTeam) {
         await Api.Teams.rejectedOrRemoveUser({ teamId: userTeam.teamId, userId: userTeam.userId })
             .then(userTeams => {
-                console.log('on drop click ', JSON.stringify(userTeams))
-
+                //console.log('on drop click ', JSON.stringify(userTeams))
                 this.updateUserTeamsState(userTeams);
             })
     };

@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using TeamBuilder.Extensions;
 using TeamBuilder.Models.Enums;
 using TeamBuilder.ViewModels;
+using System;
 
 namespace TeamBuilder.Controllers
 {
@@ -36,9 +37,12 @@ namespace TeamBuilder.Controllers
 			if (user == null)
 			{
 				user = new User { Id = profileViewModel.Id };
-				foreach (var skillId in profileViewModel.SkillsIds)
+				if (profileViewModel.SkillsIds != null)
 				{
-					user.UserSkills.Add(new UserSkill() { SkillId = skillId });
+					foreach (var skillId in profileViewModel.SkillsIds)
+					{
+						user.UserSkills.Add(new UserSkill() { SkillId = skillId });
+					}
 				}
 
 				await context.Users.AddAsync(user);
@@ -107,7 +111,14 @@ namespace TeamBuilder.Controllers
 				.ThenInclude(y => y.Skill)
 				.FirstOrDefault(u => u.Id == id);
 
-			user.AnyTeamOwner = user.UserTeams.Any(x => x.IsOwner);
+			if (user?.UserTeams != null)
+			{
+				user.UserTeams = user.UserTeams.Where(x => x.UserAction == UserActionEnum.ConsideringOffer ||
+				x.UserAction == UserActionEnum.JoinedTeam ||
+				x.UserAction == UserActionEnum.SentRequest || x.IsOwner).ToList();
+
+				user.AnyTeamOwner = user.UserTeams.Any(x => x.IsOwner);
+			}
 
 			return Json(user);
 		}
@@ -141,7 +152,6 @@ namespace TeamBuilder.Controllers
 			logger.LogInformation("Request Edit");
 
 			var dbUser = context.Users.FirstOrDefault(u => u.Id == user.Id);
-			dbUser.City = user.City;
 			dbUser.Mobile = user.Mobile;
 			dbUser.Email = user.Email;
 			dbUser.About = user.About;
@@ -153,7 +163,7 @@ namespace TeamBuilder.Controllers
 			return Json(dbUser);
 		}
 
-		public IActionResult JoinTeam(long id, long teamId)
+		public IActionResult JoinTeam(long userId, long teamId)
 		{
 			logger.LogInformation("Request JoinTeamm");
 
@@ -161,7 +171,7 @@ namespace TeamBuilder.Controllers
 				.Include(x => x.UserTeams)
 				.ThenInclude(x => x.Team)
 				.ThenInclude(y => y.Event)
-				.FirstOrDefault(u => u.Id == id);
+				.FirstOrDefault(u => u.Id == userId);
 
 			var userTeamToJoin = user.UserTeams.First(x => x.TeamId == teamId);
 			userTeamToJoin.UserAction = UserActionEnum.JoinedTeam;
@@ -169,10 +179,14 @@ namespace TeamBuilder.Controllers
 			context.Update(user);
 			context.SaveChanges();
 
-			return Json(user.UserTeams);
+			var activeUserTeams = user.UserTeams.Where(x => x.UserAction == UserActionEnum.ConsideringOffer ||
+				x.UserAction == UserActionEnum.JoinedTeam ||
+				x.UserAction == UserActionEnum.SentRequest || x.IsOwner);
+
+			return Json(activeUserTeams);
 		}
 
-		public IActionResult QuitOrDeclineTeam(long id, long teamId)
+		public IActionResult QuitOrDeclineTeam(long userId, long teamId)
 		{
 			logger.LogInformation("Request JoinTeamm");
 
@@ -180,15 +194,21 @@ namespace TeamBuilder.Controllers
 				.Include(x => x.UserTeams)
 				.ThenInclude(x => x.Team)
 				.ThenInclude(y => y.Event)
-				.FirstOrDefault(x => x.Id == id);
+				.FirstOrDefault(x => x.Id == userId);
 
-			var userTeamToDelete = user.UserTeams
-				.First(y => y.TeamId == teamId && y.UserId == id);
+			var userTeam = user.UserTeams
+				.First(y => y.TeamId == teamId);
 
-			context.UserTeams.Remove(userTeamToDelete);
+			userTeam.UserAction = userTeam.UserAction == UserActionEnum.ConsideringOffer ? 
+				UserActionEnum.RejectedTeamRequest : UserActionEnum.RejectedTeamRequest;
+
 			context.SaveChanges();
 
-			return Json(user.UserTeams);
+			var activeUserTeams = user.UserTeams.Where(x => x.UserAction == UserActionEnum.ConsideringOffer ||
+				x.UserAction == UserActionEnum.JoinedTeam ||
+				x.UserAction == UserActionEnum.SentRequest || x.IsOwner);
+
+			return Json(activeUserTeams);
 		}
 
 		[HttpGet]
@@ -202,14 +222,21 @@ namespace TeamBuilder.Controllers
 			}
 
 			var dbTeam = context.Teams.Include(x => x.UserTeams).FirstOrDefault(x => x.Id == teamId);
+			var userActionToSet = isTeamOffer ?
+					UserActionEnum.ConsideringOffer : UserActionEnum.SentRequest;
 
 			if (!dbTeam.UserTeams.Any(x => x.UserId == id))
 			{
-				dbTeam.UserTeams.Add(new UserTeam { UserId = id, UserAction = isTeamOffer ? UserActionEnum.ConsideringOffer : UserActionEnum.SentRequest });
-
-				context.Update(dbTeam);
-				context.SaveChanges();
+				dbTeam.UserTeams.Add(new UserTeam { UserId = id, UserAction = userActionToSet });
 			}
+			else
+			{
+				var user = dbTeam.UserTeams.FirstOrDefault(x => x.UserId == id);
+				user.UserAction = userActionToSet;
+			}
+
+			context.Update(dbTeam);
+			context.SaveChanges();
 
 			return Json(dbTeam);
 		}

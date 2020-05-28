@@ -192,7 +192,7 @@ namespace TeamBuilder.Controllers
 			context.Update(userTeam);
 			await context.SaveChangesAsync();
 
-			return Json(team.UserTeams);
+			return Json(team);
 		}
 
 		[HttpPost]
@@ -220,7 +220,7 @@ namespace TeamBuilder.Controllers
 			context.Remove(userTeam);
 			await context.SaveChangesAsync();
 
-			return Json(team.UserTeams);
+			return Json(team);
 		}
 
 		public IActionResult JoinTeam(long userId, long teamId)
@@ -237,11 +237,11 @@ namespace TeamBuilder.Controllers
 			context.Update(user);
 			context.SaveChanges();
 
-			var teamsWithUsers = context.Teams
+			var updTeam = context.Teams
 				.Include(x => x.UserTeams)
-				.ThenInclude(y => y.User).ToList();
+				.ThenInclude(y => y.User).FirstOrDefault(x => x.Id == teamId);
 
-			return Json(teamsWithUsers);
+			return Json(updTeam);
 		}
 	}
 }

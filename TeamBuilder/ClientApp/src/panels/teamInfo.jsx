@@ -72,7 +72,6 @@ class TeamInfo extends React.Component {
         let teamId = this.state.team.id
         let isTeamOffer = false;
 
-        console.log('setTeam get request (id, teamId):', id, teamId)
         await Api.Users.setTeam(id, teamId, isTeamOffer)
             .then(json => {
                 this.setState({ team: json });
@@ -87,29 +86,31 @@ class TeamInfo extends React.Component {
         var teamId = this.state.team.id;
         var userId = this.state.profileUser.id;
 
-        await Api.Teams.joinTeam({ teamId: teamId, userId: userId })
-            .then(json => {
-                console.log('on jonTeam click ', JSON.stringify(json))
-                this.setState({ team: json })
+        await Api.Teams.joinTeam(userId, teamId)
+            .then(data => {
+                //console.log('on jonTeam click ', JSON.stringify(data))
+                this.setState({ team: data });
             })
     };
 
-    async dropUser(e, userTeam) {
-        await Api.Teams.rejectedOrRemoveUser({ teamId: userTeam.teamId, userId: userTeam.userId })
+    async dropUser() {
+        var userId = this.state.profileUser.id;
+        var teamId = this.state.team.id;
+
+        await Api.Teams.rejectedOrRemoveUser({ teamId: teamId, userId: userId })
             .then(json => {
-                console.log('on drop click ', JSON.stringify(json))
+                //console.log('on drop click ', JSON.stringify(json))
                 this.setState({ team: json })
             })
     };
 
     async cancelUser(e, userTeam) {
         let teamId = userTeam.teamId;
-        let id = userTeam.userId;
-        let isTeamOffer = false;
+        let userId = userTeam.userId;
 
-        await Api.Teams.cancelRequestUser({ teamId, id, isTeamOffer })
+        await Api.Teams.cancelRequestUser({ teamId, userId })
             .then(json => {
-                console.log('on cancel click ', JSON.stringify(json))
+                //console.log('on cancel click ', JSON.stringify(json))
                 this.setState({ team: json });
                 var profileUser = profileUser;
                 profileUser.userAction = 1;
@@ -118,17 +119,14 @@ class TeamInfo extends React.Component {
     };
 
     render() {
-        console.log('userTeams', this.state.vkProfile.id);
+        //костыль
+        var usersCount = this.state.team.userTeams ? this.state.team.userTeams.length : 0;
         const { goBack, setTeamUser, setUser, setPage, activeView } = this.props;
-        console.log('userTeams', this.state.team.userTeams);
         let userInActiveTeam = this.state.vkProfile && this.state.team.userTeams &&
             this.state.team.userTeams.find(user => user.userId === this.state.vkProfile.id);
         let isUserInActiveTeam = userInActiveTeam != null;
-        console.log('is user In Active Team', isUserInActiveTeam);
         let isOwner = isUserInActiveTeam && userInActiveTeam && userInActiveTeam.isOwner;
-        console.log('userInActiveTeam isOwner', isOwner);
         let userAction = userInActiveTeam && userInActiveTeam.userAction;
-        console.log('userInActiveTeam userAction', userAction);
         let confirmedUser = + this.state.team.userTeams.map(x => x.userAction === 2 || x.isOwner).reduce((a, b) => a + b);
         let teamCap = this.state.team.userTeams.find(x => x.isOwner) && this.state.team.userTeams.find(x => x.isOwner).user
 
@@ -179,7 +177,8 @@ class TeamInfo extends React.Component {
                                 Отклонить заявку
                             </Cell>
                         </List>
-                        || !userAction && confirmedUser < this.state.team.numberRequiredMembers &&
+                        || (!isUserInActiveTeam || userAction == 3 || userAction == 4) &&
+                            confirmedUser < this.state.team.numberRequiredMembers &&
                         <List>
                             <Cell onClick={() => this.sendRequest()}>
                                 Подать заявку в команду
