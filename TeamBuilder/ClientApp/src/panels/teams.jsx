@@ -31,6 +31,7 @@ const Teams = props => {
     useEffect(
         () => {
             setIsSearching(true);
+            console.log(`teams.pagingSearch: ${debouncedSearchTerm}, ${props.teamsEventFilter && props.teamsEventFilter.id}`);
             Api.Teams.pagingSearch(debouncedSearchTerm, { eventId: props.teamsEventFilter && props.teamsEventFilter.id })
                 .then(result => {
                     setItems(result.collection);
@@ -69,6 +70,7 @@ const Teams = props => {
         if (nextHref) {
             url = nextHref;
         }
+        console.log(`teams.loadItems ${url}`)
         Api.get(url)
             .then(e => {
                 var itemsTemp = items;
