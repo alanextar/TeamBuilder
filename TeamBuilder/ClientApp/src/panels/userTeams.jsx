@@ -10,6 +10,7 @@ import Icon28CheckCircleOutline from '@vkontakte/icons/dist/28/check_circle_outl
 import Icon28InfoOutline from '@vkontakte/icons/dist/28/info_outline';
 import { setTeam, setUserTeam } from '../store/teams/actions';
 import { setPage } from '../store/router/actions';
+import { Api } from '../infrastructure/api';
 
 class UserTeams extends React.Component {
     constructor(props) {
@@ -27,16 +28,13 @@ class UserTeams extends React.Component {
 
     async handleJoin(e, userTeam) {
         e.stopPropagation();
-        const response = await fetch(`/api/user/joinTeam/?userId=${userTeam.userId}&&teamId=${userTeam.teamId}`);
-        const data = await response.json();
-        this.setState({ userTeams: data });
+        Api.Users.joinTeam(userTeam.userId, userTeam.teamId).then(data => this.setState({ userTeams: data }));
     }
 
     async handleQuitOrDecline(e,userTeam) {
         e.stopPropagation();
-        const response = await fetch(`/api/user/quitOrDeclineTeam/?userId=${userTeam.userId}&&teamId=${userTeam.teamId}`);
-        const data = await response.json();
-        this.setState({ userTeams: data });
+        Api.Users.quitOrDeclineTeam(userTeam.userId, userTeam.teamId)
+            .then(data => this.setState({ userTeams: data }));
     }
 
     render() {
@@ -63,7 +61,7 @@ class UserTeams extends React.Component {
                                                     <Button onClick={(e) => this.handleQuitOrDecline(e, userTeam)}
                                                         mode="secondary">Отклонить</Button>
                                                 </React.Fragment> :
-                                                ((userTeam.userAction === 2 || userTeam.userAction === 1) && <React.Fragment>
+                                                ((userTeam.userAction === 2 || userTeam.userAction === 1 && !userTeam.isOwner) && <React.Fragment>
                                                     <Button onClick={(e) => this.handleQuitOrDecline(e, userTeam)}
                                                         mode="secondary">{userTeam.userAction === 2 ? "Выйти" :
                                                             (userTeam.userAction === 1 ? "Отозвать заявку" : '')}

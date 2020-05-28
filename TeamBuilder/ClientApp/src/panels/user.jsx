@@ -66,14 +66,18 @@ class User extends React.Component {
 
     fetchUserData(id) {
         const { setRecruitTeams } = this.props;
-        fetch(`/api/user/get/?id=${id}`)
-            .then(response => response.json())
-            .then(data => { setUser(data); this.setState({ user: data }) });
+        Api.Users.get(id).then(data => { setUser(data); this.setState({ user: data }) });
+
+        //fetch(`/api/user/get/?id=${id}`)
+        //    .then(response => response.json())
+        //    .then(data => { setUser(data); this.setState({ user: data }) });
 
         if (this.state.profileUser && this.state.profileUser.anyTeamOwner && this.state.user.isSearchable) {
-            fetch(`/api/user/getRecruitTeams?vkProfileId=${this.state.vkProfile.id}&&id=${id}`)
-                .then(response => response.json())
+            Api.Users.getRecruitTeams(this.state.vkProfile.id, id)
                 .then(data => { setRecruitTeams(data); this.setState({ recruitTeams: data }) });
+            //fetch(`/api/user/getRecruitTeams?vkProfileId=${this.state.vkProfile.id}&&id=${id}`)
+            //    .then(response => response.json())
+            //    .then(data => { setRecruitTeams(data); this.setState({ recruitTeams: data }) });
         }
 
     }
