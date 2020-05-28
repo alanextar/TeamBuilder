@@ -133,7 +133,7 @@ const App = (props) => {
                     selected={activeStory === 'events'}
                     text="События"
                 ><Icon28FavoriteOutline /></TabbarItem>
-                <TabbarItem
+                <TabbarItem style={{color: props.profileUser ? "" : "red"}}
                     onClick={() => {
                         setStory('user', 'user');
                         setUser(profileUser);

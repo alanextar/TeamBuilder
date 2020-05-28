@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import {
     Panel, PanelHeader, Group, Cell, Avatar, Button, Div, PanelHeaderBack,
-    Tabs, TabsItem, Separator, Checkbox, List, Header, Title, Link
+    Tabs, TabsItem, Separator, Checkbox, InfoRow, Header, Title, Link, Switch
 } from '@vkontakte/vkui';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { } from '@vkontakte/vkui';
@@ -153,7 +153,7 @@ class User extends React.Component {
         return (
             <Panel id="user">
                 <PanelHeader separator={false} left={this.state.readOnlyMode &&
-                    <PanelHeaderBack onClick={() => goBack()} />}> {this.state.readOnlyMode ? 'Информация об участнике' : 'Профиль'}</PanelHeader>
+                    <PanelHeaderBack onClick={() => goBack()} />}>{this.state.readOnlyMode ? 'Информация об участнике' : 'Профиль'}</PanelHeader>
                 {this.state.vkUser &&
                     <Group title="VK Connect">
                         <Link href={"https://m.vk.com/id" + id} target="_blank">
@@ -178,13 +178,15 @@ class User extends React.Component {
                 </Tabs>
                 {
                     this.state.activeTabProfile === 'main' ?
-                        <Group header={<Header mode="secondary">Информация о профиле участника</Header>}>
-                            <List>
-                                {!this.state.readOnlyMode && this.state.user && < Cell asideContent=
-                                    {
-                                        <Icon24Write onClick={() => setPage('user', 'userEdit')} />
-                                    }>
-                                </Cell>}
+                        <Group header={
+                            <Header
+                                mode="secondary"
+                                aside={!this.state.readOnlyMode && this.state.user &&
+                                    <Link style={{ color: "#3f8ae0" }} onClick={() => setPage('user', 'userEdit')}>Редактировать</Link>
+                                }>
+                                Информация
+                                </Header>}>
+                            {/* <List>
                                 <Cell before={<Icon28PhoneOutline />}>
                                     тел.: {this.state.user && <Link href={"tel:" + this.state.user.mobile}>{this.state.user.mobile}</Link>}
                                 </Cell>
@@ -197,7 +199,31 @@ class User extends React.Component {
                                 <Cell before={<Icon28ArticleOutline />}>
                                     дополнительно: {this.state.user && this.state.user.about}
                                 </Cell>
-                            </List>
+                            </List> */}
+                            {this.state.user && this.state.user.mobile &&
+                                <Cell>
+                                    <InfoRow header="Телефон">
+                                        <Link href={"tel:" + this.state.user.mobile}>{this.state.user.mobile}</Link>
+                                    </InfoRow>
+                                </Cell>}
+                            {this.state.user && this.state.user.telegram &&
+                                <Cell>
+                                    <InfoRow header="Telegram">
+                                        <Link href={"tg://resolve?domain=" + this.state.user.telegram}>@{this.state.user.telegram}</Link>
+                                    </InfoRow>
+                                </Cell>}
+                            {this.state.user && this.state.user.email &&
+                                <Cell>
+                                    <InfoRow header="Email">
+                                        <Link href={"mailto:" + this.state.user.email}>{this.state.user.email}</Link>
+                                    </InfoRow>
+                                </Cell>}
+                            {this.state.user && this.state.user.about &&
+                                <Cell>
+                                    <InfoRow header="Дополнительно">
+                                        {this.state.user.about}
+                                    </InfoRow>
+                                </Cell>}
                             <Div>
                                 <Title level="3" weight="regular" style={{ marginBottom: 16 }}>Скиллы:</Title>
                                 <Typeahead id="skills"
@@ -213,19 +239,23 @@ class User extends React.Component {
                                     disabled={this.state.readOnlyMode}
                                 />
                             </Div>
+                            <Div>
+                                <Cell asideContent={
+                                    <Switch disabled={this.state.readOnlyMode}
+                                        onChange={(e) => this.handleCheckboxClick(e)}
+                                        checked={this.state.isSearchable ? 'checked' : ''} />}>
+                                    Ищу команду
+                                    </Cell>
+                                {!this.state.readOnlyMode && <Button mode={this.state.user ? "primary" : "destructive"} size='xl'
+                                    onClick={() => this.state.vkProfile && this.confirmUser()}>
+                                    {this.state.user ? "Сохранить" : "Подтвердить"}
+                                </Button>}
+                            </Div>
                         </Group> :
                         <Group>
                             <UserTeams userTeams={this.state.user && this.state.user.userTeams} readOnlyMode={this.state.readOnlyMode} />
                         </Group>
                 }
-                <Div>
-                    <Checkbox disabled={this.state.readOnlyMode} onChange={(e) => this.handleCheckboxClick(e)}
-                        checked={this.state.isSearchable ? 'checked' : ''}>в поиске команды</Checkbox>
-                    {!this.state.readOnlyMode && <Button mode={this.state.user ? "primary" : "destructive"} size='xl'
-                        onClick={() => this.state.vkProfile && this.confirmUser()}>
-                        {this.state.user ? "Сохранить" : "Подтвердить"}
-                    </Button>}
-                </Div>
                 <Div>
                     {this.state.recruitTeams && this.state.recruitTeams.length > 0 && < Button mode="primary" size='xl'
                         onClick={() => setPage(activeView, 'setUserTeam')}

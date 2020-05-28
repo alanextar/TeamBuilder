@@ -31,7 +31,6 @@ const Teams = props => {
     useEffect(
         () => {
             setIsSearching(true);
-            console.log(`teams.pagingSearch: ${debouncedSearchTerm}, ${props.teamsEventFilter && props.teamsEventFilter.id}`);
             Api.Teams.pagingSearch(debouncedSearchTerm, { eventId: props.teamsEventFilter && props.teamsEventFilter.id })
                 .then(result => {
                     setItems(result.collection);
@@ -46,7 +45,7 @@ const Teams = props => {
     const onRefresh = () => {
         setFetching(true);
         if (searchTerm) {
-            Api.Teams.pagingSearch(debouncedSearchTerm)
+            Api.Teams.pagingSearch(debouncedSearchTerm, { eventId: props.teamsEventFilter && props.teamsEventFilter.id })
                 .then(result => {
                     setItems(result.collection);
                     setNextHref(result.nextHref);
@@ -70,7 +69,7 @@ const Teams = props => {
         if (nextHref) {
             url = nextHref;
         }
-        console.log(`teams.loadItems ${url}`)
+        
         Api.get(url)
             .then(e => {
                 var itemsTemp = items;
@@ -92,7 +91,7 @@ const Teams = props => {
         <Panel id={props.id}>
             {props.profileUser ?
                 <PanelHeader separator={false}
-                    left={<PanelHeaderButton onClick={() => { setPage('events', 'eventCreate'); }}>Создать</PanelHeaderButton>}>
+                    left={<PanelHeaderButton onClick={() => { setPage('teams', 'teamCreate'); }}>Создать</PanelHeaderButton>}>
                     Команды
                 </PanelHeader> :
                 <PanelHeader separator={false}>
