@@ -12,7 +12,7 @@ import {
 import { Api } from '../infrastructure/api';
 
 const EventCreate = props => {
-    const [eventName, setEventName] = useState('');
+    const [eventName, setEventName] = useState(null);
     const [eventDescription, setEventDescription] = useState('');
     const [eventLink, setEventLink] = useState('');
     const [eventStartDate, setEventStartDate] = useState('');
@@ -49,7 +49,7 @@ const EventCreate = props => {
         }
 
         Api.Events.create(createEventViewModel)
-            .then(result => setEvent(result));
+            .then(result => { setEvent(result); setPage(activeView, 'eventInfo')});
     }
 
     return (
@@ -66,7 +66,7 @@ const EventCreate = props => {
                 <Input top="Дата завершения события" type="text" onChange={onFinishDateChange} defaultValue={eventFinishDate} />
                 <Button
                     size='xl'
-                    onClick={() => { eventName && eventCreate(); setPage(activeView, 'eventInfo') }}>
+                    onClick={() => { eventName && eventCreate() }}>
                     Создать событие
                 </Button>
 

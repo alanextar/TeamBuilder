@@ -69,7 +69,7 @@ const EventInfo = props => {
                     </InfoRow>
                 </SimpleCell>
             </Group>
-            {props.event.teams &&
+            {props.event && props.event.teams &&
                 <Group>
                     <Header mode="secondary">Участвующие команды</Header>
                     {props.event.teams.map(team => {

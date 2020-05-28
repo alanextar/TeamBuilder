@@ -97,9 +97,21 @@ class User extends React.Component {
         const { setUser, setProfileUser } = this.props;
         let id = this.state.vkProfile.id;
         let skillsIds = this.state.selectedSkills && this.state.selectedSkills.map((s, i) => s.id);
+        let photo100 = !this.state.readOnlyMode ? this.state.vkProfile.photo_100 : "";
+        let photo200 = !this.state.readOnlyMode ? this.state.vkProfile.photo_200 : "";
+        let firstName = !this.state.readOnlyMode ? this.state.vkProfile.first_name : "";
+        let lastName = !this.state.readOnlyMode ? this.state.vkProfile.last_name : "";
 
         var isSearchable = this.state.isSearchable;
-        var profileViewModel = { id, skillsIds, isSearchable };
+        var profileViewModel = {
+            id,
+            firstName,
+            lastName,
+            skillsIds,
+            isSearchable,
+            photo100,
+            photo200
+        };
 
         let saveOrConfirm = await fetch('/api/user/confirm', {
             method: 'post',

@@ -231,8 +231,7 @@ class TeamInfo extends React.Component {
                                     <Div>
                                         <InfoRow header='Участники'>
                                             Требуется {this.state.team.numberRequiredMembers} участников
-                                        {console.log('ispwner=====', teamCap)}
-                                            <SimpleCell key={-1}
+                                            {teamCap && <SimpleCell key={-1}
                                                 onClick={() => {
                                                     setPage(activeView, 'user');
                                                     setUser(teamCap);
@@ -241,7 +240,7 @@ class TeamInfo extends React.Component {
                                                 before={<Avatar size={48} src={teamCap.photo100} />}
                                                 after={<Icon28MessageOutline />}>
                                                 {teamCap.fullName}
-                                            </SimpleCell>
+                                            </SimpleCell>}
                                             {this.state.team.userTeams &&
                                                 this.state.team.userTeams.map((userTeam, i) => {
                                                     return (
@@ -252,9 +251,9 @@ class TeamInfo extends React.Component {
                                                                 setUser(userTeam.user);
                                                                 setTeamUser(userTeam.user)
                                                             }}
-                                                            before={<Avatar size={48} src={userTeam.user.photo100} />}
+                                                            before={<Avatar size={48} src={userTeam.user && userTeam.user.photo100} />}
                                                             after={<Icon28MessageOutline />}>
-                                                            {userTeam.user.fullName}
+                                                            {userTeam.user && userTeam.user.fullName}
                                                         </SimpleCell>
 
                                                     )
