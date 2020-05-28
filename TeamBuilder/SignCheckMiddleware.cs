@@ -42,7 +42,7 @@ namespace TeamBuilder
 				? context.Request.VkLaunchParams().ParsedQuery 
 				: null;
 
-			if (parsed is null || !Check(parsed))
+			if (!Check(parsed))
 			{
 				context.Response.StatusCode = 403;
 				await context.Response.WriteAsync("Launch params is invalid");
@@ -55,8 +55,11 @@ namespace TeamBuilder
 
 		private bool Check(IReadOnlyDictionary<string, string> launchParams)
 		{
-			if (env.IsDevelopment())
-				return true;
+			//if (env.IsDevelopment())
+			//	return true;
+
+			if (launchParams == null)
+				return false;
 
 			if (!launchParams.ContainsKey("sign") || string.IsNullOrEmpty(launchParams["sign"]))
 				return false;

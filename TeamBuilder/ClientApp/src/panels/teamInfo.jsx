@@ -243,7 +243,6 @@ class TeamInfo extends React.Component {
                                     </SimpleCell>
                                     <Div>
                                         <InfoRow header='Участники'>
-                                            Требуется {this.state.team.numberRequiredMembers} участников
                                             {teamCap && <SimpleCell key={-1}
                                                 onClick={() => {
                                                     setPage(activeView, 'user');
