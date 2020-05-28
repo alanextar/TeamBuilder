@@ -15,39 +15,42 @@ import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
 import { Api } from '../infrastructure/api';
 
 const EventInfo = props => {
-
     const { goBack, setPage, setEvent, setTeam, setEventsTeam, activeView } = props;
-    //Api.Users.getPage().then(x => setEvent(x)) ???
     const [contextOpened, setContextOpened] = useState(false);
 
     const toggleContext = () => {
         setContextOpened(!contextOpened);
     };
 
+    const canEdit = () => {
+        let isOwner = props.profile ? props.profile.id === props.event.ownerId : false;
+        let isModerator = props.profileUser ? props.profileUser.isModerator : false;
+        return props.profileUser && (isOwner || isModerator);
+    }
+
     return (
         <Panel id={props.id}>
-            <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
-                {props.event && props.profile.id === props.event.ownerId ?
+            <PanelHeader left={<PanelHeaderBack onClick={() => goBack()} />}>
+                {canEdit()
+                    ?
                     <PanelHeaderContent
                         aside={<Icon16Dropdown style={{ transform: `rotate(${contextOpened ? '180deg' : '0'})` }} />}
-                        onClick={toggleContext}
-                    >
-                        {props.event && props.event.name}
-                    </PanelHeaderContent> :
-                    props.event && props.event.name}
+                        onClick={toggleContext}>
+                        Событие
+                    </PanelHeaderContent>
+                    :
+                    `Событие`
+                }
             </PanelHeader>
             <PanelHeaderContext opened={contextOpened} onClose={toggleContext}>
                 <List>
                     <Cell
-                        onClick={() => { setPage(activeView, 'eventEdit') }}
-                    >
+                        onClick={() => { setPage(activeView, 'eventEdit') }}>
                         Редактировать событие
                         </Cell>
                 </List>
             </PanelHeaderContext>
             <Group>
-                {console.log('props in info ', props)}
-                <Header mode="primary">Информация о мероприятии</Header>
                 <SimpleCell multiline>
                     <InfoRow header="Название">
                         {props.event && props.event.name}
@@ -99,6 +102,7 @@ const mapStateToProps = (state) => {
     return {
         event: state.event.event,
         profile: state.user.profile,
+        profileUser: state.user.profileUser,
         activeView: state.router.activeView
     };
 };

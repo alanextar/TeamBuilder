@@ -83,7 +83,7 @@ class TeamCreate extends React.Component {
         return (
             <Panel id={this.state.id}>
                 <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
-                    Новая команда
+                    Создание
                 </PanelHeader>
                 <Tabs>
                     <TabsItem
@@ -152,7 +152,7 @@ class TeamCreate extends React.Component {
                             stretched={true}
                             onClick={(e) => {
                                 this.state.name &&
-                                this.postCreate();   
+                                    this.postCreate();
                             }}>
                             Создать Команду
                             </Button>

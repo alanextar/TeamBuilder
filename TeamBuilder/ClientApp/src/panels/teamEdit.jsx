@@ -125,7 +125,7 @@ class TeamEdit extends React.Component {
         return (
             <Panel id={this.state.panelId}>
                 <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
-                    {this.state.team && this.state.team.name}
+                    Редактировать
                 </PanelHeader>
                 <Tabs>
                     <TabsItem
@@ -214,11 +214,11 @@ class TeamEdit extends React.Component {
 
                             </Cell>
                     )}
-                <Div>
-                    <Button
-                        stretched
-                        onClick={() => { this.state.team.name && this.postEdit(); goBack() }}>
-                        Применить Изменения
+                    <Div>
+                        <Button
+                            stretched
+                            onClick={() => { this.state.team.name && this.postEdit(); goBack() }}>
+                            Применить Изменения
                         </Button>
                     </Div>
                 </Group>

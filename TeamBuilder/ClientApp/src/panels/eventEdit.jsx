@@ -66,14 +66,15 @@ const EventEdit = props => {
         </PanelHeader>
 
             <FormLayout>
-                <Input top="Название события" type="text" onChange={onNameChange} defaultValue={eventName} status={this.state.name ? 'valid' : 'error'} placeholder="Введите название соревнований"  />
+                <Input top="Название события" type="text" onChange={onNameChange} defaultValue={eventName}
+                    status={eventName ? 'valid' : 'error'} placeholder="Введите название соревнований" />
                 <Textarea top="Описание события" onChange={onDescriptionChange} defaultValue={eventDescription} />
                 <Input top="Ссылка на событие" type="text" onChange={onLinkChange} defaultValue={eventLink} />
                 <Input top="Дата начала события" type="text" onChange={onStartDateChange} defaultValue={eventStartDate} />
                 <Input top="Дата завершения события" type="text" onChange={onFinishDateChange} defaultValue={eventFinishDate} />
                 <Button
                     size='xl'
-                    onClick={() => {  eventName && eventEdit(); goBack() }}>
+                    onClick={() => { eventName && eventEdit(); goBack() }}>
                     Сохранить
                 </Button>
             </FormLayout>
