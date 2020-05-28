@@ -1,8 +1,7 @@
 ﻿import React, { useState, useEffect } from 'react';
 import {
     View, Epic, Tabbar, TabbarItem, ModalRoot, ModalPage, ModalPageHeader,
-    PanelHeaderButton, FormLayout, SelectMimicry,
-    IS_PLATFORM_IOS, IS_PLATFORM_ANDROID
+    PanelHeaderButton, FormLayout, SelectMimicry, ANDROID, IOS, usePlatform
 } from '@vkontakte/vkui';
 import { connect } from 'react-redux';
 import '@vkontakte/vkui/dist/vkui.css';
@@ -46,7 +45,7 @@ import { users } from './demo_dataset';
 
 const App = (props) => {
     let lastAndroidBackAction = 0;
-    const [teamHref, setTeamNextHref] = useState(null);
+    const platform = usePlatform();
 
     const { setStory, activeView, activeStory, panelsHistory, setProfile, setUser,
         setProfileUser, profileUser, teamUser, eventUser, participantUser, teamsTeam, setPage, setEvent, event,
@@ -153,9 +152,9 @@ const App = (props) => {
                             onClose={hideModal}
                             header={
                                 <ModalPageHeader
-                                    left={<PanelHeaderButton onClick={e => setEvent(null)}>Сбросить</PanelHeaderButton>}
+                                    left={<PanelHeaderButton onClick={e => {setEvent(null); hideModal();}}><Icon24Cancel /></PanelHeaderButton>}
                                     right={<PanelHeaderButton
-                                        onClick={() => { hideModal();  console.log('click on filter') }}>{IS_PLATFORM_IOS ? 'Готово' : <Icon24Done />}</PanelHeaderButton>}
+                                        onClick={() => { hideModal();  console.log('click on filter') }}>{platform === IOS ? 'Готово' : <Icon24Done />}</PanelHeaderButton>}
                                 >
                                     Фильтры
                                 </ModalPageHeader>
@@ -170,12 +169,12 @@ const App = (props) => {
                                             hideModal();
                                     }}>
                                     {props.event && props.event.name}
-                                    </ SelectMimicry>
+                                    </SelectMimicry>
                                 </FormLayout>}
                         </ModalPage>
                     </ModalRoot>}
             >
-                <Teams id='teams' activeStory={activeStory} href={teamHref} onFiltersClick={(e) => { console.log('onfilterclick'); setActiveModal('filters'); }}/>
+                <Teams id='teams' activeStory={activeStory} onFiltersClick={(e) => { console.log('onfilterclick'); setActiveModal('filters'); }}/>
                 <TeamInfo id='teaminfo' return='teams' />
                 <TeamCreate id='teamCreate' />
                 <TeamEdit id='teamEdit' />
