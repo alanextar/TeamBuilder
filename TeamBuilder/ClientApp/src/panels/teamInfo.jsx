@@ -17,7 +17,7 @@ import Icon28MessageOutline from '@vkontakte/icons/dist/28/message_outline';
 import Icon28EditOutline from '@vkontakte/icons/dist/28/edit_outline';
 import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
 import userTeams from './userTeams';
-import { getConfirmedCount } from "../infrastructure/utils";
+import { countConfirmed } from "../infrastructure/utils";
 
 class TeamInfo extends React.Component {
     constructor(props) {
@@ -128,7 +128,7 @@ class TeamInfo extends React.Component {
         let isOwner = isUserInActiveTeam && userInActiveTeam && userInActiveTeam.isOwner;
         let isModerator = this.state.profileUser && this.state.profileUser.isModerator;
         let userAction = userInActiveTeam && userInActiveTeam.userAction;
-        let confirmedUser = getConfirmedCount(this.state.team.userTeams);
+        let confirmedUser = countConfirmed(this.state.team.userTeams);
         let teamCap = this.state.team.userTeams.find(x => x.isOwner) && this.state.team.userTeams.find(x => x.isOwner).user
 
         return (
