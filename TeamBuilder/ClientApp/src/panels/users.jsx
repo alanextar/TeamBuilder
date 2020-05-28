@@ -120,7 +120,7 @@ const Users = props => {
                         <CardGrid style={{ marginBottom: 10 }}>
                             {items && items.map(user => (
                                 <Card size="l" mode="shadow" key={user.id}>
-                                    {user.isSearchable &&
+                                    {(user.isSearchable && props.profileUser.id != user.id) &&
                                         <RichCell
                                             before={<Avatar size={48} src={user.photo100} />}
                                             after={stringfyTeams(user.userTeams)}
@@ -144,6 +144,12 @@ const Users = props => {
     );
 };
 
+const mapStateToProps = (state) => {
+    return {
+        profileUser: state.user.profileUser
+    }
+};
+
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
@@ -151,4 +157,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(null, mapDispatchToProps)(Users);
+export default connect(mapStateToProps, mapDispatchToProps)(Users);
