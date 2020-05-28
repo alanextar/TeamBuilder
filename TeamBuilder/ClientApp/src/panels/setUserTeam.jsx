@@ -11,6 +11,7 @@ import {
 import '@vkontakte/vkui/dist/vkui.css';
 import '../../src/styles/style.css';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
+import { Api, Urls } from '../infrastructure/api';
 
 class SetUserTeam extends React.Component {
     constructor(props) {
@@ -30,7 +31,6 @@ class SetUserTeam extends React.Component {
 
     onTeamSelect(e) {
         const value = e.currentTarget.value;
-        console.log('selected team', value)
         this.setState({ selectedTeam: value });
     }
 
@@ -41,14 +41,12 @@ class SetUserTeam extends React.Component {
     async post() {
         var id = this.state.userId;
         var teamId = this.state.selectedTeam;
-
-        await fetch(`/api/user/setTeam/?id=${id}&&teamId=${teamId}`);
+        Api.Users.setTeam(id, teamId)
     }
 
     render() {
         const { goBack } = this.props;
 
-        console.log('setUserTeam render', this.state.recruitTeams);
         return (
             <Panel id="setUserTeam">
                 <PanelHeader left={<PanelHeaderBack onClick={() => goBack()} />}>Выбор команды</PanelHeader>

@@ -2,13 +2,14 @@
 import * as users from "./apiUsers";
 import * as teams from "./apiTeams";
 import * as events from "./apiEvents";
+import * as skills from "./apiSkills";
 
 export class Api {
 
     static Users = {
         pagingSearch: (value, filter = {}) => users.pagingSearch(value, filter),
         getPage: (params = {}) => users.getPage(params),
-        confirm: (data) => users.confirm(data),
+        saveOrConfirm: (data) => users.saveOrConfirm(data),
         checkConfirmation: (id) => users.checkConfirmation(id),
         getSkills: (id) => users.getSkills(id),
         getTeams: (id) => users.getTeams(id),
@@ -43,6 +44,10 @@ export class Api {
         joinTeam: (userId, teamId) => teams.joinTeam(userId, teamId),
     };
 
+    static Skills = {
+        getAll: () => skills.getAll(),
+    };
+
     static get = (url, params = {}) => api.get(url, params);
     static post = (url, data = {}) => api.post(url, data);
 }
@@ -53,6 +58,7 @@ export class Urls {
     static teamsStr = 'teams';
     static userStr = 'user';
     static eventStr = 'event';
+    static skillStr = 'skill';
 
     static Teams = {
         Get: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/get`,
@@ -73,7 +79,7 @@ export class Urls {
         GetPage: `${this.baseUrl}/${this.prefix}/${this.userStr}/getPage`,
         Edit: `${this.baseUrl}/${this.prefix}/${this.userStr}/edit`,
         PagingSearch: `${this.baseUrl}/${this.prefix}/${this.userStr}/pagingSearch`,
-        Confirm: `${this.baseUrl}/${this.prefix}/${this.userStr}/confirm`,
+        SaveOrConfirm: `${this.baseUrl}/${this.prefix}/${this.userStr}/saveOrConfirm`,
         CheckConfirmation: `${this.baseUrl}/${this.prefix}/${this.userStr}/checkConfirmation`,
         GetRecruitTeams: `${this.baseUrl}/${this.prefix}/${this.userStr}/getRecruitTeams`,
         GetSkills: `${this.baseUrl}/${this.prefix}/${this.userStr}/getSkills`,
@@ -92,5 +98,9 @@ export class Urls {
         Delete: `${this.baseUrl}/${this.prefix}/${this.eventStr}/delete`,
         Edit: `${this.baseUrl}/${this.prefix}/${this.eventStr}/edit`,
         PagingSearch: `${this.baseUrl}/${this.prefix}/${this.eventStr}/pagingSearch`
+    };
+
+    static Skills = {
+        GetAll: `${this.baseUrl}/${this.prefix}/${this.skillStr}/getall`,
     };
 }
