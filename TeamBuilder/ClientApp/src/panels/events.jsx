@@ -89,13 +89,17 @@ const Events = props => {
 
     return (
         <Panel id={props.id}>
-            <PanelHeader separator={false}
-                left={
-                    <PanelHeaderButton>
-                        <Icon28AddOutline onClick={() => { setPage('events', 'eventCreate'); }} />
-                    </PanelHeaderButton>}>
-                События
-                </PanelHeader>
+            {props.profileUser ?
+                <PanelHeader separator={false}
+                    left={
+                        <PanelHeaderButton>
+                            <Icon28AddOutline onClick={() => { setPage('events', 'eventCreate'); }} />
+                        </PanelHeaderButton>}>
+                    События
+                </PanelHeader> :
+                <PanelHeader separator={false}>
+                    События
+                </PanelHeader>}
             <Search value={searchTerm} onChange={e => setSearchTerm(e.target.value)} after={null} />
             <PullToRefresh onRefresh={onRefresh} isFetching={fetching}>
                 {isSearching ? loader :
@@ -124,10 +128,16 @@ const Events = props => {
     );
 };
 
+const mapStateToProps = (state) => {
+    return {
+        profileUser: state.user.profileUser
+    }
+};
+
 const mapDispatchToProps = {
     setPage,
     setEvent,
     goBack
 };
 
-export default connect(null, mapDispatchToProps)(Events);
+export default connect(mapStateToProps, mapDispatchToProps)(Events);
