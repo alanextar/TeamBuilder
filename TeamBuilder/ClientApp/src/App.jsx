@@ -13,7 +13,7 @@ import {
     setUser, setProfile, getUser, setProfileUser, setTeamUser,
     setEventUser, setParticipantUser
 } from "./store/user/actions";
-import { setEvent } from "./store/events/actions"
+import { setEvent, setTeamsEventFilter } from "./store/events/actions"
 import { getActivePanel } from "./services/_functions";
 
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
@@ -49,7 +49,7 @@ const App = (props) => {
 
     const { setStory, activeView, activeStory, panelsHistory, setProfile, setUser,
         setProfileUser, profileUser, teamUser, eventUser, participantUser, teamsTeam, setPage, setEvent, event,
-        eventsTeam, userTeam, usersTeam, setTeam
+        eventsTeam, userTeam, usersTeam, setTeam, setTeamsEventFilter
     } = props;
     let history = (panelsHistory[activeView] === undefined) ? [activeView] : panelsHistory[activeView];
 
@@ -155,18 +155,16 @@ const App = (props) => {
                             onClose={hideModal}
                             header={
                                 <ModalPageHeader
-                                    left={<PanelHeaderButton onClick={e => {setEvent(null); hideModal();}}><Icon24Cancel /></PanelHeaderButton>}
+                                    left={<PanelHeaderButton onClick={e => {setTeamsEventFilter(null); hideModal();}}><Icon24Cancel /></PanelHeaderButton>}
                                     right={<PanelHeaderButton
                                         onClick={() => { hideModal();  console.log('click on filter') }}>{platform === IOS ? 'Готово' : <Icon24Done />}</PanelHeaderButton>}
                                 >
                                     Фильтры
                                 </ModalPageHeader>
                             }>
-                            {console.log('event after filter', props)}
                             {events &&
                                 <FormLayout>
-                                    {console.log('events', props)}
-                                    <SelectMimicry top="Соревнования" placeholder="Не выбрано"
+                                    <SelectMimicry top="События" placeholder="Не выбрано"
                                         onClick={() => {
                                             setPage('teams', 'eventsFilter');
                                             hideModal();
@@ -256,7 +254,7 @@ function mapDispatchToProps(dispatch) {
         ...bindActionCreators({
             setStory, goBack, closeModal, setProfile, setUser, setProfileUser, setPage, setEvent,
             setEventUser, setTeamUser, setParticipantUser, setTeam, setTeamsTeam,
-            setEventsTeam, setUsersTeam, setUserTeam
+            setEventsTeam, setUsersTeam, setUserTeam, setTeamsEventFilter
         }, dispatch)
     }
 }

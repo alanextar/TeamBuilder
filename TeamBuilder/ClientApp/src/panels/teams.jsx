@@ -35,7 +35,7 @@ const Teams = props => {
             console.log("search filtredEvent", props)
             console.log(`search.debouncedSearchTerm ${debouncedSearchTerm}`)
             setIsSearching(true);
-            Api.Teams.pagingSearch(debouncedSearchTerm, { eventId: props.event && props.event.id })
+            Api.Teams.pagingSearch(debouncedSearchTerm, { eventId: props.teamsEventFilter && props.teamsEventFilter.id })
                 .then(result => {
                     setItems(result.collection);
                     setNextHref(result.nextHref);

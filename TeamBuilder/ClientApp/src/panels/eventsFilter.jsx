@@ -15,7 +15,7 @@ import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import { Api, Urls } from '../infrastructure/api';
 
 const EventsFilter = props => {
-    const { setPage, setEvent, goBack, setTeamsEventFilter } = props;
+    const { goBack, setTeamsEventFilter } = props;
 
     const [isSearching, setIsSearching] = useState(false);
     const [fetching, setFetching] = useState(false);
@@ -124,12 +124,6 @@ const EventsFilter = props => {
         </Panel>
     );
 };
-
-//const mapDispatchToProps = {
-//    setPage,
-//    setTeamsEventFilter,
-//    goBack
-//};
 
 function mapDispatchToProps(dispatch) {
     return {
