@@ -126,6 +126,7 @@ class TeamInfo extends React.Component {
             this.state.team.userTeams.find(user => user.userId === this.state.vkProfile.id);
         let isUserInActiveTeam = userInActiveTeam != null;
         let isOwner = isUserInActiveTeam && userInActiveTeam && userInActiveTeam.isOwner;
+        let isModerator = this.state.profileUser && this.state.profileUser.isModerator;
         let userAction = userInActiveTeam && userInActiveTeam.userAction;
         let confirmedUser = + this.state.team.userTeams.map(x => x.userAction === 2 || x.isOwner).reduce((a, b) => a + b);
         let teamCap = this.state.team.userTeams.find(x => x.isOwner) && this.state.team.userTeams.find(x => x.isOwner).user
@@ -144,7 +145,7 @@ class TeamInfo extends React.Component {
                         this.state.team.name}
                 </PanelHeader>
                 {this.state.team && <PanelHeaderContext opened={this.state.contextOpened} onClose={this.toggleContext}>
-                    {isOwner &&
+                    {(isOwner || isModerator) &&
                         <List>
                             <Cell
                                 onClick={() => setPage(activeView, 'teamEdit')}
@@ -178,7 +179,7 @@ class TeamInfo extends React.Component {
                             </Cell>
                         </List>
                         || (!isUserInActiveTeam || userAction == 3 || userAction == 4) &&
-                            confirmedUser < this.state.team.numberRequiredMembers &&
+                        confirmedUser < this.state.team.numberRequiredMembers &&
                         <List>
                             <Cell onClick={() => this.sendRequest()}>
                                 Подать заявку в команду
@@ -232,17 +233,16 @@ class TeamInfo extends React.Component {
                                         <InfoRow header='Участники'>
                                             Требуется {this.state.team.numberRequiredMembers} участников
                                         {console.log('ispwner=====', teamCap)}
-                                            {isOwner &&
-                                                <SimpleCell key={-1}
-                                                    onClick={() => {
-                                                        setPage(activeView, 'user');
-                                                        setUser(teamCap);
-                                                        setTeamUser(teamCap)
-                                                    }}
-                                                    before={<Avatar size={48} src={teamCap.photo100} />}
-                                                    after={<Icon28MessageOutline />}>
-                                                    {teamCap.fullName}
-                                                </SimpleCell>}
+                                            <SimpleCell key={-1}
+                                                onClick={() => {
+                                                    setPage(activeView, 'user');
+                                                    setUser(teamCap);
+                                                    setTeamUser(teamCap)
+                                                }}
+                                                before={<Avatar size={48} src={teamCap.photo100} />}
+                                                after={<Icon28MessageOutline />}>
+                                                {teamCap.fullName}
+                                            </SimpleCell>
                                             {this.state.team.userTeams &&
                                                 this.state.team.userTeams.map((userTeam, i) => {
                                                     return (
