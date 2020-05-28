@@ -153,7 +153,7 @@ const App = (props) => {
                             onClose={hideModal}
                             header={
                                 <ModalPageHeader
-                                    left={<PanelHeaderButton onClick={e => {setTeamsEventFilter(null); hideModal();}}><Icon24Cancel /></PanelHeaderButton>}
+                                    left={<PanelHeaderButton onClick={e => {setTeamsEventFilter(null); hideModal();}}>Сбросить</PanelHeaderButton>}
                                     right={<PanelHeaderButton
                                         onClick={() => { hideModal(); }}>{platform === IOS ? 'Готово' : <Icon24Done />}</PanelHeaderButton>}
                                 >
