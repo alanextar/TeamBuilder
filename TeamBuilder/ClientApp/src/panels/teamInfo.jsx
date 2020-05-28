@@ -14,7 +14,6 @@ import {
 } from '@vkontakte/vkui';
 
 import Icon28MessageOutline from '@vkontakte/icons/dist/28/message_outline';
-import Icon28EditOutline from '@vkontakte/icons/dist/28/edit_outline';
 import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
 
 class TeamInfo extends React.Component {
@@ -71,7 +70,6 @@ class TeamInfo extends React.Component {
         let teamId = this.state.team.id
         let isTeamOffer = false;
 
-        //console.log('setTeam get request (id, teamId):', id, teamId)
         await Api.Users.setTeam(id, teamId, isTeamOffer)
             .then(json => {
                 this.setState({ team: json });
@@ -87,9 +85,9 @@ class TeamInfo extends React.Component {
         var userId = this.state.profileUser.id;
 
         await Api.Teams.joinTeam(userId, teamId)
-            .then(json => {
-                console.log('on jonTeam click ', JSON.stringify(json))
-                this.setState({ team: json });
+            .then(data => {
+                //console.log('on jonTeam click ', JSON.stringify(data))
+                this.setState({ team: data });
             })
     };
 
@@ -99,7 +97,7 @@ class TeamInfo extends React.Component {
 
         await Api.Teams.rejectedOrRemoveUser({ teamId: teamId, userId : userId })
             .then(json => {
-                console.log('on drop click ', JSON.stringify(json))
+                //console.log('on drop click ', JSON.stringify(json))
                 this.setState({ team: json })
             })
     };
@@ -110,7 +108,7 @@ class TeamInfo extends React.Component {
 
         await Api.Teams.cancelRequestUser({ teamId, userId })
             .then(json => {
-                console.log('on cancel click ', JSON.stringify(json))
+                //console.log('on cancel click ', JSON.stringify(json))
                 this.setState({ team: json });
                 var profileUser = profileUser;
                 profileUser.userAction = 1;
@@ -119,18 +117,14 @@ class TeamInfo extends React.Component {
     };
 
     render() {
-        console.log('profileUser', this.state.profileUser);
-        console.log('userTeams', this.state.vkProfile.id);
+        //костыль
+        var usersCount = this.state.team.userTeams ? this.state.team.userTeams.length : 0;
         const { goBack, setTeamUser, setUser, setPage, activeView } = this.props;
-        console.log('userTeams', this.state.team.userTeams);
         let userInActiveTeam = this.state.vkProfile && this.state.team.userTeams &&
             this.state.team.userTeams.find(user => user.userId === this.state.vkProfile.id);
         let isUserInActiveTeam = userInActiveTeam != null;
-        console.log('is user In Active Team', isUserInActiveTeam);
         let isOwner = isUserInActiveTeam && userInActiveTeam && userInActiveTeam.isOwner;
-        console.log('userInActiveTeam isOwner', isOwner);
         let userAction = userInActiveTeam && userInActiveTeam.userAction;
-        console.log('userInActiveTeam userAction', userAction);
 
         return (
             <Panel id={this.state.panelId}>
@@ -178,15 +172,15 @@ class TeamInfo extends React.Component {
                                 Отклонить заявку
                             </Cell>
                         </List>
-                        //профиля нет в текущей команде и команда не полная
-                        || (!isUserInActiveTeam || userAction == 3 || userAction == 4) &&
-                        this.state.team.userTeams.length < this.state.team.numberRequiredMembers &&
+                        //профиля нет в текущей команде и команда неполная
+                        || (!isUserInActiveTeam || userAction == 3 || userAction == 4)  &&
+                            usersCount < this.state.team.numberRequiredMembers &&
                         <List>
                             <Cell onClick={() => this.sendRequest()}>
                                 Подать заявку в команду
                             </Cell>
                         </List>
-                        || this.state.team.userTeams.length >= this.state.team.numberRequiredMembers &&
+                        || usersCount >= this.state.team.numberRequiredMembers &&
                         <List>
                             <Cell>
                                 В команде нет мест

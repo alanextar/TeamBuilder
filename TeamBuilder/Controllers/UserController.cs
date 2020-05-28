@@ -217,16 +217,21 @@ namespace TeamBuilder.Controllers
 			}
 
 			var dbTeam = context.Teams.Include(x => x.UserTeams).FirstOrDefault(x => x.Id == teamId);
+			var userActionToSet = isTeamOffer ?
+					UserActionEnum.ConsideringOffer : UserActionEnum.SentRequest;
 
-			if (!dbTeam.UserTeams.Any(x => x.UserId == id && (x.UserAction == UserActionEnum.ConsideringOffer || 
-				x.UserAction == UserActionEnum.JoinedTeam || x.UserAction == UserActionEnum.SentRequest)))
+			if (!dbTeam.UserTeams.Any(x => x.UserId == id))
 			{
-				dbTeam.UserTeams.Add(new UserTeam { UserId = id, UserAction = isTeamOffer ? 
-					UserActionEnum.ConsideringOffer : UserActionEnum.SentRequest });
-
-				context.Update(dbTeam);
-				context.SaveChanges();
+				dbTeam.UserTeams.Add(new UserTeam { UserId = id, UserAction = userActionToSet });
 			}
+			else
+			{
+				var user = dbTeam.UserTeams.FirstOrDefault(x => x.UserId == id);
+				user.UserAction = userActionToSet;
+			}
+
+			context.Update(dbTeam);
+			context.SaveChanges();
 
 			return Json(dbTeam);
 		}
