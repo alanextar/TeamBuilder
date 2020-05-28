@@ -12,9 +12,9 @@ export function getPage(params) {
     return api.get(Urls.Users.GetPage, params);
 };
 
-export function confirm(data) {
-    console.log(`users.confirm`);
-    return api.post(Urls.Users.Confirm, data);
+export function saveOrConfirm(data) {
+    console.log(`users.saveOrConfirm`);
+    return api.post(Urls.Users.SaveOrConfirm, data);
 };
 
 export function checkConfirmation(id) {

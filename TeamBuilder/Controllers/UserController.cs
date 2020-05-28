@@ -25,7 +25,7 @@ namespace TeamBuilder.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> Confirm([FromBody]ProfileViewModel profileViewModel)
+		public async Task<IActionResult> SaveOrConfirm([FromBody]ProfileViewModel profileViewModel)
 		{
 			logger.LogInformation($"POST Request Confirm. Body: {JsonConvert.SerializeObject(profileViewModel)}");
 

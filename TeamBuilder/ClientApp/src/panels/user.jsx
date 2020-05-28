@@ -68,16 +68,9 @@ class User extends React.Component {
         const { setRecruitTeams } = this.props;
         Api.Users.get(id).then(data => { setUser(data); this.setState({ user: data }) });
 
-        //fetch(`/api/user/get/?id=${id}`)
-        //    .then(response => response.json())
-        //    .then(data => { setUser(data); this.setState({ user: data }) });
-
         if (this.state.profileUser && this.state.profileUser.anyTeamOwner && this.state.user.isSearchable) {
             Api.Users.getRecruitTeams(this.state.vkProfile.id, id)
                 .then(data => { setRecruitTeams(data); this.setState({ recruitTeams: data }) });
-            //fetch(`/api/user/getRecruitTeams?vkProfileId=${this.state.vkProfile.id}&&id=${id}`)
-            //    .then(response => response.json())
-            //    .then(data => { setRecruitTeams(data); this.setState({ recruitTeams: data }) });
         }
 
     }
@@ -117,15 +110,11 @@ class User extends React.Component {
             photo200
         };
 
-        let saveOrConfirm = await fetch('/api/user/confirm', {
-            method: 'post',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(profileViewModel),
-        });
-
-        let user = await saveOrConfirm.json()
-        setUser(user);
-        setProfileUser(user);
+        Api.Users.saveOrConfirm(profileViewModel)
+            .then(user => {
+                setUser(user);
+                setProfileUser(user);
+            });
     }
 
     onSkillsChange(selectedSkills) {
@@ -140,15 +129,15 @@ class User extends React.Component {
         this.setState({ isSearchable: !this.state.isSearchable })
     };
 
-    async populateSkills() {
-        const result = await fetch('/api/skill/getall');
-        const allSkillsJson = await result.json();
+    populateSkills() {
+        Api.Skills.getAll()
+            .then(allSkillsJson => {
+                var options = allSkillsJson && allSkillsJson.map(function (skill) {
+                    return { id: skill.id, label: skill.name };
+                });
 
-        var options = allSkillsJson && allSkillsJson.map(function (skill) {
-            return { id: skill.id, label: skill.name };
-        });
-
-        this.setState({ allSkills: options });
+                this.setState({ allSkills: options });
+            })
     }
 
     render() {

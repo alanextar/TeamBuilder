@@ -69,11 +69,11 @@ const App = (props) => {
         async function fetchData() {
             const profile = await bridge.send('VKWebAppGetUserInfo');
             setProfile(profile);
-
-            let response = await fetch(`/api/user/get/?id=${profile.id}`);
-            let user = await response.json();
-            setUser(user);
-            setProfileUser(user);
+            Api.Users.get(profile.id).then(user => {
+                setUser(user);
+                setProfileUser(user);
+            });
+            
             setEvent(event);
         }
         fetchData();
