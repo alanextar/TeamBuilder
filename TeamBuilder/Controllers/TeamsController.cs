@@ -166,7 +166,7 @@ namespace TeamBuilder.Controllers
 		[HttpPost]
 		public async Task<IActionResult> RejectedOrRemoveUser([FromBody]ManageUserTeamViewModel model)
 		{
-			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");
+			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(model)}");
 
 			if (!await accessChecker.CanManageTeam(model.TeamId))
 				return Forbid();
@@ -198,7 +198,7 @@ namespace TeamBuilder.Controllers
 		[HttpPost]
 		public async Task<IActionResult> CancelRequestUser([FromBody]ManageUserTeamViewModel model)
 		{
-			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");
+			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(model)}");
 
 			if (!await accessChecker.CanManageTeam(model.TeamId))
 				return Forbid();
@@ -223,19 +223,22 @@ namespace TeamBuilder.Controllers
 			return Json(team);
 		}
 
-		public IActionResult JoinTeam(long userId, long teamId)
+		public async Task<IActionResult> JoinTeam(long userId, long teamId)
 		{
-			logger.LogInformation("Request JoinTeamm");
+			logger.LogInformation($"GET Request {HttpContext.Request.Headers[":path"]}");
+			
+			if (!await accessChecker.CanManageTeam(teamId))
+				return Forbid();
 
-			var user = context.Users
+			var user = await context.Users
 				.Include(x => x.UserTeams)
-				.FirstOrDefault(u => u.Id == userId);
+				.FirstOrDefaultAsync(u => u.Id == userId);
 
 			var userTeamToJoin = user.UserTeams.First(x => x.TeamId == teamId);
 			userTeamToJoin.UserAction = UserActionEnum.JoinedTeam;
 
 			context.Update(user);
-			context.SaveChanges();
+			await context.SaveChangesAsync();
 
 			var updTeam = context.Teams
 				.Include(x => x.UserTeams)

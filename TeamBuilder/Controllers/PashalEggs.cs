@@ -42,8 +42,10 @@ namespace TeamBuilder.Controllers
 						User = ut,
 						UserAction = (UserActionEnum)random.Next(1, 6)
 					}));
-				team.UserTeams[random.Next(0, team.UserTeams.Count)].IsOwner = true;
 				team.Event = events[random.Next(0, events.Count)];
+				var id = random.Next(0, team.UserTeams.Count);
+				team.UserTeams[id].IsOwner = true;
+				team.UserTeams[id].UserAction = UserActionEnum.None;
 			}
 
 			foreach (var @event in events)

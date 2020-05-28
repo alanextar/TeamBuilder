@@ -13,7 +13,7 @@ import { setEvent } from "../store/events/actions"
 
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import Icon24Filter from '@vkontakte/icons/dist/24/filter';
-import { getConfirmedCount } from "../infrastructure/utils";
+import { countConfirmed } from "../infrastructure/utils";
 
 const Teams = props => {
     const { setPage, setTeam, setTeamsTeam, setEvent, event } = props;
@@ -125,7 +125,7 @@ const Teams = props => {
                                         before={<Avatar size={64} src={team.photo100} />}
                                         text={team.description}
                                         caption={team.event && team.event.name}
-                                        after={getConfirmedCount(team.userTeams) +
+                                        after={countConfirmed(team.userTeams) +
                                             '/' + team.numberRequiredMembers}
                                         onClick={() => { setPage('teams', 'teaminfo'); setTeam(team); setTeamsTeam(team) }}
                                     >

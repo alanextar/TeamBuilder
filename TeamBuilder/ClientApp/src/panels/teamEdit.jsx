@@ -91,33 +91,32 @@ class TeamEdit extends React.Component {
 
     async handleJoin(e, userTeam) {
         e.stopPropagation();
-        Api.Users.joinTeam(userTeam.userId, userTeam.teamId)
-            .then(result => this.updateUserTeamsState(result));
+        Api.Teams.joinTeam(userTeam.userId, userTeam.teamId)
+            .then(newTeam => {
+                console.log('on joinTeam ', JSON.stringify(newTeam));
+                this.updateTeam(newTeam)
+            });
     };
 
     async dropUser(e, userTeam) {
-        await Api.Teams.rejectedOrRemoveUser({ teamId: userTeam.teamId, userId: userTeam.userId })
-            .then(userTeams => {
+        Api.Teams.rejectedOrRemoveUser({ teamId: userTeam.teamId, userId: userTeam.userId })
+            .then(newTeam => {
                 //console.log('on drop click ', JSON.stringify(userTeams))
-                this.updateUserTeamsState(userTeams);
+                this.updateTeam(newTeam);
             })
     };
 
     async cancelUser(e, userTeam) {
-        await Api.Teams.cancelRequestUser({ teamId: userTeam.teamId, userId: userTeam.userId })
-            .then(userTeams => {
-                console.log('on cancel click ', JSON.stringify(userTeams))
-
-                this.updateUserTeamsState(userTeams)
+        Api.Teams.cancelRequestUser({ teamId: userTeam.teamId, userId: userTeam.userId })
+            .then(newTeam => {
+                console.log('on cancel click ', JSON.stringify(newTeam))
+                this.updateTeam(newTeam)
             })
     };
 
-    updateUserTeamsState(userTeams) {
+    updateTeam(newTeam) {
         const { setTeam } = this.props;
-        var team = this.state.team;
-        team.userTeams = userTeams;
-        this.setState({ team: team });
-        setTeam(team);
+        setTeam(newTeam);
     }
 
     render() {
