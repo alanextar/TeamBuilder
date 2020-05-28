@@ -21,6 +21,7 @@ import Icon28Users from '@vkontakte/icons/dist/28/users';
 import Icon28Profile from '@vkontakte/icons/dist/28/profile';
 import Icon28Users3Outline from '@vkontakte/icons/dist/28/users_3_outline';
 import Icon28FavoriteOutline from '@vkontakte/icons/dist/28/favorite_outline';
+import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 
 import Events from './panels/events'
 import EventCreate from './panels/eventCreate'
