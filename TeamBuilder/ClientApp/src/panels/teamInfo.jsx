@@ -137,11 +137,10 @@ class TeamInfo extends React.Component {
                     {this.state.profileUser ?
                         <PanelHeaderContent
                             aside={<Icon16Dropdown style={{ transform: `rotate(${this.state.contextOpened ? '180deg' : '0'})` }} />}
-                            onClick={(e) => { console.log('Dropdown'); this.toggleContext(); }}
-                        >
-                            {this.state.team && this.state.team.name.length > 15 ? `${this.state.team.name.substring(0, 15)}...` : this.state.team.name}
+                            onClick={(e) => { console.log('Dropdown'); this.toggleContext(); }}>
+                            Команда
                         </PanelHeaderContent> :
-                        this.state.team.name}
+                        `Команда`}
                 </PanelHeader>
                 {this.state.team && <PanelHeaderContext opened={this.state.contextOpened} onClose={this.toggleContext}>
                     {(isOwner || isModerator) &&
@@ -215,8 +214,13 @@ class TeamInfo extends React.Component {
                         {this.state.team && (
                             this.state.activeTab === 'teamDescription' ?
                                 <Cell>
-                                    <SimpleCell>
-                                        <InfoRow header='Описание команды'>
+                                    <SimpleCell multiline>
+                                        <InfoRow header="Название">
+                                            {this.state.team.name}
+                                        </InfoRow>
+                                    </SimpleCell>
+                                    <SimpleCell multiline>
+                                        <InfoRow header='Описание'>
                                             {this.state.team.description}
                                         </InfoRow>
                                     </SimpleCell>
@@ -228,6 +232,16 @@ class TeamInfo extends React.Component {
                                 </Cell>
                                 :
                                 <Cell>
+                                    <SimpleCell>
+                                        <InfoRow header="Мы ищем">
+                                            {this.state.team.numberRequiredMembers} участников
+                                        </InfoRow>
+                                    </SimpleCell>
+                                    <SimpleCell multiline>
+                                        <InfoRow header="Описание участников и их задач">
+                                            {this.state.team.descriptionRequiredMembers}
+                                        </InfoRow>
+                                    </SimpleCell>
                                     <Div>
                                         <InfoRow header='Участники'>
                                             Требуется {this.state.team.numberRequiredMembers} участников
@@ -259,11 +273,6 @@ class TeamInfo extends React.Component {
                                                     )
                                                 }
                                                 )}
-                                        </InfoRow>
-                                    </Div>
-                                    <Div>
-                                        <InfoRow header='Описание задач'>
-                                            {this.state.team.descriptionRequiredMembers}
                                         </InfoRow>
                                     </Div>
                                 </Cell>)}

@@ -12,7 +12,7 @@ import {
 import { Api } from '../infrastructure/api';
 
 const EventCreate = props => {
-    const [eventName, setEventName] = useState(null);
+    const [eventName, setEventName] = useState('');
     const [eventDescription, setEventDescription] = useState('');
     const [eventLink, setEventLink] = useState('');
     const [eventStartDate, setEventStartDate] = useState('');

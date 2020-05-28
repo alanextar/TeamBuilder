@@ -125,7 +125,7 @@ class TeamEdit extends React.Component {
         return (
             <Panel id={this.state.panelId}>
                 <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
-                    {this.state.team && this.state.team.name}
+                    Редактировать
                 </PanelHeader>
                 <Tabs>
                     <TabsItem
@@ -144,7 +144,7 @@ class TeamEdit extends React.Component {
                         this.state.activeTab === 'teamDescription' ?
                             <FormLayout >
                                 <Input top="Название команды" type="text" defaultValue={this.state.team.name}
-                                    onChange={this.onNameChange} status={this.state.name ? 'valid' : 'error'} placeholder='Введите название команды' />
+                                    onChange={this.onNameChange} status={this.state.team.name ? 'valid' : 'error'} placeholder='Введите название команды' />
                                 <Textarea top="Описание команды" defaultValue={this.state.team.description} onChange={this.onDescriptionChange} />
                                 <Select
                                     top="Выберете событие"
@@ -214,11 +214,11 @@ class TeamEdit extends React.Component {
 
                             </Cell>
                     )}
-                <Div>
-                    <Button
-                        stretched
-                        onClick={() => { this.state.team.name && this.postEdit(); goBack() }}>
-                        Применить Изменения
+                    <Div>
+                        <Button
+                            stretched
+                            onClick={() => { this.state.team.name && this.postEdit(); goBack() }}>
+                            Применить Изменения
                         </Button>
                     </Div>
                 </Group>
