@@ -131,9 +131,10 @@ const Users = props => {
                                         bottom={stringfySkills(user.skills)}
                                         text={user.about ? user.about : 'Хороший человек'}
                                         onClick={() => {
-                                            setPage('users', 'user');
                                             setUser(user);
-                                            setParticipantUser(user)
+                                            console.log('before setParticipantUser!!!!!!!!!!', user);
+                                            setParticipantUser(user);
+                                            setPage('users', 'user');
                                         }}
                                     >
                                         {user.firstName} {user.lastName}
@@ -147,13 +148,6 @@ const Users = props => {
     );
 };
 
-const mapStateToProps = (state) => {
-    return {
-        participantUser: state.user.participantUser
-    };
-};
-
-
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
@@ -161,4 +155,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Users);
+export default connect(null, mapDispatchToProps)(Users);

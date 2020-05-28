@@ -86,39 +86,37 @@ class TeamEdit extends React.Component {
             eventId: this.state.team.eventId
         }
         Api.Teams.edit(editTeamViewModel)
-            .then(t => setTeam(t));
+            .then(t => { setTeam(t) });
     };
 
     async handleJoin(e, userTeam) {
         e.stopPropagation();
-        Api.Users.joinTeam(userTeam.userId, userTeam.teamId)
-            .then(result => this.updateUserTeamsState(result));
+        Api.Teams.joinTeam(userTeam.userId, userTeam.teamId)
+            .then(newTeam => {
+                console.log('on joinTeam ', JSON.stringify(newTeam));
+                this.updateTeam(newTeam)
+            });
     };
 
     async dropUser(e, userTeam) {
-        await Api.Teams.rejectedOrRemoveUser({ teamId: userTeam.teamId, userId: userTeam.userId })
-            .then(userTeams => {
-                console.log('on drop click ', JSON.stringify(userTeams))
-
-                this.updateUserTeamsState(userTeams);
+        Api.Teams.rejectedOrRemoveUser({ teamId: userTeam.teamId, userId: userTeam.userId })
+            .then(newTeam => {
+                //console.log('on drop click ', JSON.stringify(userTeams))
+                this.updateTeam(newTeam);
             })
     };
 
     async cancelUser(e, userTeam) {
-        await Api.Teams.cancelRequestUser({ teamId: userTeam.teamId, userId: userTeam.userId })
-            .then(userTeams => {
-                console.log('on cancel click ', JSON.stringify(userTeams))
-
-                this.updateUserTeamsState(userTeams)
+        Api.Teams.cancelRequestUser({ teamId: userTeam.teamId, userId: userTeam.userId })
+            .then(newTeam => {
+                console.log('on cancel click ', JSON.stringify(newTeam))
+                this.updateTeam(newTeam)
             })
     };
 
-    updateUserTeamsState(userTeams) {
+    updateTeam(newTeam) {
         const { setTeam } = this.props;
-        var team = this.state.team;
-        team.userTeams = userTeams;
-        this.setState({ team: team });
-        setTeam(team);
+        setTeam(newTeam);
     }
 
     render() {
@@ -127,7 +125,7 @@ class TeamEdit extends React.Component {
         return (
             <Panel id={this.state.panelId}>
                 <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
-                    {this.state.team && this.state.team.name}
+                    Редактировать
                 </PanelHeader>
                 <Tabs>
                     <TabsItem
@@ -145,7 +143,8 @@ class TeamEdit extends React.Component {
                     {this.state.team && (
                         this.state.activeTab === 'teamDescription' ?
                             <FormLayout >
-                                <Input top="Название команды" type="text" defaultValue={this.state.team.name} onChange={this.onNameChange} />
+                                <Input top="Название команды" type="text" defaultValue={this.state.team.name}
+                                    onChange={this.onNameChange} status={this.state.team.name ? 'valid' : 'error'} placeholder='Введите название команды' />
                                 <Textarea top="Описание команды" defaultValue={this.state.team.description} onChange={this.onDescriptionChange} />
                                 <Select
                                     top="Выберете событие"
@@ -218,7 +217,7 @@ class TeamEdit extends React.Component {
                     <Div>
                         <Button
                             stretched
-                            onClick={() => { this.postEdit(); goBack() }}>
+                            onClick={() => { this.state.team.name && this.postEdit(); goBack() }}>
                             Применить Изменения
                         </Button>
                     </Div>

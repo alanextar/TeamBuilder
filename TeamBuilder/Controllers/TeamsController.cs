@@ -51,7 +51,7 @@ namespace TeamBuilder.Controllers
 				var isEqual = team.Name.ToLowerInvariant().Contains(search?.ToLowerInvariant() ?? string.Empty);
 				if (eventId != null)
 				{
-					isEqual = team.Event.Id == eventId && isEqual;
+					isEqual = team.EventId == eventId && isEqual;
 				}
 				return isEqual;
 			}
@@ -166,7 +166,7 @@ namespace TeamBuilder.Controllers
 		[HttpPost]
 		public async Task<IActionResult> RejectedOrRemoveUser([FromBody]ManageUserTeamViewModel model)
 		{
-			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");
+			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(model)}");
 
 			if (!await accessChecker.CanManageTeam(model.TeamId))
 				return Forbid();
@@ -192,13 +192,13 @@ namespace TeamBuilder.Controllers
 			context.Update(userTeam);
 			await context.SaveChangesAsync();
 
-			return Json(team.UserTeams);
+			return Json(team);
 		}
 
 		[HttpPost]
 		public async Task<IActionResult> CancelRequestUser([FromBody]ManageUserTeamViewModel model)
 		{
-			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");
+			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(model)}");
 
 			if (!await accessChecker.CanManageTeam(model.TeamId))
 				return Forbid();
@@ -220,7 +220,31 @@ namespace TeamBuilder.Controllers
 			context.Remove(userTeam);
 			await context.SaveChangesAsync();
 
-			return Json(team.UserTeams);
+			return Json(team);
+		}
+
+		public async Task<IActionResult> JoinTeam(long userId, long teamId)
+		{
+			logger.LogInformation($"GET Request {HttpContext.Request.Headers[":path"]}");
+			
+			if (!await accessChecker.CanManageTeam(teamId))
+				return Forbid();
+
+			var user = await context.Users
+				.Include(x => x.UserTeams)
+				.FirstOrDefaultAsync(u => u.Id == userId);
+
+			var userTeamToJoin = user.UserTeams.First(x => x.TeamId == teamId);
+			userTeamToJoin.UserAction = UserActionEnum.JoinedTeam;
+
+			context.Update(user);
+			await context.SaveChangesAsync();
+
+			var updTeam = context.Teams
+				.Include(x => x.UserTeams)
+				.ThenInclude(y => y.User).FirstOrDefault(x => x.Id == teamId);
+
+			return Json(updTeam);
 		}
 	}
 }

@@ -17,7 +17,7 @@ export class Api {
         edit: (data) => users.edit(data),
         joinTeam: (userId, teamId) => users.joinTeam(userId, teamId),
         quitOrDeclineTeam: (userId, teamId) => users.quitOrDeclineTeam(userId, teamId),
-        setTeam: (userId, teamId) => users.setTeam(userId, teamId),
+        setTeam: (id, teamId, isTeamOffer) => users.setTeam(id, teamId, isTeamOffer),
         getOwnerTeams: (id) => users.getOwnerTeams(id)
     };
 
@@ -39,7 +39,8 @@ export class Api {
         edit: (data) => teams.edit(data),
         delete: (data) => teams.remove(data),
         rejectedOrRemoveUser: (data) => teams.rejectedOrRemoveUser(data),
-        cancelRequestUser: (data) => teams.cancelRequestUser(data)
+        cancelRequestUser: (data) => teams.cancelRequestUser(data),
+        joinTeam: (userId, teamId) => teams.joinTeam(userId, teamId),
     };
 
     static get = (url, params = {}) => api.get(url, params);
@@ -62,7 +63,8 @@ export class Urls {
         Edit: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/edit`,
         PagingSearch: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/pagingSearch`,
         RejectedOrRemoveUser: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/rejectedOrRemoveUser`,
-        CancelRequestUser: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/cancelRequestUser`
+        CancelRequestUser: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/cancelRequestUser`,
+        JoinTeam: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/joinTeam`,
     };
 
     static Users = {

@@ -1,6 +1,7 @@
 import {
     SET_USER, SET_PROFILE, SET_PROFILE_USER, SET_EVENT_USER,
-    SET_TEAM_USER, SET_PARTICIPANT_USER, SET_USER_SKILLS, SET_ALL_SKILLS
+    SET_TEAM_USER, SET_PARTICIPANT_USER, SET_USER_SKILLS, SET_ALL_SKILLS,
+    SET_RECRUIT_TEAMS
 } from './actionTypes';
 
 const initialState = {
@@ -11,7 +12,6 @@ export const userReducer = (state = initialState, action) => {
 
     switch (action.type) {
         case SET_USER: {
-            console.log('SET_USER', action.payload.user);
             return {
                 ...state,
                 user: action.payload.user
@@ -62,6 +62,13 @@ export const userReducer = (state = initialState, action) => {
             return {
                 ...state,
                 allSkills: AllSkills
+            };
+        }
+        case SET_RECRUIT_TEAMS: {
+
+            return {
+                ...state,
+                recruitTeams: action.payload.recruitTeams
             };
         }
 

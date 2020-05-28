@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
 import { goBack, setPage } from "../store/router/actions";
 import { setTeam } from "../store/teams/actions";
-import { setUser, setTeamUser } from "../store/user/actions";
+import { setUser, setTeamUser, setProfileUser } from "../store/user/actions";
 
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell, InfoRow,
@@ -16,6 +16,8 @@ import {
 import Icon28MessageOutline from '@vkontakte/icons/dist/28/message_outline';
 import Icon28EditOutline from '@vkontakte/icons/dist/28/edit_outline';
 import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
+import userTeams from './userTeams';
+import { countConfirmed } from "../infrastructure/utils";
 
 class TeamInfo extends React.Component {
     constructor(props) {
@@ -43,9 +45,16 @@ class TeamInfo extends React.Component {
         this.toggleContext = this.toggleContext.bind(this);
     }
 
-     componentDidMount() {
-         this.populateTeamData();
-     }
+    componentDidMount() {
+        this.populateTeamData();
+    }
+
+    componentDidUpdate(prevProps) {
+        // Typical usage (don't forget to compare props):
+        if (this.props.activeTeam !== prevProps.activeTeam) {
+            this.setState({ team: this.props.activeTeam });
+        }
+    }
 
     async populateTeamData() {
         const { setTeam } = this.props;
@@ -57,34 +66,70 @@ class TeamInfo extends React.Component {
         this.setState({ contextOpened: !this.state.contextOpened });
     };
 
-    async sendRequest(e, user, team) {
-        await Api.Users.setTeam({ userId: user.id, teamId: team.id })
+    async sendRequest() {
+        const { setProfileUser } = this.props;
+
+        let id = this.state.vkProfile.id;
+        let teamId = this.state.team.id
+        let isTeamOffer = false;
+
+        await Api.Users.setTeam(id, teamId, isTeamOffer)
             .then(json => {
-                this.setState({ team: json })
+                this.setState({ team: json });
+                var user = this.state.profileUser;
+                user.userAction = 1; // отправил запрос, может отозвать заявку
+                setProfileUser(user);
             })
     };
 
-    async dropUser(e, userTeam) {
-        await Api.Teams.rejectedOrRemoveUser({ teamId: userTeam.teamId, userId: userTeam.userId })
+
+    async joinTeam() {
+        var teamId = this.state.team.id;
+        var userId = this.state.profileUser.id;
+
+        await Api.Teams.joinTeam(userId, teamId)
+            .then(data => {
+                //console.log('on jonTeam click ', JSON.stringify(data))
+                this.setState({ team: data });
+            })
+    };
+
+    async dropUser() {
+        var userId = this.state.profileUser.id;
+        var teamId = this.state.team.id;
+
+        await Api.Teams.rejectedOrRemoveUser({ teamId: teamId, userId: userId })
             .then(json => {
-                console.log('on drop click ', JSON.stringify(json))
+                //console.log('on drop click ', JSON.stringify(json))
                 this.setState({ team: json })
             })
     };
 
     async cancelUser(e, userTeam) {
-        await Api.Teams.cancelRequestUser({ teamId: userTeam.teamId, userId: userTeam.userId })
+        let teamId = userTeam.teamId;
+        let userId = userTeam.userId;
+
+        await Api.Teams.cancelRequestUser({ teamId, userId })
             .then(json => {
-                console.log('on cancel click ', JSON.stringify(json))
-                this.setState({ team: json })
+                //console.log('on cancel click ', JSON.stringify(json))
+                this.setState({ team: json });
+                var profileUser = profileUser;
+                profileUser.userAction = 1;
+                setProfileUser(profileUser);
             })
     };
 
     render() {
+        //костыль
         const { goBack, setTeamUser, setUser, setPage, activeView } = this.props;
-        let user = this.state.vkProfile && this.state.team.userTeams &&
+        let userInActiveTeam = this.state.vkProfile && this.state.team.userTeams &&
             this.state.team.userTeams.find(user => user.userId === this.state.vkProfile.id);
-        let userAction = user && user.userAction;
+        let isUserInActiveTeam = userInActiveTeam != null;
+        let isOwner = isUserInActiveTeam && userInActiveTeam && userInActiveTeam.isOwner;
+        let isModerator = this.state.profileUser && this.state.profileUser.isModerator;
+        let userAction = userInActiveTeam && userInActiveTeam.userAction;
+        let confirmedUser = countConfirmed(this.state.team.userTeams);
+        let teamCap = this.state.team.userTeams.find(x => x.isOwner) && this.state.team.userTeams.find(x => x.isOwner).user
 
         return (
             <Panel id={this.state.panelId}>
@@ -92,17 +137,16 @@ class TeamInfo extends React.Component {
                     {this.state.profileUser ?
                         <PanelHeaderContent
                             aside={<Icon16Dropdown style={{ transform: `rotate(${this.state.contextOpened ? '180deg' : '0'})` }} />}
-                            onClick={(e) => { console.log('Dropdown'); this.toggleContext(); }}
-                        >
-                            {this.state.team && this.state.team.name.length > 15 ? `${this.state.team.name.substring(0, 15)}...` : this.state.team.name}
+                            onClick={(e) => { console.log('Dropdown'); this.toggleContext(); }}>
+                            Команда
                         </PanelHeaderContent> :
-                        this.state.team.name}
+                        `Команда`}
                 </PanelHeader>
                 {this.state.team && <PanelHeaderContext opened={this.state.contextOpened} onClose={this.toggleContext}>
-                    {user && user.userId === this.state.vkProfile.id &&
+                    {(isOwner || isModerator) &&
                         <List>
                             <Cell
-                            onClick={() => setPage(activeView, 'teamEdit')}
+                                onClick={() => setPage(activeView, 'teamEdit')}
                             >
                                 Редактировать команду
                             </Cell>
@@ -115,26 +159,27 @@ class TeamInfo extends React.Component {
                         </List>
                         || userAction === 2 &&
                         <List>
-                            <Cell onClick={(e) => this.dropUser(e, user)}>
+                            <Cell onClick={(e) => this.dropUser(e, userInActiveTeam)}>
                                 удалиться из команды
                             </Cell>
                         </List>
                         || userAction === 5 &&
                         <List>
-                        <Cell
-                            onClick={() => setPage(activeView, 'teamEdit')}
+                            <Cell
+                                onClick={() => this.joinTeam()}
                             >
-                                Принять заявку /// nonono add teamcontroller
+                                Принять заявку
                             </Cell>
                             <Cell
-                                onClick={(e) => this.cancelUser(e, user)}
+                                onClick={(e) => this.cancelUser(e, userInActiveTeam)}
                             >
                                 Отклонить заявку
                             </Cell>
                         </List>
-                        || this.state.team.userTeams.length < this.state.team.numberRequiredMembers &&
+                        || (!isUserInActiveTeam || userAction == 3 || userAction == 4) &&
+                        confirmedUser < this.state.team.numberRequiredMembers &&
                         <List>
-                            <Cell onClick={(e) => this.sendRequest(e, this.state.vkProfile, this.state.team)}>
+                            <Cell onClick={() => this.sendRequest()}>
                                 Подать заявку в команду
                             </Cell>
                         </List>
@@ -169,8 +214,13 @@ class TeamInfo extends React.Component {
                         {this.state.team && (
                             this.state.activeTab === 'teamDescription' ?
                                 <Cell>
-                                    <SimpleCell>
-                                        <InfoRow header='Описание команды'>
+                                    <SimpleCell multiline>
+                                        <InfoRow header="Название">
+                                            {this.state.team.name}
+                                        </InfoRow>
+                                    </SimpleCell>
+                                    <SimpleCell multiline>
+                                        <InfoRow header='Описание'>
                                             {this.state.team.description}
                                         </InfoRow>
                                     </SimpleCell>
@@ -182,9 +232,29 @@ class TeamInfo extends React.Component {
                                 </Cell>
                                 :
                                 <Cell>
+                                    <SimpleCell>
+                                        <InfoRow header="Мы ищем">
+                                            {this.state.team.numberRequiredMembers} участников
+                                        </InfoRow>
+                                    </SimpleCell>
+                                    <SimpleCell multiline>
+                                        <InfoRow header="Описание участников и их задач">
+                                            {this.state.team.descriptionRequiredMembers}
+                                        </InfoRow>
+                                    </SimpleCell>
                                     <Div>
                                         <InfoRow header='Участники'>
                                             Требуется {this.state.team.numberRequiredMembers} участников
+                                            {teamCap && <SimpleCell key={-1}
+                                                onClick={() => {
+                                                    setPage(activeView, 'user');
+                                                    setUser(teamCap);
+                                                    setTeamUser(teamCap)
+                                                }}
+                                                before={<Avatar size={48} src={teamCap.photo100} />}
+                                                after={<Icon28MessageOutline />}>
+                                                {teamCap.fullName}
+                                            </SimpleCell>}
                                             {this.state.team.userTeams &&
                                                 this.state.team.userTeams.map((userTeam, i) => {
                                                     return (
@@ -195,19 +265,14 @@ class TeamInfo extends React.Component {
                                                                 setUser(userTeam.user);
                                                                 setTeamUser(userTeam.user)
                                                             }}
-                                                            before={<Avatar size={48} src={userTeam.user.photo100} />}
+                                                            before={<Avatar size={48} src={userTeam.user && userTeam.user.photo100} />}
                                                             after={<Icon28MessageOutline />}>
-                                                            {userTeam.user.fullName}
+                                                            {userTeam.user && userTeam.user.fullName}
                                                         </SimpleCell>
 
                                                     )
                                                 }
                                                 )}
-                                        </InfoRow>
-                                    </Div>
-                                    <Div>
-                                        <InfoRow header='Описание задач'>
-                                            {this.state.team.descriptionRequiredMembers}
                                         </InfoRow>
                                     </Div>
                                 </Cell>)}
@@ -231,7 +296,7 @@ const mapStateToProps = (state) => {
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
-        ...bindActionCreators({ setPage, setTeam, setUser, goBack, setTeamUser }, dispatch)
+        ...bindActionCreators({ setPage, setTeam, setUser, goBack, setTeamUser, setProfileUser }, dispatch)
     }
 }
 

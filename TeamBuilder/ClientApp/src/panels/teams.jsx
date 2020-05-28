@@ -9,18 +9,21 @@ import InfiniteScroll from 'react-infinite-scroller';
 import { Api, Urls } from '../infrastructure/api';
 import useDebounce from '../infrastructure/use-debounce';
 import { setTeam, setTeamsTeam } from "../store/teams/actions";
+import { setEvent } from "../store/events/actions"
 
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import Icon24Filter from '@vkontakte/icons/dist/24/filter';
+import { countConfirmed } from "../infrastructure/utils";
 
 const Teams = props => {
-    const { setPage, setTeam, setTeamsTeam } = props;
+    const { setPage, setTeam, setTeamsTeam, setEvent, event } = props;
 
     const [isSearching, setIsSearching] = useState(false);
     const [fetching, setFetching] = useState(false);
 
     const [hasMoreItems, setHasMoreItems] = useState(true);
     const [nextHref, setNextHref] = useState(null);
+    const [filtredEvent, setFiltredEvent] = useState(props.event && props.event.id);
 
     const [items, setItems] = useState([]);
 
@@ -30,9 +33,10 @@ const Teams = props => {
     useEffect(
         () => {
             console.log("search if")
+            console.log("search filtredEvent", props)
             console.log(`search.debouncedSearchTerm ${debouncedSearchTerm}`)
             setIsSearching(true);
-            Api.Teams.pagingSearch(debouncedSearchTerm)
+            Api.Teams.pagingSearch(debouncedSearchTerm, { eventId: props.event && props.event.id })
                 .then(result => {
                     setItems(result.collection);
                     setNextHref(result.nextHref);
@@ -40,7 +44,7 @@ const Teams = props => {
                     setIsSearching(false);
                 });
         },
-        [debouncedSearchTerm]
+        [debouncedSearchTerm, props.event]
     )
 
     const onRefresh = () => {
@@ -105,7 +109,7 @@ const Teams = props => {
                 </PanelHeader>
             <Search value={searchTerm} onChange={e => setSearchTerm(e.target.value)} after={null}
                 icon={<Icon24Filter />}
-                onIconClick={props.onFiltersClick} />
+                onIconClick={e => { console.log('in oniconclick'); props.onFiltersClick(e);  }} />
             <PullToRefresh onRefresh={onRefresh} isFetching={fetching}>
                 {isSearching ? loader :
                     <InfiniteScroll
@@ -116,11 +120,13 @@ const Teams = props => {
                         <CardGrid style={{ marginBottom: 10 }}>
                             {items && items.map(team => (
                                 <Card size="l" mode="shadow" key={team.id}>
+                                    {console.log('maper users', team.userTeams.map(x => x.userAction === 2 || x.isOwner))}
                                     <RichCell
                                         before={<Avatar size={64} src={team.photo100} />}
                                         text={team.description}
                                         caption={team.event && team.event.name}
-                                        after={team.userTeams.length + '/' + team.numberRequiredMembers}
+                                        after={countConfirmed(team.userTeams) +
+                                            '/' + team.numberRequiredMembers}
                                         onClick={() => { setPage('teams', 'teaminfo'); setTeam(team); setTeamsTeam(team) }}
                                     >
                                         {team.name}
@@ -135,11 +141,18 @@ const Teams = props => {
     )
 };
 
+const mapStateToProps = (state) => {
+    return {
+        event: state.event.event
+    }
+};
+
 const mapDispatchToProps = {
     setPage,
     setTeam,
     setTeamsTeam,
-    goBack
+    goBack, 
+    setEvent
 };
 
-export default connect(null, mapDispatchToProps)(Teams);
+export default connect(mapStateToProps, mapDispatchToProps)(Teams);
