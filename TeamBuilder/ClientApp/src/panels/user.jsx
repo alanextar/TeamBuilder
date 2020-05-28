@@ -146,7 +146,7 @@ class User extends React.Component {
                 {this.state.vkUser &&
                     <Group title="VK Connect">
                     <Link href={"https://m.vk.com/id" + this.state.user.id} target="_blank">
-                        <Cell description={this.state.vkUser.city && this.state.vkUser.city.title ? this.state.vkUser.city.title : ''}
+                        <Cell expandable description={this.state.vkUser.city && this.state.vkUser.city.title ? this.state.vkUser.city.title : ''}
                             before={this.state.vkUser.photo_200 ? <Avatar src={this.state.vkUser.photo_200} /> : null}>
                             {`${this.state.vkUser.first_name} ${this.state.vkUser.last_name}`}
                         </Cell>

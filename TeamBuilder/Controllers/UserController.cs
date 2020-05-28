@@ -266,12 +266,9 @@ namespace TeamBuilder.Controllers
 			return Json(result);
 		}
 
-		public async Task<IActionResult> GetPage(int pageSize = 20, int page = 0, bool prev = false)
+		public IActionResult GetPage(int pageSize = 20, int page = 0, bool prev = false)
 		{
 			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
-
-			if (!context.Users.Any())
-				await Initialize();
 
 			if (pageSize == 0)
 				return NoContent();
@@ -285,18 +282,6 @@ namespace TeamBuilder.Controllers
 			logger.LogInformation($"Response UsersCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
 									  $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
 			return Json(result);
-		}
-
-		private async Task Initialize()
-		{
-			var file = await System.IO.File.ReadAllTextAsync(@"DemoDataSets\users.json");
-			var fileSkills = await System.IO.File.ReadAllTextAsync(@"DemoDataSets\skills.json");
-			var users = JsonConvert.DeserializeObject<User[]>(file);
-			var skills = JsonConvert.DeserializeObject<Skill[]>(fileSkills);
-
-			await context.Users.AddRangeAsync(users);
-			await context.Skills.AddRangeAsync(skills);
-			await context.SaveChangesAsync();
 		}
 
 		#endregion

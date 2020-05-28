@@ -7,7 +7,7 @@ import { setEvent } from "../store/events/actions";
 import { setTeam, setEventsTeam } from "../store/teams/actions";
 
 import {
-    Panel, PanelHeader, Group, SimpleCell, InfoRow, Header, FixedLayout,
+    Panel, PanelHeader, Group, SimpleCell, InfoRow, Header, Avatar, Div,
     PanelHeaderBack, Cell, List, PanelHeaderContent, PanelHeaderContext
 } from '@vkontakte/vkui';
 import Icon28EditOutline from '@vkontakte/icons/dist/28/edit_outline';
@@ -68,9 +68,29 @@ const EventInfo = props => {
                         {props.event && props.event.startDate} - {props.event && props.event.finishDate}
                     </InfoRow>
                 </SimpleCell>
-                Добавить команды
-                //TO-DO не забыть setTeam(team); setEventsTeam(team)
             </Group>
+            {props.event.teams &&
+                <Group>
+                    <Header mode="secondary">Участвующие команды</Header>
+                    {props.event.teams.map(team => {
+                        return (
+                            <Cell
+                                key={team.id}
+                                expandable
+                                indicator={+team.userTeams.map(x => x.userAction === 2 || x.isOwner).reduce((a, b) => a + b) + '/' + team.numberRequiredMembers}
+                                onClick={() => {
+                                    setTeam(team);
+                                    setEventsTeam(team);
+                                    setPage(activeView, 'teaminfo')
+                                }}
+                                before={<Avatar size={48} src={team.photo100} />}>
+                                {team.name}
+                            </Cell>
+
+                        )
+                    }
+                    )}
+                </Group>}
         </Panel>
     );
 }

@@ -94,7 +94,7 @@ const Events = props => {
                     <PanelHeaderButton>
                         <Icon28AddOutline onClick={() => { setPage('events', 'eventCreate'); }} />
                     </PanelHeaderButton>}>
-                Мероприятия
+                События
                 </PanelHeader>
             <Search value={searchTerm} onChange={e => setSearchTerm(e.target.value)} after={null} />
             <PullToRefresh onRefresh={onRefresh} isFetching={fetching}>
