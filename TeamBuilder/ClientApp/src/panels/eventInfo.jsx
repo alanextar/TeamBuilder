@@ -10,6 +10,7 @@ import {
     PanelHeaderBack, Cell, List, PanelHeaderContent, PanelHeaderContext
 } from '@vkontakte/vkui';
 import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
+import { countConfirmed } from "../infrastructure/utils";
 
 const EventInfo = props => {
     const { goBack, setPage, setTeam, setEventsTeam, activeView } = props;
@@ -77,7 +78,7 @@ const EventInfo = props => {
                             <Cell
                                 key={team.id}
                                 expandable
-                                indicator={+team.userTeams.map(x => x.userAction === 2 || x.isOwner).reduce((a, b) => a + b) + '/' + team.numberRequiredMembers}
+                                indicator={countConfirmed(team.userTeams) + '/' + team.numberRequiredMembers}
                                 onClick={() => {
                                     setTeam(team);
                                     setEventsTeam(team);
