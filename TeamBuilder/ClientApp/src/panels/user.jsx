@@ -63,12 +63,17 @@ class User extends React.Component {
 
     fetchUserData(id) {
         const { setRecruitTeams } = this.props;
+        //TO-DO преобразовать в один запрос типа getProfileUserWithRelation - получить профиль с командами в которые можно вербовать юзера
         Api.Users.get(id).then(user => {
             setUser(user);
             let selectedSkills = user && user.userSkills && user.userSkills.map(function (userSkill) {
                 return { id: userSkill.skillId, label: userSkill.skill.name };
             })
             this.setState({ user: user, selectedSkills: selectedSkills });
+        });
+
+        Api.Users.get(this.state.vkProfile.id).then(user => {
+            setProfileUser(user);
         });
 
         if (this.state.profileUser && this.state.profileUser.anyTeamOwner && this.state.user.isSearchable) {
