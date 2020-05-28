@@ -9,7 +9,6 @@ import '@vkontakte/vkui/dist/vkui.css';
 import bridge from '@vkontakte/vk-bridge';
 import { bindActionCreators } from 'redux'
 import { goBack, closeModal, setStory } from "./store/router/actions";
-import { setParticipant } from "./store/participants/actions";
 import { setTeam, setTeamsTeam, setEventsTeam, setUserTeam, setUsersTeam } from "./store/teams/actions";
 import {
     setUser, setProfile, getUser, setProfileUser, setTeamUser,
@@ -192,7 +191,12 @@ const App = (props) => {
             >
                 <Users id='users' />
                 <User id='user' />
+                <SetUserTeam id='setUserTeam' />
                 <TeamInfo id='teaminfo' />
+                <TeamEdit id='teamEdit' />
+                <EventCreate id='eventCreate' owner={props.profile} />
+                <EventInfo id='eventInfo' />
+                <EventEdit id='eventEdit' owner={props.profile} />
             </View>
             <View id='events' activePanel={getActivePanel("events")}
                 history={history}>
@@ -229,7 +233,7 @@ const mapStateToProps = (state) => {
         profileUser: state.user.profileUser,
         eventUser: state.user.eventUser,
         teamUser: state.user.teamUser,
-        participant: state.participant.participant,
+        participantUser: state.user.participantUser,
         teamsTeam: state.team.teamsTeam,
         userTeam: state.team.userTeam,
         usersTeam: state.team.usersTeam,
@@ -244,7 +248,7 @@ function mapDispatchToProps(dispatch) {
         dispatch,
         ...bindActionCreators({
             setStory, goBack, closeModal, setProfile, setUser, setProfileUser,
-            setEventUser, setTeamUser, setParticipantUser, setTeam, setTeamsTeam,
+            setEventUser, setTeamUser, setTeam, setTeamsTeam,
             setEventsTeam, setUsersTeam, setUserTeam
         }, dispatch)
     }

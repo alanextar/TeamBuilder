@@ -37,9 +37,12 @@ namespace TeamBuilder.Controllers
 			if (user == null)
 			{
 				user = new User { Id = profileViewModel.Id };
-				foreach (var skillId in profileViewModel.SkillsIds)
+				if (profileViewModel.SkillsIds != null)
 				{
-					user.UserSkills.Add(new UserSkill() { SkillId = skillId });
+					foreach (var skillId in profileViewModel.SkillsIds)
+					{
+						user.UserSkills.Add(new UserSkill() { SkillId = skillId });
+					}
 				}
 
 				await context.Users.AddAsync(user);
@@ -108,11 +111,14 @@ namespace TeamBuilder.Controllers
 				.ThenInclude(y => y.Skill)
 				.FirstOrDefault(u => u.Id == id);
 
-			user.UserTeams = user.UserTeams.Where(x => x.UserAction == UserActionEnum.ConsideringOffer || 
-				x.UserAction == UserActionEnum.JoinedTeam || 
+			if (user?.UserTeams != null)
+			{
+				user.UserTeams = user.UserTeams.Where(x => x.UserAction == UserActionEnum.ConsideringOffer ||
+				x.UserAction == UserActionEnum.JoinedTeam ||
 				x.UserAction == UserActionEnum.SentRequest || x.IsOwner).ToList();
 
-			user.AnyTeamOwner = user.UserTeams.Any(x => x.IsOwner);
+				user.AnyTeamOwner = user.UserTeams.Any(x => x.IsOwner);
+			}
 
 			return Json(user);
 		}
@@ -146,7 +152,6 @@ namespace TeamBuilder.Controllers
 			logger.LogInformation("Request Edit");
 
 			var dbUser = context.Users.FirstOrDefault(u => u.Id == user.Id);
-			dbUser.City = user.City;
 			dbUser.Mobile = user.Mobile;
 			dbUser.Email = user.Email;
 			dbUser.About = user.About;
