@@ -1,7 +1,7 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 
-import { goBack, setPage } from '../store/router/actions';
+import { goBack } from '../store/router/actions';
 import { setEvent } from "../store/events/actions";
 
 import useDebounce from '../infrastructure/use-debounce';
@@ -10,11 +10,10 @@ import {
     PanelHeaderBack, CardGrid, Card
 } from '@vkontakte/vkui';
 import InfiniteScroll from 'react-infinite-scroller';
-import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import { Api, Urls } from '../infrastructure/api';
 
 const EventsFilter = props => {
-    const { setPage, setEvent, goBack } = props;
+    const { setEvent, goBack } = props;
 
     const [isSearching, setIsSearching] = useState(false);
     const [fetching, setFetching] = useState(false);
@@ -53,7 +52,6 @@ const EventsFilter = props => {
                 });
         }
         else {
-            console.log("refresh")
             Api.Events.getPage()
                 .then(result => {
                     setItems(result.collection);
@@ -69,7 +67,6 @@ const EventsFilter = props => {
         if (nextHref) {
             url = nextHref;
         }
-        console.log(`load.url: ${url}`);
         Api.get(url)
             .then(e => {
                 var itemsTemp = items;
@@ -121,7 +118,6 @@ const EventsFilter = props => {
 };
 
 const mapDispatchToProps = {
-    setPage,
     setEvent,
     goBack
 };

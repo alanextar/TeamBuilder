@@ -23,7 +23,6 @@ const Teams = props => {
 
     const [hasMoreItems, setHasMoreItems] = useState(true);
     const [nextHref, setNextHref] = useState(null);
-    const [filtredEvent, setFiltredEvent] = useState(props.event && props.event.id);
 
     const [items, setItems] = useState([]);
 
@@ -32,9 +31,6 @@ const Teams = props => {
 
     useEffect(
         () => {
-            console.log("search if")
-            console.log("search filtredEvent", props)
-            console.log(`search.debouncedSearchTerm ${debouncedSearchTerm}`)
             setIsSearching(true);
             Api.Teams.pagingSearch(debouncedSearchTerm, { eventId: props.event && props.event.id })
                 .then(result => {
@@ -50,7 +46,6 @@ const Teams = props => {
     const onRefresh = () => {
         setFetching(true);
         if (searchTerm) {
-            console.log(`Refresh if`)
             Api.Teams.pagingSearch(debouncedSearchTerm)
                 .then(result => {
                     setItems(result.collection);
@@ -60,12 +55,8 @@ const Teams = props => {
                 });
         }
         else {
-            console.log(`Refresh else`)
             Api.Teams.getPage()
                 .then(result => {
-
-                    console.log(`Refresh result.collection ${result.collection.length}`)
-                    console.log(`Refresh result.nextHref ${result.nextHref}`)
                     setItems(result.collection);
                     setNextHref(result.nextHref);
                     setHasMoreItems(result.nextHref ? true : false);
@@ -79,8 +70,6 @@ const Teams = props => {
         if (nextHref) {
             url = nextHref;
         }
-        console.log(`teams.loadItems.url: ${url}`)
-        console.log(`teams.loadItems.items: ${items.length}`)
         Api.get(url)
             .then(e => {
                 var itemsTemp = items;
@@ -114,7 +103,7 @@ const Teams = props => {
                 }
             <Search value={searchTerm} onChange={e => setSearchTerm(e.target.value)} after={null}
                 icon={<Icon24Filter />}
-                onIconClick={e => { console.log('in oniconclick'); props.onFiltersClick(e); }} />
+                onIconClick={e => { props.onFiltersClick(e); }} />
             <PullToRefresh onRefresh={onRefresh} isFetching={fetching}>
                 {isSearching ? loader :
                     <InfiniteScroll
@@ -125,7 +114,6 @@ const Teams = props => {
                         <CardGrid style={{ marginBottom: 10 }}>
                             {items && items.map(team => (
                                 <Card size="l" mode="shadow" key={team.id}>
-                                    {console.log('maper users', team.userTeams.map(x => x.userAction === 2 || x.isOwner))}
                                     <RichCell
                                         before={<Avatar size={64} src={team.photo100} />}
                                         text={team.description}

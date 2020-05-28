@@ -9,7 +9,6 @@ import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell,
     Div, Button, Textarea, FormLayout, Select, Input, Slider, FixedLayout
 } from '@vkontakte/vkui';
-import qwest from 'qwest';
 import { Api } from '../infrastructure/api';
 
 class TeamCreate extends React.Component {
@@ -71,10 +70,7 @@ class TeamCreate extends React.Component {
         }
         let result = await Api.Teams.create(createTeamViewModel)
 
-        console.log(`result: ${result}`);
-        console.log(`result.str: ${JSON.stringify(result)}`);
         setTeam(result);
-        console.log(`End PostCreate`);
         setPage('teams', 'teaminfo');
     }
 

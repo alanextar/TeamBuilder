@@ -53,7 +53,6 @@ const Events = props => {
                 });
         }
         else {
-            console.log("refresh")
             Api.Events.getPage()
                 .then(result => {
                     setItems(result.collection);
@@ -69,7 +68,6 @@ const Events = props => {
         if (nextHref) {
             url = nextHref;
         }
-        console.log(`load.url: ${url}`);
         Api.get(url)
             .then(e => {
                 var itemsTemp = items;

@@ -2,7 +2,7 @@
 import {
     View, Epic, Tabbar, TabbarItem, ModalRoot, ModalPage, ModalPageHeader,
     PanelHeaderButton, FormLayout, SelectMimicry,
-    IS_PLATFORM_IOS, IS_PLATFORM_ANDROID
+    IS_PLATFORM_IOS
 } from '@vkontakte/vkui';
 import { connect } from 'react-redux';
 import '@vkontakte/vkui/dist/vkui.css';
@@ -11,13 +11,12 @@ import { bindActionCreators } from 'redux'
 import { goBack, closeModal, setStory, setPage } from "./store/router/actions";
 import { setTeam, setTeamsTeam, setEventsTeam, setUserTeam, setUsersTeam } from "./store/teams/actions";
 import {
-    setUser, setProfile, getUser, setProfileUser, setTeamUser,
+    setUser, setProfile, setProfileUser, setTeamUser,
     setEventUser, setParticipantUser
 } from "./store/user/actions";
 import { setEvent } from "./store/events/actions"
 import { getActivePanel } from "./services/_functions";
 
-import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 import Icon24Done from '@vkontakte/icons/dist/24/done';
 import Icon28Users from '@vkontakte/icons/dist/28/users';
 import Icon28Profile from '@vkontakte/icons/dist/28/profile';
@@ -41,8 +40,6 @@ import UserEdit from './panels/userEdit'
 import SetUserTeam from './panels/setUserTeam'
 
 import { Api } from './infrastructure/api';
-//import { setTeam } from './infrastructure/apiUsers';
-import { users } from './demo_dataset';
 
 const App = (props) => {
     let lastAndroidBackAction = 0;
@@ -155,15 +152,13 @@ const App = (props) => {
                                 <ModalPageHeader
                                     left={<PanelHeaderButton onClick={e => setEvent(null)}>Сбросить</PanelHeaderButton>}
                                     right={<PanelHeaderButton
-                                        onClick={() => { hideModal();  console.log('click on filter') }}>{IS_PLATFORM_IOS ? 'Готово' : <Icon24Done />}</PanelHeaderButton>}
+                                        onClick={() => { hideModal(); }}>{IS_PLATFORM_IOS ? 'Готово' : <Icon24Done />}</PanelHeaderButton>}
                                 >
                                     Фильтры
                                 </ModalPageHeader>
                             }>
-                            {console.log('event after filter', props)}
                             {events &&
                                 <FormLayout>
-                                    {console.log('events', props)}
                                     <SelectMimicry top="Соревнования" placeholder="Не выбрано"
                                         onClick={() => {
                                             setPage('teams', 'eventsFilter');
@@ -175,7 +170,7 @@ const App = (props) => {
                         </ModalPage>
                     </ModalRoot>}
             >
-                <Teams id='teams' activeStory={activeStory} href={teamHref} onFiltersClick={(e) => { console.log('onfilterclick'); setActiveModal('filters'); }}/>
+                <Teams id='teams' activeStory={activeStory} href={teamHref} onFiltersClick={(e) => {setActiveModal('filters'); }}/>
                 <TeamInfo id='teaminfo' return='teams' />
                 <TeamCreate id='teamCreate' />
                 <TeamEdit id='teamEdit' />
@@ -242,7 +237,6 @@ const mapStateToProps = (state) => {
         usersTeam: state.team.usersTeam,
         eventsTeam: state.team.eventsTeam,
         event: state.event.event
-        // colorScheme: state.vkui.colorScheme
     };
 };
 

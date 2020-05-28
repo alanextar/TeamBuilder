@@ -7,12 +7,11 @@ import {
     CardGrid, Card
 } from '@vkontakte/vkui';
 import InfiniteScroll from 'react-infinite-scroller';
-import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import Icon24Work from '@vkontakte/icons/dist/24/work';
 import { Api, Urls } from '../infrastructure/api';
 
 import { setUser, setParticipantUser } from "../store/user/actions";
-import { goBack, setPage } from '../store/router/actions';
+import { setPage } from '../store/router/actions';
 
 const Users = props => {
     const { setParticipantUser, setUser, setPage } = props;
@@ -30,7 +29,6 @@ const Users = props => {
 
     useEffect(
         () => {
-            console.log("search if")
             setIsSearching(true);
             Api.Users.pagingSearch(debouncedSearchTerm)
                 .then(result => {
@@ -57,7 +55,6 @@ const Users = props => {
                 });
         }
         else {
-            console.log("refresh")
             Api.Users.getPage()
                 .then(result => {
                     setItems(result.collection);
@@ -77,7 +74,6 @@ const Users = props => {
         if (nextHref) {
             url = nextHref;
         }
-        console.log(`load.url: ${url}`);
         Api.get(url)
             .then(e => {
                 var itemsTemp = items;
@@ -132,7 +128,6 @@ const Users = props => {
                                         text={user.about ? user.about : 'Хороший человек'}
                                         onClick={() => {
                                             setUser(user);
-                                            console.log('before setParticipantUser!!!!!!!!!!', user);
                                             setParticipantUser(user);
                                             setPage('users', 'user');
                                         }}

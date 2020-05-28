@@ -1,5 +1,5 @@
 ﻿import React from 'react';
-import { Api, Urls } from '../infrastructure/api';
+import { Api } from '../infrastructure/api';
 
 import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
@@ -8,8 +8,8 @@ import { setTeam } from "../store/teams/actions";
 
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell,
-    Div, Button, Textarea, FormLayout, Select, Input, Slider, InfoRow, Avatar,
-    RichCell, FixedLayout
+    Div, Button, Textarea, FormLayout, Select, Input, InfoRow, Avatar,
+    RichCell
 } from '@vkontakte/vkui';
 
 import Icon24DismissDark from '@vkontakte/icons/dist/24/dismiss_dark';
@@ -38,7 +38,6 @@ class TeamEdit extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        // Typical usage (don't forget to compare props):
         if (this.props.activeTeam !== prevProps.activeTeam) {
             this.setState({ team: this.props.activeTeam });
         }
@@ -93,7 +92,6 @@ class TeamEdit extends React.Component {
         e.stopPropagation();
         Api.Teams.joinTeam(userTeam.userId, userTeam.teamId)
             .then(newTeam => {
-                console.log('on joinTeam ', JSON.stringify(newTeam));
                 this.updateTeam(newTeam)
             });
     };
@@ -101,7 +99,6 @@ class TeamEdit extends React.Component {
     async dropUser(e, userTeam) {
         Api.Teams.rejectedOrRemoveUser({ teamId: userTeam.teamId, userId: userTeam.userId })
             .then(newTeam => {
-                //console.log('on drop click ', JSON.stringify(userTeams))
                 this.updateTeam(newTeam);
             })
     };
@@ -109,7 +106,6 @@ class TeamEdit extends React.Component {
     async cancelUser(e, userTeam) {
         Api.Teams.cancelRequestUser({ teamId: userTeam.teamId, userId: userTeam.userId })
             .then(newTeam => {
-                console.log('on cancel click ', JSON.stringify(newTeam))
                 this.updateTeam(newTeam)
             })
     };
@@ -166,14 +162,6 @@ class TeamEdit extends React.Component {
                             :
                             <Cell>
                                 <FormLayout >
-                                    {/*<Slider
-                                        step={1}
-                                        min={0}
-                                        max={50}
-                                        value={Number(this.state.usersNumber)}
-                                        onChange={usersNumber => this.setState({ usersNumber })}
-                                        top="Количество участников в команде"
-                                    />*/}
                                     <Input value={String(this.state.usersNumber)} onChange={e => this.setState({ usersNumber: e.target.value })} type="number" />
                                     <Textarea
                                         top="Описание участников и их задач"
