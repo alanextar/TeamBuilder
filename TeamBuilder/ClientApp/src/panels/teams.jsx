@@ -102,10 +102,7 @@ const Teams = props => {
         <Panel id={props.id}>
             {props.profileUser ?
                 <PanelHeader separator={false}
-                    left={
-                        <PanelHeaderButton>
-                            <Icon28AddOutline onClick={() => { setPage('teams', 'teamCreate'); }} />
-                        </PanelHeaderButton>}>
+                    left={<PanelHeaderButton onClick={() => { setPage('teams', 'teamCreate'); }}>Создать</PanelHeaderButton>}>
                     Команды
                 </PanelHeader> :
                 <PanelHeader separator={false}>

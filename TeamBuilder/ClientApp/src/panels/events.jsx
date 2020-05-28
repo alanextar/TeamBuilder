@@ -91,10 +91,7 @@ const Events = props => {
         <Panel id={props.id}>
             {props.profileUser ?
                 <PanelHeader separator={false}
-                    left={
-                        <PanelHeaderButton>
-                            <Icon28AddOutline onClick={() => { setPage('events', 'eventCreate'); }} />
-                        </PanelHeaderButton>}>
+                    left={<PanelHeaderButton onClick={() => { setPage('events', 'eventCreate'); }}>Создать</PanelHeaderButton>}>
                     События
                 </PanelHeader> :
                 <PanelHeader separator={false}>
