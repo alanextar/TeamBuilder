@@ -125,7 +125,7 @@ const EventsFilter = props => {
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
-        ...bindActionCreators({ setPage, setTeamsEventFilter, goBack }, dispatch)
+        ...bindActionCreators({ setTeamsEventFilter, goBack }, dispatch)
     }
 }
 
