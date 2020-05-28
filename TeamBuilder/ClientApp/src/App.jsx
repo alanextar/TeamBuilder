@@ -13,7 +13,7 @@ import {
     setUser, setProfile, setProfileUser, setTeamUser,
     setEventUser, setParticipantUser
 } from "./store/user/actions";
-import { setEvent } from "./store/events/actions"
+import { setEvent, setTeamsEventFilter } from "./store/events/actions"
 import { getActivePanel } from "./services/_functions";
 
 import Icon24Done from '@vkontakte/icons/dist/24/done';
@@ -47,7 +47,7 @@ const App = (props) => {
 
     const { setStory, activeView, activeStory, panelsHistory, setProfile, setUser,
         setProfileUser, profileUser, teamUser, eventUser, participantUser, teamsTeam, setPage, setEvent, event,
-        eventsTeam, userTeam, usersTeam, setTeam
+        eventsTeam, userTeam, usersTeam, setTeam, setTeamsEventFilter
     } = props;
     let history = (panelsHistory[activeView] === undefined) ? [activeView] : panelsHistory[activeView];
 
@@ -153,7 +153,7 @@ const App = (props) => {
                             onClose={hideModal}
                             header={
                                 <ModalPageHeader
-                                    left={<PanelHeaderButton onClick={e => {setEvent(null); hideModal();}}><Icon24Cancel /></PanelHeaderButton>}
+                                    left={<PanelHeaderButton onClick={e => {setTeamsEventFilter(null); hideModal();}}><Icon24Cancel /></PanelHeaderButton>}
                                     right={<PanelHeaderButton
                                         onClick={() => { hideModal(); }}>{platform === IOS ? 'Готово' : <Icon24Done />}</PanelHeaderButton>}
                                 >
@@ -162,12 +162,12 @@ const App = (props) => {
                             }>
                             {events &&
                                 <FormLayout>
-                                    <SelectMimicry top="Соревнования" placeholder="Не выбрано"
+                                    <SelectMimicry top="События" placeholder="Не выбрано"
                                         onClick={() => {
                                             setPage('teams', 'eventsFilter');
                                             hideModal();
                                     }}>
-                                    {props.event && props.event.name}
+                                    {props.teamsEventFilter && props.teamsEventFilter.name}
                                     </SelectMimicry>
                                 </FormLayout>}
                         </ModalPage>
@@ -239,7 +239,8 @@ const mapStateToProps = (state) => {
         userTeam: state.team.userTeam,
         usersTeam: state.team.usersTeam,
         eventsTeam: state.team.eventsTeam,
-        event: state.event.event
+        event: state.event.event,
+        teamsEventFilter: state.event.teamsEventFilter
     };
 };
 
@@ -250,7 +251,7 @@ function mapDispatchToProps(dispatch) {
         ...bindActionCreators({
             setStory, goBack, closeModal, setProfile, setUser, setProfileUser, setPage, setEvent,
             setEventUser, setTeamUser, setParticipantUser, setTeam, setTeamsTeam,
-            setEventsTeam, setUsersTeam, setUserTeam
+            setEventsTeam, setUsersTeam, setUserTeam, setTeamsEventFilter
         }, dispatch)
     }
 }

@@ -9,14 +9,13 @@ import InfiniteScroll from 'react-infinite-scroller';
 import { Api, Urls } from '../infrastructure/api';
 import useDebounce from '../infrastructure/use-debounce';
 import { setTeam, setTeamsTeam } from "../store/teams/actions";
-import { setEvent } from "../store/events/actions"
 
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import Icon24Filter from '@vkontakte/icons/dist/24/filter';
 import { countConfirmed } from "../infrastructure/utils";
 
 const Teams = props => {
-    const { setPage, setTeam, setTeamsTeam, setEvent, event } = props;
+    const { setPage, setTeam, setTeamsTeam } = props;
 
     const [isSearching, setIsSearching] = useState(false);
     const [fetching, setFetching] = useState(false);
@@ -32,7 +31,7 @@ const Teams = props => {
     useEffect(
         () => {
             setIsSearching(true);
-            Api.Teams.pagingSearch(debouncedSearchTerm, { eventId: props.event && props.event.id })
+            Api.Teams.pagingSearch(debouncedSearchTerm, { eventId: props.teamsEventFilter && props.teamsEventFilter.id })
                 .then(result => {
                     setItems(result.collection);
                     setNextHref(result.nextHref);
@@ -40,7 +39,7 @@ const Teams = props => {
                     setIsSearching(false);
                 });
         },
-        [debouncedSearchTerm, props.event]
+        [debouncedSearchTerm, props.teamsEventFilter]
     )
 
     const onRefresh = () => {
@@ -91,7 +90,10 @@ const Teams = props => {
         <Panel id={props.id}>
             {props.profileUser ?
                 <PanelHeader separator={false}
-                    left={<PanelHeaderButton onClick={() => { setPage('teams', 'teamCreate'); }}>Создать</PanelHeaderButton>}>
+                    left={
+                        <PanelHeaderButton>
+                            <Icon28AddOutline onClick={() => { setPage('teams', 'teamCreate'); }} />
+                        </PanelHeaderButton>}>
                     Команды
                 </PanelHeader> :
                 <PanelHeader separator={false}>
@@ -133,7 +135,7 @@ const Teams = props => {
 
 const mapStateToProps = (state) => {
     return {
-        event: state.event.event,
+        teamsEventFilter: state.event.teamsEventFilter,
         profileUser: state.user.profileUser
     }
 };
@@ -142,8 +144,7 @@ const mapDispatchToProps = {
     setPage,
     setTeam,
     setTeamsTeam,
-    goBack,
-    setEvent
+    goBack
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Teams);
