@@ -55,6 +55,7 @@ const EventEdit = props => {
             .then(result => {
                 setEvent(result);
                 console.log(result);
+                goBack();
             });
     }
 
@@ -66,15 +67,14 @@ const EventEdit = props => {
         </PanelHeader>
 
             <FormLayout>
-                <Input top="Название события" type="text" onChange={onNameChange} defaultValue={eventName}
-                    status={eventName ? 'valid' : 'error'} placeholder="Введите название соревнований" />
-                <Textarea top="Описание события" onChange={onDescriptionChange} defaultValue={eventDescription} />
-                <Input top="Ссылка на событие" type="text" onChange={onLinkChange} defaultValue={eventLink} />
-                <Input top="Дата начала события" type="text" onChange={onStartDateChange} defaultValue={eventStartDate} />
-                <Input top="Дата завершения события" type="text" onChange={onFinishDateChange} defaultValue={eventFinishDate} />
+                <Input top="Название события" type="text" onChange={onNameChange} value={eventName} status={eventName ? 'valid' : 'error'} placeholder="Введите название события" />
+                <Textarea top="Описание события" onChange={onDescriptionChange} value={eventDescription} />
+                <Input top="Ссылка на событие" type="text" onChange={onLinkChange} value={eventLink} />
+                <Input top="Дата начала события" type="text" onChange={onStartDateChange} value={eventStartDate} />
+                <Input top="Дата завершения события" type="text" onChange={onFinishDateChange} value={eventFinishDate} />
                 <Button
                     size='xl'
-                    onClick={() => { eventName && eventEdit(); goBack() }}>
+                    onClick={() => {  eventName && eventEdit(); }}>
                     Сохранить
                 </Button>
             </FormLayout>

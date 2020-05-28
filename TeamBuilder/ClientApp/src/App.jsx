@@ -182,7 +182,9 @@ const App = (props) => {
                 <User id='user' />
                 <SetUserTeam id='setUserTeam' />
                 <EventCreate id='eventCreate' />
-                <EventsFilter id='eventsFilter' openFilter={(e) => setActiveModal('filters')} /> 
+                <EventInfo id='eventInfo' />
+                <EventsFilter id='eventsFilter' openFilter={(e) => setActiveModal('filters')} />
+                <EventEdit id='eventEdit' owner={props.profile} />
             </View>
             <View id='users' activePanel={getActivePanel("users")}
                 history={history}

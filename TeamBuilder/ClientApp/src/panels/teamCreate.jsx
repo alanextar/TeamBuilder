@@ -79,7 +79,7 @@ class TeamCreate extends React.Component {
     }
 
     render() {
-        const { id, goBack, setPage, setTeam } = this.props;
+        const { id, goBack, setPage, setTeam, activeView } = this.props;
         return (
             <Panel id={this.state.id}>
                 <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
@@ -126,9 +126,7 @@ class TeamCreate extends React.Component {
                                 })}
 
                             </Select>
-                            <Button onClick={this.state.go}
-                                data-to={'eventCreate'}
-                                data-from={this.state.id}>Создать Событие</Button>
+                            <Button onClick={() => setPage(activeView, 'eventCreate')}>Создать Событие</Button>
                         </FormLayout>
                         :
                         <Cell>
@@ -164,6 +162,13 @@ class TeamCreate extends React.Component {
 
 };
 
+
+const mapStateToProps = (state) => {
+    return {
+        activeView: state.router.activeView
+    };
+};
+
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
@@ -171,4 +176,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(null, mapDispatchToProps)(TeamCreate);
+export default connect(mapStateToProps, mapDispatchToProps)(TeamCreate);

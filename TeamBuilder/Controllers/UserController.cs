@@ -56,6 +56,11 @@ namespace TeamBuilder.Controllers
 				context.Users.Update(user);
 			}
 
+			user.FirstName = profileViewModel.FirstName;
+			user.LastName = profileViewModel.LastName;
+			user.Photo100 = profileViewModel.Photo100;
+			user.Photo200 = profileViewModel.Photo200;
+
 			user.IsSearchable = profileViewModel.IsSearchable;
 
 			await context.SaveChangesAsync();
