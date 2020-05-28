@@ -120,20 +120,21 @@ const Users = props => {
                         <CardGrid style={{ marginBottom: 10 }}>
                             {items && items.map(user => (
                                 <Card size="l" mode="shadow" key={user.id}>
-                                    <RichCell
-                                        before={<Avatar size={48} src={user.photo100} />}
-                                        after={stringfyTeams(user.userTeams)}
-                                        caption={user.city ? user.city : 'Ekaterinburg'}
-                                        bottom={stringfySkills(user.skills)}
-                                        text={user.about ? user.about : 'Хороший человек'}
-                                        onClick={() => {
-                                            setUser(user);
-                                            setParticipantUser(user);
-                                            setPage('users', 'user');
-                                        }}
-                                    >
-                                        {user.firstName} {user.lastName}
-                                    </RichCell>
+                                    {user.isSearchable &&
+                                        <RichCell
+                                            before={<Avatar size={48} src={user.photo100} />}
+                                            after={stringfyTeams(user.userTeams)}
+                                            caption={user.city ? user.city : 'Ekaterinburg'}
+                                            bottom={stringfySkills(user.skills)}
+                                            text={user.about ? user.about : 'Хороший человек'}
+                                            onClick={() => {
+                                                setUser(user);
+                                                setParticipantUser(user);
+                                                setPage('users', 'user');
+                                            }}
+                                        >
+                                            {user.firstName} {user.lastName}
+                                        </RichCell>}
                                 </Card>
                             ))}
                         </CardGrid>
