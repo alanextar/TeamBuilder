@@ -14,9 +14,7 @@ import {
 } from '@vkontakte/vkui';
 
 import Icon28MessageOutline from '@vkontakte/icons/dist/28/message_outline';
-import Icon28EditOutline from '@vkontakte/icons/dist/28/edit_outline';
 import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
-import userTeams from './userTeams';
 import { countConfirmed } from "../infrastructure/utils";
 
 class TeamInfo extends React.Component {
@@ -50,7 +48,6 @@ class TeamInfo extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        // Typical usage (don't forget to compare props):
         if (this.props.activeTeam !== prevProps.activeTeam) {
             this.setState({ team: this.props.activeTeam });
         }
@@ -77,7 +74,7 @@ class TeamInfo extends React.Component {
             .then(json => {
                 this.setState({ team: json });
                 var user = this.state.profileUser;
-                user.userAction = 1; // отправил запрос, может отозвать заявку
+                user.userAction = 1;
                 setProfileUser(user);
             })
     };
@@ -89,7 +86,6 @@ class TeamInfo extends React.Component {
 
         await Api.Teams.joinTeam(userId, teamId)
             .then(data => {
-                //console.log('on jonTeam click ', JSON.stringify(data))
                 this.setState({ team: data });
             })
     };
@@ -100,7 +96,6 @@ class TeamInfo extends React.Component {
 
         await Api.Teams.rejectedOrRemoveUser({ teamId: teamId, userId: userId })
             .then(json => {
-                //console.log('on drop click ', JSON.stringify(json))
                 this.setState({ team: json })
             })
     };
@@ -111,7 +106,6 @@ class TeamInfo extends React.Component {
 
         await Api.Teams.cancelRequestUser({ teamId, userId })
             .then(json => {
-                //console.log('on cancel click ', JSON.stringify(json))
                 this.setState({ team: json });
                 var profileUser = profileUser;
                 profileUser.userAction = 1;
@@ -132,11 +126,11 @@ class TeamInfo extends React.Component {
 
         return (
             <Panel id={this.state.panelId}>
-                <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => { console.log('goback'); goBack(); }} />}>
+                <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => { goBack(); }} />}>
                     {this.state.profileUser ?
                         <PanelHeaderContent
                             aside={<Icon16Dropdown style={{ transform: `rotate(${this.state.contextOpened ? '180deg' : '0'})` }} />}
-                            onClick={(e) => { console.log('Dropdown'); this.toggleContext(); }}>
+                            onClick={(e) => { this.toggleContext(); }}>
                             Команда
                         </PanelHeaderContent> :
                         `Команда`}

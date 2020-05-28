@@ -1,10 +1,7 @@
 ﻿import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
-import {
-    Panel, PanelHeader, Group, Search, List, RichCell, Avatar, PullToRefresh,
-    PanelHeaderButton, Cell, CardGrid, Card, Button
-} from '@vkontakte/vkui';
+import { Group, List, RichCell, CardGrid, Card, Button } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import Icon28CheckCircleOutline from '@vkontakte/icons/dist/28/check_circle_outline';
 import Icon28InfoOutline from '@vkontakte/icons/dist/28/info_outline';

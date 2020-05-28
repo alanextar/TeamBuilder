@@ -1,5 +1,5 @@
 ﻿import React from 'react';
-import { Api, Urls } from '../infrastructure/api';
+import { Api } from '../infrastructure/api';
 
 import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
@@ -38,7 +38,6 @@ class TeamEdit extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        // Typical usage (don't forget to compare props):
         if (this.props.activeTeam !== prevProps.activeTeam) {
             this.setState({ team: this.props.activeTeam });
         }
@@ -99,7 +98,6 @@ class TeamEdit extends React.Component {
         e.stopPropagation();
         Api.Teams.joinTeam(userTeam.userId, userTeam.teamId)
             .then(newTeam => {
-                console.log('on joinTeam ', JSON.stringify(newTeam));
                 this.updateTeam(newTeam)
             });
     };
@@ -107,7 +105,6 @@ class TeamEdit extends React.Component {
     async dropUser(e, userTeam) {
         Api.Teams.rejectedOrRemoveUser({ teamId: userTeam.teamId, userId: userTeam.userId })
             .then(newTeam => {
-                //console.log('on drop click ', JSON.stringify(userTeams))
                 this.updateTeam(newTeam);
             })
     };
@@ -115,7 +112,6 @@ class TeamEdit extends React.Component {
     async cancelUser(e, userTeam) {
         Api.Teams.cancelRequestUser({ teamId: userTeam.teamId, userId: userTeam.userId })
             .then(newTeam => {
-                console.log('on cancel click ', JSON.stringify(newTeam))
                 this.updateTeam(newTeam)
             })
     };

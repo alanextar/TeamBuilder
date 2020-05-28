@@ -70,10 +70,7 @@ class TeamCreate extends React.Component {
         }
         let result = await Api.Teams.create(createTeamViewModel)
 
-        console.log(`result: ${result}`);
-        console.log(`result.str: ${JSON.stringify(result)}`);
         setTeam(result);
-        console.log(`End PostCreate`);
         setPage('teams', 'teaminfo');
     }
 

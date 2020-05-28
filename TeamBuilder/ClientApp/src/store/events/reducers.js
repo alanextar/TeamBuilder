@@ -1,5 +1,5 @@
 import {
-    SET_EVENT, CREATE_EVENT
+    SET_EVENT, SET_EVENTS_EVENT, SET_TEAMS_EVENT_FILTER, CREATE_EVENT
 } from './actionTypes';
 
 const initialState = {
@@ -14,6 +14,13 @@ export const eventReducer = (state = initialState, action) => {
             return {
                 ...state,
                 event: action.payload.event
+            };
+        }
+        case SET_TEAMS_EVENT_FILTER: {
+
+            return {
+                ...state,
+                teamsEventFilter: action.payload.teamsEventFilter
             };
         }
         case CREATE_EVENT: {

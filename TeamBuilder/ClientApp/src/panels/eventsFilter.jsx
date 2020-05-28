@@ -1,8 +1,9 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
+import { bindActionCreators } from "redux";
 
-import { goBack, setPage } from '../store/router/actions';
-import { setEvent } from "../store/events/actions";
+import { goBack } from '../store/router/actions';
+import { setEvent, setTeamsEventFilter } from "../store/events/actions";
 
 import useDebounce from '../infrastructure/use-debounce';
 import {
@@ -10,11 +11,10 @@ import {
     PanelHeaderBack, CardGrid, Card
 } from '@vkontakte/vkui';
 import InfiniteScroll from 'react-infinite-scroller';
-import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import { Api, Urls } from '../infrastructure/api';
 
 const EventsFilter = props => {
-    const { setPage, setEvent, goBack } = props;
+    const { goBack, setTeamsEventFilter } = props;
 
     const [isSearching, setIsSearching] = useState(false);
     const [fetching, setFetching] = useState(false);
@@ -53,7 +53,6 @@ const EventsFilter = props => {
                 });
         }
         else {
-            console.log("refresh")
             Api.Events.getPage()
                 .then(result => {
                     setItems(result.collection);
@@ -69,7 +68,6 @@ const EventsFilter = props => {
         if (nextHref) {
             url = nextHref;
         }
-        console.log(`load.url: ${url}`);
         Api.get(url)
             .then(e => {
                 var itemsTemp = items;
@@ -106,7 +104,11 @@ const EventsFilter = props => {
                                     <RichCell
                                         bottom={`Участвуют ${event.teams && event.teams.length} команд`}
                                         caption={`${event.startDate} - ${event.startDate}`}
-                                        onClick={(e) => { goBack(); setEvent(event); props.openFilter(e) }}
+                                        onClick={(e) => {
+                                            goBack();
+                                            setTeamsEventFilter(event);
+                                            props.openFilter(e)
+                                        }}
                                     >
                                         {event.name}
                                     </RichCell>
@@ -120,10 +122,11 @@ const EventsFilter = props => {
     );
 };
 
-const mapDispatchToProps = {
-    setPage,
-    setEvent,
-    goBack
-};
+function mapDispatchToProps(dispatch) {
+    return {
+        dispatch,
+        ...bindActionCreators({ setTeamsEventFilter, goBack }, dispatch)
+    }
+}
 
 export default connect(null, mapDispatchToProps)(EventsFilter);
