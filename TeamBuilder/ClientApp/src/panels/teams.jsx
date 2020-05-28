@@ -100,16 +100,21 @@ const Teams = props => {
 
     return (
         <Panel id={props.id}>
-            <PanelHeader separator={false}
-                left={
-                    <PanelHeaderButton>
-                        <Icon28AddOutline onClick={() => { setPage('teams', 'teamCreate'); }} />
-                    </PanelHeaderButton>}>
-                Команды
+            {props.profileUser ?
+                <PanelHeader separator={false}
+                    left={
+                        <PanelHeaderButton>
+                            <Icon28AddOutline onClick={() => { setPage('teams', 'teamCreate'); }} />
+                        </PanelHeaderButton>}>
+                    Команды
+                </PanelHeader> :
+                <PanelHeader separator={false}>
+                    Команды
                 </PanelHeader>
+                }
             <Search value={searchTerm} onChange={e => setSearchTerm(e.target.value)} after={null}
                 icon={<Icon24Filter />}
-                onIconClick={e => { console.log('in oniconclick'); props.onFiltersClick(e);  }} />
+                onIconClick={e => { console.log('in oniconclick'); props.onFiltersClick(e); }} />
             <PullToRefresh onRefresh={onRefresh} isFetching={fetching}>
                 {isSearching ? loader :
                     <InfiniteScroll
@@ -120,7 +125,7 @@ const Teams = props => {
                         <CardGrid style={{ marginBottom: 10 }}>
                             {items && items.map(team => (
                                 <Card size="l" mode="shadow" key={team.id}>
-                                    {console.log('maper users', team.userTeams.map(x => x.userAction === 2 || x.isOwner))}
+                                    {/*{console.log('maper users', team.userTeams.map(x => x.userAction === 2 || x.isOwner))}*/}
                                     <RichCell
                                         before={<Avatar size={64} src={team.photo100} />}
                                         text={team.description}
@@ -143,7 +148,8 @@ const Teams = props => {
 
 const mapStateToProps = (state) => {
     return {
-        event: state.event.event
+        event: state.event.event,
+        profileUser: state.user.profileUser
     }
 };
 
@@ -151,7 +157,7 @@ const mapDispatchToProps = {
     setPage,
     setTeam,
     setTeamsTeam,
-    goBack, 
+    goBack,
     setEvent
 };
 
