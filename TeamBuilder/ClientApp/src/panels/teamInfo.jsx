@@ -17,6 +17,7 @@ import Icon28MessageOutline from '@vkontakte/icons/dist/28/message_outline';
 import Icon28EditOutline from '@vkontakte/icons/dist/28/edit_outline';
 import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
 import userTeams from './userTeams';
+import { getUsersInTeamsCount } from "../infrastructure/utils";
 
 class TeamInfo extends React.Component {
     constructor(props) {
@@ -120,16 +121,14 @@ class TeamInfo extends React.Component {
 
     render() {
         //костыль
-        var usersCount = this.state.team.userTeams ? this.state.team.userTeams.length : 0;
         const { goBack, setTeamUser, setUser, setPage, activeView } = this.props;
         let userInActiveTeam = this.state.vkProfile && this.state.team.userTeams &&
             this.state.team.userTeams.find(user => user.userId === this.state.vkProfile.id);
         let isUserInActiveTeam = userInActiveTeam != null;
         let isOwner = isUserInActiveTeam && userInActiveTeam && userInActiveTeam.isOwner;
         let userAction = userInActiveTeam && userInActiveTeam.userAction;
-        let confirmedUser = + this.state.team.userTeams.map(x => x.userAction === 2 || x.isOwner).reduce((a, b) => a + b);
+        let confirmedUser = getUsersInTeamsCount(this.state.team.userTeams);
         let teamCap = this.state.team.userTeams.find(x => x.isOwner) && this.state.team.userTeams.find(x => x.isOwner).user
-
 
         return (
             <Panel id={this.state.panelId}>

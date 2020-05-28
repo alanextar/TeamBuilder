@@ -13,6 +13,7 @@ import { setEvent } from "../store/events/actions"
 
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import Icon24Filter from '@vkontakte/icons/dist/24/filter';
+import { getUsersInTeamsCount } from "../infrastructure/utils";
 
 const Teams = props => {
     const { setPage, setTeam, setTeamsTeam, setEvent, event } = props;
@@ -124,7 +125,8 @@ const Teams = props => {
                                         before={<Avatar size={64} src={team.photo100} />}
                                         text={team.description}
                                         caption={team.event && team.event.name}
-                                        after={ + team.userTeams.map(x => x.userAction === 2 || x.isOwner).reduce((a, b) => a + b) + '/' + team.numberRequiredMembers}
+                                        after={+ getUsersInTeamsCount(team.userTeams) +
+                                            '/' + team.numberRequiredMembers}
                                         onClick={() => { setPage('teams', 'teaminfo'); setTeam(team); setTeamsTeam(team) }}
                                     >
                                         {team.name}
