@@ -26,9 +26,6 @@ class User extends React.Component {
     constructor(props) {
         super(props);
 
-        let selectedSkills = props.user && props.user.userSkills && props.user.userSkills.map(function (userSkill) {
-            return { id: userSkill.skillId, label: userSkill.skill.name };
-        })
         let isSearchable = props.user && props.user.isSearchable;
 
         this.state = {
@@ -39,7 +36,7 @@ class User extends React.Component {
             user: props.user,
             activeTabProfile: 'main',
             selected: false,
-            selectedSkills: selectedSkills,
+            selectedSkills: [],
             isConfirmed: false,
             isSearchable: isSearchable ? isSearchable : false,
             readOnlyMode: props.activeStory != 'user',
@@ -66,7 +63,18 @@ class User extends React.Component {
 
     fetchUserData(id) {
         const { setRecruitTeams } = this.props;
-        Api.Users.get(id).then(data => { setUser(data); this.setState({ user: data }) });
+        //TODO преобразовать в один запрос типа getProfileUserWithRelation - получить профиль с командами в которые можно вербовать юзера
+        Api.Users.get(id).then(user => {
+            setUser(user);
+            let selectedSkills = user && user.userSkills && user.userSkills.map(function (userSkill) {
+                return { id: userSkill.skillId, label: userSkill.skill.name };
+            })
+            this.setState({ user: user, selectedSkills: selectedSkills });
+        });
+
+        Api.Users.get(this.state.vkProfile.id).then(user => {
+            setProfileUser(user);
+        });
 
         if (this.state.profileUser && this.state.profileUser.anyTeamOwner && this.state.user.isSearchable) {
             Api.Users.getRecruitTeams(this.state.vkProfile.id, id)
