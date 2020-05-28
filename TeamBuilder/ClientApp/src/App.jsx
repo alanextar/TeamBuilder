@@ -1,8 +1,7 @@
 ﻿import React, { useState, useEffect } from 'react';
 import {
     View, Epic, Tabbar, TabbarItem, ModalRoot, ModalPage, ModalPageHeader,
-    PanelHeaderButton, FormLayout, SelectMimicry,
-    IS_PLATFORM_IOS
+    PanelHeaderButton, FormLayout, SelectMimicry, ANDROID, IOS, usePlatform
 } from '@vkontakte/vkui';
 import { connect } from 'react-redux';
 import '@vkontakte/vkui/dist/vkui.css';
@@ -43,7 +42,7 @@ import { Api } from './infrastructure/api';
 
 const App = (props) => {
     let lastAndroidBackAction = 0;
-    const [teamHref, setTeamNextHref] = useState(null);
+    const platform = usePlatform();
 
     const { setStory, activeView, activeStory, panelsHistory, setProfile, setUser,
         setProfileUser, profileUser, teamUser, eventUser, participantUser, teamsTeam, setPage, setEvent, event,
@@ -60,6 +59,9 @@ const App = (props) => {
                 const schemeAttribute = document.createAttribute('scheme');
                 schemeAttribute.value = data.scheme ? data.scheme : 'client_light';
                 document.body.attributes.setNamedItem(schemeAttribute);
+                const paddingTop = document.createAttribute('padding-top');
+                paddingTop.value = 'env(safe-area-inset-top)';
+                document.body.attributes.setNamedItem(paddingTop);
             }
         });
 
@@ -150,9 +152,9 @@ const App = (props) => {
                             onClose={hideModal}
                             header={
                                 <ModalPageHeader
-                                    left={<PanelHeaderButton onClick={e => setEvent(null)}>Сбросить</PanelHeaderButton>}
+                                    left={<PanelHeaderButton onClick={e => {setEvent(null); hideModal();}}><Icon24Cancel /></PanelHeaderButton>}
                                     right={<PanelHeaderButton
-                                        onClick={() => { hideModal(); }}>{IS_PLATFORM_IOS ? 'Готово' : <Icon24Done />}</PanelHeaderButton>}
+                                        onClick={() => { hideModal(); }}>{platform === IOS ? 'Готово' : <Icon24Done />}</PanelHeaderButton>}
                                 >
                                     Фильтры
                                 </ModalPageHeader>
@@ -165,12 +167,12 @@ const App = (props) => {
                                             hideModal();
                                     }}>
                                     {props.event && props.event.name}
-                                    </ SelectMimicry>
+                                    </SelectMimicry>
                                 </FormLayout>}
                         </ModalPage>
                     </ModalRoot>}
             >
-                <Teams id='teams' activeStory={activeStory} href={teamHref} onFiltersClick={(e) => {setActiveModal('filters'); }}/>
+                <Teams id='teams' activeStory={activeStory} onFiltersClick={(e) => { setActiveModal('filters'); }}/>
                 <TeamInfo id='teaminfo' return='teams' />
                 <TeamCreate id='teamCreate' />
                 <TeamEdit id='teamEdit' />
