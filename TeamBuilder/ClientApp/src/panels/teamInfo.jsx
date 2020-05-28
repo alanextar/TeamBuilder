@@ -120,7 +120,6 @@ class TeamInfo extends React.Component {
     };
 
     render() {
-        //костыль
         const { goBack, setTeamUser, setUser, setPage, activeView } = this.props;
         let userInActiveTeam = this.state.vkProfile && this.state.team.userTeams &&
             this.state.team.userTeams.find(user => user.userId === this.state.vkProfile.id);
@@ -160,7 +159,7 @@ class TeamInfo extends React.Component {
                         || userAction === 2 &&
                         <List>
                             <Cell onClick={(e) => this.dropUser(e, userInActiveTeam)}>
-                                удалиться из команды
+                                Выйти из команды
                             </Cell>
                         </List>
                         || userAction === 5 &&
@@ -183,7 +182,7 @@ class TeamInfo extends React.Component {
                                 Подать заявку в команду
                             </Cell>
                         </List>
-                        ||
+                        || confirmedUser > this.state.team.numberRequiredMembers &&
                         <List>
                             <Cell>
                                 В команде нет мест
