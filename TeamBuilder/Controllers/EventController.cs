@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using TeamBuilder.Extensions;
 using TeamBuilder.Models;
+using TeamBuilder.Services;
 using TeamBuilder.ViewModels;
 
 namespace TeamBuilder.Controllers
@@ -17,11 +18,13 @@ namespace TeamBuilder.Controllers
 	public class EventController : Controller
 	{
 		private readonly ApplicationContext context;
+		private readonly UserAccessChecker accessChecker;
 		private readonly ILogger<EventController> logger;
 
-		public EventController(ApplicationContext context, ILogger<EventController> logger)
+		public EventController(ApplicationContext context, UserAccessChecker accessChecker, ILogger<EventController> logger)
 		{
 			this.context = context;
+			this.accessChecker = accessChecker;
 			this.logger = logger;
 		}
 
@@ -43,7 +46,7 @@ namespace TeamBuilder.Controllers
 				return NoContent();
 
 			bool Filter(Event @event) => @event.Name.ToLowerInvariant().Contains(search?.ToLowerInvariant() ?? string.Empty);
-			var result = context.Events.Include(e => e.Teams).GetPage(pageSize, HttpContext.Request, page, prev, Filter);
+			var result = context.Events.Include(e => e.Teams).ThenInclude(t => t.UserTeams).GetPage(pageSize, HttpContext.Request, page, prev, Filter);
 			result.NextHref = result.NextHref == null ? null : $"{result.NextHref}&search={search}";
 			logger.LogInformation($"Response EventsCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
 			                      $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
@@ -51,14 +54,11 @@ namespace TeamBuilder.Controllers
 			return Json(result);
 		}
 
-		public async Task<IActionResult> GetPage(int pageSize = 20, int page = 0, bool prev = false)
+		public IActionResult GetPage(int pageSize = 20, int page = 0, bool prev = false)
 		{
 			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
 
-			if (!context.Events.Any())
-				await Initialize();
-
-			var result = context.Events.Include(e => e.Teams).GetPage(pageSize, HttpContext.Request, page, prev);
+			var result = context.Events.Include(e => e.Teams).ThenInclude(t => t.UserTeams).GetPage(pageSize, HttpContext.Request, page, prev);
 			logger.LogInformation($"Response EventsCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
 			                      $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
 
@@ -68,16 +68,15 @@ namespace TeamBuilder.Controllers
 		[HttpPost]
 		public async Task<IActionResult> Create([FromBody]CreateEventViewModel createEventViewModel)
 		{
-			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(createEventViewModel)}");
+			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(createEventViewModel)}"); ;
 
-			var user = await context.Users.FirstOrDefaultAsync(e => e.Id == createEventViewModel.OwnerId);
-
-			//if (user == null)
-			//	return Forbid();
+			if (!accessChecker.IsConfirm(out var profileId))
+				return Forbid();
 
 			var config = new MapperConfiguration(cfg => cfg.CreateMap<CreateEventViewModel, Event>()
 				.ForMember("Teams", opt => opt.Ignore())
-				.ForMember("Owner", opt => opt.MapFrom(_ => user)));
+				.ForMember("Owner", opt => opt.Ignore())
+				.ForMember("OwnerId", opt => opt.MapFrom(_ => profileId)));
 			var mapper = new Mapper(config);
 			var @event = mapper.Map<CreateEventViewModel, Event>(createEventViewModel);
 
@@ -92,11 +91,11 @@ namespace TeamBuilder.Controllers
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(editEventViewModel)}");
 
-			var @event = await context.Events.Include(e => e.Owner).FirstOrDefaultAsync(e => e.Id == editEventViewModel.Id);
+			var eventId = editEventViewModel.Id;
+			if (!await accessChecker.CanManageEvent(eventId))
+				return Forbid();
 
-			var user = await context.Users.FirstOrDefaultAsync(e => e.Id == editEventViewModel.UserId);
-			//if (user == null || @event.Owner.VkId != editEventViewModel.UserId)
-			//	return Forbid();
+			var @event = await context.Events.Include(e => e.Owner).FirstOrDefaultAsync(e => e.Id == eventId);
 
 			var config = new MapperConfiguration(cfg => cfg.CreateMap<EditEventViewModel, Event>()
 				.ForMember("Teams", opt => opt.Ignore())
@@ -115,6 +114,10 @@ namespace TeamBuilder.Controllers
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}.");
 
+			var eventId = id;
+			if (!await accessChecker.CanManageEvent(eventId))
+				return Forbid();
+
 			var @event = await context.Events.FirstOrDefaultAsync(e => e.Id == id);
 			if (@event == null)
 				return NotFound($"Event '{id}' not found");
@@ -123,15 +126,6 @@ namespace TeamBuilder.Controllers
 			await context.SaveChangesAsync();
 
 			return Ok("Deleted");
-		}
-
-		private async Task Initialize()
-		{
-			var file = await System.IO.File.ReadAllTextAsync(@"DemoDataSets\events.json");
-			var events = JsonConvert.DeserializeObject<Event[]>(file);
-
-			await context.Events.AddRangeAsync(events);
-			await context.SaveChangesAsync();
 		}
 	}
 }

@@ -1,4 +1,4 @@
-﻿import * as secrets from './secret';
+﻿import * as secrets from './secret.js';
 
 const initGet = {
     method: 'GET',

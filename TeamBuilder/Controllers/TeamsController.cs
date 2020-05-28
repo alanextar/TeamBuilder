@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using TeamBuilder.Extensions;
 using TeamBuilder.Models.Enums;
+using TeamBuilder.Services;
 using TeamBuilder.ViewModels;
 
 namespace TeamBuilder.Controllers
@@ -17,11 +18,13 @@ namespace TeamBuilder.Controllers
 	public class TeamsController : Controller
 	{
 		private readonly ApplicationContext context;
+		private readonly UserAccessChecker accessChecker;
 		private readonly ILogger<TeamsController> logger;
 
-		public TeamsController(ApplicationContext context, ILogger<TeamsController> logger)
+		public TeamsController(ApplicationContext context, UserAccessChecker accessChecker, ILogger<TeamsController> logger)
 		{
 			this.context = context;
+			this.accessChecker = accessChecker;
 			this.logger = logger;
 		}
 
@@ -48,7 +51,7 @@ namespace TeamBuilder.Controllers
 				var isEqual = team.Name.ToLowerInvariant().Contains(search?.ToLowerInvariant() ?? string.Empty);
 				if (eventId != null)
 				{
-					isEqual = team.Event.Id == eventId && isEqual;
+					isEqual = team.EventId == eventId && isEqual;
 				}
 				return isEqual;
 			}
@@ -68,9 +71,6 @@ namespace TeamBuilder.Controllers
 
 			if (!context.UserTeams.Any())
 				await PashalEggs.Eggs(context);
-
-			if (!context.Teams.Any())
-				await Initialize();
 
 			if (pageSize == 0)
 				return NoContent();
@@ -97,7 +97,8 @@ namespace TeamBuilder.Controllers
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(createTeamViewModel)}");
 
-			var profileId = long.Parse(HttpContext.VkLaunchParams().VkUserId);
+			if (!accessChecker.IsConfirm(out var profileId))
+				return Forbid();
 
 			var @event = await context.Events.FirstOrDefaultAsync(e => e.Id == createTeamViewModel.EventId);
 
@@ -105,14 +106,12 @@ namespace TeamBuilder.Controllers
 				.ForMember("Event", opt => opt.MapFrom(_ => @event)));
 			var mapper = new Mapper(config);
 			var team = mapper.Map<CreateTeamViewModel, Team>(createTeamViewModel);
-			team.UserTeams = new List<UserTeam>();
-
-			team.UserTeams.Add(
+			team.UserTeams = new List<UserTeam>{
 				new UserTeam
 				{
 					IsOwner = true,
 					UserId = profileId
-				});
+				}};
 
 			await context.Teams.AddAsync(team);
 			await context.SaveChangesAsync();
@@ -125,9 +124,13 @@ namespace TeamBuilder.Controllers
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(editTeamViewModel)}");
 
-			var team = await context.Teams.FirstOrDefaultAsync(t => t.Id == editTeamViewModel.Id);
+			var teamId = editTeamViewModel.Id;
+			if (!await accessChecker.CanManageTeam(teamId))
+				return Forbid();
+
+			var team = await context.Teams.FirstOrDefaultAsync(t => t.Id == teamId);
 			if (team == null)
-				return NotFound($"Team '{editTeamViewModel.Id}' not found");
+				return NotFound($"Team '{teamId}' not found");
 
 			var @event = await context.Events.FirstOrDefaultAsync(e => e.Id == editTeamViewModel.EventId);
 
@@ -147,6 +150,9 @@ namespace TeamBuilder.Controllers
 		{
 			logger.LogInformation($"DELETE Request {HttpContext.Request.Headers[":path"]}.");
 
+			if (!await accessChecker.CanManageTeam(id))
+				return Forbid();
+
 			var team = await context.Teams.FirstOrDefaultAsync(t => t.Id == id);
 			if (team == null)
 				return NotFound($"Team '{id}' not found");
@@ -161,6 +167,9 @@ namespace TeamBuilder.Controllers
 		public async Task<IActionResult> RejectedOrRemoveUser([FromBody]ManageUserTeamViewModel model)
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");
+
+			if (!await accessChecker.CanManageTeam(model.TeamId))
+				return Forbid();
 
 			var team = await context.Teams
 				.Include(u => u.UserTeams)
@@ -190,6 +199,9 @@ namespace TeamBuilder.Controllers
 		public async Task<IActionResult> CancelRequestUser([FromBody]ManageUserTeamViewModel model)
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");
+
+			if (!await accessChecker.CanManageTeam(model.TeamId))
+				return Forbid();
 
 			var team = await context.Teams
 				.Include(u => u.UserTeams)
@@ -230,20 +242,6 @@ namespace TeamBuilder.Controllers
 				.ThenInclude(y => y.User).FirstOrDefault(x => x.Id == teamId);
 
 			return Json(updTeam);
-		}
-
-		private async Task Initialize()
-		{
-			var file = await System.IO.File.ReadAllTextAsync(@"DemoDataSets\teams.json");
-			var teams = JsonConvert.DeserializeObject<Team[]>(file);
-			teams = teams.Select(t =>
-			{
-				t.NumberRequiredMembers = new Random().Next(0, 15);
-				return t;
-			}).ToArray();
-
-			await context.Teams.AddRangeAsync(teams);
-			await context.SaveChangesAsync();
 		}
 	}
 }

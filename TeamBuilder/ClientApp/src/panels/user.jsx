@@ -73,7 +73,7 @@ class User extends React.Component {
         if (this.state.profileUser && this.state.profileUser.anyTeamOwner && this.state.user.isSearchable) {
             fetch(`/api/user/getRecruitTeams?vkProfileId=${this.state.vkProfile.id}&&id=${id}`)
                 .then(response => response.json())
-                .then(data => { setRecruitTeams(data); this.setState({ recruitTeams: data }) } );
+                .then(data => { setRecruitTeams(data); this.setState({ recruitTeams: data }) });
         }
 
     }
@@ -146,11 +146,11 @@ class User extends React.Component {
                 {this.state.vkUser &&
                     <Group title="VK Connect">
                         <Link href={"https://m.vk.com/id" + id} target="_blank">
-                        <Cell description={this.state.vkUser.city && this.state.vkUser.city.title ? this.state.vkUser.city.title : ''}
-                            before={this.state.vkUser.photo_200 ? <Avatar src={this.state.vkUser.photo_200} /> : null}>
-                            {`${this.state.vkUser.first_name} ${this.state.vkUser.last_name}`}
-                        </Cell>
-                    </Link>
+                            <Cell description={this.state.vkUser.city && this.state.vkUser.city.title ? this.state.vkUser.city.title : ''}
+                                before={this.state.vkUser.photo_200 ? <Avatar src={this.state.vkUser.photo_200} /> : null}>
+                                {`${this.state.vkUser.first_name} ${this.state.vkUser.last_name}`}
+                            </Cell>
+                        </Link>
                     </Group>}
                 <Separator />
                 <Tabs>

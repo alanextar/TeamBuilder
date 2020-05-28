@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using React.AspNet;
 using Newtonsoft.Json;
+using TeamBuilder.Services;
 
 namespace TeamBuilder
 {
@@ -31,7 +32,8 @@ namespace TeamBuilder
 		{
 			services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(GetConnectionString()));
 
-			services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+			services.AddHttpContextAccessor();
+			services.AddTransient<UserAccessChecker>();
 			services.AddReact();
 
 			services.AddControllersWithViews()
