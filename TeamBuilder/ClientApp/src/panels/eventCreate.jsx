@@ -59,14 +59,14 @@ const EventCreate = props => {
         </PanelHeader>
 
             <FormLayout>
-                <Input top="Название события" type="text" onChange={onNameChange} defaultValue={eventName} />
+                <Input top="Название события" type="text" onChange={onNameChange} defaultValue={eventName} placeholder="Введите название события" status={eventName ? 'valid' : 'error'}  />
                 <Textarea top="Описание события" onChange={onDescriptionChange} defaultValue={eventDescription} />
                 <Input top="Ссылка на событие" type="text" onChange={onLinkChange} defaultValue={eventLink} />
                 <Input top="Дата начала события" type="text" onChange={onStartDateChange} defaultValue={eventStartDate} />
                 <Input top="Дата завершения события" type="text" onChange={onFinishDateChange} defaultValue={eventFinishDate} />
                 <Button
                     size='xl'
-                    onClick={() => { eventCreate(); setPage(activeView, 'eventInfo') }}>
+                    onClick={() => { eventName && eventCreate(); setPage(activeView, 'eventInfo') }}>
                     Создать событие
                 </Button>
 

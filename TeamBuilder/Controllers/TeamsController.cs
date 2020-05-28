@@ -51,7 +51,7 @@ namespace TeamBuilder.Controllers
 				var isEqual = team.Name.ToLowerInvariant().Contains(search?.ToLowerInvariant() ?? string.Empty);
 				if (eventId != null)
 				{
-					isEqual = team.Event.Id == eventId && isEqual;
+					isEqual = team.EventId == eventId && isEqual;
 				}
 				return isEqual;
 			}
@@ -221,6 +221,27 @@ namespace TeamBuilder.Controllers
 			await context.SaveChangesAsync();
 
 			return Json(team.UserTeams);
+		}
+
+		public IActionResult JoinTeam(long userId, long teamId)
+		{
+			logger.LogInformation("Request JoinTeamm");
+
+			var user = context.Users
+				.Include(x => x.UserTeams)
+				.FirstOrDefault(u => u.Id == userId);
+
+			var userTeamToJoin = user.UserTeams.First(x => x.TeamId == teamId);
+			userTeamToJoin.UserAction = UserActionEnum.JoinedTeam;
+
+			context.Update(user);
+			context.SaveChanges();
+
+			var teamsWithUsers = context.Teams
+				.Include(x => x.UserTeams)
+				.ThenInclude(y => y.User).ToList();
+
+			return Json(teamsWithUsers);
 		}
 	}
 }

@@ -41,3 +41,8 @@ export function cancelRequestUser(data) {
     console.log(`teams.cancelRequestUser`);
     return api.post(Urls.Teams.CancelRequestUser, data);
 };
+
+export function joinTeam(userId, teamId) {
+    console.log(`users.joinTeam`);
+    return api.get(Urls.Teams.JoinTeam, { userId: userId, teamId: teamId });
+};
