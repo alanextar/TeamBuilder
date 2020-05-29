@@ -29,8 +29,8 @@ namespace TeamBuilder.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<string>("FinishDate")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("FinishDate")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Link")
                         .HasColumnType("text");
@@ -41,8 +41,8 @@ namespace TeamBuilder.Migrations
                     b.Property<long?>("OwnerId")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("StartDate")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("StartDate")
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 

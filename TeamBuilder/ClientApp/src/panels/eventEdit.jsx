@@ -67,8 +67,8 @@ const EventEdit = props => {
                 <Input top="Название события" type="text" onChange={onNameChange} value={eventName} status={eventName ? 'valid' : 'error'} placeholder="Введите название события" />
                 <Textarea top="Описание события" onChange={onDescriptionChange} value={eventDescription} />
                 <Input top="Ссылка на событие" type="text" onChange={onLinkChange} value={eventLink} />
-                <Input top="Дата начала события" type="text" onChange={onStartDateChange} value={eventStartDate} />
-                <Input top="Дата завершения события" type="text" onChange={onFinishDateChange} value={eventFinishDate} />
+                <Input top="Дата начала события" type="date" onChange={onStartDateChange} value={eventStartDate} />
+                <Input top="Дата завершения события" type="date" onChange={onFinishDateChange} value={eventFinishDate} />
                 <Button
                     size='xl'
                     onClick={() => {  eventName && eventEdit(); }}>
