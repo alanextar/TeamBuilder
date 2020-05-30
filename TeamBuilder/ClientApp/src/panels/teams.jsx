@@ -90,11 +90,11 @@ const Teams = props => {
     return (
         <Panel id={props.id}>
             {props.profileUser ?
-                <PanelHeader separator={false}
+                <PanelHeader separator={false} className='header-for-iphone'
                     left={<PanelHeaderButton onClick={() => { setPage('teams', 'teamCreate'); }}>Создать</PanelHeaderButton>}>
                     Команды
                 </PanelHeader> :
-                <PanelHeader separator={false}>
+                <PanelHeader separator={false} className='header-for-iphone'>
                     Команды
                 </PanelHeader>
             }
