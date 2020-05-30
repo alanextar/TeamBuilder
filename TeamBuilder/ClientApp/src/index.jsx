@@ -1,17 +1,19 @@
-﻿import React from 'react';
-import ReactDOM from 'react-dom';
-import logger from 'redux-logger';
-import 'core-js/es6/map';
+﻿import 'core-js/es6/map';
 import 'core-js/es6/set';
+
+import React from 'react';
+import ReactDOM from 'react-dom';
 import { applyMiddleware, createStore } from "redux";
 import thunk from 'redux-thunk';
-import { Provider } from 'react-redux';
+import logger from 'redux-logger';
 import rootReducer from './store/reducers';
-import { composeWithDevTools } from 'redux-devtools-extension';
 import { setStory } from "./store/router/actions";
+import { composeWithDevTools } from 'redux-devtools-extension';
+import { Provider } from 'react-redux';
 
 import bridge from '@vkontakte/vk-bridge';
 
+import './css/main.css';
 import App from './App'
 
 bridge.send("VKWebAppInit", {});
