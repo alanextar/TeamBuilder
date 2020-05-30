@@ -1,7 +1,3 @@
-.header-for-iphone {
-  padding-top: env(safe-area-inset-top);
-}
-
 a, div, img, p, button {
     user-select: none;
     -webkit-user-select: none;
