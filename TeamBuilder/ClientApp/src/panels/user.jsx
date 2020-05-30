@@ -6,17 +6,15 @@ import {
     Tabs, TabsItem, Separator, Checkbox, InfoRow, Header, Title, Link, Switch
 } from '@vkontakte/vkui';
 import { Typeahead } from 'react-bootstrap-typeahead';
-import { } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
-import '../../src/styles/style.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'react-bootstrap-typeahead/css/Typeahead.css';
+import 'react-bootstrap-typeahead/css/Typeahead.css'; 
 import Icon28PhoneOutline from '@vkontakte/icons/dist/28/phone_outline';
 import Icon28ArticleOutline from '@vkontakte/icons/dist/28/article_outline';
 import Icon28MailOutline from '@vkontakte/icons/dist/28/mail_outline';
 import Icon24Write from '@vkontakte/icons/dist/24/write';
 import Icon28Send from '@vkontakte/icons/dist/28/send';
 import UserTeams from './userTeams'
+import CreatableMulti from './CreatableMulti'
 import bridge from '@vkontakte/vk-bridge';
 import { Api, Urls } from '../infrastructure/api';
 import { goBack, setPage } from '../store/router/actions';
@@ -139,7 +137,7 @@ class User extends React.Component {
         Api.Skills.getAll()
             .then(allSkillsJson => {
                 var options = allSkillsJson && allSkillsJson.map(function (skill) {
-                    return { id: skill.id, label: skill.name };
+                    return { id: skill.id, value:skill.name, label: skill.name };
                 });
 
                 this.setState({ allSkills: options });
@@ -226,7 +224,7 @@ class User extends React.Component {
                                 </Cell>}
                             <Div>
                                 <Title level="3" weight="regular" style={{ marginBottom: 16 }}>Скиллы:</Title>
-                                <Typeahead id="skills"
+                                {/* <Typeahead id="skills"
                                     clearButton
                                     onChange={(e) => {
                                         this.onSkillsChange(e)
@@ -237,7 +235,9 @@ class User extends React.Component {
                                     multiple
                                     className="Select__el skillsInput"
                                     disabled={this.state.readOnlyMode}
-                                />
+                                /> */}
+
+                                <CreatableMulti data={this.state.allSkills && this.state.allSkills}/>
                             </Div>
                             <Div>
                                 <Cell asideContent={
