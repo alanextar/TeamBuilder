@@ -50,7 +50,7 @@ class User extends React.Component {
     componentDidMount() {
         let id = this.state.readOnlyMode ? this.state.user.id : this.state.vkProfile.id;
         this.populateSkills();
-        this.state.vkProfile && this.fetchVkUser(id);
+        //this.state.vkProfile && this.fetchVkUser(id);
         this.state.vkProfile && this.fetchUserData(id);
     }
 
@@ -154,12 +154,12 @@ class User extends React.Component {
             <Panel id="user">
                 <PanelHeader separator={false} left={this.state.readOnlyMode &&
                     <PanelHeaderBack onClick={() => goBack()} />}>{this.state.readOnlyMode ? 'Участник' : 'Профиль'}</PanelHeader>
-                {this.state.vkUser &&
+                {this.state.user &&
                     <Group title="VK Connect">
                         <Link href={"https://m.vk.com/id" + id} target="_blank">
-                            <Cell description={this.state.vkUser.city && this.state.vkUser.city.title ? this.state.vkUser.city.title : ''}
-                                before={this.state.vkUser.photo_200 ? <Avatar src={this.state.vkUser.photo_200} /> : null}>
-                                {`${this.state.vkUser.first_name} ${this.state.vkUser.last_name}`}
+                            <Cell description={this.state.user.city && this.state.user.city.title ? this.state.user.city.title : ''}
+                                before={this.state.user.photo_200 ? <Avatar src={this.state.user.photo_200} /> : null}>
+                                {`${this.state.user.first_name} ${this.state.user.last_name}`}
                             </Cell>
                         </Link>
                     </Group>}
