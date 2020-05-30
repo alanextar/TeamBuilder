@@ -1,0 +1,10 @@
+.header-for-iphone {
+  padding-top: env(safe-area-inset-top);
+}
+
+a, div, img, p, button {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+}

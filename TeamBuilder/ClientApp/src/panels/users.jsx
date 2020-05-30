@@ -108,7 +108,7 @@ const Users = props => {
 
     return (
         <Panel id={props.id}>
-            <PanelHeader separator={false}>Пользователи</PanelHeader>
+            <PanelHeader separator={false}>Участники</PanelHeader>
             <Search value={searchTerm} onChange={e => setSearchTerm(e.target.value)} after={null} />
             <PullToRefresh onRefresh={onRefresh} isFetching={fetching}>
                 {isSearching ? loader :

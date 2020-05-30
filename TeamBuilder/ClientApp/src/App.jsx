@@ -1,7 +1,7 @@
 ﻿import React, { useState, useEffect } from 'react';
 import {
     View, Epic, Tabbar, TabbarItem, ModalRoot, ModalPage, ModalPageHeader,
-    PanelHeaderButton, FormLayout, SelectMimicry, ANDROID, IOS, usePlatform
+    PanelHeaderButton, FormLayout, SelectMimicry
 } from '@vkontakte/vkui';
 import { connect } from 'react-redux';
 import '@vkontakte/vkui/dist/vkui.css';
@@ -43,7 +43,6 @@ import { Api } from './infrastructure/api';
 
 const App = (props) => {
     let lastAndroidBackAction = 0;
-    const platform = usePlatform();
 
     const { setStory, activeView, activeStory, panelsHistory, setProfile, setUser,
         setProfileUser, profileUser, teamUser, eventUser, participantUser, teamsTeam, setPage, setEvent, event,
@@ -60,9 +59,6 @@ const App = (props) => {
                 const schemeAttribute = document.createAttribute('scheme');
                 schemeAttribute.value = data.scheme ? data.scheme : 'client_light';
                 document.body.attributes.setNamedItem(schemeAttribute);
-                const paddingTop = document.createAttribute('padding-top');
-                paddingTop.value = 'env(safe-area-inset-top)';
-                document.body.attributes.setNamedItem(paddingTop);
             }
         });
 
@@ -133,7 +129,7 @@ const App = (props) => {
                     selected={activeStory === 'events'}
                     text="События"
                 ><Icon28FavoriteOutline /></TabbarItem>
-                <TabbarItem
+                <TabbarItem style={{color: props.profileUser ? "" : "red"}}
                     onClick={() => {
                         setStory('user', 'user');
                         setUser(profileUser);
@@ -155,7 +151,7 @@ const App = (props) => {
                                 <ModalPageHeader
                                     left={<PanelHeaderButton onClick={e => {setTeamsEventFilter(null); hideModal();}}>Сбросить</PanelHeaderButton>}
                                     right={<PanelHeaderButton
-                                        onClick={() => { hideModal(); }}>{platform === IOS ? 'Готово' : <Icon24Done />}</PanelHeaderButton>}
+                                        onClick={() => { hideModal(); }}>Готово</PanelHeaderButton>}
                                 >
                                     Фильтры
                                 </ModalPageHeader>

@@ -31,7 +31,6 @@ const Teams = props => {
     useEffect(
         () => {
             setIsSearching(true);
-            console.log(`teams.pagingSearch: ${debouncedSearchTerm}, ${props.teamsEventFilter && props.teamsEventFilter.id}`);
             Api.Teams.pagingSearch(debouncedSearchTerm, { eventId: props.teamsEventFilter && props.teamsEventFilter.id })
                 .then(result => {
                     setItems(result.collection);
@@ -46,7 +45,7 @@ const Teams = props => {
     const onRefresh = () => {
         setFetching(true);
         if (searchTerm) {
-            Api.Teams.pagingSearch(debouncedSearchTerm)
+            Api.Teams.pagingSearch(debouncedSearchTerm, { eventId: props.teamsEventFilter && props.teamsEventFilter.id })
                 .then(result => {
                     setItems(result.collection);
                     setNextHref(result.nextHref);
@@ -66,11 +65,11 @@ const Teams = props => {
     };
 
     const loadItems = page => {
-        var url = `${Urls.Teams.GetPage}`;
+        var url = `${Urls.Teams.PagingSearch}?eventId=${props.teamsEventFilter && props.teamsEventFilter.id}`;
         if (nextHref) {
             url = nextHref;
         }
-        console.log(`teams.loadItems ${url}`)
+        
         Api.get(url)
             .then(e => {
                 var itemsTemp = items;
@@ -92,16 +91,13 @@ const Teams = props => {
         <Panel id={props.id}>
             {props.profileUser ?
                 <PanelHeader separator={false}
-                    left={
-                        <PanelHeaderButton>
-                            <Icon28AddOutline onClick={() => { setPage('teams', 'teamCreate'); }} />
-                        </PanelHeaderButton>}>
+                    left={<PanelHeaderButton onClick={() => { setPage('teams', 'teamCreate'); }}>Создать</PanelHeaderButton>}>
                     Команды
                 </PanelHeader> :
                 <PanelHeader separator={false}>
                     Команды
                 </PanelHeader>
-                }
+            }
             <Search value={searchTerm} onChange={e => setSearchTerm(e.target.value)} after={null}
                 icon={<Icon24Filter />}
                 onIconClick={e => { props.onFiltersClick(e); }} />
