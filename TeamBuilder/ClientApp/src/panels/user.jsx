@@ -8,8 +8,6 @@ import {
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
-import '../../src/styles/style.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import Icon28PhoneOutline from '@vkontakte/icons/dist/28/phone_outline';
 import Icon28ArticleOutline from '@vkontakte/icons/dist/28/article_outline';
@@ -235,7 +233,7 @@ class User extends React.Component {
                                     selected={this.state.selectedSkills}
                                     top="Skills"
                                     multiple
-                                    className="Select__el skillsInput"
+                                    className="Select__el"
                                     disabled={this.state.readOnlyMode}
                                 />
                             </Div>
