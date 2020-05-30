@@ -10,6 +10,7 @@ import {
     Div, Button, Textarea, FormLayout, Select, Input, Slider, FixedLayout, Link
 } from '@vkontakte/vkui';
 import { Api } from '../infrastructure/api';
+import {GetRandomPic} from '../infrastructure/utils';
 
 class TeamCreate extends React.Component {
     constructor(props) {
@@ -63,6 +64,7 @@ class TeamCreate extends React.Component {
         const { setTeam, setPage } = this.props;
         var createTeamViewModel = {
             name: this.state.name,
+            photo100: GetRandomPic(),
             description: this.state.description,
             numberRequiredMembers: this.state.usersNumber,
             descriptionRequiredMembers: this.state.membersDescription,
@@ -70,10 +72,7 @@ class TeamCreate extends React.Component {
         }
         let result = await Api.Teams.create(createTeamViewModel)
 
-        console.log(`result: ${result}`);
-        console.log(`result.str: ${JSON.stringify(result)}`);
         setTeam(result);
-        console.log(`End PostCreate`);
         setPage('teams', 'teaminfo');
     }
 

@@ -7,12 +7,11 @@ import {
     CardGrid, Card
 } from '@vkontakte/vkui';
 import InfiniteScroll from 'react-infinite-scroller';
-import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import Icon24Work from '@vkontakte/icons/dist/24/work';
 import { Api, Urls } from '../infrastructure/api';
 
 import { setUser, setParticipantUser } from "../store/user/actions";
-import { goBack, setPage } from '../store/router/actions';
+import { setPage } from '../store/router/actions';
 
 const Users = props => {
     const { setParticipantUser, setUser, setPage } = props;
@@ -30,7 +29,6 @@ const Users = props => {
 
     useEffect(
         () => {
-            console.log("search if")
             setIsSearching(true);
             Api.Users.pagingSearch(debouncedSearchTerm)
                 .then(result => {
@@ -57,7 +55,6 @@ const Users = props => {
                 });
         }
         else {
-            console.log("refresh")
             Api.Users.getPage()
                 .then(result => {
                     setItems(result.collection);
@@ -77,7 +74,6 @@ const Users = props => {
         if (nextHref) {
             url = nextHref;
         }
-        console.log(`load.url: ${url}`);
         Api.get(url)
             .then(e => {
                 var itemsTemp = items;
@@ -112,7 +108,7 @@ const Users = props => {
 
     return (
         <Panel id={props.id}>
-            <PanelHeader separator={false}>Пользователи</PanelHeader>
+            <PanelHeader separator={false}>Участники</PanelHeader>
             <Search value={searchTerm} onChange={e => setSearchTerm(e.target.value)} after={null} />
             <PullToRefresh onRefresh={onRefresh} isFetching={fetching}>
                 {isSearching ? loader :
@@ -124,21 +120,21 @@ const Users = props => {
                         <CardGrid style={{ marginBottom: 10 }}>
                             {items && items.map(user => (
                                 <Card size="l" mode="shadow" key={user.id}>
-                                    <RichCell
-                                        before={<Avatar size={48} src={user.photo100} />}
-                                        after={stringfyTeams(user.userTeams)}
-                                        caption={user.city ? user.city : 'Ekaterinburg'}
-                                        bottom={stringfySkills(user.skills)}
-                                        text={user.about ? user.about : 'Хороший человек'}
-                                        onClick={() => {
-                                            setUser(user);
-                                            console.log('before setParticipantUser!!!!!!!!!!', user);
-                                            setParticipantUser(user);
-                                            setPage('users', 'user');
-                                        }}
-                                    >
-                                        {user.firstName} {user.lastName}
-                                    </RichCell>
+                                    {(user.isSearchable && props.profileUser.id != user.id) &&
+                                        <RichCell
+                                            before={<Avatar size={48} src={user.photo100} />}
+                                            after={stringfyTeams(user.userTeams)}
+                                            caption={user.city ? user.city : 'Ekaterinburg'}
+                                            bottom={stringfySkills(user.skills)}
+                                            text={user.about ? user.about : 'Хороший человек'}
+                                            onClick={() => {
+                                                setUser(user);
+                                                setParticipantUser(user);
+                                                setPage('users', 'user');
+                                            }}
+                                        >
+                                            {user.firstName} {user.lastName}
+                                        </RichCell>}
                                 </Card>
                             ))}
                         </CardGrid>
@@ -148,6 +144,12 @@ const Users = props => {
     );
 };
 
+const mapStateToProps = (state) => {
+    return {
+        profileUser: state.user.profileUser
+    }
+};
+
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
@@ -155,4 +157,4 @@ function mapDispatchToProps(dispatch) {
     }
 }
 
-export default connect(null, mapDispatchToProps)(Users);
+export default connect(mapStateToProps, mapDispatchToProps)(Users);

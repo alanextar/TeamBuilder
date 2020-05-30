@@ -6,14 +6,12 @@ import { goBack, setPage } from "../store/router/actions";
 import { setEvent } from "../store/events/actions";
 
 import {
-    Panel, PanelHeader, Group, Button, Textarea, FixedLayout,
+    Panel, PanelHeader, Button, Textarea,
     PanelHeaderBack, Input, FormLayout
 } from '@vkontakte/vkui';
 import { Api } from '../infrastructure/api';
 
 const EventEdit = props => {
-    const [changedEvent, setChangedEvent] = useState(props.event.name);
-
     const [eventName, setEventName] = useState(props.event.name);
     const [eventDescription, setEventDescription] = useState(props.event.description);
     const [eventLink, setEventLink] = useState(props.event.link);
@@ -54,7 +52,6 @@ const EventEdit = props => {
         Api.Events.edit(editEventViewModel)
             .then(result => {
                 setEvent(result);
-                console.log(result);
                 goBack();
             });
     }
@@ -70,8 +67,8 @@ const EventEdit = props => {
                 <Input top="Название события" type="text" onChange={onNameChange} value={eventName} status={eventName ? 'valid' : 'error'} placeholder="Введите название события" />
                 <Textarea top="Описание события" onChange={onDescriptionChange} value={eventDescription} />
                 <Input top="Ссылка на событие" type="text" onChange={onLinkChange} value={eventLink} />
-                <Input top="Дата начала события" type="text" onChange={onStartDateChange} value={eventStartDate} />
-                <Input top="Дата завершения события" type="text" onChange={onFinishDateChange} value={eventFinishDate} />
+                <Input top="Дата начала события" type="date" onChange={onStartDateChange} value={eventStartDate} />
+                <Input top="Дата завершения события" type="date" onChange={onFinishDateChange} value={eventFinishDate} />
                 <Button
                     size='xl'
                     onClick={() => {  eventName && eventEdit(); }}>

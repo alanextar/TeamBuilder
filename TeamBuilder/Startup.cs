@@ -38,7 +38,12 @@ namespace TeamBuilder
 
 			services.AddControllersWithViews()
 				.AddNewtonsoftJson(options =>
-				options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+				{
+					options.SerializerSettings.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.Utc;
+					options.SerializerSettings.DateFormatString = "dd'.'MM'.'yyyy";
+					options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+				}
+
 			);
 
 			// In production, the React files will be served from this directory

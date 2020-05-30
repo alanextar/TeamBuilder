@@ -10,18 +10,18 @@ import { bindActionCreators } from 'redux'
 import { goBack, closeModal, setStory, setPage } from "./store/router/actions";
 import { setTeam, setTeamsTeam, setEventsTeam, setUserTeam, setUsersTeam } from "./store/teams/actions";
 import {
-    setUser, setProfile, getUser, setProfileUser, setTeamUser,
+    setUser, setProfile, setProfileUser, setTeamUser,
     setEventUser, setParticipantUser
 } from "./store/user/actions";
 import { setEvent, setTeamsEventFilter } from "./store/events/actions"
 import { getActivePanel } from "./services/_functions";
 
-import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 import Icon24Done from '@vkontakte/icons/dist/24/done';
 import Icon28Users from '@vkontakte/icons/dist/28/users';
 import Icon28Profile from '@vkontakte/icons/dist/28/profile';
 import Icon28Users3Outline from '@vkontakte/icons/dist/28/users_3_outline';
 import Icon28FavoriteOutline from '@vkontakte/icons/dist/28/favorite_outline';
+import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 
 import Events from './panels/events'
 import EventCreate from './panels/eventCreate'
@@ -40,8 +40,6 @@ import UserEdit from './panels/userEdit'
 import SetUserTeam from './panels/setUserTeam'
 
 import { Api } from './infrastructure/api';
-//import { setTeam } from './infrastructure/apiUsers';
-import { users } from './demo_dataset';
 
 const App = (props) => {
     let lastAndroidBackAction = 0;
@@ -135,7 +133,7 @@ const App = (props) => {
                     selected={activeStory === 'events'}
                     text="События"
                 ><Icon28FavoriteOutline /></TabbarItem>
-                <TabbarItem
+                <TabbarItem style={{color: props.profileUser ? "" : "red"}}
                     onClick={() => {
                         setStory('user', 'user');
                         setUser(profileUser);
@@ -155,9 +153,9 @@ const App = (props) => {
                             onClose={hideModal}
                             header={
                                 <ModalPageHeader
-                                    left={<PanelHeaderButton onClick={e => {setTeamsEventFilter(null); hideModal();}}><Icon24Cancel /></PanelHeaderButton>}
+                                    left={<PanelHeaderButton onClick={e => {setTeamsEventFilter(null); hideModal();}}>Сбросить</PanelHeaderButton>}
                                     right={<PanelHeaderButton
-                                        onClick={() => { hideModal();  console.log('click on filter') }}>{platform === IOS ? 'Готово' : <Icon24Done />}</PanelHeaderButton>}
+                                        onClick={() => { hideModal(); }}>Готово</PanelHeaderButton>}
                                 >
                                     Фильтры
                                 </ModalPageHeader>
@@ -175,7 +173,7 @@ const App = (props) => {
                         </ModalPage>
                     </ModalRoot>}
             >
-                <Teams id='teams' activeStory={activeStory} onFiltersClick={(e) => { console.log('onfilterclick'); setActiveModal('filters'); }}/>
+                <Teams id='teams' activeStory={activeStory} onFiltersClick={(e) => { setActiveModal('filters'); }}/>
                 <TeamInfo id='teaminfo' return='teams' />
                 <TeamCreate id='teamCreate' />
                 <TeamEdit id='teamEdit' />
@@ -243,7 +241,6 @@ const mapStateToProps = (state) => {
         eventsTeam: state.team.eventsTeam,
         event: state.event.event,
         teamsEventFilter: state.event.teamsEventFilter
-        // colorScheme: state.vkui.colorScheme
     };
 };
 

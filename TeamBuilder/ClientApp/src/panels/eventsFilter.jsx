@@ -2,7 +2,7 @@
 import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
 
-import { goBack, setPage } from '../store/router/actions';
+import { goBack } from '../store/router/actions';
 import { setEvent, setTeamsEventFilter } from "../store/events/actions";
 
 import useDebounce from '../infrastructure/use-debounce';
@@ -11,7 +11,6 @@ import {
     PanelHeaderBack, CardGrid, Card
 } from '@vkontakte/vkui';
 import InfiniteScroll from 'react-infinite-scroller';
-import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import { Api, Urls } from '../infrastructure/api';
 
 const EventsFilter = props => {
@@ -54,7 +53,6 @@ const EventsFilter = props => {
                 });
         }
         else {
-            console.log("refresh")
             Api.Events.getPage()
                 .then(result => {
                     setItems(result.collection);
@@ -70,7 +68,6 @@ const EventsFilter = props => {
         if (nextHref) {
             url = nextHref;
         }
-        console.log(`load.url: ${url}`);
         Api.get(url)
             .then(e => {
                 var itemsTemp = items;
@@ -128,7 +125,7 @@ const EventsFilter = props => {
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
-        ...bindActionCreators({ setPage, setTeamsEventFilter, goBack }, dispatch)
+        ...bindActionCreators({ setTeamsEventFilter, goBack }, dispatch)
     }
 }
 
