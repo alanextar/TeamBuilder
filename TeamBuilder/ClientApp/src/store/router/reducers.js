@@ -50,9 +50,9 @@ export const routerReducer = (state = initialState, action) => {
                 panelsHistory = [...panelsHistory, Panel];
             }
 
-            if (panelsHistory.length > 1) {
-                VK.swipeBackOn();
-            }
+            //if (panelsHistory.length > 1) {
+            //    VK.swipeBackOn();
+            //}
 
             return {
                 ...state,
@@ -211,9 +211,9 @@ export const routerReducer = (state = initialState, action) => {
                 VK.closeApp();
             }
 
-            if (panelsHistory.length === 1) {
-                VK.swipeBackOff();
-            }
+            //if (panelsHistory.length === 1) {
+            //    VK.swipeBackOff();
+            //}
 
             return {
                 ...state,
