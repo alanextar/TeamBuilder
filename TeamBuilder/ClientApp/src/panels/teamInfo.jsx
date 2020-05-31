@@ -114,25 +114,47 @@ class TeamInfo extends React.Component {
             })
     };
 
-    openPopout = () => {
+    openPopoutExit = () => {
         this.props.openPopout(
-                <Alert
-                    actionsLayout="vertical"
-                    actions={[{
-                        title: 'Выйти из команды',
-                        autoclose: true,
-                        mode: 'destructive',
-                        action: () => this.dropUser(),
-                    }, {
-                        title: 'Отмена',
-                        autoclose: true,
-                        mode: 'cancel'
-                    }]}
+            <Alert
+                actionsLayout="vertical"
+                actions={[{
+                    title: 'Выйти из команды',
+                    autoclose: true,
+                    mode: 'destructive',
+                    action: () => this.dropUser(),
+                }, {
+                    title: 'Отмена',
+                    autoclose: true,
+                    mode: 'cancel'
+                }]}
                 onClose={() => this.props.closePopout()}
-                >
-                    <h2>Подтвердите действие</h2>
-                    <p>Вы уверены, что хотите выйти из команды?</p>
-                </Alert>
+            >
+                <h2>Подтвердите действие</h2>
+                <p>Вы уверены, что хотите выйти из команды?</p>
+            </Alert>
+        );
+    };
+
+    openPopoutDecline = (e, userInActiveTeam) => {
+        this.props.openPopout(
+            <Alert
+                actionsLayout="vertical"
+                actions={[{
+                    title: 'Отклонить заявку',
+                    autoclose: true,
+                    mode: 'destructive',
+                    action: () => this.cancelUser(e, userInActiveTeam),
+                }, {
+                    title: 'Отмена',
+                    autoclose: true,
+                    mode: 'cancel'
+                }]}
+                onClose={() => this.props.closePopout()}
+            >
+                <h2>Подтвердите действие</h2>
+                <p>Вы уверены, что хотите выйти из команды?</p>
+            </Alert>
         );
     };
 
@@ -175,8 +197,8 @@ class TeamInfo extends React.Component {
                             </Cell>
                         </List>
                         || userAction === 2 &&
-                    <List>
-                        <Cell onClick={() => this.openPopout()}>
+                        <List>
+                            <Cell onClick={() => this.openPopoutExit()}>
                                 Выйти из команды
                             </Cell>
                         </List>
@@ -188,7 +210,7 @@ class TeamInfo extends React.Component {
                                 Принять заявку
                             </Cell>
                             <Cell
-                                onClick={(e) => this.cancelUser(e, userInActiveTeam)}
+                                onClick={(e) => this.openPopoutDecline(e, userInActiveTeam)}
                             >
                                 Отклонить заявку
                             </Cell>
