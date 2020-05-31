@@ -8,22 +8,22 @@ import {setColorScheme, setAccessToken} from "../store/vk/actions";
 const APP_ID = 7448436;
 const API_VERSION = '5.92';
 
-//export const initApp = () => (dispatch) => {
-//    const VKConnectCallback = (e) => {
-//        if (e.detail.type === 'VKWebAppUpdateConfig') {
-//            VKConnect.unsubscribe(VKConnectCallback);
+export const initApp = () => (dispatch) => {
+    const VKConnectCallback = (e) => {
+        if (e.detail.type === 'VKWebAppUpdateConfig') {
+            bridge.unsubscribe(VKConnectCallback);
 
-//            dispatch(setColorScheme(e.detail.data.scheme));
-//        }
-//    };
+            dispatch(setColorScheme(e.detail.data.scheme));
+        }
+    };
 
-//    VKConnect.subscribe(VKConnectCallback);
-//    return VKConnect.send('VKWebAppInit', {}).then(data => {
-//        return data;
-//    }).catch(error => {
-//        return error;
-//    });
-//};
+    bridge.subscribe(VKConnectCallback);
+    return bridge.send('VKWebAppInit', {}).then(data => {
+        return data;
+    }).catch(error => {
+        return error;
+    });
+};
 
 //export const getAuthToken = (scope) => (dispatch) => {
 //    VKConnect.send("VKWebAppGetAuthToken", {

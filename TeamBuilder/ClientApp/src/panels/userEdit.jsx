@@ -60,15 +60,14 @@ class UserEdit extends React.Component {
 
     componentWillUnmount() {
         const { setProfileUser } = this.props;
-        //this.props.setFormData('profile_form', this.state.inputData);
         console.log('componentWillUnmount()', this.state.user);
         setProfileUser(this.state.user);
     }
 
     async postEdit() {
         let updatedUser = await Api.post(Urls.Users.Edit, this.state.user);
-
-        setUser(updatedUser);
+        const { setProfileUser } = this.props;
+        //setUser(updatedUser);
         setProfileUser(updatedUser);
     }
 
