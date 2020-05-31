@@ -1,7 +1,7 @@
 ﻿import React, { useState, useEffect } from 'react';
 import {
     View, Epic, Tabbar, TabbarItem, ModalRoot, ModalPage, ModalPageHeader,
-    PanelHeaderButton, FormLayout, SelectMimicry
+    PanelHeaderButton, FormLayout, SelectMimicry, ConfigProvider, Root
 } from '@vkontakte/vkui';
 import { connect } from 'react-redux';
 import '@vkontakte/vkui/dist/vkui.css';
@@ -42,18 +42,20 @@ import SetUserTeam from './panels/setUserTeam'
 import { Api } from './infrastructure/api';
 
 const App = (props) => {
-    let lastAndroidBackAction = 0;
+    const [lastAndroidBackAction, setLastAndroidBackButton] = useState(0);
+    const [history, setHistory] = useState(null);
+    const [popout, setPopout] = useState(null);
 
-    const { setStory, activeView, activeStory, panelsHistory, setProfile, setUser,
+    const { setStory, activeView, activeStory, setProfile, setUser,
         setProfileUser, profileUser, teamUser, eventUser, participantUser, teamsTeam, setPage, setEvent, event,
-        eventsTeam, userTeam, usersTeam, setTeam, setTeamsEventFilter, popouts
+        eventsTeam, userTeam, usersTeam, setTeam, setTeamsEventFilter
     } = props;
-    let history = (panelsHistory[activeView] === undefined) ? [activeView] : panelsHistory[activeView];
 
     const [events, setEvents] = useState(null);
     const [activeModal, setActiveModal] = useState(null);
 
     useEffect(() => {
+        const { goBack } = props;
         bridge.subscribe(({ detail: { type, data } }) => {
             if (type === 'VKWebAppUpdateConfig') {
                 const schemeAttribute = document.createAttribute('scheme');
@@ -69,27 +71,34 @@ const App = (props) => {
                 setUser(user);
                 setProfileUser(user);
             });
-
+            
             setEvent(event);
         }
         fetchData();
-
-        const { activeView, activeStory, activePanel } = props;
-        const { goBack, dispatch } = props;
+        getEvents();
 
         window.onpopstate = () => {
             let timeNow = +new Date();
 
-            if (timeNow - this.lastAndroidBackAction > 500) {
-                lastAndroidBackAction = timeNow;
+            if (timeNow - lastAndroidBackAction > 500) {
+                setLastAndroidBackButton(timeNow);
+
                 goBack();
             } else {
                 window.history.pushState(null, null);
             }
         };
-
-        getEvents();
     }, []);
+
+    useEffect(() => {
+        const { activeView, panelsHistory, activeModals, popouts } = props;
+        let history = (panelsHistory[activeView] === undefined) ? [activeView] : panelsHistory[activeView];
+        let popout = (popouts[activeView] === undefined) ? null : popouts[activeView];
+        let activeModal = (activeModals[activeView] === undefined) ? null : activeModals[activeView];
+        setHistory(history);
+        setPopout(popout);
+        setActiveModal(activeModal);
+    });
 
     const hideModal = () => {
         setActiveModal(null);
@@ -99,126 +108,137 @@ const App = (props) => {
         Api.Events.getAll().then(result => setEvents(result))
     }
 
-    let popout = (popouts[activeView] === undefined) ? null : popouts[activeView];
-
     return (
-        <Epic activeStory={activeStory} tabbar={
-            <Tabbar>
-                <TabbarItem
-                    onClick={() => {
-                        setStory('teams', 'teams');
-                        teamUser && setUser(teamUser);
-                        teamsTeam && setTeam(teamsTeam);
-                    }}
-                    selected={activeStory === 'teams'}
-                    text="Команды"
-                ><Icon28Users3Outline /></TabbarItem>
-                <TabbarItem
-                    onClick={() => {
-                        setStory('users', 'users');
-                        participantUser && setUser(participantUser);
-                        usersTeam && setTeam(usersTeam);
-                    }}
-                    selected={activeStory === 'users'}
-                    text="Участники"
-                ><Icon28Users /></TabbarItem>
-                <TabbarItem
-                    onClick={() => {
-                        setStory('events', 'events');
-                        eventUser && setUser(eventUser);
-                        eventsTeam && setTeam(eventsTeam);
-                    }}
-                    selected={activeStory === 'events'}
-                    text="События"
-                ><Icon28FavoriteOutline /></TabbarItem>
-                <TabbarItem style={{ color: props.profileUser ? "" : "red" }}
-                    onClick={() => {
-                        setStory('user', 'user');
-                        setUser(profileUser);
-                        userTeam && setTeam(userTeam)
-                    }}
-                    selected={activeStory === 'user'}
-                    text="Профиль"
-                ><Icon28Profile /></TabbarItem>
-            </Tabbar>
-        }>
-            <View id='teams' activePanel={getActivePanel("teams")}
-                history={history}
-                popout={popout}
-                modal={
-                    <ModalRoot activeModal={activeModal}>
-                        <ModalPage
-                            id="filters"
-                            onClose={hideModal}
-                            header={
-                                <ModalPageHeader
-                                    left={<PanelHeaderButton onClick={e => { setTeamsEventFilter(null); hideModal(); }}>Сбросить</PanelHeaderButton>}
-                                    right={<PanelHeaderButton
-                                        onClick={() => { hideModal(); }}>Готово</PanelHeaderButton>}
-                                >
-                                    Фильтры
+        <ConfigProvider isWebView={true} /*scheme={colorScheme}*/>
+            <Epic activeStory={activeStory} tabbar={
+                <Tabbar>
+                    <TabbarItem
+                        onClick={() => {
+                            setStory('teams', 'teams');
+                            teamUser && setUser(teamUser);
+                            teamsTeam && setTeam(teamsTeam);
+                        }}
+                        selected={activeStory === 'teams'}
+                        text="Команды"
+                    ><Icon28Users3Outline /></TabbarItem>
+                    <TabbarItem
+                        onClick={() => {
+                            setStory('users', 'users');
+                            participantUser && setUser(participantUser);
+                            usersTeam && setTeam(usersTeam);
+                        }}
+                        selected={activeStory === 'users'}
+                        text="Участники"
+                    ><Icon28Users /></TabbarItem>
+                    <TabbarItem
+                        onClick={() => {
+                            setStory('events', 'events');
+                            eventUser && setUser(eventUser);
+                            eventsTeam && setTeam(eventsTeam);
+                        }}
+                        selected={activeStory === 'events'}
+                        text="События"
+                    ><Icon28FavoriteOutline /></TabbarItem>
+                    <TabbarItem style={{ color: props.profileUser ? "" : "red" }}
+                        onClick={() => {
+                            setStory('user', 'user');
+                            setUser(profileUser);
+                            userTeam && setTeam(userTeam)
+                        }}
+                        selected={activeStory === 'user'}
+                        text="Профиль"
+                    ><Icon28Profile /></TabbarItem>
+                </Tabbar>
+            }>
+                <Root id="teams" activeView={activeView} popout={popout}>
+                    <View id='teams' activePanel={getActivePanel("teams")}
+                        history={history}
+                        onSwipeBack={() => goBack()}
+                        modal={
+                            <ModalRoot activeModal={activeModal}>
+                                <ModalPage
+                                    id="filters"
+                                    onClose={hideModal}
+                                    header={
+                                        <ModalPageHeader
+                                            left={<PanelHeaderButton onClick={e => { setTeamsEventFilter(null); hideModal(); }}>Сбросить</PanelHeaderButton>}
+                                            right={<PanelHeaderButton
+                                                onClick={() => { hideModal(); }}>Готово</PanelHeaderButton>}
+                                        >
+                                            Фильтры
                                 </ModalPageHeader>
-                            }>
-                            {events &&
-                                <FormLayout>
-                                    <SelectMimicry top="События" placeholder="Не выбрано"
-                                        onClick={() => {
-                                            setPage('teams', 'eventsFilter');
-                                            hideModal();
-                                        }}>
-                                        {props.teamsEventFilter && props.teamsEventFilter.name}
-                                    </SelectMimicry>
-                                </FormLayout>}
-                        </ModalPage>
-                    </ModalRoot>}
-            >
-                <Teams id='teams' activeStory={activeStory} onFiltersClick={(e) => { setActiveModal('filters'); }} />
-                <TeamInfo id='teaminfo' return='teams' />
-                <TeamCreate id='teamCreate' />
-                <TeamEdit id='teamEdit' />
-                <User id='user' />
-                <SetUserTeam id='setUserTeam' />
-                <EventCreate id='eventCreate' />
-                <EventInfo id='eventInfo' />
-                <EventsFilter id='eventsFilter' openFilter={(e) => setActiveModal('filters')} />
-                <EventEdit id='eventEdit' owner={props.profile} />
-            </View>
-            <View id='users' activePanel={getActivePanel("users")}
-                history={history}
-            >
-                <Users id='users' />
-                <User id='user' />
-                <SetUserTeam id='setUserTeam' />
-                <TeamInfo id='teaminfo' />
-                <TeamEdit id='teamEdit' />
-                <EventCreate id='eventCreate' owner={props.profile} />
-                <EventInfo id='eventInfo' />
-                <EventEdit id='eventEdit' owner={props.profile} />
-            </View>
-            <View id='events' activePanel={getActivePanel("events")}
-                history={history}>
-                <Events id='events' />
-                <EventCreate id='eventCreate' owner={props.profile} />
-                <EventInfo id='eventInfo' />
-                <EventEdit id='eventEdit' owner={props.profile} />
-                <TeamInfo id='teaminfo' />
-                <TeamEdit id='teamEdit' />
-                <User id='user' />
-            </View>
-            <View id='user' activePanel={getActivePanel("user")}
-                history={history}
-            >
-                <User id='user' />
-                <UserEdit id='userEdit' />
-                <TeamInfo id='teaminfo' />
-                <SetUserTeam id='setUserTeam' />
-                <TeamEdit id='teamEdit' />
-                <EventCreate id='eventCreate' owner={props.profile} />
-                <EventInfo id='eventInfo' />
-                <EventEdit id='eventEdit' owner={props.profile} />
-            </View>
-        </Epic>
-
+                                    }>
+                                    {events &&
+                                        <FormLayout>
+                                            <SelectMimicry top="События" placeholder="Не выбрано"
+                                                onClick={() => {
+                                                    setPage('teams', 'eventsFilter');
+                                                    hideModal();
+                                                }}>
+                                                {props.teamsEventFilter && props.teamsEventFilter.name}
+                                            </SelectMimicry>
+                                        </FormLayout>}
+                                </ModalPage>
+                            </ModalRoot>}
+                    >
+                        <Teams id='teams' activeStory={activeStory} onFiltersClick={(e) => { setActiveModal('filters'); }} />
+                        <TeamInfo id='teaminfo' />
+                        <TeamCreate id='teamCreate' />
+                        <TeamEdit id='teamEdit' />
+                        <User id='user' />
+                        <SetUserTeam id='setUserTeam' />
+                        <EventCreate id='eventCreate' />
+                        <EventInfo id='eventInfo' />
+                        <EventsFilter id='eventsFilter' openFilter={(e) => setActiveModal('filters')} />
+                        <EventEdit id='eventEdit' owner={props.profile} />
+                    </View>
+                </Root>
+                <Root id="users" activeView={activeView} popout={popout}>
+                    <View id="users" activePanel={getActivePanel("users")}
+                        history={history}
+                        onSwipeBack={() => goBack()}
+                    >
+                        <Users id="users" />
+                        <User id="user" />
+                        <SetUserTeam id="setUserTeam" />
+                        <TeamInfo id="teaminfo" />
+                        <TeamEdit id="teamEdit" />
+                        <EventCreate id='eventCreate' owner={props.profile} />
+                        <EventInfo id='eventInfo' />
+                        <EventEdit id='eventEdit' owner={props.profile} />
+                    </View>
+                </Root>
+                <Root id="events" activeView={activeView} popout={popout}>
+                    <View id='events' activePanel={getActivePanel("events")}
+                        history={history}
+                        onSwipeBack={() => goBack()}
+                    >
+                        <Events id='events' />
+                        <EventCreate id='eventCreate' owner={props.profile} />
+                        <EventInfo id='eventInfo' />
+                        <EventEdit id='eventEdit' owner={props.profile} />
+                        <TeamInfo id='teaminfo' />
+                        <TeamEdit id='teamEdit' />
+                        <User id='user' />
+                    </View>
+                </Root>
+                <Root id="user" activeView={activeView} popout={popout}>
+                    <View id='user' activePanel={getActivePanel("user")}
+                        history={history}
+                        onSwipeBack={() => goBack()}
+                    >
+                        <User id='user' />
+                        <UserEdit id='userEdit' />
+                        <TeamInfo id='teaminfo' />
+                        <SetUserTeam id='setUserTeam' />
+                        <TeamEdit id='teamEdit' />
+                        <EventCreate id='eventCreate' owner={props.profile} />
+                        <EventInfo id='eventInfo' />
+                        <EventEdit id='eventEdit' owner={props.profile} />
+                    </View>
+                </Root>
+            </Epic>
+        </ConfigProvider>
     );
 }
 
@@ -227,6 +247,9 @@ const mapStateToProps = (state) => {
         activeView: state.router.activeView,
         activeStory: state.router.activeStory,
         panelsHistory: state.router.panelsHistory,
+        popouts: state.router.popouts,
+        activeModals: state.router.activeModals,
+        colorScheme: state.vkui.colorScheme,
         scrollPosition: state.router.scrollPosition,
         profile: state.user.profile,
         user: state.user.user,
@@ -240,7 +263,6 @@ const mapStateToProps = (state) => {
         eventsTeam: state.team.eventsTeam,
         event: state.event.event,
         teamsEventFilter: state.event.teamsEventFilter,
-        popouts: state.router.popouts,
     };
 };
 

@@ -1,9 +1,8 @@
-//import bridge from "@vkontakte/vk-connect";
-import bridge from '@vkontakte/vk-bridge';
+import VKConnect from "@vkontakte/vk-connect";
 
 import { store } from "../index";
 
-import {setColorScheme, setAccessToken} from "../store/vk/actions";
+import { setColorScheme, setAccessToken } from "../store/vk/actions";
 
 const APP_ID = 7448436;
 const API_VERSION = '5.92';
@@ -11,14 +10,14 @@ const API_VERSION = '5.92';
 export const initApp = () => (dispatch) => {
     const VKConnectCallback = (e) => {
         if (e.detail.type === 'VKWebAppUpdateConfig') {
-            bridge.unsubscribe(VKConnectCallback);
+            VKConnect.unsubscribe(VKConnectCallback);
 
             dispatch(setColorScheme(e.detail.data.scheme));
         }
     };
 
-    bridge.subscribe(VKConnectCallback);
-    return bridge.send('VKWebAppInit', {}).then(data => {
+    VKConnect.subscribe(VKConnectCallback);
+    return VKConnect.send('VKWebAppInit', {}).then(data => {
         return data;
     }).catch(error => {
         return error;
@@ -26,7 +25,7 @@ export const initApp = () => (dispatch) => {
 };
 
 export const getAuthToken = (scope) => (dispatch) => {
-    bridge.send("VKWebAppGetAuthToken", {
+    VKConnect.send("VKWebAppGetAuthToken", {
         "app_id": APP_ID,
         "scope": scope.join(',')
     }).then(data => {
@@ -37,7 +36,7 @@ export const getAuthToken = (scope) => (dispatch) => {
 };
 
 export const closeApp = () => {
-    return bridge.send("VKWebAppClose", {
+    return VKConnect.send("VKWebAppClose", {
         "status": "success"
     }).then(data => {
         return data;
@@ -47,7 +46,7 @@ export const closeApp = () => {
 };
 
 export const swipeBackOn = () => {
-    return bridge.send("VKWebAppEnableSwipeBack", {}).then(data => {
+    return VKConnect.send("VKWebAppEnableSwipeBack", {}).then(data => {
         return data;
     }).catch(error => {
         return error;
@@ -55,7 +54,7 @@ export const swipeBackOn = () => {
 };
 
 export const swipeBackOff = () => {
-    return bridge.send("VKWebAppDisableSwipeBack", {}).then(data => {
+    return VKConnect.send("VKWebAppDisableSwipeBack", {}).then(data => {
         return data;
     }).catch(error => {
         return error;
@@ -74,7 +73,7 @@ export const APICall = (method, params) => {
     params['access_token'] = store.getState().vkui.accessToken;
     params['v'] = params['v'] === undefined ? API_VERSION : params['v'];
 
-    return bridge.send("VKWebAppCallAPIMethod", {
+    return VKConnect.send("VKWebAppCallAPIMethod", {
         "method": method,
         "params": params
     }).then(data => {

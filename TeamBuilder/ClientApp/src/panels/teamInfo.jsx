@@ -167,7 +167,6 @@ class TeamInfo extends React.Component {
         let isModerator = this.state.profileUser && this.state.profileUser.isModerator;
         let userAction = userInActiveTeam && userInActiveTeam.userAction;
         let confirmedUser = countConfirmed(this.state.team.userTeams);
-        console.log('!!!!!!!!!!!!', this.state.team)
         let teamCap = this.state.team.userTeams.find(x => x.isOwner) && this.state.team.userTeams.find(x => x.isOwner).user
 
         return (
