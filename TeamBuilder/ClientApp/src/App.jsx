@@ -98,7 +98,7 @@ const App = (props) => {
         setHistory(history);
         setPopout(popout);
         setActiveModal(activeModal);
-    }, []);
+    });
 
     const hideModal = () => {
         setActiveModal(null);
