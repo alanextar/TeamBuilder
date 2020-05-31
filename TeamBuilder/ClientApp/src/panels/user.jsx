@@ -19,6 +19,7 @@ import bridge from '@vkontakte/vk-bridge';
 import { Api, Urls } from '../infrastructure/api';
 import { goBack, setPage } from '../store/router/actions';
 import { setUser, setProfileUser, setRecruitTeams } from '../store/user/actions';
+import { setActiveTab } from "../store/vk/actions";
 
 class User extends React.Component {
     constructor(props) {
@@ -32,7 +33,7 @@ class User extends React.Component {
             vkProfile: props.profile,
             profileUser: props.profileUser,
             user: props.user,
-            activeTabProfile: 'main',
+            activeTab: props.activeTab["profile"] || "main",
             selected: false,
             selectedSkills: [],
             isConfirmed: false,
@@ -56,6 +57,12 @@ class User extends React.Component {
         if (this.props.user !== prevProps.user) {
             this.setState({ user: this.props.user });
         }
+    }
+
+    componentWillUnmount() {
+        const { setActiveTab } = this.props;
+
+        setActiveTab("profile", this.state.activeTab);
     }
 
     fetchUserData(id) {
@@ -164,18 +171,18 @@ class User extends React.Component {
                 <Separator />
                 <Tabs>
                     <TabsItem
-                        onClick={() => this.setState({ activeTabProfile: 'main', showMain: true })}
-                        selected={this.state.activeTabProfile === 'main'}>
+                        onClick={() => this.setState({ activeTab: 'main' })}
+                        selected={this.state.activeTab === 'main'}>
                         Основное
                         </TabsItem>
                     <TabsItem
-                        onClick={() => this.setState({ activeTabProfile: 'teams', showMain: false })}
-                        selected={this.state.activeTabProfile === 'teams'}>
+                        onClick={() => this.setState({ activeTab: 'teams' })}
+                        selected={this.state.activeTab === 'teams'}>
                         Команды
                     </TabsItem>
                 </Tabs>
                 {
-                    this.state.activeTabProfile === 'main' ?
+                    this.state.activeTab === 'main' ?
                         <Group header={
                             <Header
                                 mode="secondary"
@@ -275,7 +282,8 @@ const mapStateToProps = (state) => {
         profileUser: state.user.profileUser,
         profile: state.user.profile,
         activeStory: state.router.activeStory,
-        activeView: state.router.activeView
+        activeView: state.router.activeView,
+        activeTab: state.vkui.activeTab
     };
 };
 
@@ -284,7 +292,8 @@ const mapDispatchToProps = {
     setUser,
     setProfileUser,
     goBack,
-    setRecruitTeams
+    setRecruitTeams,
+    setActiveTab
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(User);
