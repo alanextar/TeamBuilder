@@ -40,6 +40,7 @@ import UserEdit from './panels/userEdit'
 import SetUserTeam from './panels/setUserTeam'
 
 import { Api } from './infrastructure/api';
+import * as VK from './services/VK';
 
 const App = (props) => {
     const [lastAndroidBackAction, setLastAndroidBackButton] = useState(0);
@@ -48,21 +49,24 @@ const App = (props) => {
 
     const { setStory, activeView, activeStory, setProfile, setUser,
         setProfileUser, profileUser, teamUser, eventUser, participantUser, teamsTeam, setPage, setEvent, event,
-        eventsTeam, userTeam, usersTeam, setTeam, setTeamsEventFilter
+        eventsTeam, userTeam, usersTeam, setTeam, setTeamsEventFilter, colorScheme
     } = props;
 
     const [events, setEvents] = useState(null);
     const [activeModal, setActiveModal] = useState(null);
 
     useEffect(() => {
-        const { goBack } = props;
-        bridge.subscribe(({ detail: { type, data } }) => {
-            if (type === 'VKWebAppUpdateConfig') {
-                const schemeAttribute = document.createAttribute('scheme');
-                schemeAttribute.value = data.scheme ? data.scheme : 'client_light';
-                document.body.attributes.setNamedItem(schemeAttribute);
-            }
-        });
+        const { goBack, dispatch } = props;
+
+        dispatch(VK.initApp());
+
+        //bridge.subscribe(({ detail: { type, data } }) => {
+        //    if (type === 'VKWebAppUpdateConfig') {
+        //        const schemeAttribute = document.createAttribute('scheme');
+        //        schemeAttribute.value = data.scheme ? data.scheme : 'client_light';
+        //        document.body.attributes.setNamedItem(schemeAttribute);
+        //    }
+        //});
 
         async function fetchData() {
             const profile = await bridge.send('VKWebAppGetUserInfo');
@@ -109,7 +113,7 @@ const App = (props) => {
     }
 
     return (
-        <ConfigProvider isWebView={true} /*scheme={colorScheme}*/>
+        <ConfigProvider isWebView={true} scheme={colorScheme}>
             <Epic activeStory={activeStory} tabbar={
                 <Tabbar>
                     <TabbarItem

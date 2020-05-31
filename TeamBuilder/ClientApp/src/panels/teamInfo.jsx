@@ -6,6 +6,7 @@ import { bindActionCreators } from "redux";
 import { goBack, setPage, openPopout, closePopout } from "../store/router/actions";
 import { setTeam } from "../store/teams/actions";
 import { setUser, setTeamUser, setProfileUser } from "../store/user/actions";
+import { setActiveTab } from "../store/vk/actions";
 
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell, InfoRow,
@@ -24,7 +25,7 @@ class TeamInfo extends React.Component {
         this.state = {
             team: props.activeTeam,
             panelId: props.id,
-            activeTab: 'teamDescription',
+            activeTab: props.activeTab["teamInfo"] || "teamDescription",
             edit: true,
             contextOpened: false,
             vkProfile: props.profile,
@@ -52,6 +53,11 @@ class TeamInfo extends React.Component {
         if (this.props.activeTeam !== prevProps.activeTeam) {
             this.setState({ team: this.props.activeTeam });
         }
+    }
+
+    componentWillUnmount() {
+        const { setActiveTab } = this.props;
+        setActiveTab("teamInfo", this.state.activeTab);
     }
 
     async populateTeamData() {
@@ -326,14 +332,18 @@ const mapStateToProps = (state) => {
         activeTeam: state.team.activeTeam,
         activeView: state.router.activeView,
         profile: state.user.profile,
-        profileUser: state.user.profileUser
+        profileUser: state.user.profileUser,
+        activeTab: state.vkui.activeTab
     };
 };
 
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
-        ...bindActionCreators({ setPage, setTeam, setUser, goBack, setTeamUser, setProfileUser, openPopout, closePopout }, dispatch)
+        ...bindActionCreators({
+            setPage, setTeam, setUser, goBack, setActiveTab,
+            setTeamUser, setProfileUser, openPopout, closePopout
+        }, dispatch)
     }
 }
 
