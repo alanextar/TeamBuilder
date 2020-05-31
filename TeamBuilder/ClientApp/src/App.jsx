@@ -46,7 +46,7 @@ const App = (props) => {
 
     const { setStory, activeView, activeStory, panelsHistory, setProfile, setUser,
         setProfileUser, profileUser, teamUser, eventUser, participantUser, teamsTeam, setPage, setEvent, event,
-        eventsTeam, userTeam, usersTeam, setTeam, setTeamsEventFilter
+        eventsTeam, userTeam, usersTeam, setTeam, setTeamsEventFilter, popouts
     } = props;
     let history = (panelsHistory[activeView] === undefined) ? [activeView] : panelsHistory[activeView];
 
@@ -69,7 +69,7 @@ const App = (props) => {
                 setUser(user);
                 setProfileUser(user);
             });
-            
+
             setEvent(event);
         }
         fetchData();
@@ -98,6 +98,8 @@ const App = (props) => {
     const getEvents = () => {
         Api.Events.getAll().then(result => setEvents(result))
     }
+
+    let popout = (popouts[activeView] === undefined) ? null : popouts[activeView];
 
     return (
         <Epic activeStory={activeStory} tabbar={
@@ -129,7 +131,7 @@ const App = (props) => {
                     selected={activeStory === 'events'}
                     text="События"
                 ><Icon28FavoriteOutline /></TabbarItem>
-                <TabbarItem style={{color: props.profileUser ? "" : "red"}}
+                <TabbarItem style={{ color: props.profileUser ? "" : "red" }}
                     onClick={() => {
                         setStory('user', 'user');
                         setUser(profileUser);
@@ -142,6 +144,7 @@ const App = (props) => {
         }>
             <View id='teams' activePanel={getActivePanel("teams")}
                 history={history}
+                popout={popout}
                 modal={
                     <ModalRoot activeModal={activeModal}>
                         <ModalPage
@@ -149,7 +152,7 @@ const App = (props) => {
                             onClose={hideModal}
                             header={
                                 <ModalPageHeader
-                                    left={<PanelHeaderButton onClick={e => {setTeamsEventFilter(null); hideModal();}}>Сбросить</PanelHeaderButton>}
+                                    left={<PanelHeaderButton onClick={e => { setTeamsEventFilter(null); hideModal(); }}>Сбросить</PanelHeaderButton>}
                                     right={<PanelHeaderButton
                                         onClick={() => { hideModal(); }}>Готово</PanelHeaderButton>}
                                 >
@@ -162,14 +165,14 @@ const App = (props) => {
                                         onClick={() => {
                                             setPage('teams', 'eventsFilter');
                                             hideModal();
-                                    }}>
-                                    {props.teamsEventFilter && props.teamsEventFilter.name}
+                                        }}>
+                                        {props.teamsEventFilter && props.teamsEventFilter.name}
                                     </SelectMimicry>
                                 </FormLayout>}
                         </ModalPage>
                     </ModalRoot>}
             >
-                <Teams id='teams' activeStory={activeStory} onFiltersClick={(e) => { setActiveModal('filters'); }}/>
+                <Teams id='teams' activeStory={activeStory} onFiltersClick={(e) => { setActiveModal('filters'); }} />
                 <TeamInfo id='teaminfo' return='teams' />
                 <TeamCreate id='teamCreate' />
                 <TeamEdit id='teamEdit' />
@@ -236,7 +239,8 @@ const mapStateToProps = (state) => {
         usersTeam: state.team.usersTeam,
         eventsTeam: state.team.eventsTeam,
         event: state.event.event,
-        teamsEventFilter: state.event.teamsEventFilter
+        teamsEventFilter: state.event.teamsEventFilter,
+        popouts: state.router.popouts,
     };
 };
 
