@@ -41,23 +41,21 @@ import SetUserTeam from './panels/setUserTeam'
 
 import { Api } from './infrastructure/api';
 
-import HomePanelBase from './panels/home/base';
-import HomePanelGroups from './panels/home/groups';
-
 const App = (props) => {
     const [lastAndroidBackAction, setLastAndroidBackButton] = useState(0);
     const [history, setHistory] = useState(null);
     const [popout, setPopout] = useState(null);
 
-    const { setStory, activeView, activeStory, panelsHistory, setProfile, setUser,
+    const { setStory, activeView, activeStory, setProfile, setUser,
         setProfileUser, profileUser, teamUser, eventUser, participantUser, teamsTeam, setPage, setEvent, event,
-        eventsTeam, userTeam, usersTeam, setTeam, setTeamsEventFilter, popouts, colorScheme
+        eventsTeam, userTeam, usersTeam, setTeam, setTeamsEventFilter
     } = props;
 
     const [events, setEvents] = useState(null);
     const [activeModal, setActiveModal] = useState(null);
 
     useEffect(() => {
+        const { goBack } = props;
         bridge.subscribe(({ detail: { type, data } }) => {
             if (type === 'VKWebAppUpdateConfig') {
                 const schemeAttribute = document.createAttribute('scheme');
@@ -77,38 +75,30 @@ const App = (props) => {
             setEvent(event);
         }
         fetchData();
-
         getEvents();
 
+        window.onpopstate = () => {
+            let timeNow = +new Date();
+
+            if (timeNow - lastAndroidBackAction > 500) {
+                setLastAndroidBackButton(timeNow);
+
+                goBack();
+            } else {
+                window.history.pushState(null, null);
+            }
+        };
     }, []);
-
-    useEffect(() => {
-        window.addEventListener('popstate', handleChange)
-        return () => window.removeEventListener('popstate', handleChange)
-    }, [])
-
-    const handleChange = () => {
-        let timeNow = +new Date();
-
-        if (timeNow - lastAndroidBackAction > 500) {
-            setLastAndroidBackButton(timeNow);
-
-            goBack();
-        } else {
-            window.history.pushState(null, null);
-        }
-    }
 
     useEffect(() => {
         const { activeView, panelsHistory, activeModals, popouts } = props;
         let history = (panelsHistory[activeView] === undefined) ? [activeView] : panelsHistory[activeView];
-        setHistory(history);
         let popout = (popouts[activeView] === undefined) ? null : popouts[activeView];
-        setPopout(popout);
         let activeModal = (activeModals[activeView] === undefined) ? null : activeModals[activeView];
+        setHistory(history);
+        setPopout(popout);
         setActiveModal(activeModal);
-        console.log('history popout activeModal', history, popout, activeModal);
-    });
+    }, []);
 
     const hideModal = () => {
         setActiveModal(null);
