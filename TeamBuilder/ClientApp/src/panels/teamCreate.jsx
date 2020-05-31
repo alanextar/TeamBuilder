@@ -140,8 +140,6 @@ class TeamCreate extends React.Component {
                                 <Textarea top="Описание участников и их задач" onChange={this.onMembersDescriptionChange} defaultValue={this.state.membersDescription} />
                             </FormLayout>
                         </Cell>}
-                </Group>
-                <FixedLayout vertical="bottom">
                     <Div>
                         <Button
                             stretched={true}
@@ -152,7 +150,7 @@ class TeamCreate extends React.Component {
                             Создать Команду
                             </Button>
                     </Div>
-                </FixedLayout>
+                </Group>
             </Panel>
         );
     }

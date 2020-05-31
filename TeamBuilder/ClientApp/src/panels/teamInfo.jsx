@@ -3,14 +3,14 @@ import { Api } from '../infrastructure/api';
 
 import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
-import { goBack, setPage } from "../store/router/actions";
+import { goBack, setPage, openPopout, closePopout } from "../store/router/actions";
 import { setTeam } from "../store/teams/actions";
 import { setUser, setTeamUser, setProfileUser } from "../store/user/actions";
 
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell, InfoRow,
-    SimpleCell, Avatar, Div, PullToRefresh, FixedLayout, PanelHeaderContent, PanelHeaderContext,
-    List,
+    SimpleCell, Avatar, Div, PullToRefresh, PanelHeaderContent, PanelHeaderContext,
+    List, Alert
 } from '@vkontakte/vkui';
 
 import Icon28MessageOutline from '@vkontakte/icons/dist/28/message_outline';
@@ -28,7 +28,8 @@ class TeamInfo extends React.Component {
             edit: true,
             contextOpened: false,
             vkProfile: props.profile,
-            profileUser: props.profileUser
+            profileUser: props.profileUser,
+            exitTeamAlert: null,
         };
 
         this.onRefresh = async () => {
@@ -113,6 +114,50 @@ class TeamInfo extends React.Component {
             })
     };
 
+    openPopoutExit = () => {
+        this.props.openPopout(
+            <Alert
+                actionsLayout="vertical"
+                actions={[{
+                    title: 'Выйти из команды',
+                    autoclose: true,
+                    mode: 'destructive',
+                    action: () => this.dropUser(),
+                }, {
+                    title: 'Отмена',
+                    autoclose: true,
+                    mode: 'cancel'
+                }]}
+                onClose={() => this.props.closePopout()}
+            >
+                <h2>Подтвердите действие</h2>
+                <p>Вы уверены, что хотите выйти из команды?</p>
+            </Alert>
+        );
+    };
+
+    openPopoutDecline = (e, userInActiveTeam) => {
+        this.props.openPopout(
+            <Alert
+                actionsLayout="vertical"
+                actions={[{
+                    title: 'Отклонить заявку',
+                    autoclose: true,
+                    mode: 'destructive',
+                    action: () => this.cancelUser(e, userInActiveTeam),
+                }, {
+                    title: 'Отмена',
+                    autoclose: true,
+                    mode: 'cancel'
+                }]}
+                onClose={() => this.props.closePopout()}
+            >
+                <h2>Подтвердите действие</h2>
+                <p>Вы уверены, что хотите выйти из команды?</p>
+            </Alert>
+        );
+    };
+
     render() {
         const { goBack, setTeamUser, setUser, setPage, activeView } = this.props;
         let userInActiveTeam = this.state.vkProfile && this.state.team.userTeams &&
@@ -122,6 +167,7 @@ class TeamInfo extends React.Component {
         let isModerator = this.state.profileUser && this.state.profileUser.isModerator;
         let userAction = userInActiveTeam && userInActiveTeam.userAction;
         let confirmedUser = countConfirmed(this.state.team.userTeams);
+        console.log('!!!!!!!!!!!!', this.state.team)
         let teamCap = this.state.team.userTeams.find(x => x.isOwner) && this.state.team.userTeams.find(x => x.isOwner).user
 
         return (
@@ -152,7 +198,7 @@ class TeamInfo extends React.Component {
                         </List>
                         || userAction === 2 &&
                         <List>
-                            <Cell onClick={(e) => this.dropUser(e, userInActiveTeam)}>
+                            <Cell onClick={() => this.openPopoutExit()}>
                                 Выйти из команды
                             </Cell>
                         </List>
@@ -164,7 +210,7 @@ class TeamInfo extends React.Component {
                                 Принять заявку
                             </Cell>
                             <Cell
-                                onClick={(e) => this.cancelUser(e, userInActiveTeam)}
+                                onClick={(e) => this.openPopoutDecline(e, userInActiveTeam)}
                             >
                                 Отклонить заявку
                             </Cell>
@@ -288,7 +334,7 @@ const mapStateToProps = (state) => {
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
-        ...bindActionCreators({ setPage, setTeam, setUser, goBack, setTeamUser, setProfileUser }, dispatch)
+        ...bindActionCreators({ setPage, setTeam, setUser, goBack, setTeamUser, setProfileUser, openPopout, closePopout }, dispatch)
     }
 }
 
