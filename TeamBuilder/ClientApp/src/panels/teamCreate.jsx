@@ -4,13 +4,14 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
 import { goBack, setPage } from "../store/router/actions";
 import { setTeam } from "../store/teams/actions";
+import { setActiveTab } from "../store/vk/actions";
 
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell,
     Div, Button, Textarea, FormLayout, Select, Input, Slider, FixedLayout, Link
 } from '@vkontakte/vkui';
 import { Api } from '../infrastructure/api';
-import {GetRandomPic} from '../infrastructure/utils';
+import { GetRandomPic } from '../infrastructure/utils';
 
 class TeamCreate extends React.Component {
     constructor(props) {
@@ -25,7 +26,7 @@ class TeamCreate extends React.Component {
             usersNumber: 2,
             go: props.go,
             id: props.id,
-            activeTab: 'teamDescription'
+            activeTab: props.activeTab["teamCreate"] || "teamDescription",
         };
 
         this.onEventChange = this.onEventChange.bind(this);
@@ -37,6 +38,11 @@ class TeamCreate extends React.Component {
 
     componentDidMount() {
         this.populateTeamData();
+    }
+
+    componentWillUnmount() {
+        const { setActiveTab } = this.props;
+        setActiveTab("teamCreate", this.state.activeTab);
     }
 
     async populateTeamData() {
@@ -160,14 +166,15 @@ class TeamCreate extends React.Component {
 
 const mapStateToProps = (state) => {
     return {
-        activeView: state.router.activeView
+        activeView: state.router.activeView,
+        activeTab: state.vkui.activeTab
     };
 };
 
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
-        ...bindActionCreators({ setPage, goBack, setTeam }, dispatch)
+        ...bindActionCreators({ setPage, goBack, setTeam, setActiveTab }, dispatch)
     }
 }
 

@@ -61,7 +61,6 @@ class User extends React.Component {
 
     componentWillUnmount() {
         const { setActiveTab } = this.props;
-
         setActiveTab("profile", this.state.activeTab);
     }
 

@@ -5,6 +5,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
 import { goBack, setPage } from "../store/router/actions";
 import { setTeam } from "../store/teams/actions";
+import { setActiveTab } from "../store/vk/actions";
 
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell,
@@ -21,7 +22,7 @@ class TeamEdit extends React.Component {
         this.state = {
             team: this.props.activeTeam,
             events: [],
-            activeTab: 'teamDescription',
+            activeTab: props.activeTab["teamEdit"] || "teamDescription",
             panelId: props.id
         };
 
@@ -41,6 +42,11 @@ class TeamEdit extends React.Component {
         if (this.props.activeTeam !== prevProps.activeTeam) {
             this.setState({ team: this.props.activeTeam });
         }
+    }
+
+    componentWillUnmount() {
+        const { setActiveTab } = this.props;
+        setActiveTab("teamEdit", this.state.activeTab);
     }
 
     async populateEventsData() {
@@ -229,7 +235,8 @@ class TeamEdit extends React.Component {
 const mapStateToProps = (state) => {
     return {
         activeTeam: state.team.activeTeam,
-        activeView: state.router.activeView
+        activeView: state.router.activeView,
+        activeTab: state.vkui.activeTab
     };
 };
 
@@ -237,7 +244,7 @@ const mapStateToProps = (state) => {
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
-        ...bindActionCreators({ setPage, setTeam, goBack }, dispatch)
+        ...bindActionCreators({ setPage, setTeam, goBack, setActiveTab }, dispatch)
     }
 }
 
