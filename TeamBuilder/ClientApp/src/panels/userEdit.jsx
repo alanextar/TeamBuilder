@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
 
 import { goBack } from "../store/router/actions";
-//import { setFormData } from "../store/formData/actions";
+import { setFormData } from "../store/formData/actions";
 import { setUser, setProfileUser } from "../store/user/actions";
 
 import {
@@ -12,6 +12,7 @@ import {
     FormLayoutGroup, Textarea, Separator, FormLayout, PanelHeaderBack
 } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
+import '../../src/styles/style.css';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import { Api, Urls } from '../infrastructure/api';
 
@@ -19,19 +20,10 @@ class UserEdit extends React.Component {
     constructor(props) {
         super(props);
 
-        let defaultInputData = {
-            about: '',
-            mobile: '',
-            email: '',
-            telegram: '',
-
-            checkboxInSearch: 0
-        };
-
         this.state = {
             vkProfile: props.profile,
-            user: props.user || defaultInputData,
-            lastSavedUser: props.user
+            user: props.user,
+            inputData: props.inputData['profile_form'] ? props.inputData['profile_form'] : props.user
         }
 
         this.handleInput = (e) => {
@@ -42,37 +34,40 @@ class UserEdit extends React.Component {
             }
 
             this.setState({
+                inputData: {
+                    ...this.state.inputData,
+                    [e.currentTarget.name]: value
+                },
                 user: {
                     ...this.state.user,
                     [e.currentTarget.name]: value
-                }
+				}
             })
         }
 
         this.cancelForm = () => {
-            setProfileUser(this.state.lastSavedUser);
+            this.setState({
+                inputData: null
+            })
             goBack();
         };
 
         this.postEdit = this.postEdit.bind(this);
-        const { setProfileUser, goBack } = this.props;
+        const { goBack } = this.props;
     }
 
     componentWillUnmount() {
-        const { setProfileUser } = this.props;
-        console.log('componentWillUnmount()', this.state.user);
-        setProfileUser(this.state.user);
+        this.props.setFormData('profile_form', this.state.inputData);
     }
 
     async postEdit() {
         let updatedUser = await Api.post(Urls.Users.Edit, this.state.user);
-        const { setProfileUser } = this.props;
-        //setUser(updatedUser);
+        const { setProfileUser, setUser } = this.props;
+        setUser(updatedUser);
         setProfileUser(updatedUser);
     }
 
     render() {
-
         const { goBack } = this.props;
 
         return (
@@ -88,10 +83,10 @@ class UserEdit extends React.Component {
                 <Separator />
                 <FormLayout>
                     <FormLayoutGroup top="Редактирование">
-                        <Input name="mobile" value={this.state.user.mobile} onChange={this.handleInput} type="text" placeholder="тел" />
-                        <Input name="telegram" value={this.state.user.telegram} onChange={this.handleInput} type="text" placeholder="telegram" />
-                        <Input name="email" value={this.state.user.email} onChange={this.handleInput} type="text" placeholder="email" />
-                        <Textarea name="about" value={this.state.user.about} onChange={this.handleInput} placeholder="дополнительно" />
+                        <Input name="mobile" value={this.state.inputData && this.state.inputData.mobile} onChange={this.handleInput} type="text" placeholder="тел" />
+                        <Input name="telegram" value={this.state.inputData && this.state.inputData.telegram} onChange={this.handleInput} type="text" placeholder="telegram" />
+                        <Input name="email" value={this.state.inputData && this.state.inputData.email} onChange={this.handleInput} type="text" placeholder="email" />
+                        <Textarea name="about" value={this.state.inputData && this.state.inputData.about} onChange={this.handleInput} placeholder="дополнительно" />
                     </FormLayoutGroup>
                 </FormLayout>
                 <Div>
@@ -114,14 +109,15 @@ const mapStateToProps = (state) => {
 
     return {
         user: state.user.user,
-        profile: state.user.profile
+        profile: state.user.profile,
+        inputData: state.formData.forms,
     };
 };
 
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
-        ...bindActionCreators({ goBack, setUser, setProfileUser }, dispatch)
+        ...bindActionCreators({ goBack, setUser, setProfileUser, setFormData }, dispatch)
     }
 }
 

@@ -6,7 +6,10 @@ import {
     Tabs, TabsItem, Separator, Checkbox, InfoRow, Header, Title, Link, Switch
 } from '@vkontakte/vkui';
 import { Typeahead } from 'react-bootstrap-typeahead';
+import { } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
+import '../../src/styles/style.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import Icon28PhoneOutline from '@vkontakte/icons/dist/28/phone_outline';
 import Icon28ArticleOutline from '@vkontakte/icons/dist/28/article_outline';
@@ -230,7 +233,7 @@ class User extends React.Component {
                                 </Cell>}
                             <Div>
                                 <Title level="3" weight="regular" style={{ marginBottom: 16 }}>Скиллы:</Title>
-                                {/* <Typeahead id="skills"
+                                <Typeahead id="skills"
                                     clearButton
                                     onChange={(e) => {
                                         this.onSkillsChange(e)
@@ -241,9 +244,9 @@ class User extends React.Component {
                                     multiple
                                     className="Select__el"
                                     disabled={this.state.readOnlyMode}
-                                /> */}
+                                />
 
-                                <CreatableMulti data={this.state.allSkills && this.state.allSkills}/>
+                                {/*<CreatableMulti data={this.state.allSkills && this.state.allSkills} />*/}
                             </Div>
                             <Div>
                                 <Cell asideContent={
