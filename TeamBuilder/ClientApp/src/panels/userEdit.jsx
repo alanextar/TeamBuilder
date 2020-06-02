@@ -61,7 +61,7 @@ class UserEdit extends React.Component {
     }
 
     async postEdit() {
-        let updatedUser = await Api.post(Urls.Users.Edit, this.state.user);
+        let updatedUser = await Api.post(Urls.Users.Edit, this.state.inputData);
         const { setProfileUser, setUser } = this.props;
         setUser(updatedUser);
         setProfileUser(updatedUser);
@@ -72,7 +72,7 @@ class UserEdit extends React.Component {
 
         return (
             <Panel id="userEdit">
-                <PanelHeader left={<PanelHeaderBack onClick={() => goBack()} />}>Профиль</PanelHeader>
+                <PanelHeader left={<PanelHeaderBack onClick={this.cancelForm} />}>Профиль</PanelHeader>
                 {this.state.vkProfile &&
                     <Group title="VK Connect">
                         <Cell description={this.state.vkProfile.city && this.state.vkProfile.city.title ? this.state.vkProfile.city.title : ''}
