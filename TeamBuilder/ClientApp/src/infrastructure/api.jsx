@@ -42,7 +42,7 @@ export class Api {
         delete: (data) => teams.remove(data),
         rejectedOrRemoveUser: (data) => teams.rejectedOrRemoveUser(data),
         cancelRequestUser: (data) => teams.cancelRequestUser(data),
-        joinTeam: (userId, teamId) => teams.joinTeam(userId, teamId),
+        joinTeam: (data) => teams.joinTeam(data),
     };
 
     static Skills = {

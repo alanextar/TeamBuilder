@@ -70,6 +70,7 @@ class TeamInfo extends React.Component {
         this.setState({ contextOpened: !this.state.contextOpened });
     };
 
+    //Подать заявку в команду
     async sendRequest() {
         const { setProfileUser } = this.props;
 
@@ -86,17 +87,20 @@ class TeamInfo extends React.Component {
             })
     };
 
-
+    //Принять приглашение
     async joinTeam() {
         var teamId = this.state.team.id;
         var userId = this.state.profileUser.id;
 
-        await Api.Teams.joinTeam(userId, teamId)
-            .then(data => {
-                this.setState({ team: data });
+        await Api.Users.joinTeam(teamId)
+            .then(userTeams => {
+                var profileUser = this.state.profileUser;
+                profileUser.userAction = 2;
+                setProfileUser(profileUser);
             })
     };
 
+    //Выйти из команды / отклонить приглашение
     async dropUser() {
         var userId = this.state.profileUser.id;
         var teamId = this.state.team.id;
@@ -107,15 +111,19 @@ class TeamInfo extends React.Component {
             })
     };
 
+    //Отменить поданную в команду заявку
     async cancelUser(e, userTeam) {
         let teamId = userTeam.teamId;
-        let userId = userTeam.userId;
 
-        await Api.Teams.cancelRequestUser({ teamId, userId })
-            .then(json => {
-                this.setState({ team: json });
-                var profileUser = profileUser;
-                profileUser.userAction = 1;
+        await Api.Users.cancelRequestTeam(teamId)
+            .then(userTeams => {
+                console.log()
+                this.setState({ team: {
+                    ...this.state.team,
+                    userTeams: userTeams
+                } });
+                var profileUser = this.state.profileUser;
+                profileUser.userAction = 0;
                 setProfileUser(profileUser);
             })
     };
@@ -147,10 +155,10 @@ class TeamInfo extends React.Component {
             <Alert
                 actionsLayout="vertical"
                 actions={[{
-                    title: 'Отклонить заявку',
+                    title: 'Отклонить приглашение',
                     autoclose: true,
                     mode: 'destructive',
-                    action: () => this.cancelUser(e, userInActiveTeam),
+                    action: () => this.dropUser(e, userInActiveTeam),
                 }, {
                     title: 'Отмена',
                     autoclose: true,
@@ -159,7 +167,7 @@ class TeamInfo extends React.Component {
                 onClose={() => this.props.closePopout()}
             >
                 <h2>Подтвердите действие</h2>
-                <p>Вы уверены, что хотите выйти из команды?</p>
+                <p>Вы уверены, что хотите отклонить приглашение?</p>
             </Alert>
         );
     };
@@ -189,9 +197,7 @@ class TeamInfo extends React.Component {
                 {this.state.team && <PanelHeaderContext opened={this.state.contextOpened} onClose={this.toggleContext}>
                     {(isOwner || isModerator) &&
                         <List>
-                            <Cell
-                                onClick={() => setPage(activeView, 'teamEdit')}
-                            >
+                            <Cell onClick={() => setPage(activeView, 'teamEdit')}>
                                 Редактировать команду
                             </Cell>
                         </List>
@@ -199,6 +205,9 @@ class TeamInfo extends React.Component {
                         <List>
                             <Cell>
                                 Заявка на рассмотрении
+                            </Cell>
+                            <Cell onClick={(e) => this.cancelUser(e, userInActiveTeam)}>
+                                Отменить заявку
                             </Cell>
                         </List>
                         || userAction === 2 &&
@@ -209,15 +218,12 @@ class TeamInfo extends React.Component {
                         </List>
                         || userAction === 5 &&
                         <List>
-                            <Cell
-                                onClick={() => this.joinTeam()}
-                            >
-                                Принять заявку
+                            <Cell onClick={() => this.joinTeam()}>
+                                Принять приглашение
                             </Cell>
                             <Cell
-                                onClick={(e) => this.openPopoutDecline(e, userInActiveTeam)}
-                            >
-                                Отклонить заявку
+                                onClick={(e) => this.openPopoutDecline(e, userInActiveTeam)}>
+                                Отклонить приглашение
                             </Cell>
                         </List>
                         || (!isUserInActiveTeam || userAction == 3 || userAction == 4) &&
