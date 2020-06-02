@@ -1,9 +1,10 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 
 import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
 import { goBack, setPage } from "../store/router/actions";
 import { setEvent } from "../store/events/actions";
+import { setFormData } from "../store/formData/actions";
 
 import {
     Panel, PanelHeader, Group, Button, Textarea, FixedLayout,
@@ -12,61 +13,63 @@ import {
 import { Api } from '../infrastructure/api';
 
 const EventCreate = props => {
-    const [eventName, setEventName] = useState('');
-    const [eventDescription, setEventDescription] = useState('');
-    const [eventLink, setEventLink] = useState('');
-    const [eventStartDate, setEventStartDate] = useState('');
-    const [eventFinishDate, setEventFinishDate] = useState('');
+    let defaultInputData = {
+        name: '',
+        description: '',
+        link: '',
+        startDate: '',
+        finishDate: ''
+    };
     const { activeView, setPage, setEvent, goBack } = props;
+    const [inputData, setInputData] = useState(props.inputData['eventCreate_form'] || defaultInputData);
 
-    const onNameChange = (e) => {
-        setEventName(e.target.value);
-    };
+    const handleInput = (e) => {
+        let value = e.currentTarget.value;
+        console.log('!!!!!!!!!!!!!!', value);
 
-    const onDescriptionChange = (e) => {
-        setEventDescription(e.target.value);
-    };
+        if (e.currentTarget.type === 'checkbox') {
+            value = e.currentTarget.checked;
+        }
 
-    const onLinkChange = (e) => {
-        setEventLink(e.target.value);
-    };
+        setInputData({
+            ...inputData,
+            [e.currentTarget.name]: value
+        });
+    }
 
-    const onStartDateChange = (e) => {
-        setEventStartDate(e.target.value);
-    };
-
-    const onFinishDateChange = (e) => {
-        setEventFinishDate(e.target.value);
+    const cancelForm = () => {
+        setInputData(defaultInputData);
+        props.goBack();
     };
 
     const eventCreate = () => {
-        var createEventViewModel = {
-            name: eventName,
-            description: eventDescription,
-            startDate: eventStartDate,
-            finishDate: eventFinishDate,
-            link: eventLink
-        }
-
-        Api.Events.create(createEventViewModel)
+        Api.Events.create(inputData)
             .then(result => { setEvent(result); setPage(activeView, 'eventInfo')});
     }
 
+    useEffect(() => {
+        const { setFormData } = props;
+
+        return () => {
+            setFormData('eventCreate_form', inputData);
+        };
+    }, [inputData]);
+
     return (
         <Panel id={props.id}>
-            <PanelHeader left={<PanelHeaderBack onClick={() => goBack()} />}>
+            <PanelHeader left={<PanelHeaderBack onClick={cancelForm} />}>
                 Создание
         </PanelHeader>
 
             <FormLayout>
-                <Input top="Название события" type="text" onChange={onNameChange} value={eventName} placeholder="Введите название события" status={eventName ? 'valid' : 'error'}  />
-                <Textarea top="Описание события" onChange={onDescriptionChange} value={eventDescription} />
-                <Input top="Ссылка на событие" type="text" onChange={onLinkChange} value={eventLink} />
-                <Input top="Дата начала события" type="date" onChange={onStartDateChange} value={eventStartDate} />
-                <Input top="Дата завершения события" type="date" onChange={onFinishDateChange} value={eventFinishDate} />
+                <Input top="Название события" type="text" onChange={handleInput} name="name" value={inputData.name} placeholder="Введите название события" status={inputData.name ? 'valid' : 'error'} />
+                <Textarea top="Описание события" onChange={handleInput} name="description" value={inputData.description} />
+                <Input top="Ссылка на событие" type="text" onChange={handleInput} name="link" value={inputData.link} />
+                <Input top="Дата начала события" type="date" onChange={handleInput} name="startDate" value={inputData.startDate} />
+                <Input top="Дата завершения события" type="date" onChange={handleInput} name="finishDate" value={inputData.finishDate} />
                 <Button
                     size='xl'
-                    onClick={() => { eventName && eventCreate() }}>
+                    onClick={() => { inputData.name && eventCreate() }}>
                     Создать событие
                 </Button>
 
@@ -77,14 +80,15 @@ const EventCreate = props => {
 
 const mapStateToProps = (state) => {
     return {
-        activeView: state.router.activeView
+        activeView: state.router.activeView,
+        inputData: state.formData.forms,
     };
 };
 
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
-        ...bindActionCreators({ setPage, setEvent, goBack }, dispatch)
+        ...bindActionCreators({ setPage, setEvent, goBack, setFormData }, dispatch)
     }
 }
 
