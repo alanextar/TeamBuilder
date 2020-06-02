@@ -25,7 +25,6 @@ const EventCreate = props => {
 
     const handleInput = (e) => {
         let value = e.currentTarget.value;
-        console.log('!!!!!!!!!!!!!!', value);
 
         if (e.currentTarget.type === 'checkbox') {
             value = e.currentTarget.checked;

@@ -38,8 +38,9 @@ const EventEdit = props => {
     }
 
     const cancelForm = () => {
+        const { goBack } = props;
         setInputData(null);
-        props.goBack();
+        goBack();
     };
 
     useEffect(() => {
@@ -51,18 +52,17 @@ const EventEdit = props => {
     }, [inputData]);
 
     return (
-
         <Panel id={props.id}>
             <PanelHeader separator={false} left={<PanelHeaderBack onClick={cancelForm} />}>
                 Редактировать
         </PanelHeader>
 
             <FormLayout>
-                <Input top="Название события" type="text" onChange={handleInput} name="name" value={inputData.name} status={inputData.name ? 'valid' : 'error'} placeholder="Введите название события" />
-                <Textarea top="Описание события" onChange={handleInput} name="description" value={inputData.description} />
-                <Input top="Ссылка на событие" type="text" onChange={handleInput} name="link" value={inputData.link} />
-                <Input top="Дата начала события" type="date" onChange={handleInput} name="startDate" value={inputData.startDate} />
-                <Input top="Дата завершения события" type="date" onChange={handleInput} name="finishDate" value={inputData.finishDate} />
+                <Input top="Название события" type="text" onChange={handleInput} name="name" value={inputData && inputData.name} status={inputData && inputData.name ? 'valid' : 'error'} placeholder="Введите название события" />
+                <Textarea top="Описание события" onChange={handleInput} name="description" value={inputData && inputData.description} />
+                <Input top="Ссылка на событие" type="text" onChange={handleInput} name="link" value={inputData && inputData.link} />
+                <Input top="Дата начала события" type="date" onChange={handleInput} name="startDate" value={inputData && inputData.startDate} />
+                <Input top="Дата завершения события" type="date" onChange={handleInput} name="finishDate" value={inputData && inputData.finishDate} />
                 <Button
                     size='xl'
                     onClick={() => { inputData.name && eventEdit(); }}>
