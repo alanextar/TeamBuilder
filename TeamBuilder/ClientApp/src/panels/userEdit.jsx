@@ -61,7 +61,7 @@ class UserEdit extends React.Component {
     }
 
     async postEdit() {
-        let updatedUser = await Api.post(Urls.Users.Edit, this.state.user);
+        let updatedUser = await Api.post(Urls.Users.Edit, this.state.inputData);
         const { setProfileUser, setUser } = this.props;
         setUser(updatedUser);
         setProfileUser(updatedUser);
