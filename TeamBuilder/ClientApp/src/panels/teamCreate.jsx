@@ -5,6 +5,7 @@ import { bindActionCreators } from "redux";
 import { goBack, setPage } from "../store/router/actions";
 import { setTeam } from "../store/teams/actions";
 import { setActiveTab } from "../store/vk/actions";
+import { setFormData } from "../store/formData/actions";
 
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell,
@@ -17,22 +18,43 @@ class TeamCreate extends React.Component {
     constructor(props) {
         super(props);
 
-        this.state = {
+        let defaultInputData = {
             name: '',
-            description: '',
-            membersDescription: '',
-            events: [],
             eventId: null,
-            usersNumber: 2,
-            go: props.go,
-            id: props.id,
-            activeTab: props.activeTab["teamCreate"] || "teamDescription",
+            numberRequiredMembers: 2,
+            membersDescription: ''
         };
 
-        this.onEventChange = this.onEventChange.bind(this);
-        this.onDescriptionChange = this.onDescriptionChange.bind(this);
-        this.onMembersDescriptionChange = this.onMembersDescriptionChange.bind(this);
-        this.onNameChange = this.onNameChange.bind(this);
+        this.state = {
+            events: [],
+            id: props.id,
+            activeTab: props.activeTab["teamCreate"] || "teamDescription",
+            inputData: props.inputData['teamCreate_form'] || defaultInputData
+        };
+
+         this.handleInput = (e) => {
+             let value = e.currentTarget.value;
+
+             if (e.currentTarget.type === 'checkbox') {
+                 value = e.currentTarget.checked;
+             }
+             console.log(value);
+             this.setState({
+                 inputData: {
+                     ...this.state.inputData,
+                     [e.currentTarget.name]: value
+                 }
+             })
+             console.log(this.state.inputData);
+         }
+
+        this.cancelForm = () => {
+            this.setState({
+                inputData: null
+            })
+            props.goBack();
+        };
+
         this.postCreate = this.postCreate.bind(this);
     }
 
@@ -41,8 +63,9 @@ class TeamCreate extends React.Component {
     }
 
     componentWillUnmount() {
-        const { setActiveTab } = this.props;
+        const { setActiveTab, setFormData } = this.props;
         setActiveTab("teamCreate", this.state.activeTab);
+        setFormData('teamCreate_form', this.state.inputData);
     }
 
     async populateTeamData() {
@@ -50,33 +73,14 @@ class TeamCreate extends React.Component {
             .then(result => this.setState({ events: result, }));
     }
 
-    onEventChange(e) {
-        this.setState({ eventId: e.target.value });
-    }
-
-    onNameChange(e) {
-        this.setState({ name: e.target.value })
-    }
-
-    onDescriptionChange(e) {
-        this.setState({ description: e.target.value })
-    }
-
-    onMembersDescriptionChange(e) {
-        this.setState({ membersDescription: e.target.value })
-    }
-
     async postCreate() {
         const { setTeam, setPage } = this.props;
-        var createTeamViewModel = {
-            name: this.state.name,
-            photo100: GetRandomPic(),
-            description: this.state.description,
-            numberRequiredMembers: this.state.usersNumber,
-            descriptionRequiredMembers: this.state.membersDescription,
-            eventId: this.state.eventId
+        this.setState = {
+            ...this.state.inputData,
+            photo100: GetRandomPic()
         }
-        let result = await Api.Teams.create(createTeamViewModel)
+
+        let result = await Api.Teams.create(this.state.inputData)
 
         setTeam(result);
         setPage('teams', 'teaminfo');
@@ -84,9 +88,11 @@ class TeamCreate extends React.Component {
 
     render() {
         const { id, goBack, setPage, setTeam, activeView } = this.props;
+        var inputData = this.state.inputData;
+
         return (
             <Panel id={this.state.id}>
-                <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
+                <PanelHeader separator={false} left={<PanelHeaderBack onClick={this.cancelForm} />}>
                     Создание
                 </PanelHeader>
                 <Tabs>
@@ -111,15 +117,16 @@ class TeamCreate extends React.Component {
                     {this.state.activeTab === 'teamDescription' ?
                         <FormLayout >
                             <Input top="Название команды" type="text" placeholder="Введите название команды"
-                                onChange={this.onNameChange}
-                                defaultValue={this.state.name}
-                                status={this.state.name ? 'valid' : 'error'} />
-                            <Textarea top="Описание команды" onChange={this.onDescriptionChange} defaultValue={this.state.description} />
+                                onChange={this.handleInput}
+                                name="name"
+                                value={inputData.name}
+                                status={inputData.name ? 'valid' : 'error'} />
+                            <Textarea top="Описание команды" onChange={this.handleInput} name="description" value={inputData.description} />
                             <Select
                                 top="Выберете событие"
                                 placeholder="Событие"
-                                onChange={this.onEventChange}
-                                value={this.state.eventId ? this.state.eventId : ''}
+                                onChange={this.handleInput}
+                                value={inputData.eventId && inputData.eventId}
                                 name="eventId"
                                 bottom={<Link style={{ color: 'rebeccapurple', textAlign: "right" }} onClick={() => setPage(activeView, 'eventCreate')}>Создать событие</Link>}>>
                                 {this.state.events && this.state.events.map((ev, i) => {
@@ -134,23 +141,24 @@ class TeamCreate extends React.Component {
                         :
                         <Cell>
                             <FormLayout >
-                                <Slider
+                                {/*<Slider
                                     step={1}
                                     min={2}
                                     max={10}
-                                    value={Number(this.state.usersNumber)}
-                                    onChange={usersNumber => this.setState({ usersNumber })}
+                                    name="numberRequiredMembers"
+                                    value={Number(inputData.numberRequiredMembers)}
+                                    onChange={this.handleInput}
                                     top="Количество участников в команде"
-                                />
-                                <Input value={String(this.state.usersNumber)} onChange={e => this.setState({ usersNumber: e.target.value })} type="number" />
-                                <Textarea top="Описание участников и их задач" onChange={this.onMembersDescriptionChange} defaultValue={this.state.membersDescription} />
+                                />*/}
+                                <Input name="numberRequiredMembers" value={inputData.numberRequiredMembers} onChange={this.handleInput} type="number" />
+                                <Textarea name="membersDescription" value={inputData.membersDescription} top="Описание участников и их задач" onChange={this.handleInput} />
                             </FormLayout>
                         </Cell>}
                     <Div>
                         <Button
                             stretched={true}
                             onClick={(e) => {
-                                this.state.name &&
+                                inputData.name &&
                                     this.postCreate();
                             }}>
                             Создать Команду
@@ -167,14 +175,15 @@ class TeamCreate extends React.Component {
 const mapStateToProps = (state) => {
     return {
         activeView: state.router.activeView,
-        activeTab: state.vkui.activeTab
+        activeTab: state.vkui.activeTab,
+        inputData: state.formData.forms,
     };
 };
 
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
-        ...bindActionCreators({ setPage, goBack, setTeam, setActiveTab }, dispatch)
+        ...bindActionCreators({ setPage, goBack, setTeam, setActiveTab, setFormData }, dispatch)
     }
 }
 
