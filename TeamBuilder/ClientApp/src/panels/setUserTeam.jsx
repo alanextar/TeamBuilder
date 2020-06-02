@@ -8,6 +8,7 @@ import {
     Panel, PanelHeader, Button, Div, FormLayoutGroup, Separator, FormLayout, Select, PanelHeaderBack
 } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
+import '../../src/styles/style.css';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import { Api } from '../infrastructure/api';
 

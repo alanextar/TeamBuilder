@@ -12,23 +12,13 @@ import {
     FormLayoutGroup, Textarea, Separator, FormLayout, PanelHeaderBack
 } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
+import '../../src/styles/style.css';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import { Api, Urls } from '../infrastructure/api';
 
 class UserEdit extends React.Component {
     constructor(props) {
         super(props);
-
-        console.log("!!!!!!!!!!!!!!!!!!!!!!", props.inputData['profile_form'] ? props.inputData['profile_form'] : props.user);
-
-        //let defaultInputData = {
-        //    about: '',
-        //    mobile: '',
-        //    email: '',
-        //    telegram: '',
-
-        //    checkboxInSearch: 0
-        //};
 
         this.state = {
             vkProfile: props.profile,
@@ -56,7 +46,6 @@ class UserEdit extends React.Component {
         }
 
         this.cancelForm = () => {
-            //this.props.setFormData('profile_form', null);
             this.setState({
                 inputData: null
             })
@@ -68,13 +57,13 @@ class UserEdit extends React.Component {
     }
 
     componentWillUnmount() {
-        this.props.setFormData('profile_form', this.state.user);
+        this.props.setFormData('profile_form', this.state.inputData);
     }
 
     async postEdit() {
         let updatedUser = await Api.post(Urls.Users.Edit, this.state.user);
-        const { setProfileUser } = this.props;
-        //setUser(updatedUser);
+        const { setProfileUser, setUser } = this.props;
+        setUser(updatedUser);
         setProfileUser(updatedUser);
     }
 
