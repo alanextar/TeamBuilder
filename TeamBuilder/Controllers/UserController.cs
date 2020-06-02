@@ -278,7 +278,7 @@ namespace TeamBuilder.Controllers
 		{
 			logger.LogInformation("Request SetTeam");
 
-			var dbTeam = context.Teams.Include(x => x.UserTeams).FirstOrDefault(x => x.Id == teamId);
+			var dbTeam = context.Teams.Include(x => x.UserTeams).ThenInclude(x => x.User).FirstOrDefault(x => x.Id == teamId);
 			if (dbTeam == null)
 				return NotFound();
 
