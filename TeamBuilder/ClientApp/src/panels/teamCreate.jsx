@@ -87,7 +87,7 @@ class TeamCreate extends React.Component {
     }
 
     render() {
-        const { id, goBack, setPage, setTeam, activeView } = this.props;
+        const { setPage, activeView } = this.props;
         var inputData = this.state.inputData;
 
         return (
@@ -119,14 +119,14 @@ class TeamCreate extends React.Component {
                             <Input top="Название команды" type="text" placeholder="Введите название команды"
                                 onChange={this.handleInput}
                                 name="name"
-                                value={inputData.name}
-                                status={inputData.name ? 'valid' : 'error'} />
-                            <Textarea top="Описание команды" onChange={this.handleInput} name="description" value={inputData.description} />
+                                value={inputData && inputData.name}
+                                status={inputData && inputData.name ? 'valid' : 'error'} />
+                            <Textarea top="Описание команды" onChange={this.handleInput} name="description" value={inputData && inputData.description} />
                             <Select
                                 top="Выберете событие"
                                 placeholder="Событие"
                                 onChange={this.handleInput}
-                                value={inputData.eventId && inputData.eventId}
+                                value={inputData && inputData.eventId && inputData.eventId}
                                 name="eventId"
                                 bottom={<Link style={{ color: 'rebeccapurple', textAlign: "right" }} onClick={() => setPage(activeView, 'eventCreate')}>Создать событие</Link>}>>
                                 {this.state.events && this.state.events.map((ev, i) => {
@@ -150,15 +150,15 @@ class TeamCreate extends React.Component {
                                     onChange={this.handleInput}
                                     top="Количество участников в команде"
                                 />*/}
-                                <Input name="numberRequiredMembers" value={inputData.numberRequiredMembers} onChange={this.handleInput} type="number" />
-                                <Textarea name="membersDescription" value={inputData.membersDescription} top="Описание участников и их задач" onChange={this.handleInput} />
+                                <Input name="numberRequiredMembers" value={inputData && inputData.numberRequiredMembers} onChange={this.handleInput} type="number" />
+                                <Textarea name="membersDescription" value={inputData && inputData.membersDescription} top="Описание участников и их задач" onChange={this.handleInput} />
                             </FormLayout>
                         </Cell>}
                     <Div>
                         <Button
                             stretched={true}
                             onClick={(e) => {
-                                inputData.name &&
+                                inputData && inputData.name &&
                                     this.postCreate();
                             }}>
                             Создать Команду
