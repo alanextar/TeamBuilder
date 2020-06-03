@@ -5,12 +5,9 @@ import {
     Panel, PanelHeader, Group, Cell, Avatar, Button, Div, PanelHeaderBack,
     Tabs, TabsItem, Separator, Checkbox, InfoRow, Header, Title, Link, Switch
 } from '@vkontakte/vkui';
-import { Typeahead } from 'react-bootstrap-typeahead';
 import { } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import '../../src/styles/style.css';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'react-bootstrap-typeahead/css/Typeahead.css';
 import Icon28PhoneOutline from '@vkontakte/icons/dist/28/phone_outline';
 import Icon28ArticleOutline from '@vkontakte/icons/dist/28/article_outline';
 import Icon28MailOutline from '@vkontakte/icons/dist/28/mail_outline';
@@ -51,7 +48,7 @@ class User extends React.Component {
 
     componentDidMount() {
         let id = this.state.readOnlyMode ? this.state.user.id : this.state.vkProfile.id;
-        this.populateSkills();
+        this.populateSkills(); //TODO переписать с кэшированием (сохранение в localStorage)
         this.state.vkProfile && this.fetchVkUser(id);
         this.state.vkProfile && this.fetchUserData(id);
     }
@@ -106,23 +103,12 @@ class User extends React.Component {
 
     async confirmUser() {
         const { setUser, setProfileUser } = this.props;
-        let id = this.state.vkProfile.id;
-        let skillsIds = this.state.selectedSkills && this.state.selectedSkills.map((s, i) => s.id);
-        let photo100 = !this.state.readOnlyMode ? this.state.vkProfile.photo_100 : "";
-        let photo200 = !this.state.readOnlyMode ? this.state.vkProfile.photo_200 : "";
-        let firstName = !this.state.readOnlyMode ? this.state.vkProfile.first_name : "";
-        let lastName = !this.state.readOnlyMode ? this.state.vkProfile.last_name : "";
+        let profileViewModel = this.state.vkProfile;
 
-        var isSearchable = this.state.isSearchable;
-        var profileViewModel = {
-            id,
-            firstName,
-            lastName,
-            skillsIds,
-            isSearchable,
-            photo100,
-            photo200
-        };
+        profileViewModel.skillsIds = this.state.selectedSkills && this.state.selectedSkills.map(s => s.id);
+        profileViewModel.isSearchable = this.state.isSearchable;
+
+        console.log(`confirmUser.profileViewModel ${JSON.stringify(profileViewModel, null, 4)}`);
 
         Api.Users.saveOrConfirm(profileViewModel)
             .then(user => {
@@ -146,7 +132,7 @@ class User extends React.Component {
         Api.Skills.getAll()
             .then(allSkillsJson => {
                 var options = allSkillsJson && allSkillsJson.map(function (skill) {
-                    return { id: skill.id, value:skill.name, label: skill.name };
+                    return { id: skill.id, value: skill.name, label: skill.name };
                 });
 
                 this.setState({ allSkills: options });
@@ -155,7 +141,8 @@ class User extends React.Component {
 
     render() {
         const { setPage, goBack, activeView } = this.props;
-        let id = this.state.readOnlyMode ? this.state.user.id : this.state.vkProfile.id;
+        console.log(`vkProfile. ${JSON.stringify(this.state.vkProfile, null, 4)}`);
+        let id = this.state.readOnlyMode ? this.state.user.id : this.state.vkProfile && this.state.vkProfile.id;
 
         return (
             <Panel id="user">
@@ -233,7 +220,7 @@ class User extends React.Component {
                                 </Cell>}
                             <Div>
                                 <Title level="3" weight="regular" style={{ marginBottom: 16 }}>Скиллы:</Title>
-                                <Typeahead id="skills"
+                                {/* <Typeahead id="skills"
                                     clearButton
                                     onChange={(e) => {
                                         this.onSkillsChange(e)
@@ -244,9 +231,9 @@ class User extends React.Component {
                                     multiple
                                     className="Select__el"
                                     disabled={this.state.readOnlyMode}
-                                />
+                                /> */}
 
-                                {/*<CreatableMulti data={this.state.allSkills && this.state.allSkills} />*/}
+                                <CreatableMulti data={this.state.allSkills && this.state.allSkills} />
                             </Div>
                             <Div>
                                 <Cell asideContent={
@@ -279,6 +266,7 @@ class User extends React.Component {
 
 const mapStateToProps = (state) => {
 
+    console.log(`mapStateToProps.state ${JSON.stringify(state, null, 4)}`);
     return {
         user: state.user.user,
         profileUser: state.user.profileUser,

@@ -1,9 +1,11 @@
 //import VKConnect from "@vkontakte/vk-connect";
 import bridge from '@vkontakte/vk-bridge';
+import { Api } from '../infrastructure/api';
 
-import {store} from "../index";
+import { store } from "../index";
 
-import {setColorScheme, setAccessToken} from "../store/vk/actions";
+import { setColorScheme, setAccessToken } from "../store/vk/actions";
+import { setProfile, setUser } from "../store/user/actions";
 
 const APP_ID = 7448436;
 const API_VERSION = '5.92';
@@ -24,6 +26,79 @@ export const initApp = () => (dispatch) => {
         return error;
     });
 };
+
+export const initProfile = () => async (dispatch) => {
+    const userInfo = await bridge.send('VKWebAppGetUserInfo');
+    const personalCard = {}
+    if (bridge.supports("VKWebAppGetPersonalCard")) {
+        personalCard = await bridge.send('VKWebAppGetPersonalCard', {"type": ["phone", "email"]});
+    }
+
+    const user = await Api.Users.get(userInfo.id);
+
+    if (user === null) {
+        let profile = {
+            id: userInfo.id,
+            firstName: userInfo.first_name,
+            lastName: userInfo.last_name,
+            city: userInfo.city.title,
+            photo100: userInfo.photo_100,
+            photo200: userInfo.photo_200,
+            mobile: personalCard.phone,
+            email: personalCard.email,
+            isSearchable: true,
+            isNew: true
+        };
+        dispatch(setProfile(profile));
+        dispatch(setUser(profile));
+        return;
+    }
+
+    console.log(`user.beforeCompare ${JSON.stringify(user, null, 4)}`);
+
+    if (needUpdate(userInfo, user)){
+        let profileViewModel = {
+            id: user.id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            city: user.city,
+            photo100: user.photo100,
+            photo200: user.photo200,
+            mobile: user.phone,
+            email: user.email,
+            isSearchable: true,
+        };
+        await Api.Users.saveOrConfirm(profileViewModel);
+    }
+
+    dispatch(setProfile(user));
+    dispatch(setUser(user));
+}
+
+const needUpdate = (userInfo, user) => {
+    var isEqual = true;
+    compareProp(userInfo, user, "first_name", "firstName", isEqual);
+    compareProp(userInfo, user, "last_name", "lastName", isEqual);
+    compareProp(userInfo, user, "photo_100", "photo100", isEqual);
+    compareProp(userInfo, user, "photo_200", "photo200", isEqual);
+    // if (true){
+    //     compare(userInfo, user, "phone", "mobile", isEqual);
+    //     compare(userInfo, user, "email", "email", isEqual);
+    // }
+    if (userInfo.city.title !== user['city']){
+        user['city'] = userInfo.city.title;
+        isEqual = false;
+    }
+    return !isEqual;
+}
+
+//СЫЛКИ НА аватар почему то всегда "различаются" (не равны). по факту одинаковые
+const compareProp = (vk, bd, vkProp, bdProp, isEqual) => {
+    if (vk[vkProp] !== bd[bdProp]){
+        bd[bdProp] = vk[vkProp];
+        isEqual = false;
+    }
+}
 
 //export const getAuthToken = (scope) => (dispatch) => {
 //    VKConnect.send("VKWebAppGetAuthToken", {

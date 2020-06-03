@@ -7,7 +7,7 @@ export const setUser = (user) => {
 
     return {
         type: SET_USER,
-            payload: {
+        payload: {
             user: user
         }
     }
@@ -17,7 +17,7 @@ export const setProfile = (profile) => {
 
     return {
         type: SET_PROFILE,
-            payload: {
+        payload: {
             profile: profile
         }
     }
@@ -27,8 +27,8 @@ export const setProfileUser = (profileUser) => {
 
     return {
         type: SET_PROFILE_USER,
-            payload: {
-                profileUser: profileUser
+        payload: {
+            profileUser: profileUser
         }
     }
 };
@@ -37,8 +37,8 @@ export const setEventUser = (eventUser) => {
 
     return {
         type: SET_EVENT_USER,
-            payload: {
-                eventUser: eventUser
+        payload: {
+            eventUser: eventUser
         }
     }
 };
@@ -47,8 +47,8 @@ export const setTeamUser = (teamUser) => {
 
     return {
         type: SET_TEAM_USER,
-            payload: {
-                teamUser: teamUser
+        payload: {
+            teamUser: teamUser
         }
     }
 };
@@ -57,8 +57,8 @@ export const setParticipantUser = (participantUser) => {
 
     return {
         type: SET_PARTICIPANT_USER,
-            payload: {
-                participantUser: participantUser
+        payload: {
+            participantUser: participantUser
         }
     }
 };

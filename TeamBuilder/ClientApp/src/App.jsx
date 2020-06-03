@@ -48,7 +48,7 @@ const App = (props) => {
     const [popout, setPopout] = useState(null);
 
     const { setStory, activeView, activeStory, setProfile, setUser,
-        setProfileUser, profileUser, teamUser, eventUser, participantUser, teamsTeam, setPage, setEvent, event,
+        setProfileUser, profile, teamUser, eventUser, participantUser, teamsTeam, setPage, setEvent, event,
         eventsTeam, userTeam, usersTeam, setTeam, setTeamsEventFilter, colorScheme
     } = props;
 
@@ -60,25 +60,17 @@ const App = (props) => {
 
         dispatch(VK.initApp());
 
-        //bridge.subscribe(({ detail: { type, data } }) => {
-        //    if (type === 'VKWebAppUpdateConfig') {
-        //        const schemeAttribute = document.createAttribute('scheme');
-        //        schemeAttribute.value = data.scheme ? data.scheme : 'client_light';
-        //        document.body.attributes.setNamedItem(schemeAttribute);
-        //    }
-        //});
+        // async function fetchData() {
+        //     const profile = await bridge.send('VKWebAppGetUserInfo');
+        //     setProfile(profile);
+        //     Api.Users.get(profile.id).then(user => {
+        //         setUser(user);
+        //         setProfileUser(user);
+        //     });
 
-        async function fetchData() {
-            const profile = await bridge.send('VKWebAppGetUserInfo');
-            setProfile(profile);
-            Api.Users.get(profile.id).then(user => {
-                setUser(user);
-                setProfileUser(user);
-            });
-            
-            setEvent(event);
-        }
-        fetchData();
+        //     setEvent(event); // ЧЕ ЭТО ТАКОЕ?
+        // }
+        // fetchData();
         getEvents();
 
         window.onpopstate = () => {
@@ -143,10 +135,10 @@ const App = (props) => {
                         selected={activeStory === 'events'}
                         text="События"
                     ><Icon28FavoriteOutline /></TabbarItem>
-                    <TabbarItem style={{ color: props.profileUser ? "" : "red" }}
+                    <TabbarItem style={{ color: profile && profile.isNew ? "red" : "" }}
                         onClick={() => {
+                            setUser(profile);
                             setStory('user', 'user');
-                            setUser(profileUser);
                             userTeam && setTeam(userTeam)
                         }}
                         selected={activeStory === 'user'}

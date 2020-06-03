@@ -48,7 +48,7 @@ namespace TeamBuilder.Controllers
 
 				await context.Users.AddAsync(user);
 			}
-			else
+			else if (profileViewModel.SkillsIds != null)
 			{
 				var dbUserSkills = user.UserSkills;
 				var userSkillsDto = profileViewModel.SkillsIds.Select(s => new UserSkill { UserId = user.Id, SkillId = s }).ToList();
@@ -59,11 +59,15 @@ namespace TeamBuilder.Controllers
 
 			user.FirstName = profileViewModel.FirstName;
 			user.LastName = profileViewModel.LastName;
+			user.City = profileViewModel.City;
+			user.Mobile = profileViewModel.Mobile;
+			user.Email = profileViewModel.Email;
 			user.Photo100 = profileViewModel.Photo100;
 			user.Photo200 = profileViewModel.Photo200;
 
 			user.IsSearchable = profileViewModel.IsSearchable;
 
+			context.Update(user);
 			await context.SaveChangesAsync();
 
 			return Json(user);
@@ -291,21 +295,6 @@ namespace TeamBuilder.Controllers
 			await context.SaveChangesAsync();
 
 			return Json(dbTeam);
-		}
-
-		//TODO Упростить выражение
-		public IEnumerable<Team> GetOwnerTeams(long id)
-		{
-			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
-			var teams = context.Users
-				.Include(x => x.UserTeams)
-				.ThenInclude(y => y.Team)
-				.SelectMany(x => x.UserTeams)
-				.Where(x => x.UserId == id && x.IsOwner)
-				.Select(x => x.Team)
-				.ToList();
-
-			return teams;
 		}
 
 		#region List

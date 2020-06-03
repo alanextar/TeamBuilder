@@ -19,7 +19,7 @@ const initPost = {
     cache: 'default'
 };
 
-export function get(url, params = {}) {
+export async function get(url, params = {}) {
     var searchParams = new URLSearchParams(params).toString();
     if (searchParams){
         url = `${url}?${searchParams}`;

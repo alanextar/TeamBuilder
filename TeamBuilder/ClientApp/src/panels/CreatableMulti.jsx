@@ -4,20 +4,14 @@ import CreatableSelect from 'react-select/creatable';
 export default class CreatableMulti extends React.Component {
     constructor(props) {
         super(props);
-
-        console.group('constructor');
-        console.log(`props.data: ${props.data}`);
-        console.groupEnd();
-
-        this.state = {
-            options: props.data,
-        }
     }
 
-    handleChange = (newValue: any, actionMeta: any) => {
+    //
+    handleChange = (newValue, actionMeta) => {
         console.group('Value Changed');
         console.log(newValue);
-        console.log(`action: ${actionMeta.action}`);
+        console.log(`actionMeta: ${Object.entries(actionMeta)}`);
+        console.log(`actionMeta.action: ${actionMeta.action}`);
         console.groupEnd();
     };
 
