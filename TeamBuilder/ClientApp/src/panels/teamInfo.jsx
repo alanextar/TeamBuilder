@@ -113,6 +113,13 @@ class TeamInfo extends React.Component {
             })
     };
 
+    //Удалить команду
+    async deleteTeam() {
+        let id = this.state.team.id
+        console.log('IIIIID', id)
+        await Api.Teams.delete({ id: id });
+    };
+
     //Отменить поданную в команду заявку
     async cancelUser(e, userTeam) {
         let teamId = userTeam.teamId;
@@ -173,14 +180,40 @@ class TeamInfo extends React.Component {
         );
     };
 
-    getPanelHeaderContext = (isOwner, isModerator, userAction, userInActiveTeam, isUserInActiveTeam, confirmedUser, activeView) => {
+    openPopoutDeleteTeam = () => {
+        this.props.openPopout(
+            <Alert
+                actionsLayout="vertical"
+                actions={[{
+                    title: 'Удалить команду',
+                    autoclose: true,
+                    mode: 'destructive',
+                    action: () => this.deleteTeam(),
+                }, {
+                    title: 'Отмена',
+                    autoclose: true,
+                    mode: 'cancel'
+                }]}
+                onClose={() => this.props.closePopout()}
+            >
+                <h2>Подтвердите действие</h2>
+                <p>Вы уверены, что хотите удалить команду?</p>
+            </Alert>
+        );
+    };
+
+    getPanelHeaderContext = (isOwner, isModerator, userAction, userInActiveTeam, isUserInActiveTeam, confirmedUser) => {
+        const { setPage, activeView } = this.props;
         return (
             this.state.team && <PanelHeaderContext opened={this.state.contextOpened} onClose={this.toggleContext}>
                 {(isOwner || isModerator) &&
                     <List>
                         <Cell onClick={() => setPage(activeView, 'teamEdit')}>
-                            Редактировать команду
-                                </Cell>
+                        Редактировать команду
+                         </Cell>
+                    <Cell onClick={() => { this.openPopoutDeleteTeam(); setPage(activeView, 'teams'); }}>
+                            Удалить команду
+                         </Cell>
                     </List>
                     || userAction === 1 &&
                     <List>
@@ -247,7 +280,7 @@ class TeamInfo extends React.Component {
                         </PanelHeaderContent> :
                         `Команда`}
                 </PanelHeader>
-                {this.getPanelHeaderContext(isOwner, isModerator, userAction, userInActiveTeam, isUserInActiveTeam, confirmedUser, activeView)}
+                {this.getPanelHeaderContext(isOwner, isModerator, userAction, userInActiveTeam, isUserInActiveTeam, confirmedUser)}
                 <Tabs>
                     <TabsItem
                         onClick={() => {
