@@ -295,7 +295,7 @@ const mapDispatchToProps = {
     setProfileUser,
     goBack,
     setRecruitTeams,
-    setActiveTab
+    setActiveTab,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(User);
