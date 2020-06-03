@@ -186,9 +186,10 @@ namespace TeamBuilder.Controllers
 			{
 				UserActionEnum.SentRequest => UserActionEnum.RejectedTeamRequest,
 				UserActionEnum.JoinedTeam => UserActionEnum.QuitTeam,
+				UserActionEnum.ConsideringOffer => UserActionEnum.RejectedTeamRequest,
 				_ => throw new Exception(
 					$"User '{model.UserId}' have invalid userAction '{userTeam.UserAction}' for team '{model.TeamId}'. " +
-					$"Available value: {UserActionEnum.SentRequest}, {UserActionEnum.JoinedTeam}")
+					$"Available value: {UserActionEnum.SentRequest}, {UserActionEnum.JoinedTeam}, {UserActionEnum.ConsideringOffer}")
 			};
 
 			context.Update(userTeam);
