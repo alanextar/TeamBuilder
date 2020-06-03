@@ -6,6 +6,7 @@ import { bindActionCreators } from "redux";
 import { goBack, setPage } from "../store/router/actions";
 import { setTeam } from "../store/teams/actions";
 import { setActiveTab } from "../store/vk/actions";
+import { setFormData } from "../store/formData/actions";
 
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell,
@@ -20,17 +21,39 @@ class TeamEdit extends React.Component {
         super(props);
 
         this.state = {
-            team: this.props.activeTeam,
+            team: props.activeTeam,
             events: [],
             activeTab: props.activeTab["teamEdit"] || "teamDescription",
-            panelId: props.id
+            panelId: props.id,
+            inputData: props.inputData['teamEdit_form'] ? props.inputData['teamEdit_form'] : props.activeTeam
         };
 
-        this.onEventChange = this.onEventChange.bind(this);
-        this.onDescriptionChange = this.onDescriptionChange.bind(this);
-        this.onMembersDescriptionChange = this.onMembersDescriptionChange.bind(this);
-        this.onNumberRequiredMembersChange = this.onNumberRequiredMembersChange.bind(this);
-        this.onNameChange = this.onNameChange.bind(this);
+        this.handleInput = (e) => {
+            let value = e.currentTarget.value;
+
+            if (e.currentTarget.type === 'checkbox') {
+                value = e.currentTarget.checked;
+            }
+
+            this.setState({
+                inputData: {
+                    ...this.state.inputData,
+                    [e.currentTarget.name]: value
+                },
+                team: {
+                    ...this.state.team,
+                    [e.currentTarget.name]: value
+                }
+            })
+        }
+
+        this.cancelForm = () => {
+            this.setState({
+                inputData: null
+            })
+            props.goBack();
+        };
+
         this.postEdit = this.postEdit.bind(this);
     }
 
@@ -47,6 +70,7 @@ class TeamEdit extends React.Component {
     componentWillUnmount() {
         const { setActiveTab } = this.props;
         setActiveTab("teamEdit", this.state.activeTab);
+        this.props.setFormData('teamEdit_form', this.state.inputData);
     }
 
     async populateEventsData() {
@@ -54,49 +78,10 @@ class TeamEdit extends React.Component {
             .then(result => this.setState({ events: result, }));
     }
 
-    onEventChange(e) {
-        var team = this.state.team;
-        team.eventId = e.target.value;
-        this.setState({ team: team })
-    }
-
-    onNameChange(e) {
-        var team = this.state.team;
-        team.name = e.target.value;
-        this.setState({ team: team })
-    }
-
-    onDescriptionChange(e) {
-        var team = this.state.team;
-        team.description = e.target.value;
-        this.setState({ team: team })
-
-    }
-
-    onMembersDescriptionChange(e) {
-        var team = this.state.team;
-        team.membersDescription = e.target.value;
-        this.setState({ team: team })
-    }
-
-    onNumberRequiredMembersChange(e) {
-        var team = this.state.team;
-        team.numberRequiredMembers = e.target.value;
-        this.setState({ team: team })
-    }
-
     async postEdit() {
         const { setTeam } = this.props;
 
-        var editTeamViewModel = {
-            id: this.state.team.id,
-            name: this.state.team.name,
-            description: this.state.team.description,
-            numberRequiredMembers: this.state.team.numberRequiredMembers,
-            descriptionRequiredMembers: this.state.team.membersDescription,
-            eventId: this.state.team.eventId
-        }
-        Api.Teams.edit(editTeamViewModel)
+        Api.Teams.edit(this.state.inputData)
             .then(t => { setTeam(t) });
     };
 
@@ -132,10 +117,11 @@ class TeamEdit extends React.Component {
 
     render() {
         const { goBack, setPage, activeView } = this.props;
+        var inputData = this.state.inputData;
 
         return (
             <Panel id={this.state.panelId}>
-                <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
+                <PanelHeader separator={false} left={<PanelHeaderBack onClick={this.cancelForm} />}>
                     Редактировать
                 </PanelHeader>
                 <Tabs>
@@ -151,18 +137,18 @@ class TeamEdit extends React.Component {
                         </TabsItem>
                 </Tabs>
                 <Group>
-                    {this.state.team && (
+                    {inputData && (
                         this.state.activeTab === 'teamDescription' ?
                             <FormLayout >
-                                <Input top="Название команды" type="text" defaultValue={this.state.team.name}
-                                    onChange={this.onNameChange} status={this.state.team.name ? 'valid' : 'error'} placeholder='Введите название команды' />
-                                <Textarea top="Описание команды" defaultValue={this.state.team.description} onChange={this.onDescriptionChange} />
+                                <Input name="name" top="Название команды" type="text" value={inputData.name}
+                                    onChange={this.handleInput} status={inputData.name ? 'valid' : 'error'} placeholder='Введите название команды' />
+                                <Textarea top="Описание команды" name="description" value={inputData.description} onChange={this.handleInput} />
                                 <Select
                                     top='Выберете событие'
                                     placeholder="Событие"
-                                    onChange={this.onEventChange}
-                                    value={this.state.team && this.state.team.eventId}
+                                    onChange={this.handleInput}
                                     name="eventId"
+                                    value={inputData.eventId}
                                     bottom={<Link style={{ color: 'rebeccapurple', textAlign: "right" }} onClick={() => setPage(activeView, 'eventCreate')}>Создать событие</Link>}>
                                     {this.state.events && this.state.events.map((ev, i) => {
                                         return (
@@ -178,19 +164,21 @@ class TeamEdit extends React.Component {
                                 <Group>
                                     <FormLayout>
                                         <Input top="Количество требуемых участников"
-                                            value={String(this.state.team.numberRequiredMembers)}
-                                            onChange={this.onNumberRequiredMembersChange}
+                                            name="numberRequiredMembers"
+                                            value={String(inputData.numberRequiredMembers)}
+                                            onChange={this.handleInput}
                                             type="number" />
                                         <Textarea
                                             top="Описание участников и их задач"
-                                            value={this.state.team.membersDescription}
-                                            onChange={this.onMembersDescriptionChange} />
+                                            name="descriptionRequiredMembers"
+                                            value={inputData.descriptionRequiredMembers}
+                                            onChange={this.handleInput} />
                                     </FormLayout>
                                 </Group>
                                 <Group>
                                     <Header mode="secondary">Участники</Header>
-                                    {this.state.team.userTeams &&
-                                        this.state.team.userTeams.map(userTeam => {
+                                    {inputData.userTeams &&
+                                        inputData.userTeams.map(userTeam => {
                                             return (
                                                 (userTeam.userAction === 1 || userTeam.userAction === 2 || userTeam.userAction === 5) &&
                                                 <RichCell key={userTeam.userId}
@@ -224,7 +212,7 @@ class TeamEdit extends React.Component {
                     <Div>
                         <Button
                             stretched
-                            onClick={() => { this.state.team.name && this.postEdit(); goBack() }}>
+                            onClick={() => { inputData.name && this.postEdit(); goBack() }}>
                             Сохранить
                         </Button>
                     </Div>
@@ -239,7 +227,8 @@ const mapStateToProps = (state) => {
     return {
         activeTeam: state.team.activeTeam,
         activeView: state.router.activeView,
-        activeTab: state.vkui.activeTab
+        activeTab: state.vkui.activeTab,
+        inputData: state.formData.forms,
     };
 };
 
@@ -247,7 +236,7 @@ const mapStateToProps = (state) => {
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
-        ...bindActionCreators({ setPage, setTeam, goBack, setActiveTab }, dispatch)
+        ...bindActionCreators({ setPage, setTeam, goBack, setActiveTab, setFormData }, dispatch)
     }
 }
 

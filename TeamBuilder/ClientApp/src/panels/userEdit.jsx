@@ -12,7 +12,7 @@ import {
     FormLayoutGroup, Textarea, Separator, FormLayout, PanelHeaderBack
 } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
-import '../../src/styles/style.css';
+import '../../src/css/style.css';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import { Api, Urls } from '../infrastructure/api';
 
