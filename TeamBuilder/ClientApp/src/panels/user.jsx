@@ -233,7 +233,7 @@ class User extends React.Component {
                                 </Cell>}
                             <Div>
                                 <Title level="3" weight="regular" style={{ marginBottom: 16 }}>Скиллы:</Title>
-                                <Typeahead id="skills"
+                                {/*<Typeahead id="skills"
                                     clearButton
                                     onChange={(e) => {
                                         this.onSkillsChange(e)
@@ -244,9 +244,9 @@ class User extends React.Component {
                                     multiple
                                     className="Select__el"
                                     disabled={this.state.readOnlyMode}
-                                />
+                                />*/}
 
-                                {/*<CreatableMulti data={this.state.allSkills && this.state.allSkills} />*/}
+                                <CreatableMulti data={this.state.allSkills && this.state.allSkills} />
                             </Div>
                             <Div>
                                 <Cell asideContent={
