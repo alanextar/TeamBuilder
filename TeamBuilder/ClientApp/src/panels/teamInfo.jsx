@@ -86,15 +86,20 @@ class TeamInfo extends React.Component {
 
     //Принять приглашение
     async joinTeam() {
-        var teamId = this.state.team.id;
+        let teamId = this.state.team.id;
         var userId = this.state.profileUser.id;
 
         await Api.Users.joinTeam(teamId)
-            .then(userTeams => {
-                var profileUser = this.state.profileUser;
-                profileUser.userAction = 2;
-                setProfileUser(profileUser);
-            })
+        let updateTeam = this.state.team.userTeams
+        updateTeam.map((user, i) => {
+            (user.userId === userId) && (user.userAction = 2);
+        })
+        this.setState({
+            team: {
+                ...this.state.team,
+                userTeams: updateTeam
+            }
+        })
     };
 
     //Выйти из команды / отклонить приглашение
