@@ -29,7 +29,7 @@ class TeamCreate extends React.Component {
             events: [],
             id: props.id,
             activeTab: props.activeTab["teamCreate"] || "teamDescription",
-            inputData: props.inputData['teamCreate_form'] || defaultInputData
+            inputData: props.inputData['teamCreate'] || defaultInputData
         };
 
          this.handleInput = (e) => {
@@ -65,7 +65,7 @@ class TeamCreate extends React.Component {
     componentWillUnmount() {
         const { setActiveTab, setFormData } = this.props;
         setActiveTab("teamCreate", this.state.activeTab);
-        setFormData('teamCreate_form', this.state.inputData);
+        setFormData('teamCreate', this.state.inputData);
     }
 
     async populateTeamData() {
