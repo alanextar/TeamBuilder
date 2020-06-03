@@ -146,7 +146,7 @@ namespace TeamBuilder.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> Delete([FromBody]long id)
+		public async Task<IActionResult> Delete(long id)
 		{
 			logger.LogInformation($"DELETE Request {HttpContext.Request.Headers[":path"]}.");
 
