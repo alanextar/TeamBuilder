@@ -8,7 +8,6 @@ import {
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
-import '../../src/styles/style.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import Icon28PhoneOutline from '@vkontakte/icons/dist/28/phone_outline';
