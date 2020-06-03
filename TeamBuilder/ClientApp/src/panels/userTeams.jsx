@@ -1,12 +1,12 @@
 ﻿import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
-import { Group, List, RichCell, CardGrid, Card, Button } from '@vkontakte/vkui';
+import { Group, List, RichCell, CardGrid, Card, Button, Alert } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import Icon28CheckCircleOutline from '@vkontakte/icons/dist/28/check_circle_outline';
 import Icon28InfoOutline from '@vkontakte/icons/dist/28/info_outline';
 import { setTeam, setUserTeam } from '../store/teams/actions';
-import { setPage } from '../store/router/actions';
+import { setPage, openPopout, closePopout } from '../store/router/actions';
 import { Api } from '../infrastructure/api';
 
 class UserTeams extends React.Component {
@@ -41,6 +41,75 @@ class UserTeams extends React.Component {
             .then(data => this.setState({ userTeams: data }));
     }
 
+    openPopoutExit = (e, teamId) => {
+        e.stopPropagation();
+        this.props.openPopout(
+            <Alert
+                actionsLayout="vertical"
+                actions={[{
+                    title: 'Выйти из команды',
+                    autoclose: true,
+                    mode: 'destructive',
+                    action: () => this.handleQuitOrDecline(e, teamId),
+                }, {
+                    title: 'Отмена',
+                    autoclose: true,
+                    mode: 'cancel'
+                }]}
+                onClose={() => this.props.closePopout()}
+            >
+                <h2>Подтвердите действие</h2>
+                <p>Вы уверены, что хотите выйти из команды?</p>
+            </Alert>
+        );
+    };
+
+    openPopoutDecline = (e, teamId) => {
+        e.stopPropagation();
+        this.props.openPopout(
+            <Alert
+                actionsLayout="vertical"
+                actions={[{
+                    title: 'Отклонить приглашение',
+                    autoclose: true,
+                    mode: 'destructive',
+                    action: () => this.handleQuitOrDecline(e, teamId),
+                }, {
+                    title: 'Отмена',
+                    autoclose: true,
+                    mode: 'cancel'
+                }]}
+                onClose={() => this.props.closePopout()}
+            >
+                <h2>Подтвердите действие</h2>
+                <p>Вы уверены, что хотите отклонить приглашение?</p>
+            </Alert>
+        );
+    };
+
+    openPopoutAbort = (e, teamId) => {
+        e.stopPropagation();
+        this.props.openPopout(
+            <Alert
+                actionsLayout="vertical"
+                actions={[{
+                    title: 'Отменить заявку',
+                    autoclose: true,
+                    mode: 'destructive',
+                    action: () => this.handleCancelRequestTeam(e, teamId),
+                }, {
+                    title: 'Отмена',
+                    autoclose: true,
+                    mode: 'cancel'
+                }]}
+                onClose={() => this.props.closePopout()}
+            >
+                <h2>Подтвердите действие</h2>
+                <p>Вы уверены, что хотите отменить заявку?</p>
+            </Alert>
+        );
+    };
+
     render() {
         const { setPage, setTeam, activeView, setUserTeam } = this.props;
 
@@ -63,20 +132,20 @@ class UserTeams extends React.Component {
                                             actions={!this.props.readOnlyMode && (userTeam.userAction === 5 ?
                                                 <React.Fragment>
                                                     <Button onClick={(e) => this.handleJoin(e, userTeam.teamId)}>Принять</Button>
-                                                    <Button onClick={(e) => this.handleQuitOrDecline(e, userTeam.teamId)}
+                                                    <Button onClick={(e) => this.openPopoutDecline(e, userTeam.teamId)}
                                                         mode="secondary">Отклонить</Button>
                                                 </React.Fragment> :
                                                 ((userTeam.userAction === 2 || userTeam.userAction === 1 && !userTeam.isOwner) && <React.Fragment>
                                                     {
                                                         userTeam.userAction === 2
-                                                        ?
-                                                        <Button onClick={(e) => this.handleQuitOrDecline(e, userTeam.teamId)} mode="secondary">
-                                                            Выйти
+                                                            ?
+                                                            <Button onClick={(e) => this.openPopoutExit(e, userTeam.teamId)} mode="secondary">
+                                                                Выйти
                                                         </Button>
-                                                        :
-                                                        (userTeam.userAction === 1 ?
-                                                            <Button onClick={(e) => this.handleCancelRequestTeam(e, userTeam.teamId)} mode="secondary">
-                                                                Отозвать заявку
+                                                            :
+                                                            (userTeam.userAction === 1 ?
+                                                                <Button onClick={(e) => this.openPopoutAbort(e, userTeam.teamId)} mode="secondary">
+                                                                    Отозвать заявку
                                                     </Button> : '')
                                                     }
                                                 </React.Fragment>
@@ -105,7 +174,7 @@ const mapStateToProps = (state) => {
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
-        ...bindActionCreators({ setPage, setTeam, setUserTeam }, dispatch)
+        ...bindActionCreators({ setPage, setTeam, setUserTeam, openPopout, closePopout }, dispatch)
     }
 }
 

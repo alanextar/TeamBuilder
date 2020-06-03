@@ -188,6 +188,11 @@ namespace TeamBuilder.Controllers
 				.FirstOrDefault(u => u.Id == profileId);
 
 			var userTeamToJoin = user.UserTeams.First(x => x.TeamId == teamId);
+
+			if (userTeamToJoin.UserAction != UserActionEnum.ConsideringOffer)
+				throw new Exception($"User '{user.Id}' have invalid userAction '{userTeamToJoin.UserAction}' for team '{teamId}'. " +
+				                    $"Available value: {UserActionEnum.ConsideringOffer}");
+
 			userTeamToJoin.UserAction = UserActionEnum.JoinedTeam;
 
 			context.Update(user);
@@ -200,6 +205,7 @@ namespace TeamBuilder.Controllers
 			return Json(activeUserTeams);
 		}
 
+		//Пользователь выходит из команды / отказывается от приглашения из меню профиля
 		public async Task<IActionResult> QuitOrDeclineTeam(long teamId)
 		{
 			logger.LogInformation("Request JoinTeamm");
@@ -233,6 +239,7 @@ namespace TeamBuilder.Controllers
 			return Json(activeUserTeams);
 		}
 
+		//Пользователь сам отменяет заявку в команду
 		public async Task<IActionResult> CancelRequestTeam(long teamId)
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");
@@ -265,12 +272,13 @@ namespace TeamBuilder.Controllers
 		}
 
 		//TODO Не понял что тут происходит :) 
+		//Пользователь отправляет запрос в команду из меню команды / Пользователя приглашает команда по кнопке завербовать
 		[HttpGet]
 		public async Task<IActionResult> SetTeam(long id, long teamId, bool isTeamOffer = true)
 		{
 			logger.LogInformation("Request SetTeam");
 
-			var dbTeam = context.Teams.Include(x => x.UserTeams).FirstOrDefault(x => x.Id == teamId);
+			var dbTeam = context.Teams.Include(x => x.UserTeams).ThenInclude(x => x.User).FirstOrDefault(x => x.Id == teamId);
 			if (dbTeam == null)
 				return NotFound();
 
@@ -291,21 +299,6 @@ namespace TeamBuilder.Controllers
 			await context.SaveChangesAsync();
 
 			return Json(dbTeam);
-		}
-
-		//TODO Упростить выражение
-		public IEnumerable<Team> GetOwnerTeams(long id)
-		{
-			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
-			var teams = context.Users
-				.Include(x => x.UserTeams)
-				.ThenInclude(y => y.Team)
-				.SelectMany(x => x.UserTeams)
-				.Where(x => x.UserId == id && x.IsOwner)
-				.Select(x => x.Team)
-				.ToList();
-
-			return teams;
 		}
 
 		#region List

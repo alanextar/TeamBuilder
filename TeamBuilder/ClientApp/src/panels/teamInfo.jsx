@@ -70,6 +70,7 @@ class TeamInfo extends React.Component {
         this.setState({ contextOpened: !this.state.contextOpened });
     };
 
+    //Подать заявку в команду
     async sendRequest() {
         const { setProfileUser } = this.props;
 
@@ -80,23 +81,28 @@ class TeamInfo extends React.Component {
         await Api.Users.setTeam(id, teamId, isTeamOffer)
             .then(json => {
                 this.setState({ team: json });
-                var user = this.state.profileUser;
-                user.userAction = 1;
-                setProfileUser(user);
             })
     };
 
-
+    //Принять приглашение
     async joinTeam() {
-        var teamId = this.state.team.id;
+        let teamId = this.state.team.id;
         var userId = this.state.profileUser.id;
 
-        await Api.Teams.joinTeam(userId, teamId)
-            .then(data => {
-                this.setState({ team: data });
-            })
+        await Api.Users.joinTeam(teamId)
+        let updateTeam = this.state.team.userTeams
+        updateTeam.map((user, i) => {
+            (user.userId === userId) && (user.userAction = 2);
+        })
+        this.setState({
+            team: {
+                ...this.state.team,
+                userTeams: updateTeam
+            }
+        })
     };
 
+    //Выйти из команды / отклонить приглашение
     async dropUser() {
         var userId = this.state.profileUser.id;
         var teamId = this.state.team.id;
@@ -107,17 +113,27 @@ class TeamInfo extends React.Component {
             })
     };
 
+    //Удалить команду
+    async deleteTeam() {
+        let id = this.state.team.id
+        console.log('IIIIID', id)
+        await Api.Teams.delete({ id: id });
+    };
+
+    //Отменить поданную в команду заявку
     async cancelUser(e, userTeam) {
         let teamId = userTeam.teamId;
-        let userId = userTeam.userId;
-
-        await Api.Teams.cancelRequestUser({ teamId, userId })
-            .then(json => {
-                this.setState({ team: json });
-                var profileUser = profileUser;
-                profileUser.userAction = 1;
-                setProfileUser(profileUser);
-            })
+        await Api.Users.cancelRequestTeam(teamId)
+        let updateTeam = []
+        this.state.team.userTeams.map((user, i) => {
+            (user.userId != this.state.profileUser.id) && updateTeam.push(user)
+        })
+        this.setState({
+            team: {
+                ...this.state.team,
+                userTeams: updateTeam
+            }
+        })
     };
 
     openPopoutExit = () => {
@@ -147,10 +163,10 @@ class TeamInfo extends React.Component {
             <Alert
                 actionsLayout="vertical"
                 actions={[{
-                    title: 'Отклонить заявку',
+                    title: 'Отклонить приглашение',
                     autoclose: true,
                     mode: 'destructive',
-                    action: () => this.cancelUser(e, userInActiveTeam),
+                    action: () => this.dropUser(e, userInActiveTeam),
                 }, {
                     title: 'Отмена',
                     autoclose: true,
@@ -159,10 +175,88 @@ class TeamInfo extends React.Component {
                 onClose={() => this.props.closePopout()}
             >
                 <h2>Подтвердите действие</h2>
-                <p>Вы уверены, что хотите выйти из команды?</p>
+                <p>Вы уверены, что хотите отклонить приглашение?</p>
             </Alert>
         );
     };
+
+    openPopoutDeleteTeam = () => {
+        this.props.openPopout(
+            <Alert
+                actionsLayout="vertical"
+                actions={[{
+                    title: 'Удалить команду',
+                    autoclose: true,
+                    mode: 'destructive',
+                    action: () => this.deleteTeam(),
+                }, {
+                    title: 'Отмена',
+                    autoclose: true,
+                    mode: 'cancel'
+                }]}
+                onClose={() => this.props.closePopout()}
+            >
+                <h2>Подтвердите действие</h2>
+                <p>Вы уверены, что хотите удалить команду?</p>
+            </Alert>
+        );
+    };
+
+    getPanelHeaderContext = (isOwner, isModerator, userAction, userInActiveTeam, isUserInActiveTeam, confirmedUser) => {
+        const { setPage, activeView } = this.props;
+        return (
+            this.state.team && <PanelHeaderContext opened={this.state.contextOpened} onClose={this.toggleContext}>
+                {(isOwner || isModerator) &&
+                    <List>
+                        <Cell onClick={() => setPage(activeView, 'teamEdit')}>
+                        Редактировать команду
+                         </Cell>
+                    <Cell onClick={() => { this.openPopoutDeleteTeam(); setPage(activeView, 'teams'); }}>
+                            Удалить команду
+                         </Cell>
+                    </List>
+                    || userAction === 1 &&
+                    <List>
+                        <Cell>
+                            Заявка на рассмотрении
+                                </Cell>
+                        <Cell onClick={(e) => this.cancelUser(e, userInActiveTeam)}>
+                            Отменить заявку
+                                </Cell>
+                    </List>
+                    || userAction === 2 &&
+                    <List>
+                        <Cell onClick={() => this.openPopoutExit()}>
+                            Выйти из команды
+                                </Cell>
+                    </List>
+                    || userAction === 5 &&
+                    <List>
+                        <Cell onClick={() => this.joinTeam()}>
+                            Принять приглашение
+                                </Cell>
+                        <Cell
+                            onClick={(e) => this.openPopoutDecline(e, userInActiveTeam)}>
+                            Отклонить приглашение
+                                </Cell>
+                    </List>
+                    || (!isUserInActiveTeam || userAction == 3 || userAction == 4) &&
+                    confirmedUser < this.state.team.numberRequiredMembers &&
+                    <List>
+                        <Cell onClick={() => this.sendRequest()}>
+                            Подать заявку в команду
+                                </Cell>
+                    </List>
+                    || confirmedUser > this.state.team.numberRequiredMembers &&
+                    <List>
+                        <Cell>
+                            В команде нет мест
+                                </Cell>
+                    </List>
+                }
+            </PanelHeaderContext>
+        )
+    }
 
     render() {
         const { goBack, setTeamUser, setUser, setPage, activeView } = this.props;
@@ -186,55 +280,7 @@ class TeamInfo extends React.Component {
                         </PanelHeaderContent> :
                         `Команда`}
                 </PanelHeader>
-                {this.state.team && <PanelHeaderContext opened={this.state.contextOpened} onClose={this.toggleContext}>
-                    {(isOwner || isModerator) &&
-                        <List>
-                            <Cell
-                                onClick={() => setPage(activeView, 'teamEdit')}
-                            >
-                                Редактировать команду
-                            </Cell>
-                        </List>
-                        || userAction === 1 &&
-                        <List>
-                            <Cell>
-                                Заявка на рассмотрении
-                            </Cell>
-                        </List>
-                        || userAction === 2 &&
-                        <List>
-                            <Cell onClick={() => this.openPopoutExit()}>
-                                Выйти из команды
-                            </Cell>
-                        </List>
-                        || userAction === 5 &&
-                        <List>
-                            <Cell
-                                onClick={() => this.joinTeam()}
-                            >
-                                Принять заявку
-                            </Cell>
-                            <Cell
-                                onClick={(e) => this.openPopoutDecline(e, userInActiveTeam)}
-                            >
-                                Отклонить заявку
-                            </Cell>
-                        </List>
-                        || (!isUserInActiveTeam || userAction == 3 || userAction == 4) &&
-                        confirmedUser < this.state.team.numberRequiredMembers &&
-                        <List>
-                            <Cell onClick={() => this.sendRequest()}>
-                                Подать заявку в команду
-                            </Cell>
-                        </List>
-                        || confirmedUser > this.state.team.numberRequiredMembers &&
-                        <List>
-                            <Cell>
-                                В команде нет мест
-                            </Cell>
-                        </List>
-                    }
-                </PanelHeaderContext>}
+                {this.getPanelHeaderContext(isOwner, isModerator, userAction, userInActiveTeam, isUserInActiveTeam, confirmedUser)}
                 <Tabs>
                     <TabsItem
                         onClick={() => {
@@ -300,6 +346,7 @@ class TeamInfo extends React.Component {
                                             </SimpleCell>}
                                             {this.state.team.userTeams &&
                                                 this.state.team.userTeams.map((userTeam, i) => {
+                                                    console.log('userTeam out', userTeam);
                                                     return (
                                                         userTeam.userAction === 2 &&
                                                         <SimpleCell key={i}

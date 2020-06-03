@@ -55,6 +55,25 @@ namespace TeamBuilder.Services
 			return isOwner || isModerator;
 		}
 
+		internal async Task<bool> CanManageTeamOrSelfInTeam(long teamId, long userId)
+		{
+			var profileId = httpContextAccessor.HttpContext.VkLaunchParams().VkUserId;
+			var user = await context.Users.Include(u => u.UserTeams).FirstOrDefaultAsync(u => u.Id == profileId);
+
+			if (user == null)
+				return false;
+
+			if (userId == profileId)
+				return true;
+
+			var userTeam = user.UserTeams.FirstOrDefault(ut => ut.TeamId == teamId);
+
+			var isOwner = userTeam?.IsOwner ?? false;
+			var isModerator = user.IsModerator;
+
+			return isOwner || isModerator;
+		}
+
 		internal async Task<bool> CanManageEvent(long eventId)
 		{
 			var profileId = httpContextAccessor.HttpContext.VkLaunchParams().VkUserId;
