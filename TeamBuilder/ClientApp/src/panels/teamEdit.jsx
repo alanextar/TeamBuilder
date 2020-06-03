@@ -167,8 +167,8 @@ class TeamEdit extends React.Component {
                                             type="number" />
                                         <Textarea
                                             top="Описание участников и их задач"
-                                            name="membersDescription"
-                                            value={inputData.membersDescription}
+                                            name="descriptionRequiredMembers"
+                                            value={inputData.descriptionRequiredMembers}
                                             onChange={this.handleInput} />
                                     </FormLayout>
                                 </Group>

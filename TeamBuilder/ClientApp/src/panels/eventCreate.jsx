@@ -21,7 +21,7 @@ const EventCreate = props => {
         finishDate: ''
     };
     const { activeView, setPage, setEvent, goBack } = props;
-    const [inputData, setInputData] = useState(props.inputData['eventCreate_form'] || defaultInputData);
+    const [inputData, setInputData] = useState(props.inputData[`${activeView}_eventCreate`] || defaultInputData);
 
     const handleInput = (e) => {
         let value = e.currentTarget.value;
@@ -50,7 +50,7 @@ const EventCreate = props => {
         const { setFormData } = props;
 
         return () => {
-            setFormData('eventCreate_form', inputData);
+            setFormData(`${activeView}_eventCreate`, inputData);
         };
     }, [inputData]);
 
@@ -80,7 +80,7 @@ const EventCreate = props => {
 const mapStateToProps = (state) => {
     return {
         activeView: state.router.activeView,
-        inputData: state.formData.forms,
+        inputData: state.formData.forms
     };
 };
 

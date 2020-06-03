@@ -22,14 +22,14 @@ class TeamCreate extends React.Component {
             name: '',
             eventId: null,
             numberRequiredMembers: 2,
-            membersDescription: ''
+            descriptionRequiredMembers: ''
         };
 
         this.state = {
             events: [],
             id: props.id,
             activeTab: props.activeTab["teamCreate"] || "teamDescription",
-            inputData: props.inputData['teamCreate_form'] || defaultInputData
+            inputData: props.inputData['teamCreate'] || defaultInputData
         };
 
          this.handleInput = (e) => {
@@ -65,7 +65,7 @@ class TeamCreate extends React.Component {
     componentWillUnmount() {
         const { setActiveTab, setFormData } = this.props;
         setActiveTab("teamCreate", this.state.activeTab);
-        setFormData('teamCreate_form', this.state.inputData);
+        setFormData('teamCreate', this.state.inputData);
     }
 
     async populateTeamData() {
@@ -151,7 +151,7 @@ class TeamCreate extends React.Component {
                                     top="Количество участников в команде"
                                 />*/}
                                 <Input name="numberRequiredMembers" value={inputData && inputData.numberRequiredMembers} onChange={this.handleInput} type="number" />
-                                <Textarea name="membersDescription" value={inputData && inputData.membersDescription} top="Описание участников и их задач" onChange={this.handleInput} />
+                                <Textarea name="descriptionRequiredMembers" value={inputData && inputData.descriptionRequiredMembers} top="Описание участников и их задач" onChange={this.handleInput} />
                             </FormLayout>
                         </Cell>}
                     <Div>
