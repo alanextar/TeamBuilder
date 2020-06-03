@@ -6,6 +6,7 @@ import '@vkontakte/vkui/dist/vkui.css';
 import Icon28CheckCircleOutline from '@vkontakte/icons/dist/28/check_circle_outline';
 import Icon28InfoOutline from '@vkontakte/icons/dist/28/info_outline';
 import { setTeam, setUserTeam } from '../store/teams/actions';
+import { setProfileUser, setUser } from '../store/user/actions';
 import { setPage, openPopout, closePopout } from '../store/router/actions';
 import { Api } from '../infrastructure/api';
 
@@ -26,20 +27,29 @@ class UserTeams extends React.Component {
     async handleJoin(e, teamId) {
         e.stopPropagation();
         Api.Users.joinTeam(teamId)
-            .then(data => this.setState({ userTeams: data }));
+            .then(data => this.updateUserTeams(data));
     }
 
     async handleQuitOrDecline(e, teamId) {
         e.stopPropagation();
         Api.Users.quitOrDeclineTeam(teamId)
-            .then(data => this.setState({ userTeams: data }));
+            .then(data => this.updateUserTeams(data));
     }
 
     async handleCancelRequestTeam(e, teamId) {
         e.stopPropagation();
         Api.Users.cancelRequestTeam(teamId)
-            .then(data => this.setState({ userTeams: data }));
+            .then(data => this.updateUserTeams(data));
     }
+
+    updateUserTeams = (userTeams) => {
+        this.props.setProfileUser({
+            ...this.props.profileUser,
+            userTeams: userTeams
+        });
+        this.setState({ userTeams: userTeams });
+        this.props.setUser(this.props.profileUser)
+    };
 
     openPopoutExit = (e, teamId) => {
         e.stopPropagation();
@@ -167,15 +177,19 @@ class UserTeams extends React.Component {
 const mapStateToProps = (state) => {
 
     return {
-        activeView: state.router.activeView
+        activeView: state.router.activeView,
+        profileUser: state.user.profileUser
     };
 };
 
-function mapDispatchToProps(dispatch) {
-    return {
-        dispatch,
-        ...bindActionCreators({ setPage, setTeam, setUserTeam, openPopout, closePopout }, dispatch)
-    }
+const mapDispatchToProps = {
+    setPage,
+    setTeam,
+    setUserTeam,
+    openPopout,
+    closePopout,
+    setProfileUser,
+    setUser
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(UserTeams);
