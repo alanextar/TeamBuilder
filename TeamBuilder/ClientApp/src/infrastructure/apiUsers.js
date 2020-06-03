@@ -17,11 +17,6 @@ export function saveOrConfirm(data) {
     return api.post(Urls.Users.SaveOrConfirm, data);
 };
 
-export function checkConfirmation(id) {
-    console.log(`users.checkConfirmation`);
-    return api.get(Urls.Users.CheckConfirmation, { id: id });
-};
-
 export function getSkills(id) {
     console.log(`users.getSkills`);
     return api.get(Urls.Users.GetSkills, { id: id });

@@ -73,16 +73,6 @@ namespace TeamBuilder.Controllers
 			return Json(user);
 		}
 
-		[HttpGet]
-		public IActionResult CheckConfirmation(long id)
-		{
-			logger.LogInformation($"Request CheckConfirmation/{id}");
-
-			var isConfirmed = context.Users.FirstOrDefault(x => x.Id == id) != null ? true : false;
-
-			return Json(isConfirmed);
-		}
-
 		//TODO не используется
 		public List<Skill> GetSkills(long id)
 		{
