@@ -42,6 +42,7 @@ class UserTeams extends React.Component {
     }
 
     openPopoutExit = (e, teamId) => {
+        e.stopPropagation();
         this.props.openPopout(
             <Alert
                 actionsLayout="vertical"
@@ -64,6 +65,7 @@ class UserTeams extends React.Component {
     };
 
     openPopoutDecline = (e, teamId) => {
+        e.stopPropagation();
         this.props.openPopout(
             <Alert
                 actionsLayout="vertical"
@@ -86,6 +88,7 @@ class UserTeams extends React.Component {
     };
 
     openPopoutAbort = (e, teamId) => {
+        e.stopPropagation();
         this.props.openPopout(
             <Alert
                 actionsLayout="vertical"
@@ -135,14 +138,14 @@ class UserTeams extends React.Component {
                                                 ((userTeam.userAction === 2 || userTeam.userAction === 1 && !userTeam.isOwner) && <React.Fragment>
                                                     {
                                                         userTeam.userAction === 2
-                                                        ?
-                                                            <Button onClick={(e) => this.openPopoutExit(e, userTeam.teamId )} mode="secondary">
-                                                            Выйти
+                                                            ?
+                                                            <Button onClick={(e) => this.openPopoutExit(e, userTeam.teamId)} mode="secondary">
+                                                                Выйти
                                                         </Button>
-                                                        :
-                                                        (userTeam.userAction === 1 ?
+                                                            :
+                                                            (userTeam.userAction === 1 ?
                                                                 <Button onClick={(e) => this.openPopoutAbort(e, userTeam.teamId)} mode="secondary">
-                                                                Отозвать заявку
+                                                                    Отозвать заявку
                                                     </Button> : '')
                                                     }
                                                 </React.Fragment>
