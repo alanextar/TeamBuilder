@@ -9,25 +9,25 @@ export default class CreatableMulti extends React.Component {
             control: (base, state) => ({
                 ...base,
                 backgroundColor: 'var(--field_background)',
-                lineHeight: '38px',
+                lineHeight: '20px',
                 border: '1px solid var(--field_border)',
-                '&:hover': {
-                    border: '1px solid var(--field_border)',
-                },
+                //'&:hover': {
+                //    border: '1px solid var(--field_border)',
+                //},
                 borderRadius: '16px',
                 width: '100%',
-                height: '100%'
+                height: '100%',
+                zIndex: 3,
             }),
             option: (provided, state) => ({
                 ...provided,
                 fontSize: '16px',
+                color: 'black'
             }),
             container: (provided, state) => ({
                 ...provided,
                 fontSize: '19px',
-                lineHeight: '19px',
-                color: 'var(--text_primary)'
-            }),
+            })
         }
 
         console.group('constructor');
@@ -39,23 +39,21 @@ export default class CreatableMulti extends React.Component {
             style: customCreatableSelect
         }
 
-        
+        this.handleChange = this.handleChange.bind(this);
     }
 
-    handleChange = (newValue: any, actionMeta: any) => {
-        console.group('Value Changed');
-        console.log(newValue);
-        console.log(`action: ${actionMeta.action}`);
-        console.groupEnd();
+    handleChange = (e) => {
     };
 
     render() {
         return (
             <CreatableSelect
                 styles={this.state.style}
+                //openMenuOnFocus={true}
+                //menuIsOpen={true}
                 placeholder='Выберите скиллы'
                 isMulti
-                onChange={this.handleChange}
+                onChange={() => this.handleChange()}
                 options={this.props.data}
             />
         );
