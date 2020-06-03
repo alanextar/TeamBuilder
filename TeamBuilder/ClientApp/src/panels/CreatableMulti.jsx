@@ -6,11 +6,14 @@ export default class CreatableMulti extends React.Component {
         super(props);
 
         const customCreatableSelect = {
-            control: (base) => ({
+            control: (base, state) => ({
                 ...base,
                 backgroundColor: 'var(--field_background)',
-                lineHeight: '44px',
+                lineHeight: '38px',
                 border: '1px solid var(--field_border)',
+                '&:hover': {
+                    border: '1px solid var(--field_border)',
+                },
                 borderRadius: '16px',
                 width: '100%',
                 height: '100%'
