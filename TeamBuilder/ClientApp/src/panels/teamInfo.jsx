@@ -80,15 +80,7 @@ class TeamInfo extends React.Component {
 
         await Api.Users.setTeam(id, teamId, isTeamOffer)
             .then(json => {
-                console.log('team', this.state.team);
-                console.log('send request', json);
-                console.log('prof user', this.state.profileUser);
                 this.setState({ team: json });
-                console.log('team', this.state.team);
-                //var user = this.state.profileUser;
-                //user.userAction = 1;
-                //setProfileUser(user);
-                //console.log('prof user', this.state.profileUser);
             })
     };
 
@@ -119,19 +111,17 @@ class TeamInfo extends React.Component {
     //Отменить поданную в команду заявку
     async cancelUser(e, userTeam) {
         let teamId = userTeam.teamId;
-
         await Api.Users.cancelRequestTeam(teamId)
-            .then(userTeams => {
-                console.log('userTeams', userTeams)
-                console.log('this.state.team', this.state.team)
-                this.setState({ team: {
-                    ...this.state.team,
-                    userTeams: userTeams
-                } });
-                var profileUser = this.state.profileUser;
-                profileUser.userAction = 0;
-                setProfileUser(profileUser);
-            })
+        let updateTeam = []
+        this.state.team.userTeams.map((user, i) => {
+            (user.userId != this.state.profileUser.id) && updateTeam.push(user)
+        })
+        this.setState({
+            team: {
+                ...this.state.team,
+                userTeams: updateTeam
+            }
+        })
     };
 
     openPopoutExit = () => {
@@ -179,55 +169,56 @@ class TeamInfo extends React.Component {
     };
 
     getPanelHeaderContext = (isOwner, isModerator, userAction, userInActiveTeam, isUserInActiveTeam, confirmedUser, activeView) => {
-        return(
-        this.state.team && <PanelHeaderContext opened={this.state.contextOpened} onClose={this.toggleContext}>
-            {(isOwner || isModerator) &&
-                <List>
-                    <Cell onClick={() => setPage(activeView, 'teamEdit')}>
-                        Редактировать команду
+        return (
+            this.state.team && <PanelHeaderContext opened={this.state.contextOpened} onClose={this.toggleContext}>
+                {(isOwner || isModerator) &&
+                    <List>
+                        <Cell onClick={() => setPage(activeView, 'teamEdit')}>
+                            Редактировать команду
                                 </Cell>
-                </List>
-                || userAction === 1 &&
-                <List>
-                    <Cell>
-                        Заявка на рассмотрении
+                    </List>
+                    || userAction === 1 &&
+                    <List>
+                        <Cell>
+                            Заявка на рассмотрении
                                 </Cell>
-                    <Cell onClick={(e) => this.cancelUser(e, userInActiveTeam)}>
-                        Отменить заявку
+                        <Cell onClick={(e) => this.cancelUser(e, userInActiveTeam)}>
+                            Отменить заявку
                                 </Cell>
-                </List>
-                || userAction === 2 &&
-                <List>
-                    <Cell onClick={() => this.openPopoutExit()}>
-                        Выйти из команды
+                    </List>
+                    || userAction === 2 &&
+                    <List>
+                        <Cell onClick={() => this.openPopoutExit()}>
+                            Выйти из команды
                                 </Cell>
-                </List>
-                || userAction === 5 &&
-                <List>
-                    <Cell onClick={() => this.joinTeam()}>
-                        Принять приглашение
+                    </List>
+                    || userAction === 5 &&
+                    <List>
+                        <Cell onClick={() => this.joinTeam()}>
+                            Принять приглашение
                                 </Cell>
-                    <Cell
-                        onClick={(e) => this.openPopoutDecline(e, userInActiveTeam)}>
-                        Отклонить приглашение
+                        <Cell
+                            onClick={(e) => this.openPopoutDecline(e, userInActiveTeam)}>
+                            Отклонить приглашение
                                 </Cell>
-                </List>
-                || (!isUserInActiveTeam || userAction == 3 || userAction == 4) &&
-                confirmedUser < this.state.team.numberRequiredMembers &&
-                <List>
-                    <Cell onClick={() => this.sendRequest()}>
-                        Подать заявку в команду
+                    </List>
+                    || (!isUserInActiveTeam || userAction == 3 || userAction == 4) &&
+                    confirmedUser < this.state.team.numberRequiredMembers &&
+                    <List>
+                        <Cell onClick={() => this.sendRequest()}>
+                            Подать заявку в команду
                                 </Cell>
-                </List>
-                || confirmedUser > this.state.team.numberRequiredMembers &&
-                <List>
-                    <Cell>
-                        В команде нет мест
+                    </List>
+                    || confirmedUser > this.state.team.numberRequiredMembers &&
+                    <List>
+                        <Cell>
+                            В команде нет мест
                                 </Cell>
-                </List>
-            }
-        </PanelHeaderContext>
-    )}
+                    </List>
+                }
+            </PanelHeaderContext>
+        )
+    }
 
     render() {
         const { goBack, setTeamUser, setUser, setPage, activeView } = this.props;
@@ -317,7 +308,7 @@ class TeamInfo extends React.Component {
                                             </SimpleCell>}
                                             {this.state.team.userTeams &&
                                                 this.state.team.userTeams.map((userTeam, i) => {
-                                                    console.log('userTeam out', userTeam); 
+                                                    console.log('userTeam out', userTeam);
                                                     return (
                                                         userTeam.userAction === 2 &&
                                                         <SimpleCell key={i}
