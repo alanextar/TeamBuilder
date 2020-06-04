@@ -79,9 +79,6 @@ namespace TeamBuilder.Controllers
 				.ForMember("OwnerId", opt => opt.MapFrom(_ => profileId)));
 			var mapper = new Mapper(config);
 			var @event = mapper.Map<CreateEventViewModel, Event>(createEventViewModel);
-			//TODO настроить маппинг для даты, по умолчанию пустая дата мапится в минимальную для DateTime = 01.01.0001
-			@event.StartDate = DateTime.Parse(createEventViewModel.StartDate);
-			@event.FinishDate = DateTime.Parse(createEventViewModel.FinishDate);
 
 			await context.Events.AddAsync(@event);
 			await context.SaveChangesAsync();
@@ -128,7 +125,7 @@ namespace TeamBuilder.Controllers
 			context.Remove(@event);
 			await context.SaveChangesAsync();
 
-			return Ok("Deleted");
+			return Json("Deleted");
 		}
 	}
 }

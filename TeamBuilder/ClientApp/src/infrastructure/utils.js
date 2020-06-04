@@ -13,6 +13,12 @@ export function convertSkills(userSkills) {
 	})
 }
 
+export function countActiveUserTeams(userTeams) {
+	var count = userTeams ? userTeams.filter(x => x.userAction === 1 ||
+		x.userAction === 2 || x.userAction === 5 || x.isOwner).length : 0;
+	return count;
+};
+
 export function GetRandomPic() {
 	let url = ``;
 

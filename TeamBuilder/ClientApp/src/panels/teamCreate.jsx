@@ -13,6 +13,7 @@ import {
 } from '@vkontakte/vkui';
 import { Api } from '../infrastructure/api';
 import { GetRandomPic } from '../infrastructure/utils';
+import { setProfileUser, addTeamToProfile } from '../store/user/actions';
 
 class TeamCreate extends React.Component {
     constructor(props) {
@@ -81,8 +82,15 @@ class TeamCreate extends React.Component {
         }
 
         let result = await Api.Teams.create(this.state.inputData)
-
         setTeam(result);
+        let newUserTeam = {
+            isOwner: true,
+            team: result,
+            teamId: result.id,
+            userAction: 0,
+            userId: this.props.profileUser.id
+        };
+        this.props.addTeamToProfile(newUserTeam);
         setPage('teams', 'teaminfo');
     }
 
@@ -177,14 +185,18 @@ const mapStateToProps = (state) => {
         activeView: state.router.activeView,
         activeTab: state.vkui.activeTab,
         inputData: state.formData.forms,
+        profileUser: state.user.profileUser
     };
 };
 
-function mapDispatchToProps(dispatch) {
-    return {
-        dispatch,
-        ...bindActionCreators({ setPage, goBack, setTeam, setActiveTab, setFormData }, dispatch)
-    }
+const mapDispatchToProps = {
+    setPage,
+    goBack,
+    setTeam,
+    setActiveTab,
+    setFormData,
+    setProfileUser,
+    addTeamToProfile
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(TeamCreate);

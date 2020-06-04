@@ -160,7 +160,7 @@ namespace TeamBuilder.Controllers
 			context.Remove(team);
 			await context.SaveChangesAsync();
 
-			return Ok("Deleted");
+			return Json("Deleted");
 		}
 
 		//Отклонить заявку пользователя / удалить пользователя из команды
