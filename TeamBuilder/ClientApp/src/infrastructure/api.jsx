@@ -29,7 +29,7 @@ export class Api {
         get: (id) => events.get(id),
         create: (data) => events.create(data),
         edit: (data) => events.edit(data),
-        delete: (data) => events.remove(data)
+        delete: (id) => events.Delete(id)
     };
     
     static Teams = {
@@ -38,7 +38,7 @@ export class Api {
         get: (id) => teams.get(id),
         create: async (data) => await teams.create(data),
         edit: (data) => teams.edit(data),
-        delete: (data) => teams.remove(data),
+        delete: (id) => teams.Delete(id),
         rejectedOrRemoveUser: (data) => teams.rejectedOrRemoveUser(data),
         cancelRequestUser: (data) => teams.cancelRequestUser(data),
         joinTeam: (userId, teamId) => teams.joinTeam(userId, teamId),

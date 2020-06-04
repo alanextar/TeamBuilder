@@ -19,6 +19,15 @@ const initPost = {
     cache: 'default'
 };
 
+const initDelete = {
+    method: 'DELETE',
+    headers: {
+        'Launch-Params': window.location.search// === "" ? secrets.launchParams : window.location.search,
+    },
+    mode: 'cors',
+    cache: 'default'
+};
+
 export async function get(url, params = {}) {
     var searchParams = new URLSearchParams(params).toString();
     if (searchParams){
@@ -46,4 +55,19 @@ export async function post(url, data = {}) {
         console.log(`Error for post request '${url}' with body ${JSON.stringify(data)}.  Details: ${error}`);
         return {};
     }
+}
+
+export async function Delete(url, params = {}) {
+    var searchParams = new URLSearchParams(params).toString();
+    if (searchParams){
+        url = `${url}?${searchParams}`;
+    }
+    console.log(`delete request: ${url}`);
+    return fetch(url, initDelete)
+        .then(resp => resp.json())
+        .then(json => json)
+        .catch(error => {
+            console.log(`Error for delete request '${url}'. Details: ${error}`);
+            return {};
+        });
 }
