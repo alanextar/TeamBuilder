@@ -31,7 +31,7 @@ export function edit(data) {
     return api.post(Urls.Events.Edit, data);
 };
 
-export function remove(data) {
-    console.log(`events.remove`);
-    return api.post(Urls.Events.Delete, data);
+export function Delete(id) {
+    console.log(`events.Delete`);
+    return api.Delete(Urls.Events.Delete, {id: id});
 };

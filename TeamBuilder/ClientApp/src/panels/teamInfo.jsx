@@ -1,5 +1,5 @@
 ﻿import React from 'react';
-import { Api } from '../infrastructure/api';
+import { Api, Urls } from '../infrastructure/api';
 
 import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
@@ -116,8 +116,9 @@ class TeamInfo extends React.Component {
     //Удалить команду
     async deleteTeam() {
         let id = this.state.team.id
-        console.log('IIIIID', id)
-        await Api.Teams.delete({ id: id });
+        //Api.Teams.delete({ id });
+        Api.post(Urls.Teams.Delete + `\?id=${id}`);
+        this.props.setPage('teams', 'teams');
     };
 
     //Отменить поданную в команду заявку
@@ -384,14 +385,16 @@ const mapStateToProps = (state) => {
     };
 };
 
-function mapDispatchToProps(dispatch) {
-    return {
-        dispatch,
-        ...bindActionCreators({
-            setPage, setTeam, setUser, goBack, setActiveTab,
-            setTeamUser, setProfileUser, openPopout, closePopout
-        }, dispatch)
-    }
+const mapDispatchToProps = {
+    setPage,
+    setTeam,
+    setUser,
+    goBack,
+    setActiveTab,
+    setTeamUser,
+    setProfileUser,
+    openPopout,
+    closePopout
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(TeamInfo);

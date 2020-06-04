@@ -13,7 +13,7 @@ export function getPage(params) {
 };
 
 export function get(id) {
-    console.log(`teams.get`);
+    console.log(`teams.get id: '${id}'`);
     return api.get(Urls.Teams.Get, {id: id});
 };
 
@@ -27,9 +27,9 @@ export function edit(data) {
     return api.post(Urls.Teams.Edit, data);
 };
 
-export function remove(data) {
-    console.log(`teams.remove`);
-    return api.post(Urls.Teams.Delete, data);
+export function Delete(id) {
+    console.log(`teams.Delete id: '${id}'`);
+    return api.Delete(Urls.Teams.Delete, {id: id});
 };
 
 export function rejectedOrRemoveUser(data) {
@@ -42,7 +42,7 @@ export function cancelRequestUser(data) {
     return api.post(Urls.Teams.CancelRequestUser, data);
 };
 
-export function joinTeam(data) {
+export function joinTeam(userId, teamId) {
     console.log(`users.joinTeam`);
-    return api.post(Urls.Teams.JoinTeam, data);
+    return api.get(Urls.Teams.JoinTeam, { userId: userId, teamId: teamId });
 };

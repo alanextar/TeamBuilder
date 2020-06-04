@@ -88,7 +88,7 @@ class TeamEdit extends React.Component {
     //Принять в команду
     async handleJoin(e, userTeam) {
         e.stopPropagation();
-        Api.Teams.joinTeam({userId: userTeam.userId, teamId: userTeam.teamId})
+        Api.Teams.joinTeam(userTeam.userId, userTeam.teamId)
             .then(newTeam => {
                 this.updateTeam(newTeam)
             });
