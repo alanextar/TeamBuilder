@@ -1,15 +1,15 @@
 ﻿import React, { Component } from 'react';
 import CreatableSelect from 'react-select/creatable';
-import { customCreatableSelect } from '../customize.js';
+import { showTokensOnly } from '../customize.js';
 
-export default class CreatableMulti extends React.Component {
+export default class SkillTokens extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
             options: props.data,
             selectedSkills: this.props.selectedSkills,
-            style: customCreatableSelect
+            style: showTokensOnly
         }
 
         this.handleChange = this.handleChange.bind(this);
@@ -22,12 +22,13 @@ export default class CreatableMulti extends React.Component {
         return (
             <CreatableSelect
                 styles={this.state.style}
-                openMenuOnFocus={true}
-                placeholder='Выберите скиллы'
-                value={this.state.selectedSkills}
+                value={[{ key: 1, label: 'C#' }, { key: 2, label: 'React' }, { key: 2, label: 'javascript' },
+                { key: 2, label: 'python' }, { key: 2, label: 'html' }, { key: 2, label: 'css' }, { key: 2, label: 'блокнот' }]}
+                isDisabled
+                placeholder=''
                 isMulti
-                onChange={() => this.handleChange()}
                 options={this.props.data}
+
             />
         );
     }

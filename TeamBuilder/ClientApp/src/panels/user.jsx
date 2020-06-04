@@ -22,6 +22,7 @@ import { Api, Urls } from '../infrastructure/api';
 import { goBack, setPage } from '../store/router/actions';
 import { setUser, setProfileUser, setRecruitTeams } from '../store/user/actions';
 import { setActiveTab } from "../store/vk/actions";
+import SkillTokens from './SkillTokens';
 
 class User extends React.Component {
     constructor(props) {
@@ -231,7 +232,7 @@ class User extends React.Component {
                                     </InfoRow>
                                 </Cell>}
                             <Div>
-                                <Title level="3" weight="regular" style={{ marginBottom: 16 }}>Скиллы:</Title>
+                                <Title level="3" weight="regular" style={{ marginBottom: 4 }}>Скиллы:</Title>
                                 {/*<Typeahead id="skills"
                                     clearButton
                                     onChange={(e) => {
@@ -244,8 +245,10 @@ class User extends React.Component {
                                     className="Select__el"
                                     disabled={this.state.readOnlyMode}
                                 />*/}
-
-                                <CreatableMulti data={this.state.allSkills && this.state.allSkills} />
+                                {/*CreatableMulti - вынести в редактирование*/}
+                                {/*<CreatableMulti data={this.state.allSkills && this.state.allSkills} selectedSkills={this.state.selectedSkills} />*/}
+                                {/*SkillTokens - просто прямоугольники без селекта для отображения в информации об участнике*/}
+                                <SkillTokens data={this.state.allSkills && this.state.allSkills} selectedSkills={this.state.selectedSkills} />
                             </Div>
                             <Div>
                                 <Cell asideContent={
