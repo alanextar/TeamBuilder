@@ -145,7 +145,7 @@ namespace TeamBuilder.Controllers
 			return Ok(team);
 		}
 
-		[HttpPost]
+		[HttpDelete]
 		public async Task<IActionResult> Delete(long id)
 		{
 			logger.LogInformation($"DELETE Request {HttpContext.Request.Headers[":path"]}.");
@@ -160,7 +160,7 @@ namespace TeamBuilder.Controllers
 			context.Remove(team);
 			await context.SaveChangesAsync();
 
-			return Ok("Deleted");
+			return Json("Deleted");
 		}
 
 		//Отклонить заявку пользователя / удалить пользователя из команды

@@ -109,7 +109,7 @@ namespace TeamBuilder.Controllers
 			return Json(@event);
 		}
 
-		[HttpPost]
+		[HttpDelete]
 		public async Task<IActionResult> Delete(long id)
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}.");
@@ -125,7 +125,7 @@ namespace TeamBuilder.Controllers
 			context.Remove(@event);
 			await context.SaveChangesAsync();
 
-			return Ok("Deleted");
+			return Json("Deleted");
 		}
 	}
 }
