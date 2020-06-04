@@ -17,7 +17,7 @@ class UserTeams extends React.Component {
 
         this.state = {
             userTeams: props.userTeams,
-            fetching: false,
+			fetching: false,
         }
     }
 
@@ -126,12 +126,17 @@ class UserTeams extends React.Component {
         let isTeamsExists = countActiveUserTeams(this.state.userTeams);
 
         return (
-            <Group>
-                {!isTeamsExists && < Placeholder
+			<Group>
+				{!isTeamsExists && !this.props.readOnlyMode && < Placeholder
                     header="Вступайте в команду"
                 >
-                    Или создайте свою и пригласите других участников. Здесь можно будет принять
-                    приглашение от команд или отозвать заявку.
+					Или создайте свою и пригласите других участников. Здесь можно будет принять
+					приглашение от команд или отозвать заявку.
+                </Placeholder>}
+				{!isTeamsExists && this.props.readOnlyMode && < Placeholder
+					header="Нет команд"
+				>
+					Пользователь пока не состоит ни в одной из команд. Вы можете отправить ему приглашение, чтобы он присоединился к вам.
                 </Placeholder>}
                 <List>
 
