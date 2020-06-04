@@ -86,15 +86,16 @@ const App = (props) => {
 		};
 	}, []);
 
-	useEffect(() => {
-		const { activeView, panelsHistory, activeModals, popouts } = props;
-		let history = (panelsHistory[activeView] === undefined) ? [activeView] : panelsHistory[activeView];
-		let popout = (popouts[activeView] === undefined) ? null : popouts[activeView];
-		let activeModal = (activeModals[activeView] === undefined) ? null : activeModals[activeView];
-		setHistory(history);
-		setPopout(popout);
-		setActiveModal(activeModal);
-	});
+    useEffect(() => {
+        const { activeView, panelsHistory, activeModals, popouts } = props;
+        let history = (panelsHistory[activeView] === undefined) ? [activeView] : panelsHistory[activeView];
+        let popout = (popouts[activeView] === undefined) ? null : popouts[activeView];
+        //let activeModal = (activeModals[activeView] === undefined) ? null : activeModals[activeView];
+        //setActiveModal(activeModal);
+        //console.log('history popout active modal', history, popout, activeModal);
+        setHistory(history);
+        setPopout(popout);
+    });
 
 	const hideModal = () => {
 		setActiveModal(null);

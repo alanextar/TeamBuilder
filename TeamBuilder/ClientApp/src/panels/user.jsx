@@ -5,7 +5,6 @@ import {
     Tabs, TabsItem, Separator, Checkbox, InfoRow, Header, Title, Link, Switch
 } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
-import '../../src/styles/style.css';
 import Icon28PhoneOutline from '@vkontakte/icons/dist/28/phone_outline';
 import Icon28ArticleOutline from '@vkontakte/icons/dist/28/article_outline';
 import Icon28MailOutline from '@vkontakte/icons/dist/28/mail_outline';
@@ -18,6 +17,7 @@ import { Api, Urls } from '../infrastructure/api';
 import { goBack, setPage } from '../store/router/actions';
 import { setUser, setProfile, setRecruitTeams } from '../store/user/actions';
 import { setActiveTab } from "../store/vk/actions";
+import SkillTokens from './SkillTokens';
 
 class User extends React.Component {
     constructor(props) {
@@ -149,44 +149,55 @@ class User extends React.Component {
                                     дополнительно: {this.state.user && this.state.user.about}
                                 </Cell>
                             </List> */}
-                        {this.state.user && this.state.user.mobile &&
-                            <Cell>
-                                <InfoRow header="Телефон">
-                                    <Link href={"tel:" + this.state.user.mobile}>{this.state.user.mobile}</Link>
-                                </InfoRow>
-                            </Cell>}
-                        {this.state.user && this.state.user.telegram &&
-                            <Cell>
-                                <InfoRow header="Telegram">
-                                    <Link href={"tg://resolve?domain=" + this.state.user.telegram}>@{this.state.user.telegram}</Link>
-                                </InfoRow>
-                            </Cell>}
-                        {this.state.user && this.state.user.email &&
-                            <Cell>
-                                <InfoRow header="Email">
-                                    <Link href={"mailto:" + this.state.user.email}>{this.state.user.email}</Link>
-                                </InfoRow>
-                            </Cell>}
-                        {this.state.user && this.state.user.about &&
-                            <Cell>
-                                <InfoRow header="Дополнительно">
-                                    {this.state.user.about}
-                                </InfoRow>
-                            </Cell>}
-                        <Div>
-                            <Title level="3" weight="regular" style={{ marginBottom: 16 }}>Скиллы:</Title>
-                            <CreatableMulti
-                                disabled={true}
-                                defaultValue={this.state.user.userSkills
-                                    ? this.convertSkills(this.state.user.userSkills)
-                                    : ['Выберите навыки']}
-                            />
-                        </Div>
-                        <Div>
-                            <Cell asideContent={
-                                <Switch disabled={true}
-                                    checked={this.state.user.isSearchable ? 'checked' : ''} />}>
-                                Ищу команду
+                            {this.state.user && this.state.user.mobile &&
+                                <Cell>
+                                    <InfoRow header="Телефон">
+                                        <Link href={"tel:" + this.state.user.mobile}>{this.state.user.mobile}</Link>
+                                    </InfoRow>
+                                </Cell>}
+                            {this.state.user && this.state.user.telegram &&
+                                <Cell>
+                                    <InfoRow header="Telegram">
+                                        <Link href={"tg://resolve?domain=" + this.state.user.telegram}>@{this.state.user.telegram}</Link>
+                                    </InfoRow>
+                                </Cell>}
+                            {this.state.user && this.state.user.email &&
+                                <Cell>
+                                    <InfoRow header="Email">
+                                        <Link href={"mailto:" + this.state.user.email}>{this.state.user.email}</Link>
+                                    </InfoRow>
+                                </Cell>}
+                            {this.state.user && this.state.user.about &&
+                                <Cell>
+                                    <InfoRow header="Дополнительно">
+                                        {this.state.user.about}
+                                    </InfoRow>
+                                </Cell>}
+                            <Div>
+                                <Title level="3" weight="regular" style={{ marginBottom: 4 }}>Скиллы:</Title>
+                                {/*<Typeahead id="skills"
+                                    clearButton
+                                    onChange={(e) => {
+                                        this.onSkillsChange(e)
+                                    }}
+                                    options={this.state.allSkills && this.state.allSkills}
+                                    selected={this.state.selectedSkills}
+                                    top="Skills"
+                                    multiple
+                                    className="Select__el"
+                                    disabled={this.state.readOnlyMode}
+                                />*/}
+                                {/*CreatableMulti - вынести в редактирование*/}
+                                {/*<CreatableMulti data={this.state.allSkills && this.state.allSkills} selectedSkills={this.state.selectedSkills} />*/}
+                                {/*SkillTokens - просто прямоугольники без селекта для отображения в информации об участнике*/}
+                                <SkillTokens data={this.state.allSkills && this.state.allSkills} selectedSkills={this.state.selectedSkills} />
+                            </Div>
+                            <Div>
+                                <Cell asideContent={
+                                    <Switch disabled={this.state.readOnlyMode}
+                                        onChange={(e) => this.handleCheckboxClick(e)}
+                                        checked={this.state.isSearchable ? 'checked' : ''} />}>
+                                    Ищу команду
                                     </Cell>
                             {this.state.user.isNew &&
                                 <Button
