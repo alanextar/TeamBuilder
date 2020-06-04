@@ -1,7 +1,7 @@
 ﻿import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
-import { Group, List, RichCell, CardGrid, Card, Button, Alert } from '@vkontakte/vkui';
+import { Group, List, RichCell, CardGrid, Card, Button, Alert, Placeholder } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import Icon28CheckCircleOutline from '@vkontakte/icons/dist/28/check_circle_outline';
 import Icon28InfoOutline from '@vkontakte/icons/dist/28/info_outline';
@@ -125,6 +125,14 @@ class UserTeams extends React.Component {
 
         return (
             <Group>
+                {this.state.userTeams && < Placeholder
+                    header="Вступайте в команду"
+                >
+                    <p>Или создайте свою и</p>
+                    <p>пригласите других участников</p>
+                    <p>Здесь можно будет принять приглашение от команд</p>
+                    <p>или отклонить заявку</p>
+                </Placeholder>}
                 <List>
 
                     <CardGrid>
