@@ -25,7 +25,6 @@ class User extends React.Component {
 
         this.state = {
             profile: props.profile,             //Здесь все данные о пользователе, если первый раз пришёл то только те что есть в VK, если нет то все данные которые у нас есть
-            profileUser: props.profileUser,     //TODO Удалить бы её НАХЕР
             user: props.user,                   //Тот пользователь который сейчас отображается в этой панели, на story profile равны
             activeTab: props.activeTab["profile"] || "main",
             readOnlyMode: props.activeStory != 'user',
@@ -35,16 +34,17 @@ class User extends React.Component {
         this.confirmUser = this.confirmUser.bind(this);
     }
 
+	//TODO Вынести в утилиты для обработки данных бэка
     convertSkills(userSkills) {
-        return userSkills.map(skill => {
+        return userSkills && userSkills.map(skill => {
             return {
-                id: skill.id,
-                value: skill.name,
+                key: skill.id,
                 label: skill.name
             };
         })
     }
 
+	//
     componentDidMount() {
         this.state.readOnlyMode && this.fetchUserData(this.state.id);
     }
@@ -61,8 +61,6 @@ class User extends React.Component {
     }
 
     fetchUserData(id) {
-        const { setRecruitTeams } = this.props;
-        //TODO преобразовать в один запрос типа getProfileUserWithRelation - получить профиль с командами в которые можно вербовать юзера
         Api.Users.get(id)
             .then(user => {
                 setUser(user);
@@ -175,22 +173,8 @@ class User extends React.Component {
                                 </Cell>}
                             <Div>
                                 <Title level="3" weight="regular" style={{ marginBottom: 4 }}>Скиллы:</Title>
-                                {/*<Typeahead id="skills"
-                                    clearButton
-                                    onChange={(e) => {
-                                        this.onSkillsChange(e)
-                                    }}
-                                    options={this.state.allSkills && this.state.allSkills}
-                                    selected={this.state.selectedSkills}
-                                    top="Skills"
-                                    multiple
-                                    className="Select__el"
-                                    disabled={this.state.readOnlyMode}
-                                />*/}
-                                {/*CreatableMulti - вынести в редактирование*/}
-                                {/*<CreatableMulti data={this.state.allSkills && this.state.allSkills} selectedSkills={this.state.selectedSkills} />*/}
                                 {/*SkillTokens - просто прямоугольники без селекта для отображения в информации об участнике*/}
-                                <SkillTokens data={this.state.allSkills && this.state.allSkills} selectedSkills={this.state.selectedSkills} />
+                                <SkillTokens selectedSkills={this.convertSkills(this.state.user.userSkills)} />
                             </Div>
                             <Div>
                                 <Cell asideContent={
@@ -232,7 +216,6 @@ const mapStateToProps = (state) => {
     console.log(`mapStateToProps.state ${JSON.stringify(state, null, 4)}`);
     return {
         user: state.user.user,
-        profileUser: state.user.profileUser,
         profile: state.user.profile,
         activeStory: state.router.activeStory,
         activeView: state.router.activeView,
