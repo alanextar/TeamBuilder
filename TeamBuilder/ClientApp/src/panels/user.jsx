@@ -12,6 +12,7 @@ import Icon24Write from '@vkontakte/icons/dist/24/write';
 import Icon28Send from '@vkontakte/icons/dist/28/send';
 import UserTeams from './userTeams'
 import { Api } from '../infrastructure/api';
+import * as Utils from '../infrastructure/utils';
 import { goBack, setPage } from '../store/router/actions';
 import { setUser, setProfileUser, setRecruitTeams } from '../store/user/actions';
 import { setActiveTab } from "../store/vk/actions";
@@ -28,7 +29,6 @@ class User extends React.Component {
 			profileUser: props.profileUser,
 			user: props.user,
 			activeTab: props.activeTab["profile"] || "main",
-			selectedSkills: [],
 			isConfirmed: false,
 			isSearchable: isSearchable ? isSearchable : false,
 			readOnlyMode: props.activeStory != 'user',
@@ -60,10 +60,7 @@ class User extends React.Component {
 		//TODO преобразовать в один запрос типа getProfileUserWithRelation - получить профиль с командами в которые можно вербовать юзера
 		Api.Users.get(id).then(user => {
 			setUser(user);
-			let selectedSkills = user && user.userSkills && user.userSkills.map(userSkill => {
-				return { key: userSkill.skillId, label: userSkill.skill.name };
-			})
-			this.setState({ user: user, selectedSkills: selectedSkills });
+			this.setState({ user: user });
 		});
 
 		Api.Users.get(this.state.vkProfile.id).then(user => {
@@ -79,22 +76,16 @@ class User extends React.Component {
 
 	async confirmUser() {
 		const { setUser, setProfileUser } = this.props;
-		let id = this.state.vkProfile.id;
-		let skillsIds = this.state.selectedSkills && this.state.selectedSkills.map((s, i) => s.id);
-		let photo100 = !this.state.readOnlyMode ? this.state.vkProfile.photo_100 : "";
-		let photo200 = !this.state.readOnlyMode ? this.state.vkProfile.photo_200 : "";
-		let firstName = !this.state.readOnlyMode ? this.state.vkProfile.first_name : "";
-		let lastName = !this.state.readOnlyMode ? this.state.vkProfile.last_name : "";
 
-		var isSearchable = this.state.isSearchable;
+		if (!this.state.vkProfile)
+			return;
+
 		var profileViewModel = {
-			id,
-			firstName,
-			lastName,
-			skillsIds,
-			isSearchable,
-			photo100,
-			photo200
+			id: this.state.vkProfile.id,
+			firstName: this.state.vkProfile.first_name,
+			lastName: this.state.vkProfile.last_name,
+			photo100: this.state.vkProfile.photo_100,
+			photo200: this.state.vkProfile.photo_200
 		};
 
 		Api.Users.saveOrConfirm(profileViewModel)
@@ -168,46 +159,48 @@ class User extends React.Component {
                                     дополнительно: {this.state.user && this.state.user.about}
                                 </Cell>
                             </List> */}
-							{this.state.user && this.state.user.mobile &&
+							{this.state.user?.mobile &&
 								<Cell>
 									<InfoRow header="Телефон">
 										<Link href={"tel:" + this.state.user.mobile}>{this.state.user.mobile}</Link>
 									</InfoRow>
 								</Cell>}
-							{this.state.user && this.state.user.telegram &&
+							{this.state.user?.telegram &&
 								<Cell>
 									<InfoRow header="Telegram">
 										<Link href={"tg://resolve?domain=" + this.state.user.telegram}>@{this.state.user.telegram}</Link>
 									</InfoRow>
 								</Cell>}
-							{this.state.user && this.state.user.email &&
+							{this.state.user?.email &&
 								<Cell>
 									<InfoRow header="Email">
 										<Link href={"mailto:" + this.state.user.email}>{this.state.user.email}</Link>
 									</InfoRow>
 								</Cell>}
-							{this.state.user && this.state.user.about &&
+							{this.state.user?.about &&
 								<Cell>
 									<InfoRow header="Дополнительно">
 										{this.state.user.about}
 									</InfoRow>
 								</Cell>}
-							<Div>
-								<Title level="3" weight="regular" style={{ marginBottom: 4 }}>Скиллы:</Title>
-								{/*SkillTokens - просто прямоугольники без селекта для отображения в информации об участнике*/}
-								<SkillTokens selectedSkills={this.state.selectedSkills} />
-							</Div>
+							{this.state.user?.userSkills?.length > 0 &&
+								<Div>
+									<Title level="3" weight="regular" style={{ marginBottom: 4 }}>Скиллы:</Title>
+									{/*SkillTokens - просто прямоугольники без селекта для отображения в информации об участнике*/}
+									<SkillTokens selectedSkills={Utils.convertSkills(this.state.user?.userSkills)} />
+								</Div>}
 							<Div>
 								<Cell asideContent={
-									<Switch disabled={this.state.readOnlyMode}
+									<Switch disabled={true}
 										onChange={() => this.setState({ isSearchable: !this.state.isSearchable })}
-										checked={this.state.isSearchable ? 'checked' : ''} />}>
+										checked={this.state.isSearchable} />}>
 									Ищу команду
                                     </Cell>
-								{!this.state.readOnlyMode && <Button mode={this.state.user ? "primary" : "destructive"} size='xl'
-									onClick={() => this.state.vkProfile && this.confirmUser()}>
-									{this.state.user ? "Сохранить" : "Подтвердить"}
-								</Button>}
+								{!this.state.readOnlyMode && !this.props.profileUser &&
+									<Button mode="destructive" size='xl'
+										onClick={() => this.confirmUser()}>
+										Подтвердить
+									</Button>}
 							</Div>
 						</Group> :
 						<Group>

@@ -8,117 +8,125 @@ import { setFormData } from "../store/formData/actions";
 import { setUser, setProfileUser } from "../store/user/actions";
 
 import {
-    Panel, PanelHeader, Group, Cell, Avatar, Button, Div, Input,
-    FormLayoutGroup, Textarea, Separator, FormLayout, PanelHeaderBack
-} from '@vkontakte/vkui';
+	Panel, PanelHeader, Group, Cell, Avatar, Button, Div, Input, Title,
+	FormLayoutGroup, Textarea, Separator, FormLayout, PanelHeaderBack, Switch
+} from '@vkontakte/vkui'; 
+import CreatableMulti from './CreatableMulti'
 import '@vkontakte/vkui/dist/vkui.css';
-import '../../src/css/style.css';
-import 'react-bootstrap-typeahead/css/Typeahead.css';
-import { Api, Urls } from '../infrastructure/api';
+import { Api } from '../infrastructure/api';
 
 class UserEdit extends React.Component {
-    constructor(props) {
-        super(props);
+	constructor(props) {
+		super(props);
 
-        this.state = {
-            vkProfile: props.profile,
-            user: props.user,
-            inputData: props.inputData['profile_form'] ? props.inputData['profile_form'] : props.user
-        }
+		this.state = {
+			user: props.user,
+			inputData: props.inputData['profile_form'] ? props.inputData['profile_form'] : props.user
+		}
 
-        this.handleInput = (e) => {
-            let value = e.currentTarget.value;
+		this.handleInput = (e) => {
+			let value = e.currentTarget.value;
 
-            if (e.currentTarget.type === 'checkbox') {
-                value = e.currentTarget.checked;
-            }
+			if (e.currentTarget.type === 'switch') {
+				value = e.currentTarget.checked;
+			}
 
-            this.setState({
-                inputData: {
-                    ...this.state.inputData,
-                    [e.currentTarget.name]: value
-                },
-                user: {
-                    ...this.state.user,
-                    [e.currentTarget.name]: value
+			this.setState({
+				inputData: {
+					...this.state.inputData,
+					[e.currentTarget.name]: value
+				},
+				user: {
+					...this.state.user,
+					[e.currentTarget.name]: value
 				}
-            })
-        }
+			})
+		}
 
-        this.cancelForm = () => {
-            this.setState({
-                inputData: null
-            })
-            goBack();
-        };
+		this.cancelForm = () => {
+			this.setState({
+				inputData: null
+			})
+			goBack();
+		};
 
-        this.postEdit = this.postEdit.bind(this);
-        const { goBack } = this.props;
-    }
+		this.postEdit = this.postEdit.bind(this);
+		const { goBack } = this.props;
+	}
 
-    componentWillUnmount() {
-        this.props.setFormData('profile_form', this.state.inputData);
-    }
+	componentWillUnmount() {
+		this.props.setFormData('profile_form', this.state.inputData);
+	}
 
-    async postEdit() {
-        let updatedUser = await Api.post(Urls.Users.Edit, this.state.inputData);
-        const { setProfileUser, setUser } = this.props;
-        setUser(updatedUser);
-        setProfileUser(updatedUser);
-    }
+	async postEdit() {
+		let updatedUser = await Api.Users.edit(this.state.inputData);
+		const { setProfileUser, setUser, goBack } = this.props;
+		setUser(updatedUser);
+		setProfileUser(updatedUser);
+		goBack();
+	}
 
-    render() {
-        const { goBack } = this.props;
-
-        return (
-            <Panel id="userEdit">
-                <PanelHeader left={<PanelHeaderBack onClick={this.cancelForm} />}>Профиль</PanelHeader>
-                {this.state.vkProfile &&
-                    <Group title="VK Connect">
-                        <Cell description={this.state.vkProfile.city && this.state.vkProfile.city.title ? this.state.vkProfile.city.title : ''}
-                            before={this.state.vkProfile.photo_200 ? <Avatar src={this.state.vkProfile.photo_200} /> : null}>
-                            {`${this.state.vkProfile.first_name} ${this.state.vkProfile.last_name}`}
-                        </Cell>
-                    </Group>}
-                <Separator />
-                <FormLayout>
-                    <FormLayoutGroup top="Редактирование">
-                        <Input name="mobile" value={this.state.inputData && this.state.inputData.mobile} onChange={this.handleInput} type="text" placeholder="тел" />
-                        <Input name="telegram" value={this.state.inputData && this.state.inputData.telegram} onChange={this.handleInput} type="text" placeholder="telegram" />
-                        <Input name="email" value={this.state.inputData && this.state.inputData.email} onChange={this.handleInput} type="text" placeholder="email" />
-                        <Textarea name="about" value={this.state.inputData && this.state.inputData.about} onChange={this.handleInput} placeholder="дополнительно" />
-                    </FormLayoutGroup>
-                </FormLayout>
-                <Div>
-                    <Button onClick={() => {
-                        this.postEdit();
-                        goBack()
-                    }}
-                        mode="commerce"
-                    >
-                        Принять
-                     </Button>
-                    <Button onClick={this.cancelForm} mode="destructive">Отменить</Button>
-                </Div>
-            </Panel>
-        )
-    }
+	render() {
+		return (
+			<Panel id="userEdit">
+				<PanelHeader left={<PanelHeaderBack onClick={this.cancelForm} />}>Профиль</PanelHeader>
+				{this.props.profile &&
+					<Group title="VK Connect">
+						<Cell description={this.props.profile.city && this.props.profile.city.title ? this.props.profile.city.title : ''}
+							before={this.props.profile.photo_200 ? <Avatar src={this.props.profile.photo_200} /> : null}>
+							{`${this.props.profile.first_name} ${this.props.profile.last_name}`}
+						</Cell>
+					</Group>}
+				<Separator />
+				<FormLayout>
+					<FormLayoutGroup top="Редактирование">
+						<Input name="mobile" value={this.state.inputData && this.state.inputData.mobile} onChange={this.handleInput} type="text" placeholder="Телефон" />
+						<Input name="telegram" value={this.state.inputData && this.state.inputData.telegram} onChange={this.handleInput} type="text" placeholder="Telegram" />
+						<Input name="email" value={this.state.inputData && this.state.inputData.email} onChange={this.handleInput} type="text" placeholder="Email" />
+						<Textarea name="about" value={this.state.inputData && this.state.inputData.about} onChange={this.handleInput} placeholder="Дополнительно" />
+						<Div>
+                            <Title level="3" weight="regular" style={{ marginBottom: 16 }}>Скиллы:</Title>
+                            <CreatableMulti
+                                name="userSkills"
+                                data={this.state.allSkills && this.state.allSkills}
+                                defaultValue={this.state.selectedSkills}
+                                handleChange={this.handleChange}
+                            />
+                        </Div>
+                        <Div>
+                            <Cell asideContent={
+                                <Switch
+                                    name="isSearchable"
+                                    onChange={this.handleInput}
+                                    checked={this.props.user.isSearchable} />}>
+                                Ищу команду
+                                    </Cell>
+                        </Div>
+					</FormLayoutGroup>
+				</FormLayout>
+				<Div style={{ display: 'flex' }}>
+					<Button size="l" onClick={this.postEdit} stretched style={{ marginRight: 8 }}>Принять</Button>
+					<Button size="l" onClick={this.cancelForm} stretched mode="secondary">Отменить</Button>
+				</Div>
+			</Panel>
+		)
+	}
 }
 
 const mapStateToProps = (state) => {
 
-    return {
-        user: state.user.user,
-        profile: state.user.profile,
-        inputData: state.formData.forms,
-    };
+	return {
+		user: state.user.user,
+		profile: state.user.profile,
+		inputData: state.formData.forms,
+	};
 };
 
 function mapDispatchToProps(dispatch) {
-    return {
-        dispatch,
-        ...bindActionCreators({ goBack, setUser, setProfileUser, setFormData }, dispatch)
-    }
+	return {
+		dispatch,
+		...bindActionCreators({ goBack, setUser, setProfileUser, setFormData }, dispatch)
+	}
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(UserEdit);

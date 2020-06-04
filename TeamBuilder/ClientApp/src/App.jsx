@@ -58,10 +58,6 @@ const App = (props) => {
     useEffect(() => {
 		const { goBack } = props;
 		
-		if (props.profileUser){
-			setIsNewUser(true);
-		}
-
 		getEvents();
 		
         window.onpopstate = () => {
@@ -75,7 +71,7 @@ const App = (props) => {
                 window.history.pushState(null, null);
             }
         };
-    }, []);
+	}, []);
 
     useEffect(() => {
         const { activeView, panelsHistory, activeModals, popouts } = props;
@@ -127,7 +123,7 @@ const App = (props) => {
                         selected={activeStory === 'events'}
                         text="События"
                     ><Icon28FavoriteOutline /></TabbarItem>
-                    <TabbarItem style={{ color: isNewUser ? "red" : "" }}
+                    <TabbarItem style={{ color: !props.profileUser ? "red" : "" }}
                         onClick={() => {
                             setStory('user', 'user');
                             setUser(profileUser);

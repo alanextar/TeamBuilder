@@ -3,6 +3,16 @@ export function countConfirmed(userTeams) {
 	return count;
 };
 
+export function convertSkills(userSkills) {
+	return userSkills && userSkills.map(userSkill => {
+		return {
+			key: userSkill.skillId,
+			label: userSkill.skill.name,
+			value: userSkill.skill.name
+		};
+	})
+}
+
 export function GetRandomPic() {
 	let url = ``;
 
