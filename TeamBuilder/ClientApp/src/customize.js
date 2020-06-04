@@ -2,7 +2,7 @@ export const showTokensOnly = {
     control: (base, state) => ({
         ...base,
         backgroundColor: 'transparent',
-        lineHeight: '20px',
+        lineHeight: '14px',
         border: 'none',
         '&:hover': {
             border: 'none'
@@ -31,7 +31,8 @@ export const showTokensOnly = {
     }),
     multiValue: (provided, state) => ({
         ...provided,
-        borderRadius: '10px',
+        borderRadius: '15px',
+        padding: '8px'
     }),
     multiValueRemove: (provided, state) => ({
         ...provided,

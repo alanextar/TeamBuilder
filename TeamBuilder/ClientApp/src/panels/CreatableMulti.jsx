@@ -1,6 +1,6 @@
 ﻿import React, { Component } from 'react';
 import CreatableSelect from 'react-select/creatable';
-import { customCreatableSelect } from '../customizatize.js';
+import { customCreatableSelect } from '../customize.js';
 
 export default class CreatableMulti extends React.Component {
     constructor(props) {
