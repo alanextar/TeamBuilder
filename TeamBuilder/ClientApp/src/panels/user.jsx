@@ -204,7 +204,7 @@ class User extends React.Component {
 							</Div>
 						</Group> :
 						<Group>
-							<UserTeams userTeams={this.state.user && this.state.user.userTeams} readOnlyMode={this.state.readOnlyMode} />
+							<UserTeams readOnlyMode={this.state.readOnlyMode} userTeams={this.state.user && this.state.user.userTeams} readOnlyMode={this.state.readOnlyMode} />
 						</Group>
 				}
 				<Div>
