@@ -85,6 +85,7 @@ class TeamEdit extends React.Component {
             .then(t => { setTeam(t) });
     };
 
+    //Принять в команду
     async handleJoin(e, userTeam) {
         e.stopPropagation();
         Api.Teams.joinTeam(userTeam.userId, userTeam.teamId)
@@ -93,6 +94,7 @@ class TeamEdit extends React.Component {
             });
     };
 
+    //Удалить из команды / отклонить заявку
     async dropUser(e, userTeam) {
         Api.Teams.rejectedOrRemoveUser({ teamId: userTeam.teamId, userId: userTeam.userId })
             .then(newTeam => {
@@ -100,6 +102,7 @@ class TeamEdit extends React.Component {
             })
     };
 
+    //Отменить приглашение
     async cancelUser(e, userTeam) {
         Api.Teams.cancelRequestUser({ teamId: userTeam.teamId, userId: userTeam.userId })
             .then(newTeam => {
