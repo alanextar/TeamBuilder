@@ -1,11 +1,9 @@
 ﻿import React, { useState, useEffect } from 'react';
-import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 import {
     Panel, PanelHeader, Group, Cell, Avatar, Button, Div, PanelHeaderBack,
     Tabs, TabsItem, Separator, Checkbox, InfoRow, Header, Title, Link, Switch
 } from '@vkontakte/vkui';
-import { } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import '../../src/styles/style.css';
 import Icon28PhoneOutline from '@vkontakte/icons/dist/28/phone_outline';
@@ -18,39 +16,37 @@ import CreatableMulti from './CreatableMulti'
 import bridge from '@vkontakte/vk-bridge';
 import { Api, Urls } from '../infrastructure/api';
 import { goBack, setPage } from '../store/router/actions';
-import { setUser, setProfileUser, setRecruitTeams } from '../store/user/actions';
+import { setUser, setProfile, setRecruitTeams } from '../store/user/actions';
 import { setActiveTab } from "../store/vk/actions";
 
 class User extends React.Component {
     constructor(props) {
         super(props);
 
-        let isSearchable = props.user && props.user.isSearchable;
-
         this.state = {
-            allSkills: null,
-            vkUser: null,
-            vkProfile: props.profile,
-            profileUser: props.profileUser,
-            user: props.user,
+            profile: props.profile,             //Здесь все данные о пользователе, если первый раз пришёл то только те что есть в VK, если нет то все данные которые у нас есть
+            profileUser: props.profileUser,     //TODO Удалить бы её НАХЕР
+            user: props.user,                   //Тот пользователь который сейчас отображается в этой панели, на story profile равны
             activeTab: props.activeTab["profile"] || "main",
-            selected: false,
-            selectedSkills: [],
-            isConfirmed: false,
-            isSearchable: isSearchable ? isSearchable : false,
             readOnlyMode: props.activeStory != 'user',
-            recruitTeams: []
+            teamsCanInvite: []
         }
 
         this.confirmUser = this.confirmUser.bind(this);
+    }
 
+    convertSkills(userSkills) {
+        return userSkills.map(skill => {
+            return {
+                id: skill.id,
+                value: skill.name,
+                label: skill.name
+            };
+        })
     }
 
     componentDidMount() {
-        let id = this.state.readOnlyMode ? this.state.user.id : this.state.vkProfile.id;
-        this.populateSkills(); //TODO переписать с кэшированием (сохранение в localStorage)
-        this.state.vkProfile && this.fetchVkUser(id);
-        this.state.vkProfile && this.fetchUserData(id);
+        this.state.readOnlyMode && this.fetchUserData(this.state.id);
     }
 
     componentDidUpdate(prevProps) {
@@ -67,93 +63,52 @@ class User extends React.Component {
     fetchUserData(id) {
         const { setRecruitTeams } = this.props;
         //TODO преобразовать в один запрос типа getProfileUserWithRelation - получить профиль с командами в которые можно вербовать юзера
-        Api.Users.get(id).then(user => {
-            setUser(user);
-            let selectedSkills = user && user.userSkills && user.userSkills.map(function (userSkill) {
-                return { id: userSkill.skillId, label: userSkill.skill.name };
-            })
-            this.setState({ user: user, selectedSkills: selectedSkills });
-        });
-
-        Api.Users.get(this.state.vkProfile.id).then(user => {
-            setProfileUser(user);
-        });
-
-        if (this.state.profileUser && this.state.profileUser.anyTeamOwner && this.state.user.isSearchable) {
-            Api.Users.getRecruitTeams(this.state.vkProfile.id, id)
-                .then(data => { setRecruitTeams(data); this.setState({ recruitTeams: data }) });
-        }
-
-    }
-
-    async fetchVkUser(id) {
-        const t = await bridge.send("VKWebAppGetAuthToken",
-            { "app_id": 7448436, "scope": "" });
-
-        let params = {
-            user_id: id,
-            fields: 'city,photo_200,contacts',
-            v: '5.103',
-            access_token: t.access_token
-        };
-
-        const request = await bridge.send("VKWebAppCallAPIMethod", { "method": "users.get", "request_id": "32test", "params": params });
-        this.setState({ vkUser: request.response[0] });
-    }
-
-    async confirmUser() {
-        const { setUser, setProfileUser } = this.props;
-        let profileViewModel = this.state.vkProfile;
-
-        profileViewModel.skillsIds = this.state.selectedSkills && this.state.selectedSkills.map(s => s.id);
-        profileViewModel.isSearchable = this.state.isSearchable;
-
-        console.log(`confirmUser.profileViewModel ${JSON.stringify(profileViewModel, null, 4)}`);
-
-        Api.Users.saveOrConfirm(profileViewModel)
+        Api.Users.get(id)
             .then(user => {
                 setUser(user);
-                setProfileUser(user);
+                this.setState({ user: user });
             });
     }
 
-    onSkillsChange(selectedSkills) {
+    async confirmUser() {
+        const { setUser, setProfile } = this.props;
 
-        this.setState({
-            selectedSkills: selectedSkills
-        })
-    };
+        console.log(`confirmUser.profileViewModel ${JSON.stringify(this.state.profile, null, 4)}`);
 
-    handleCheckboxClick(event) {
-        this.setState({ isSearchable: !this.state.isSearchable })
-    };
+        Api.Users.saveOrConfirm(this.state.profile)
+            .then(user => {
+                setUser(user);
+                setProfile(user);
+            });
+    }
 
-    populateSkills() {
-        Api.Skills.getAll()
-            .then(allSkillsJson => {
-                var options = allSkillsJson && allSkillsJson.map(function (skill) {
-                    return { id: skill.id, value: skill.name, label: skill.name };
-                });
+    getTeamsCanInvite() {
+        let teamsToRecruit = this.state.profile.teamsToRecruit;
+        let userTeams = this.state.user && this.state.user.UserTeams
 
-                this.setState({ allSkills: options });
-            })
+        let myTeams = teamsToRecruit ? teamsToRecruit.map(t => t.id) : []
+        let teamsOccupateUser = userTeams ? userTeams.map(ut => ut.teamId) : [];
+
+        return myTeams
+            .filter(x => !teamsOccupateUser.includes(x))
+            .concat(teamsOccupateUser.filter(x => !myTeams.includes(x)));
     }
 
     render() {
         const { setPage, goBack, activeView } = this.props;
-        console.log(`vkProfile. ${JSON.stringify(this.state.vkProfile, null, 4)}`);
-        let id = this.state.readOnlyMode ? this.state.user.id : this.state.vkProfile && this.state.vkProfile.id;
+        console.log(`vkProfile. ${JSON.stringify(this.state.profile, null, 4)}`);
+        let user = this.state.user;
 
         return (
             <Panel id="user">
                 <PanelHeader separator={false} left={this.state.readOnlyMode &&
                     <PanelHeaderBack onClick={() => goBack()} />}>{this.state.readOnlyMode ? 'Участник' : 'Профиль'}</PanelHeader>
-                {this.state.vkUser &&
+                {user &&
                     <Group title="VK Connect">
-                        <Link href={"https://m.vk.com/id" + id} target="_blank">
-                            <Cell description={this.state.vkUser.city && this.state.vkUser.city.title ? this.state.vkUser.city.title : ''}
-                                before={this.state.vkUser.photo_200 ? <Avatar src={this.state.vkUser.photo_200} /> : null}>
-                                {`${this.state.vkUser.first_name} ${this.state.vkUser.last_name}`}
+                        <Link href={"https://m.vk.com/id" + user.id} target="_blank">
+                            <Cell description={user.city ? user.city : ''}
+                                before={user.photo100 ? <Avatar src={user.photo100} /> : null}>
+                                {`${user.firstName} ${user.lastName}`}
                             </Cell>
                         </Link>
                     </Group>}
@@ -170,17 +125,17 @@ class User extends React.Component {
                         Команды
                     </TabsItem>
                 </Tabs>
-                {
-                    this.state.activeTab === 'main' ?
-                        <Group header={
-                            <Header
-                                mode="secondary"
-                                aside={!this.state.readOnlyMode && this.state.user &&
-                                    <Link style={{ color: "#3f8ae0" }} onClick={() => setPage('user', 'userEdit')}>Редактировать</Link>
-                                }>
-                                Информация
+                {this.state.activeTab === 'main'
+                    ?
+                    <Group header={
+                        <Header
+                            mode="secondary"
+                            aside={!this.state.readOnlyMode && !this.state.user.isNew &&
+                                <Link style={{ color: "#3f8ae0" }} onClick={() => setPage('user', 'userEdit')}>Редактировать</Link>
+                            }>
+                            Информация
                                 </Header>}>
-                            {/* <List>
+                        {/* <List>
                                 <Cell before={<Icon28PhoneOutline />}>
                                     тел.: {this.state.user && <Link href={"tel:" + this.state.user.mobile}>{this.state.user.mobile}</Link>}
                                 </Cell>
@@ -194,69 +149,66 @@ class User extends React.Component {
                                     дополнительно: {this.state.user && this.state.user.about}
                                 </Cell>
                             </List> */}
-                            {this.state.user && this.state.user.mobile &&
-                                <Cell>
-                                    <InfoRow header="Телефон">
-                                        <Link href={"tel:" + this.state.user.mobile}>{this.state.user.mobile}</Link>
-                                    </InfoRow>
-                                </Cell>}
-                            {this.state.user && this.state.user.telegram &&
-                                <Cell>
-                                    <InfoRow header="Telegram">
-                                        <Link href={"tg://resolve?domain=" + this.state.user.telegram}>@{this.state.user.telegram}</Link>
-                                    </InfoRow>
-                                </Cell>}
-                            {this.state.user && this.state.user.email &&
-                                <Cell>
-                                    <InfoRow header="Email">
-                                        <Link href={"mailto:" + this.state.user.email}>{this.state.user.email}</Link>
-                                    </InfoRow>
-                                </Cell>}
-                            {this.state.user && this.state.user.about &&
-                                <Cell>
-                                    <InfoRow header="Дополнительно">
-                                        {this.state.user.about}
-                                    </InfoRow>
-                                </Cell>}
-                            <Div>
-                                <Title level="3" weight="regular" style={{ marginBottom: 16 }}>Скиллы:</Title>
-                                {/* <Typeahead id="skills"
-                                    clearButton
-                                    onChange={(e) => {
-                                        this.onSkillsChange(e)
-                                    }}
-                                    options={this.state.allSkills && this.state.allSkills}
-                                    selected={this.state.selectedSkills}
-                                    top="Skills"
-                                    multiple
-                                    className="Select__el"
-                                    disabled={this.state.readOnlyMode}
-                                /> */}
-
-                                <CreatableMulti data={this.state.allSkills && this.state.allSkills} />
-                            </Div>
-                            <Div>
-                                <Cell asideContent={
-                                    <Switch disabled={this.state.readOnlyMode}
-                                        onChange={(e) => this.handleCheckboxClick(e)}
-                                        checked={this.state.isSearchable ? 'checked' : ''} />}>
-                                    Ищу команду
+                        {this.state.user && this.state.user.mobile &&
+                            <Cell>
+                                <InfoRow header="Телефон">
+                                    <Link href={"tel:" + this.state.user.mobile}>{this.state.user.mobile}</Link>
+                                </InfoRow>
+                            </Cell>}
+                        {this.state.user && this.state.user.telegram &&
+                            <Cell>
+                                <InfoRow header="Telegram">
+                                    <Link href={"tg://resolve?domain=" + this.state.user.telegram}>@{this.state.user.telegram}</Link>
+                                </InfoRow>
+                            </Cell>}
+                        {this.state.user && this.state.user.email &&
+                            <Cell>
+                                <InfoRow header="Email">
+                                    <Link href={"mailto:" + this.state.user.email}>{this.state.user.email}</Link>
+                                </InfoRow>
+                            </Cell>}
+                        {this.state.user && this.state.user.about &&
+                            <Cell>
+                                <InfoRow header="Дополнительно">
+                                    {this.state.user.about}
+                                </InfoRow>
+                            </Cell>}
+                        <Div>
+                            <Title level="3" weight="regular" style={{ marginBottom: 16 }}>Скиллы:</Title>
+                            <CreatableMulti
+                                disabled={true}
+                                defaultValue={this.state.user.userSkills
+                                    ? this.convertSkills(this.state.user.userSkills)
+                                    : ['Выберите навыки']}
+                            />
+                        </Div>
+                        <Div>
+                            <Cell asideContent={
+                                <Switch disabled={true}
+                                    checked={this.state.user.isSearchable ? 'checked' : ''} />}>
+                                Ищу команду
                                     </Cell>
-                                {!this.state.readOnlyMode && <Button mode={this.state.user ? "primary" : "destructive"} size='xl'
-                                    onClick={() => this.state.vkProfile && this.confirmUser()}>
-                                    {this.state.user ? "Сохранить" : "Подтвердить"}
+                            {this.state.user.isNew &&
+                                <Button
+                                    size='xl'
+                                    mode="destructive"
+                                    onClick={this.confirmUser}>
+                                    Подтвердить
                                 </Button>}
-                            </Div>
-                        </Group> :
-                        <Group>
-                            <UserTeams userTeams={this.state.user && this.state.user.userTeams} readOnlyMode={this.state.readOnlyMode} />
-                        </Group>
+                        </Div>
+                    </Group>
+                    :
+                    <Group>
+                        <UserTeams userTeams={this.state.user && this.state.user.userTeams} readOnlyMode={this.state.readOnlyMode} />
+                    </Group>
                 }
                 <Div>
-                    {this.state.recruitTeams && this.state.recruitTeams.length > 0 && < Button mode="primary" size='xl'
-                        onClick={() => setPage(activeView, 'setUserTeam')}
-                    >
-                        Завербовать
+                    {this.state.readOnlyMode && this.getTeamsCanInvite().length > 0 &&
+                        <Button
+                            size='xl'
+                            mode="primary"
+                            onClick={() => setPage(activeView, 'setUserTeam')}>
+                            Завербовать
                     </Button>}
                 </Div>
             </Panel>
@@ -280,7 +232,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
     setPage,
     setUser,
-    setProfileUser,
+    setProfile,
     goBack,
     setRecruitTeams,
     setActiveTab

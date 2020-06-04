@@ -74,7 +74,7 @@ namespace TeamBuilder.Services
 		internal async Task<bool> CanManageUser(long id)
 		{
 			var profileId = httpContextAccessor.HttpContext.VkLaunchParams().VkUserId;
-			var user = await context.Users.FirstOrDefaultAsync(u => u.Id == profileId);
+			var user = await context.Users.FirstOrDefaultAsync(u => u.Id == id);
 
 			if (user == null)
 				return false;

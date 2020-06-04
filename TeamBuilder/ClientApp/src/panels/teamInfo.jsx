@@ -43,6 +43,7 @@ class TeamInfo extends React.Component {
         };
 
         this.toggleContext = this.toggleContext.bind(this);
+        this.deleteTeam = this.deleteTeam.bind(this);
     }
 
     componentDidMount() {
@@ -120,6 +121,13 @@ class TeamInfo extends React.Component {
             })
     };
 
+    async deleteTeam() {
+        console.log(`delete.team.id ${this.state.team.id}`)
+        await Api.Teams.delete(this.state.team.id);
+        console.log(`success delete`)
+    };
+
+
     openPopoutExit = () => {
         this.props.openPopout(
             <Alert
@@ -170,7 +178,8 @@ class TeamInfo extends React.Component {
             this.state.team.userTeams.find(user => user.userId === this.state.vkProfile.id);
         let isUserInActiveTeam = userInActiveTeam != null;
         let isOwner = isUserInActiveTeam && userInActiveTeam && userInActiveTeam.isOwner;
-        let isModerator = this.state.profileUser && this.state.profileUser.isModerator;
+        let isModerator = this.state.vkProfile && this.state.vkProfile.isModerator;
+        console.log(`moderator ${isModerator}`)
         let userAction = userInActiveTeam && userInActiveTeam.userAction;
         let confirmedUser = countConfirmed(this.state.team.userTeams);
         let teamCap = this.state.team.userTeams.find(x => x.isOwner) && this.state.team.userTeams.find(x => x.isOwner).user
@@ -178,7 +187,7 @@ class TeamInfo extends React.Component {
         return (
             <Panel id={this.state.panelId}>
                 <PanelHeader separator={false} left={<PanelHeaderBack onClick={() => { goBack(); }} />}>
-                    {this.state.profileUser ?
+                    {true ?
                         <PanelHeaderContent
                             aside={<Icon16Dropdown style={{ transform: `rotate(${this.state.contextOpened ? '180deg' : '0'})` }} />}
                             onClick={(e) => { this.toggleContext(); }}>
@@ -189,10 +198,11 @@ class TeamInfo extends React.Component {
                 {this.state.team && <PanelHeaderContext opened={this.state.contextOpened} onClose={this.toggleContext}>
                     {(isOwner || isModerator) &&
                         <List>
-                            <Cell
-                                onClick={() => setPage(activeView, 'teamEdit')}
-                            >
+                            <Cell onClick={() => setPage(activeView, 'teamEdit')}>
                                 Редактировать команду
+                            </Cell>
+                            <Cell onClick={this.deleteTeam}>
+                                Удаить команду
                             </Cell>
                         </List>
                         || userAction === 1 &&

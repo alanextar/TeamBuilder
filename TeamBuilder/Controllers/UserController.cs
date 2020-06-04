@@ -10,6 +10,7 @@ using TeamBuilder.Extensions;
 using TeamBuilder.Models.Enums;
 using TeamBuilder.ViewModels;
 using System;
+using AutoMapper;
 using TeamBuilder.Services;
 
 namespace TeamBuilder.Controllers
@@ -37,16 +38,14 @@ namespace TeamBuilder.Controllers
 
 			if (user == null)
 			{
-				user = new User { Id = profileViewModel.Id };
-				if (profileViewModel.SkillsIds != null)
-				{
-					foreach (var skillId in profileViewModel.SkillsIds)
-					{
-						user.UserSkills.Add(new UserSkill() { SkillId = skillId });
-					}
-				}
+				user = new User();
+				var config = new MapperConfiguration(cfg => cfg.CreateMap<ProfileViewModel, User>());
+				var mapper = new Mapper(config);
+				mapper.Map(profileViewModel, user);
 
 				await context.Users.AddAsync(user);
+				await context.SaveChangesAsync();
+				return Json(user);
 			}
 			else if (profileViewModel.SkillsIds != null)
 			{
@@ -106,7 +105,8 @@ namespace TeamBuilder.Controllers
 		{
 			logger.LogInformation($"Request Get/{id}");
 
-			var user = context.Users.Include(x => x.UserTeams)
+			var user = context.Users
+				.Include(x => x.UserTeams)
 				.ThenInclude(y => y.Team)
 				.ThenInclude(y => y.Event)
 				.Include(x => x.UserSkills)
@@ -115,11 +115,15 @@ namespace TeamBuilder.Controllers
 
 			if (user?.UserTeams != null)
 			{
-				user.UserTeams = user.UserTeams.Where(x => x.UserAction == UserActionEnum.ConsideringOffer ||
-				x.UserAction == UserActionEnum.JoinedTeam ||
-				x.UserAction == UserActionEnum.SentRequest || x.IsOwner).ToList();
+				user.UserTeams = user.UserTeams
+					.Where(x => x.UserAction == UserActionEnum.ConsideringOffer ||
+								x.UserAction == UserActionEnum.JoinedTeam ||
+								x.UserAction == UserActionEnum.SentRequest ||
+								x.IsOwner)
+					.ToList();
 
 				user.AnyTeamOwner = user.UserTeams.Any(x => x.IsOwner);
+				user.TeamsToRecruit = user.UserTeams.Where(ut => ut.IsOwner).Select(ut => ut.Team).ToList();
 			}
 
 			return Json(user);
@@ -149,23 +153,30 @@ namespace TeamBuilder.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> Edit([FromBody]User user)
+		public async Task<IActionResult> Edit([FromBody]EditUserViewModel editUserModel)
 		{
-			logger.LogInformation("Request Edit");
+			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");
 
-			if (!await accessChecker.CanManageUser(user.Id))
+			if (!await accessChecker.CanManageUser(editUserModel.Id))
 				return Forbid();
 
-			var dbUser = context.Users.FirstOrDefault(u => u.Id == user.Id);
-			dbUser.Mobile = user.Mobile;
-			dbUser.Email = user.Email;
-			dbUser.About = user.About;
-			dbUser.Telegram = user.Telegram;
+			var user = await context.Users
+				.Include(x => x.UserTeams)
+				.ThenInclude(y => y.Team)
+				.ThenInclude(y => y.Event)
+				.Include(x => x.UserSkills)
+				.ThenInclude(y => y.Skill)
+				.FirstOrDefaultAsync(u => u.Id == editUserModel.Id);
 
-			context.Update(dbUser);
+			var config = new MapperConfiguration(cfg => cfg.CreateMap<EditUserViewModel, User>()
+				.ForMember("UserSkills", opt => opt.MapFrom(src => src.Skills.Select(id => new UserSkill{SkillId = id}))));
+			var mapper = new Mapper(config);
+			mapper.Map(editUserModel, user);
+
+			context.Update(user);
 			await context.SaveChangesAsync();
 
-			return Json(dbUser);
+			return Json(user);
 		}
 
 		public async Task<IActionResult> JoinTeam(long teamId)
@@ -174,7 +185,7 @@ namespace TeamBuilder.Controllers
 
 			if (!accessChecker.IsConfirm(out var profileId))
 				return Forbid();
-			
+
 			var user = context.Users
 				.Include(x => x.UserTeams)
 				.ThenInclude(x => x.Team)
@@ -229,7 +240,7 @@ namespace TeamBuilder.Controllers
 
 		public async Task<IActionResult> CancelRequestTeam(long teamId)
 		{
-			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");
+			logger.LogInformation($"GET Request {HttpContext.Request.Headers[":path"]}");
 
 			if (!accessChecker.IsConfirm(out var profileId))
 				return Forbid();

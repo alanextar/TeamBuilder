@@ -226,7 +226,7 @@ namespace TeamBuilder.Controllers
 		public async Task<IActionResult> JoinTeam(long userId, long teamId)
 		{
 			logger.LogInformation($"GET Request {HttpContext.Request.Headers[":path"]}");
-			
+
 			if (!await accessChecker.CanManageTeam(teamId))
 				return Forbid();
 

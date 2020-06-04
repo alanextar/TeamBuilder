@@ -1,0 +1,16 @@
+root = true
+
+[*]
+end_of_line = crlf
+
+[**.{yaml,yml,xml,xsd}]
+indent_style = tab
+tab_width = 4
+
+[*.{cs,csx,vb,vbx}]
+indent_style = tab
+tab_width = 4
+
+[*.{js,jsx,css,html,json}]
+indent_style = tab
+tab_width = 4

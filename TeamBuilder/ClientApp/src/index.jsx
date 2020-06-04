@@ -21,15 +21,18 @@ bridge.send("VKWebAppInit", {});
 
 export const store = createStore(
     rootReducer, composeWithDevTools(
-    applyMiddleware(thunk),
-    applyMiddleware(logger)
-));
+        applyMiddleware(thunk),
+        applyMiddleware(logger)
+    ));
 
 store.dispatch(VK.initProfile());
+store.dispatch(setStory('events', 'events'));
 
-store.dispatch(setStory('user', 'user'));
-
-ReactDOM.render(<Provider store={store}><App /></Provider>, document.getElementById('root'));
+ReactDOM.render(
+    <Provider store={store}>
+        <App />
+    </Provider>,
+    document.getElementById('root'));
 if (process.env.NODE_ENV === "development") {
     import("eruda").then(({ default: eruda }) => { }); //runtime download
 }

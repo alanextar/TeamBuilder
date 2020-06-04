@@ -6,21 +6,14 @@ export default class CreatableMulti extends React.Component {
         super(props);
     }
 
-    //
-    handleChange = (newValue, actionMeta) => {
-        console.group('Value Changed');
-        console.log(newValue);
-        console.log(`actionMeta: ${Object.entries(actionMeta)}`);
-        console.log(`actionMeta.action: ${actionMeta.action}`);
-        console.groupEnd();
-    };
-
     render() {
         return (
             <CreatableSelect
+                isDisabled={this.props.disabled ? this.props.disabled : false}
                 isMulti
-                onChange={this.handleChange}
+                onChange={this.props.handleChange}
                 options={this.props.data}
+                defaultValue={this.props.selected}
             />
         );
     }

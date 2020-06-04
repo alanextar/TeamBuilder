@@ -49,6 +49,7 @@ export const initProfile = () => async (dispatch) => {
             isSearchable: true,
             isNew: true
         };
+        console.log(`user.first ${JSON.stringify(profile, null, 4)}`);
         dispatch(setProfile(profile));
         dispatch(setUser(profile));
         return;
