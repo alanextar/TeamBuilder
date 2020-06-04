@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
 import { goBack, setPage, openPopout, closePopout } from "../store/router/actions";
 import { setTeam } from "../store/teams/actions";
-import { setUser, setTeamUser, setProfileUser } from "../store/user/actions";
+import { setUser, setTeamUser, setProfileUser, addTeamToProfile } from "../store/user/actions";
 import { setActiveTab } from "../store/vk/actions";
 
 import {
@@ -68,54 +68,90 @@ class TeamInfo extends React.Component {
     toggleContext() {
         this.setState({ contextOpened: !this.state.contextOpened });
     };
-
+	//TODO рефакторинг обновления профиля после выполнения действий по команде
     //Подать заявку в команду
     async sendRequest() {
         const { setProfileUser } = this.props;
 
         let id = this.state.vkProfile.id;
         let teamId = this.state.team.id
-        let isTeamOffer = false;
+		let isTeamOffer = false;
+
+		let newUserTeam = {
+			isOwner: false,
+			team: this.state.team,
+			teamId: teamId,
+			userAction: 1,
+			userId: this.props.profileUser.id
+		};
 
         await Api.Users.setTeam(id, teamId, isTeamOffer)
-            .then(json => {
-                this.setState({ team: json });
+            .then(team => {
+				this.setState({ team: team });
+				this.props.addTeamToProfile(newUserTeam);
             })
     };
 
     //Принять приглашение
     async joinTeam() {
+		let profile = this.props.profileUser;
         let teamId = this.state.team.id;
         var userId = this.state.profileUser.id;
 
-        await Api.Users.joinTeam(teamId)
-        let updateTeam = this.state.team.userTeams
-        updateTeam.map((user, i) => {
-            (user.userId === userId) && (user.userAction = 2);
-        })
+		await Api.Users.joinTeam(teamId);
+		let userTeams = this.state.team.userTeams;
+
+        userTeams.map((userTeam, i) => {
+            (userTeam.userId === userId) && (userTeam.userAction = 2);
+		})
+
         this.setState({
             team: {
                 ...this.state.team,
-                userTeams: updateTeam
+                userTeams: userTeams
             }
-        })
+		})
+
+		let userTeamToUpd = profile.userTeams.find(x => x.teamId == teamId);
+		userTeamToUpd.userAction = 2;
+		this.props.setProfileUser(profile);
     };
 
     //Выйти из команды / отклонить приглашение
     async dropUser() {
-        var userId = this.state.profileUser.id;
-        var teamId = this.state.team.id;
+        let userId = this.state.profileUser.id;
+        let teamId = this.state.team.id;
 
         await Api.Teams.rejectedOrRemoveUser({ teamId: teamId, userId: userId })
             .then(json => {
-                this.setState({ team: json })
+				this.setState({ team: json });
+				let profile = this.props.profileUser;
+				let userTeamToUpd = profile.userTeams.find(x => x.teamId == teamId);
+
+				switch (userTeamToUpd.userAction) {
+					case 2:
+						userTeamToUpd.userAction = 4;
+					case 5:
+						userTeamToUpd.userAction = 3;
+				}
+
+				this.props.setProfileUser(profile);
             })
     };
 
     //Удалить команду
     async deleteTeam() {
         let id = this.state.team.id
-        await Api.Teams.delete(id);
+		await Api.Teams.delete(id);
+
+		let profile = this.props.profileUser;
+		let teamsToRemove = profile.userTeams.find(x => x.teamId == id);
+		const index = profile.userTeams.indexOf(teamsToRemove);
+		if (index > -1) {
+			profile.userTeams.splice(index, 1);
+		}
+		this.props.setProfileUser(profile);
+
         this.props.goBack();
     };
 
@@ -124,15 +160,24 @@ class TeamInfo extends React.Component {
         let teamId = userTeam.teamId;
         await Api.Users.cancelRequestTeam(teamId)
         let updateTeam = []
-        this.state.team.userTeams.map((user, i) => {
-            (user.userId != this.state.profileUser.id) && updateTeam.push(user)
-        })
+        this.state.team.userTeams.map((userTeam, i) => {
+            (userTeam.userId != this.state.profileUser.id) && updateTeam.push(userTeam)
+		})
+
         this.setState({
             team: {
                 ...this.state.team,
                 userTeams: updateTeam
             }
-        })
+		})
+
+		let profile = this.props.profileUser;
+		let teamsToRemove = profile.userTeams.find(x => x.teamId == teamId);
+		const index = profile.userTeams.indexOf(teamsToRemove);
+		if (index > -1) {
+			profile.userTeams.splice(index, 1);
+		}
+		this.props.setProfileUser(profile);
     };
 
     openPopoutExit = () => {
@@ -392,7 +437,8 @@ const mapDispatchToProps = {
     setTeamUser,
     setProfileUser,
     openPopout,
-    closePopout
+	closePopout,
+	addTeamToProfile
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(TeamInfo);
