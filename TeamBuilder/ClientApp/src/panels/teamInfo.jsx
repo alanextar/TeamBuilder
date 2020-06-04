@@ -145,7 +145,7 @@ class TeamInfo extends React.Component {
 		await Api.Teams.delete(id);
 
 		let profile = this.props.profileUser;
-		teamsToRemove = profile.userTeams.find(x => x.teamId == id);
+		let teamsToRemove = profile.userTeams.find(x => x.teamId == id);
 		const index = profile.userTeams.indexOf(teamsToRemove);
 		if (index > -1) {
 			profile.userTeams.splice(index, 1);
@@ -172,9 +172,11 @@ class TeamInfo extends React.Component {
 		})
 
 		let profile = this.props.profileUser;
-		let userTeamToUpd = profile.userTeams.find(x => x.teamId == teamId);
-		//не нашел подходящего действия, поставил 4 чтобы команда не отображалась
-		userTeamToUpd.userAction = 4;
+		let teamsToRemove = profile.userTeams.find(x => x.teamId == teamId);
+		const index = profile.userTeams.indexOf(teamsToRemove);
+		if (index > -1) {
+			profile.userTeams.splice(index, 1);
+		}
 		this.props.setProfileUser(profile);
     };
 
