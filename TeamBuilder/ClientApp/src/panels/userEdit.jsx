@@ -10,10 +10,12 @@ import { setUser, setProfileUser } from "../store/user/actions";
 import {
 	Panel, PanelHeader, Group, Cell, Avatar, Button, Div, Input, Title,
 	FormLayoutGroup, Textarea, Separator, FormLayout, PanelHeaderBack, Switch
-} from '@vkontakte/vkui'; 
+} from '@vkontakte/vkui';
 import CreatableMulti from './CreatableMulti'
 import '@vkontakte/vkui/dist/vkui.css';
+
 import { Api } from '../infrastructure/api';
+import * as Utils from '../infrastructure/utils';
 
 class UserEdit extends React.Component {
 	constructor(props) {
@@ -21,13 +23,17 @@ class UserEdit extends React.Component {
 
 		this.state = {
 			user: props.user,
-			inputData: props.inputData['profile_form'] ? props.inputData['profile_form'] : props.user
+			inputData: props.inputData['profile_form'] ? props.inputData['profile_form'] : {
+				...props.user,
+				selectedSkills: Utils.convertUserSkills(props.user?.userSkills)
+			},
+			allSkills: []
 		}
 
 		this.handleInput = (e) => {
 			let value = e.currentTarget.value;
 
-			if (e.currentTarget.type === 'switch') {
+			if (e.currentTarget.type === 'checkbox') {
 				value = e.currentTarget.checked;
 			}
 
@@ -51,7 +57,12 @@ class UserEdit extends React.Component {
 		};
 
 		this.postEdit = this.postEdit.bind(this);
+		this.handleChangeSkills = this.handleChangeSkills.bind(this);
 		const { goBack } = this.props;
+	}
+
+	componentDidMount() {
+		this.populateSkills();
 	}
 
 	componentWillUnmount() {
@@ -59,11 +70,36 @@ class UserEdit extends React.Component {
 	}
 
 	async postEdit() {
-		let updatedUser = await Api.Users.edit(this.state.inputData);
+		let editUserViewModel = {
+			...this.state.inputData,
+			skillsIds: this.state.inputData.selectedSkills.map(s => s.id)
+		}
+		delete editUserViewModel.userSkills;
+		delete editUserViewModel.selectedSkills;
+		let updatedUser = await Api.Users.edit(editUserViewModel);
 		const { setProfileUser, setUser, goBack } = this.props;
 		setUser(updatedUser);
 		setProfileUser(updatedUser);
 		goBack();
+	}
+
+	populateSkills() {
+		Api.Skills.getAll()
+			.then(allSkillsJson => this.setState({ allSkills: Utils.convertSkills(allSkillsJson) }))
+	}
+
+	handleChangeSkills = (newValue, actionMeta) => {
+		this.setState({
+			inputData: {
+				...this.state.inputData,
+				selectedSkills: newValue
+			}
+		})
+
+	};
+
+	getOrEmpty = (name) => {
+		return this.state.inputData[name] ? this.state.inputData[name] : '';
 	}
 
 	render() {
@@ -79,34 +115,34 @@ class UserEdit extends React.Component {
 					</Group>}
 				<Separator />
 				<FormLayout>
-					<FormLayoutGroup top="Редактирование">
-						<Input name="mobile" value={this.state.inputData && this.state.inputData.mobile} onChange={this.handleInput} type="text" placeholder="Телефон" />
-						<Input name="telegram" value={this.state.inputData && this.state.inputData.telegram} onChange={this.handleInput} type="text" placeholder="Telegram" />
-						<Input name="email" value={this.state.inputData && this.state.inputData.email} onChange={this.handleInput} type="text" placeholder="Email" />
-						<Textarea name="about" value={this.state.inputData && this.state.inputData.about} onChange={this.handleInput} placeholder="Дополнительно" />
+					<FormLayoutGroup>
+						<Input name="mobile" value={this.getOrEmpty('mobile')} onChange={this.handleInput} type="text" placeholder="Телефон" />
+						<Input name="telegram" value={this.getOrEmpty('telegram')} onChange={this.handleInput} type="text" placeholder="Telegram" />
+						<Input name="email" value={this.getOrEmpty('email')} onChange={this.handleInput} type="text" placeholder="Email" />
+						<Textarea name="about" value={this.getOrEmpty('about')} onChange={this.handleInput} placeholder="Дополнительно" />
 						<Div>
-                            <Title level="3" weight="regular" style={{ marginBottom: 16 }}>Скиллы:</Title>
-                            <CreatableMulti
-                                name="userSkills"
-                                data={this.state.allSkills && this.state.allSkills}
-                                defaultValue={this.state.selectedSkills}
-                                handleChange={this.handleChange}
-                            />
-                        </Div>
-                        <Div>
-                            <Cell asideContent={
-                                <Switch
-                                    name="isSearchable"
-                                    onChange={this.handleInput}
-                                    checked={this.props.user.isSearchable} />}>
-                                Ищу команду
+							<Title level="3" weight="regular" style={{ marginBottom: 16 }}>Скиллы:</Title>
+							<CreatableMulti
+								name="userSkills"
+								data={this.state.allSkills}
+								selectedSkills={this.getOrEmpty('selectedSkills')}
+								onChange={this.handleChangeSkills}
+							/>
+						</Div>
+						<Div>
+							<Cell asideContent={
+								<Switch
+									name="isSearchable"
+									onChange={this.handleInput}
+									checked={this.state.user.isSearchable} />}>
+								Ищу команду
                                     </Cell>
-                        </Div>
+						</Div>
 					</FormLayoutGroup>
 				</FormLayout>
 				<Div style={{ display: 'flex' }}>
-					<Button size="l" onClick={this.postEdit} stretched style={{ marginRight: 8 }}>Принять</Button>
-					<Button size="l" onClick={this.cancelForm} stretched mode="secondary">Отменить</Button>
+					<Button size="l" onClick={() => this.postEdit()} stretched style={{ marginRight: 8 }}>Принять</Button>
+					<Button size="l" onClick={() => this.cancelForm()} stretched mode="secondary">Отменить</Button>
 				</Div>
 			</Panel>
 		)

@@ -9,7 +9,12 @@ import Icon28PhoneOutline from '@vkontakte/icons/dist/28/phone_outline';
 import Icon28ArticleOutline from '@vkontakte/icons/dist/28/article_outline';
 import Icon28MailOutline from '@vkontakte/icons/dist/28/mail_outline';
 import Icon24Write from '@vkontakte/icons/dist/24/write';
+import Icon28WriteOutline from '@vkontakte/icons/dist/28/write_outline';
 import Icon28Send from '@vkontakte/icons/dist/28/send';
+
+import Icon28ViewOutline from '@vkontakte/icons/dist/28/view_outline';
+import Icon28HideOutline from '@vkontakte/icons/dist/28/hide_outline';
+
 import UserTeams from './userTeams'
 import { Api } from '../infrastructure/api';
 import * as Utils from '../infrastructure/utils';
@@ -22,15 +27,12 @@ class User extends React.Component {
 	constructor(props) {
 		super(props);
 
-		let isSearchable = props.user && props.user.isSearchable;
-
 		this.state = {
 			vkProfile: props.profile,
 			profileUser: props.profileUser,
 			user: props.user,
 			activeTab: props.activeTab["profile"] || "main",
-			isConfirmed: false,
-			isSearchable: isSearchable ? isSearchable : false,
+			isSearchable: props.user?.isSearchable ? props.user.isSearchable : false,
 			readOnlyMode: props.activeStory != 'user',
 			recruitTeams: []
 		}
@@ -107,7 +109,8 @@ class User extends React.Component {
 					<Group title="VK Connect">
 						<Link href={"https://m.vk.com/id" + this.state.user.id} target="_blank">
 							<Cell description={this.state.user.city ? this.state.user.city : ''}
-								before={this.state.user.photo100 ? <Avatar src={this.state.user.photo100} /> : null}>
+								before={this.state.user.photo100 ? <Avatar src={this.state.user.photo100} /> : null}
+								asideContent={this.state.isSearchable ? <Icon28ViewOutline /> : <Icon28HideOutline />}>
 								{`${this.state.user.firstName} ${this.state.user.lastName}`}
 							</Cell>
 						</Link>
@@ -116,7 +119,8 @@ class User extends React.Component {
 					<Group title="VK Connect">
 						<Link href={"https://m.vk.com/id" + this.state.vkProfile.id} target="_blank">
 							<Cell description={this.state.vkProfile.city && this.state.vkProfile.city.title ? this.state.vkProfile.city.title : ''}
-								before={this.state.vkProfile.photo_200 ? <Avatar src={this.state.vkProfile.photo_200} /> : null}>
+								before={this.state.vkProfile.photo_200 ? <Avatar src={this.state.vkProfile.photo_200} /> : null}
+								asideContent={this.state.isSearchable ? <Icon28ViewOutline /> : <Icon28HideOutline />}>
 								{`${this.state.vkProfile.first_name} ${this.state.vkProfile.last_name}`}
 							</Cell>
 						</Link>
@@ -141,7 +145,7 @@ class User extends React.Component {
 							<Header
 								mode="secondary"
 								aside={!this.state.readOnlyMode && this.state.user &&
-									<Link style={{ color: "#3f8ae0" }} onClick={() => setPage('user', 'userEdit')}>Редактировать</Link>
+									<Icon24Write style={{ color: "#3f8ae0" }} onClick={() => setPage('user', 'userEdit')} />
 								}>
 								Информация
                                 </Header>}>
@@ -178,28 +182,22 @@ class User extends React.Component {
 									</InfoRow>
 								</Cell>}
 							{this.state.user?.about &&
-								<Cell>
+								<Cell multiline>
 									<InfoRow header="Дополнительно">
 										{this.state.user.about}
 									</InfoRow>
 								</Cell>}
 							{this.state.user?.userSkills?.length > 0 &&
-								<Div>
-									<Title level="3" weight="regular" style={{ marginBottom: 4 }}>Скиллы:</Title>
-									{/*SkillTokens - просто прямоугольники без селекта для отображения в информации об участнике*/}
-									<SkillTokens selectedSkills={Utils.convertSkills(this.state.user?.userSkills)} />
-								</Div>}
+								<Cell>
+									<InfoRow header="Навыки">
+										<SkillTokens selectedSkills={Utils.convertUserSkills(this.state.user?.userSkills)} />
+									</InfoRow>
+								</Cell>}
 							<Div>
-								<Cell asideContent={
-									<Switch disabled={true}
-										onChange={() => this.setState({ isSearchable: !this.state.isSearchable })}
-										checked={this.state.isSearchable} />}>
-									Ищу команду
-                                    </Cell>
 								{!this.state.readOnlyMode && !this.props.profileUser &&
 									<Button mode="destructive" size='xl'
 										onClick={() => this.confirmUser()}>
-										Подтвердить
+										Зарегистрироваться
 									</Button>}
 							</Div>
 						</Group> :

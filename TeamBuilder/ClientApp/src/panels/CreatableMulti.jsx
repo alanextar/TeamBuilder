@@ -1,5 +1,5 @@
 ﻿import React, { Component } from 'react';
-import CreatableSelect from 'react-select/creatable';
+import Select from 'react-select';
 import { customCreatableSelect } from '../customize.js';
 
 export default class CreatableMulti extends React.Component {
@@ -7,26 +7,19 @@ export default class CreatableMulti extends React.Component {
         super(props);
 
         this.state = {
-            options: props.data,
-            selectedSkills: this.props.selectedSkills,
             style: customCreatableSelect
         }
-
-        this.handleChange = this.handleChange.bind(this);
     }
-
-    handleChange = (e) => {
-    };
 
     render() {
         return (
-            <CreatableSelect
+            <Select
                 styles={this.state.style}
                 openMenuOnFocus={true}
                 placeholder='Выберите скиллы'
-                value={this.state.selectedSkills}
+                value={this.props.selectedSkills}
                 isMulti
-                onChange={() => this.handleChange()}
+                onChange={this.props.onChange}
                 options={this.props.data}
             />
         );

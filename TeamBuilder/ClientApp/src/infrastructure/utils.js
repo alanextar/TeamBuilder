@@ -3,12 +3,22 @@ export function countConfirmed(userTeams) {
 	return count;
 };
 
-export function convertSkills(userSkills) {
+export function convertUserSkills(userSkills) {
 	return userSkills && userSkills.map(userSkill => {
 		return {
-			key: userSkill.skillId,
+			id: userSkill.skillId,
 			label: userSkill.skill.name,
 			value: userSkill.skill.name
+		};
+	})
+}
+
+export function convertSkills(skills) {
+	return skills && skills.map(skill => {
+		return {
+			id: skill.id,
+			label: skill.name,
+			value: skill.name
 		};
 	})
 }
