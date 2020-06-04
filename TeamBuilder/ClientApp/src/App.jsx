@@ -5,7 +5,6 @@ import {
 } from '@vkontakte/vkui';
 import { connect } from 'react-redux';
 import '@vkontakte/vkui/dist/vkui.css';
-import bridge from '@vkontakte/vk-bridge';
 import { bindActionCreators } from 'redux'
 import { goBack, closeModal, setStory, setPage } from "./store/router/actions";
 import { setTeam, setTeamsTeam, setEventsTeam, setUserTeam, setUsersTeam } from "./store/teams/actions";
@@ -40,7 +39,6 @@ import UserEdit from './panels/userEdit'
 import SetUserTeam from './panels/setUserTeam'
 
 import { Api } from './infrastructure/api';
-import * as VK from './services/VK';
 
 const App = (props) => {
     const [lastAndroidBackAction, setLastAndroidBackButton] = useState(0);
@@ -52,35 +50,20 @@ const App = (props) => {
         eventsTeam, userTeam, usersTeam, setTeam, setTeamsEventFilter, colorScheme
     } = props;
 
+	const [isNewUser, setIsNewUser] = useState(false);
+	
     const [events, setEvents] = useState(null);
     const [activeModal, setActiveModal] = useState(null);
 
     useEffect(() => {
-        const { goBack, dispatch } = props;
+		const { goBack } = props;
+		
+		if (props.profileUser){
+			setIsNewUser(true);
+		}
 
-        dispatch(VK.initApp());
-
-        //bridge.subscribe(({ detail: { type, data } }) => {
-        //    if (type === 'VKWebAppUpdateConfig') {
-        //        const schemeAttribute = document.createAttribute('scheme');
-        //        schemeAttribute.value = data.scheme ? data.scheme : 'client_light';
-        //        document.body.attributes.setNamedItem(schemeAttribute);
-        //    }
-        //});
-
-        async function fetchData() {
-            const profile = await bridge.send('VKWebAppGetUserInfo');
-            setProfile(profile);
-            Api.Users.get(profile.id).then(user => {
-                setUser(user);
-                setProfileUser(user);
-            });
-            
-            setEvent(event);
-        }
-        fetchData();
-        getEvents();
-
+		getEvents();
+		
         window.onpopstate = () => {
             let timeNow = +new Date();
 
@@ -144,7 +127,7 @@ const App = (props) => {
                         selected={activeStory === 'events'}
                         text="События"
                     ><Icon28FavoriteOutline /></TabbarItem>
-                    <TabbarItem style={{ color: props.profileUser ? "" : "red" }}
+                    <TabbarItem style={{ color: isNewUser ? "red" : "" }}
                         onClick={() => {
                             setStory('user', 'user');
                             setUser(profileUser);

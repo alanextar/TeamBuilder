@@ -15,8 +15,7 @@ import bridge from '@vkontakte/vk-bridge';
 
 import './css/main.css';
 import App from './App'
-
-bridge.send("VKWebAppInit", {});
+import * as VK from './services/VK';
 
 export const store = createStore(
     rootReducer, composeWithDevTools(
@@ -24,6 +23,8 @@ export const store = createStore(
     applyMiddleware(logger)
 ));
 
+store.dispatch(VK.initApp()); 
+store.dispatch(VK.initProfile());
 store.dispatch(setStory('events', 'events'));
 
 ReactDOM.render(<Provider store={store}><App /></Provider>, document.getElementById('root'));
