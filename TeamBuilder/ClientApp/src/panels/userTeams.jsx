@@ -1,7 +1,7 @@
 ﻿import React from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
-import { Group, List, RichCell, CardGrid, Card, Button, Alert } from '@vkontakte/vkui';
+import { Group, List, RichCell, CardGrid, Card, Button, Alert, Placeholder } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import Icon28CheckCircleOutline from '@vkontakte/icons/dist/28/check_circle_outline';
 import Icon28InfoOutline from '@vkontakte/icons/dist/28/info_outline';
@@ -9,6 +9,7 @@ import { setTeam, setUserTeam } from '../store/teams/actions';
 import { setProfileUser, setUser } from '../store/user/actions';
 import { setPage, openPopout, closePopout } from '../store/router/actions';
 import { Api } from '../infrastructure/api';
+import { countActiveUserTeams } from "../infrastructure/utils";
 
 class UserTeams extends React.Component {
     constructor(props) {
@@ -122,9 +123,16 @@ class UserTeams extends React.Component {
 
     render() {
         const { setPage, setTeam, activeView, setUserTeam } = this.props;
+        let isTeamsExists = countActiveUserTeams(this.state.userTeams);
 
         return (
             <Group>
+                {!isTeamsExists && < Placeholder
+                    header="Вступайте в команду"
+                >
+                    Или создайте свою и пригласите других участников. Здесь можно будет принять
+                    приглашение от команд или отозвать заявку.
+                </Placeholder>}
                 <List>
 
                     <CardGrid>
