@@ -9,6 +9,7 @@ import { setTeam, setUserTeam } from '../store/teams/actions';
 import { setProfileUser, setUser } from '../store/user/actions';
 import { setPage, openPopout, closePopout } from '../store/router/actions';
 import { Api } from '../infrastructure/api';
+import { countActiveUserTeams } from "../infrastructure/utils";
 
 class UserTeams extends React.Component {
     constructor(props) {
@@ -122,16 +123,15 @@ class UserTeams extends React.Component {
 
     render() {
         const { setPage, setTeam, activeView, setUserTeam } = this.props;
+        let isTeamsExists = countActiveUserTeams(this.state.userTeams);
 
         return (
             <Group>
-                {this.state.userTeams && < Placeholder
+                {!isTeamsExists && < Placeholder
                     header="Вступайте в команду"
                 >
-                    <p>Или создайте свою и</p>
-                    <p>пригласите других участников</p>
-                    <p>Здесь можно будет принять приглашение от команд</p>
-                    <p>или отклонить заявку</p>
+                    Или создайте свою и пригласите других участников. Здесь можно будет принять
+                    приглашение от команд или отозвать заявку.
                 </Placeholder>}
                 <List>
 

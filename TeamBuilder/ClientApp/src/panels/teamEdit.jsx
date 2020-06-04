@@ -7,6 +7,7 @@ import { goBack, setPage } from "../store/router/actions";
 import { setTeam } from "../store/teams/actions";
 import { setActiveTab } from "../store/vk/actions";
 import { setFormData } from "../store/formData/actions";
+import { setProfileUser } from "../store/user/actions";
 
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell,
@@ -82,7 +83,14 @@ class TeamEdit extends React.Component {
         const { setTeam } = this.props;
 
         Api.Teams.edit(this.state.inputData)
-            .then(t => { setTeam(t) });
+            .then(t => {
+                setTeam(t)
+                let profileUser = this.props.profileUser;
+                let ut = profileUser.userTeams.find(x => x.teamId == t.id);
+                ut.team = t;
+
+                this.props.setProfileUser(profileUser);
+            });
     };
 
     //Принять в команду
@@ -229,15 +237,18 @@ const mapStateToProps = (state) => {
         activeView: state.router.activeView,
         activeTab: state.vkui.activeTab,
         inputData: state.formData.forms,
+        profileUser: state.user.profileUser
     };
 };
 
 
-function mapDispatchToProps(dispatch) {
-    return {
-        dispatch,
-        ...bindActionCreators({ setPage, setTeam, goBack, setActiveTab, setFormData }, dispatch)
-    }
+const mapDispatchToProps = {
+    setPage,
+    setTeam,
+    goBack,
+    setActiveTab,
+    setFormData,
+    setProfileUser
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(TeamEdit);
