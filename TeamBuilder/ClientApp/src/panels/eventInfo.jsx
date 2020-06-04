@@ -28,7 +28,7 @@ const EventInfo = props => {
     };
 
     const deleteEvent = () => {
-        await Api.Events.delete(props.event.id);
+        Api.Events.delete(props.event.id);
         goBack();
     };
 
