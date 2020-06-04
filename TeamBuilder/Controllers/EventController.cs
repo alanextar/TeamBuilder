@@ -128,7 +128,7 @@ namespace TeamBuilder.Controllers
 			context.Remove(@event);
 			await context.SaveChangesAsync();
 
-			return Ok("Deleted");
+			return Json("Deleted");
 		}
 	}
 }

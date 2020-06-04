@@ -30,7 +30,6 @@ class TeamInfo extends React.Component {
             contextOpened: false,
             vkProfile: props.profile,
             profileUser: props.profileUser,
-            exitTeamAlert: null,
         };
 
         this.onRefresh = async () => {
@@ -116,9 +115,8 @@ class TeamInfo extends React.Component {
     //Удалить команду
     async deleteTeam() {
         let id = this.state.team.id
-        //Api.Teams.delete({ id });
-        Api.post(Urls.Teams.Delete + `\?id=${id}`);
-        this.props.setPage('teams', 'teams');
+        await Api.Teams.delete(id);
+        this.props.goBack();
     };
 
     //Отменить поданную в команду заявку
@@ -189,7 +187,7 @@ class TeamInfo extends React.Component {
                     title: 'Удалить команду',
                     autoclose: true,
                     mode: 'destructive',
-                    action: () => this.deleteTeam(),
+                    action: () => { this.deleteTeam() },
                 }, {
                     title: 'Отмена',
                     autoclose: true,
@@ -212,7 +210,7 @@ class TeamInfo extends React.Component {
                         <Cell onClick={() => setPage(activeView, 'teamEdit')}>
                         Редактировать команду
                          </Cell>
-                    <Cell onClick={() => { this.openPopoutDeleteTeam(); setPage(activeView, 'teams'); }}>
+                    <Cell onClick={() => { this.openPopoutDeleteTeam() }}>
                             Удалить команду
                          </Cell>
                     </List>

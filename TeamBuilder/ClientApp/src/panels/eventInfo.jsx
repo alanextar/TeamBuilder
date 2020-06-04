@@ -28,7 +28,8 @@ const EventInfo = props => {
     };
 
     const deleteEvent = () => {
-        Api.Events.delete({ id: props.event.id })
+        await Api.Events.delete(props.event.id);
+        goBack();
     };
 
     const openPopoutDeleteEvent = () => {
@@ -74,7 +75,7 @@ const EventInfo = props => {
                         Редактировать событие
                         </Cell>
                     <Cell
-                        onClick={() => { openPopoutDeleteEvent(); setPage(activeView, 'events') }}>
+                        onClick={() => { openPopoutDeleteEvent() }}>
                         Удалить событие
                         </Cell>
                 </List>
