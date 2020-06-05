@@ -334,16 +334,14 @@ namespace TeamBuilder.Controllers
 		{
 			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
 
-			if (string.IsNullOrEmpty(search))
-				return RedirectToAction("GetPage", new { pageSize, page, prev });
-
 			if (pageSize == 0)
 				return NoContent();
 
-			bool Filter(User user) => user.FullName.ToLowerInvariant().Contains(search?.ToLowerInvariant());
+			bool Filter(User user) => user.FullName.ToLowerInvariant().Contains(search?.ToLowerInvariant() ?? string.Empty);
 			var result = context.Users
-				.Include(u => u.UserSkills).ThenInclude(us => us.Skill)
-				.Include(u => u.UserTeams).ThenInclude(ut => ut.Team)
+				.Include(u => u.UserSkills)
+				.ThenInclude(us => us.Skill)
+				.Include(u => u.UserTeams)
 				.GetPage(pageSize, HttpContext.Request, page, prev, Filter)
 				.HackForReferenceLoop();
 
@@ -363,8 +361,9 @@ namespace TeamBuilder.Controllers
 				return NoContent();
 
 			var result = context.Users
-				.Include(u => u.UserSkills).ThenInclude(us => us.Skill)
-				.Include(u => u.UserTeams).ThenInclude(ut => ut.Team)
+				.Include(u => u.UserSkills)
+				.ThenInclude(us => us.Skill)
+				.Include(u => u.UserTeams)
 				.GetPage(pageSize, HttpContext.Request, page, prev)
 				.HackForReferenceLoop();
 
