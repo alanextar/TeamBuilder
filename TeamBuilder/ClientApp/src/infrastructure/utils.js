@@ -24,8 +24,15 @@ export function convertSkills(skills) {
 }
 
 export function countActiveUserTeams(userTeams) {
-	var count = userTeams ? userTeams.filter(x => x.userAction === 1 ||
-		x.userAction === 2 || x.userAction === 5 || x.isOwner).length : 0;
+	var count = !userTeams
+		? 0
+		: userTeams
+			.filter(x =>
+				x.userAction === 1 ||
+				x.userAction === 2 ||
+				x.userAction === 5 ||
+				x.isOwner)
+			.length;
 	return count;
 };
 
