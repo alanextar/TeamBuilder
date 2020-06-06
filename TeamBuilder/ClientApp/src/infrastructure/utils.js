@@ -3,6 +3,39 @@ export function countConfirmed(userTeams) {
 	return count;
 };
 
+export function convertUserSkills(userSkills) {
+	return userSkills && userSkills.map(userSkill => {
+		return {
+			id: userSkill.skillId,
+			label: userSkill.skill.name,
+			value: userSkill.skill.name
+		};
+	})
+}
+
+export function convertSkills(skills) {
+	return skills && skills.map(skill => {
+		return {
+			id: skill.id,
+			label: skill.name,
+			value: skill.name
+		};
+	})
+}
+
+export function countActiveUserTeams(userTeams) {
+	var count = !userTeams
+		? 0
+		: userTeams
+			.filter(x =>
+				x.userAction === 1 ||
+				x.userAction === 2 ||
+				x.userAction === 5 ||
+				x.isOwner)
+			.length;
+	return count;
+};
+
 export function GetRandomPic() {
 	let url = ``;
 

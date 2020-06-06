@@ -10,6 +10,7 @@ using TeamBuilder.Extensions;
 using TeamBuilder.Models.Enums;
 using TeamBuilder.ViewModels;
 using System;
+using AutoMapper;
 using TeamBuilder.Services;
 
 namespace TeamBuilder.Controllers
@@ -155,23 +156,38 @@ namespace TeamBuilder.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> Edit([FromBody]User user)
+		public async Task<IActionResult> Edit([FromBody]EditUserViewModel editUserModel)
 		{
-			logger.LogInformation("Request Edit");
+			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");
 
-			if (!await accessChecker.CanManageUser(user.Id))
+			if (!await accessChecker.CanManageUser(editUserModel.Id))
 				return Forbid();
 
-			var dbUser = context.Users.FirstOrDefault(u => u.Id == user.Id);
-			dbUser.Mobile = user.Mobile;
-			dbUser.Email = user.Email;
-			dbUser.About = user.About;
-			dbUser.Telegram = user.Telegram;
+			var user = await context.Users
+				.Include(x => x.UserSkills)
+				.FirstOrDefaultAsync(u => u.Id == editUserModel.Id);
 
-			context.Update(dbUser);
+			var config = new MapperConfiguration(cfg => cfg.CreateMap<EditUserViewModel, User>());
+			var mapper = new Mapper(config);
+			mapper.Map(editUserModel, user);
+
+			var existUserSkills = user.UserSkills;
+			var newUserSkills = editUserModel.SkillsIds.Select(s => new UserSkill { UserId = user.Id, SkillId = s }).ToList();
+			context.TryUpdateManyToMany(existUserSkills, newUserSkills, x => new { x.SkillId });
+
+			context.Update(user);
 			await context.SaveChangesAsync();
 
-			return Json(dbUser);
+			//TODO ПОЧЕМУ ПРИХОДИТСЯ ЗАНОВО ДОСТАВАТЬ????
+			var updUser = await context.Users
+				.Include(x => x.UserTeams)
+				.ThenInclude(y => y.Team)
+				.ThenInclude(y => y.Event)
+				.Include(x => x.UserSkills)
+				.ThenInclude(y => y.Skill)
+				.FirstOrDefaultAsync(u => u.Id == editUserModel.Id);
+
+			return Json(updUser);
 		}
 
 		public async Task<IActionResult> JoinTeam(long teamId)
@@ -180,7 +196,7 @@ namespace TeamBuilder.Controllers
 
 			if (!accessChecker.IsConfirm(out var profileId))
 				return Forbid();
-			
+
 			var user = context.Users
 				.Include(x => x.UserTeams)
 				.ThenInclude(x => x.Team)
@@ -188,6 +204,11 @@ namespace TeamBuilder.Controllers
 				.FirstOrDefault(u => u.Id == profileId);
 
 			var userTeamToJoin = user.UserTeams.First(x => x.TeamId == teamId);
+
+			if (userTeamToJoin.UserAction != UserActionEnum.ConsideringOffer)
+				throw new Exception($"User '{user.Id}' have invalid userAction '{userTeamToJoin.UserAction}' for team '{teamId}'. " +
+									$"Available value: {UserActionEnum.ConsideringOffer}");
+
 			userTeamToJoin.UserAction = UserActionEnum.JoinedTeam;
 
 			context.Update(user);
@@ -200,6 +221,7 @@ namespace TeamBuilder.Controllers
 			return Json(activeUserTeams);
 		}
 
+		//Пользователь выходит из команды / отказывается от приглашения из меню профиля
 		public async Task<IActionResult> QuitOrDeclineTeam(long teamId)
 		{
 			logger.LogInformation("Request JoinTeamm");
@@ -233,6 +255,7 @@ namespace TeamBuilder.Controllers
 			return Json(activeUserTeams);
 		}
 
+		//Пользователь сам отменяет заявку в команду
 		public async Task<IActionResult> CancelRequestTeam(long teamId)
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");
@@ -265,12 +288,13 @@ namespace TeamBuilder.Controllers
 		}
 
 		//TODO Не понял что тут происходит :) 
+		//Пользователь отправляет запрос в команду из меню команды / Пользователя приглашает команда по кнопке завербовать
 		[HttpGet]
 		public async Task<IActionResult> SetTeam(long id, long teamId, bool isTeamOffer = true)
 		{
 			logger.LogInformation("Request SetTeam");
 
-			var dbTeam = context.Teams.Include(x => x.UserTeams).FirstOrDefault(x => x.Id == teamId);
+			var dbTeam = context.Teams.Include(x => x.UserTeams).ThenInclude(x => x.User).FirstOrDefault(x => x.Id == teamId);
 			if (dbTeam == null)
 				return NotFound();
 
@@ -293,21 +317,6 @@ namespace TeamBuilder.Controllers
 			return Json(dbTeam);
 		}
 
-		//TODO Упростить выражение
-		public IEnumerable<Team> GetOwnerTeams(long id)
-		{
-			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
-			var teams = context.Users
-				.Include(x => x.UserTeams)
-				.ThenInclude(y => y.Team)
-				.SelectMany(x => x.UserTeams)
-				.Where(x => x.UserId == id && x.IsOwner)
-				.Select(x => x.Team)
-				.ToList();
-
-			return teams;
-		}
-
 		#region List
 
 		public IActionResult GetAll()
@@ -325,16 +334,14 @@ namespace TeamBuilder.Controllers
 		{
 			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
 
-			if (string.IsNullOrEmpty(search))
-				return RedirectToAction("GetPage", new { pageSize, page, prev });
-
 			if (pageSize == 0)
 				return NoContent();
 
-			bool Filter(User user) => user.FullName.ToLowerInvariant().Contains(search?.ToLowerInvariant());
+			bool Filter(User user) => user.FullName.ToLowerInvariant().Contains(search?.ToLowerInvariant() ?? string.Empty);
 			var result = context.Users
-				.Include(u => u.UserSkills).ThenInclude(us => us.Skill)
-				.Include(u => u.UserTeams).ThenInclude(ut => ut.Team)
+				.Include(u => u.UserSkills)
+				.ThenInclude(us => us.Skill)
+				.Include(u => u.UserTeams)
 				.GetPage(pageSize, HttpContext.Request, page, prev, Filter)
 				.HackForReferenceLoop();
 
@@ -354,8 +361,9 @@ namespace TeamBuilder.Controllers
 				return NoContent();
 
 			var result = context.Users
-				.Include(u => u.UserSkills).ThenInclude(us => us.Skill)
-				.Include(u => u.UserTeams).ThenInclude(ut => ut.Team)
+				.Include(u => u.UserSkills)
+				.ThenInclude(us => us.Skill)
+				.Include(u => u.UserTeams)
 				.GetPage(pageSize, HttpContext.Request, page, prev)
 				.HackForReferenceLoop();
 

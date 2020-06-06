@@ -1,7 +1,7 @@
 import {
     SET_USER, SET_PROFILE, SET_PROFILE_USER, SET_EVENT_USER,
     SET_TEAM_USER, SET_PARTICIPANT_USER, SET_USER_SKILLS, SET_ALL_SKILLS,
-    SET_RECRUIT_TEAMS
+    SET_RECRUIT_TEAMS, ADD_TEAM_TO_PROFILE
 } from './actionTypes';
 
 const initialState = {
@@ -69,6 +69,17 @@ export const userReducer = (state = initialState, action) => {
             return {
                 ...state,
                 recruitTeams: action.payload.recruitTeams
+            };
+        }
+        case ADD_TEAM_TO_PROFILE: {
+            let ut = action.payload.userTeam;
+
+            return {
+                ...state,
+                profileUser: {
+                    ...state.profileUser,
+                    userTeams: [...state.profileUser.userTeams, ut]
+                }
             };
         }
 

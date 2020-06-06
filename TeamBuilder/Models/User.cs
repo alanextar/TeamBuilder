@@ -53,4 +53,17 @@ namespace TeamBuilder.Models
 		public List<Team> TeamsToRecruit { get; set; }
 		public bool AnyTeamOwner { get; set; }
 	}
+
+	public class UserDtoForList : IDbItem
+	{
+		public long Id { get; set; }
+		public string FirstName { get; set; }
+		public string SecondName { get; set; }
+		public string LastName { get; set; }
+		public string City { get; set; }
+		public string Photo100 { get; set; }
+		public bool IsSearchable { get; set; }
+		public List<SkillDto> Skills { get; set; }
+		public bool IsTeamMember { get; set; }
+	}
 }

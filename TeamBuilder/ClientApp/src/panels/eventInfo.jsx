@@ -2,15 +2,16 @@
 
 import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
-import { goBack, setPage } from "../store/router/actions";
+import { goBack, setPage, openPopout, closePopout } from "../store/router/actions";
 import { setTeam, setEventsTeam } from "../store/teams/actions";
 
 import {
-    Panel, PanelHeader, Group, SimpleCell, InfoRow, Header, Avatar,
+    Panel, PanelHeader, Group, SimpleCell, InfoRow, Header, Avatar, Alert,
     PanelHeaderBack, Cell, List, PanelHeaderContent, PanelHeaderContext
 } from '@vkontakte/vkui';
 import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
 import { countConfirmed } from "../infrastructure/utils";
+import { Api } from '../infrastructure/api';
 
 const EventInfo = props => {
     const { goBack, setPage, setTeam, setEventsTeam, activeView } = props;
@@ -24,7 +25,34 @@ const EventInfo = props => {
         let isOwner = props.profile ? props.profile.id === props.event.ownerId : false;
         let isModerator = props.profileUser ? props.profileUser.isModerator : false;
         return props.profileUser && (isOwner || isModerator);
-    }
+    };
+
+    const deleteEvent = () => {
+        Api.Events.delete(props.event.id);
+        goBack();
+    };
+
+    const openPopoutDeleteEvent = () => {
+        props.openPopout(
+            <Alert
+                actionsLayout="vertical"
+                actions={[{
+                    title: 'Удалить событие',
+                    autoclose: true,
+                    mode: 'destructive',
+                    action: () => deleteEvent(),
+                }, {
+                    title: 'Отмена',
+                    autoclose: true,
+                    mode: 'cancel'
+                }]}
+                onClose={() => props.closePopout()}
+            >
+                <h2>Подтвердите действие</h2>
+                <p>Вы уверены, что хотите удалить событие?</p>
+            </Alert>
+        );
+    };
 
     return (
         <Panel id={props.id}>
@@ -45,6 +73,10 @@ const EventInfo = props => {
                     <Cell
                         onClick={() => { setPage(activeView, 'eventEdit') }}>
                         Редактировать событие
+                        </Cell>
+                    <Cell
+                        onClick={() => { openPopoutDeleteEvent() }}>
+                        Удалить событие
                         </Cell>
                 </List>
             </PanelHeaderContext>
@@ -109,7 +141,7 @@ const mapStateToProps = (state) => {
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
-        ...bindActionCreators({ setPage, goBack, setTeam, setEventsTeam }, dispatch)
+        ...bindActionCreators({ setPage, goBack, setTeam, setEventsTeam, openPopout, closePopout }, dispatch)
     }
 }
 

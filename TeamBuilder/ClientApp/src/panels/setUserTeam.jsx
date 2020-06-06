@@ -3,6 +3,7 @@
 import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
 import { goBack, setPage } from "../store/router/actions";
+import { setFormData } from "../store/formData/actions";
 
 import {
     Panel, PanelHeader, Button, Div, FormLayoutGroup, Separator, FormLayout, Select, PanelHeaderBack
@@ -18,46 +19,67 @@ class SetUserTeam extends React.Component {
         this.state = {
             vkProfile: props.vkProfile,
             userId: props.user.id,
-            selectedTeam: null,
             responseStatus: null,
-            recruitTeams: props.recruitTeams
+            recruitTeams: props.recruitTeams,
+            inputData: props.inputData['setUserTeam']
         }
 
         this.post = this.post.bind(this);
-        this.onTeamSelect = this.onTeamSelect.bind(this);
-    }
 
-    onTeamSelect(e) {
-        const value = e.currentTarget.value;
-        this.setState({ selectedTeam: value });
+        this.handleInput = (e) => {
+            let value = e.currentTarget.value;
+
+            if (e.currentTarget.type === 'checkbox') {
+                value = e.currentTarget.checked;
+            }
+
+            this.setState({
+                inputData: {
+                    ...this.state.inputData,
+                    [e.currentTarget.name]: value
+                }
+            })
+        }
+
+        this.cancelForm = () => {
+            this.setState({
+                inputData: null
+            })
+            this.props.goBack();
+        };
     }
 
     componentDidMount() {
-        //this.populateTeamData();
+    }
+
+    componentWillUnmount() {
+        this.props.setFormData('setUserTeam', this.state.inputData);
     }
 
     async post() {
         var id = this.state.userId;
-        var teamId = this.state.selectedTeam;
+        var teamId = this.state.inputData;
         Api.Users.setTeam(id, teamId)
     }
 
     render() {
         const { goBack } = this.props;
+        var inputData = this.state.inputData;
 
         return (
             <Panel id="setUserTeam">
-                <PanelHeader left={<PanelHeaderBack onClick={() => goBack()} />}>Выбор команды</PanelHeader>
+                <PanelHeader left={<PanelHeaderBack onClick={this.cancelForm} />}>Выбор команды</PanelHeader>
                 <Separator />
                 <FormLayout>
                     <FormLayoutGroup top="Завербовать">
                         <Select
                             top="Выберите команду"
                             placeholder="Команда"
-                            onChange={this.onTeamSelect}
-                            status={this.state.selectedTeam ? 'valid' : 'error'}
-                            bottom={this.state.selectedTeam ? '' : 'Пожалуйста, выберете или создайте команду'}
-                            name="check"
+                            onChange={this.handleInput}
+                            status={inputData ? 'valid' : 'error'}
+                            bottom={inputData ? '' : 'Пожалуйста, выберете или создайте команду'}
+                            name="name"
+                            value={inputData && inputData.name}
                         >
                             {this.state.recruitTeams && this.state.recruitTeams.map((team, i) => {
                                 return (
@@ -73,7 +95,7 @@ class SetUserTeam extends React.Component {
                 <Div>
                     <Button onClick={(e) => { this.post(); goBack() }}
                         data-to='user' mode="commerce">Принять</Button>
-                    <Button onClick={() => goBack()} data-to='user' mode="destructive">Отменить</Button>
+                    <Button onClick={this.cancelForm} mode="destructive">Отменить</Button>
                 </Div>
             </Panel>
         )
@@ -84,14 +106,15 @@ const mapStateToProps = (state) => {
 
     return {
         recruitTeams: state.user.recruitTeams,
-        user: state.user.user
+        user: state.user.user,
+        inputData: state.formData.forms
     };
 };
 
 function mapDispatchToProps(dispatch) {
     return {
         dispatch,
-        ...bindActionCreators({ setPage, goBack }, dispatch)
+        ...bindActionCreators({ setPage, goBack, setFormData }, dispatch)
     }
 }
 

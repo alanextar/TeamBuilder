@@ -98,12 +98,6 @@ const Users = props => {
         return result;
     }
 
-    const stringfyTeams = (teams) => {
-        var confirmedTeams = teams && teams.filter(ut => ut.isConfirmed);
-        var result = confirmedTeams.length !== 0 && <Icon24Work />
-        return result;
-    }
-
     //#endregion
 
     return (
@@ -120,13 +114,13 @@ const Users = props => {
                         <CardGrid style={{ marginBottom: 10 }}>
                             {items && items.map(user => (
                                 <Card size="l" mode="shadow" key={user.id}>
-                                    {(user.isSearchable && props.profileUser.id != user.id) &&
+                                    {user.isSearchable &&
                                         <RichCell
                                             before={<Avatar size={48} src={user.photo100} />}
-                                            after={stringfyTeams(user.userTeams)}
-                                            caption={user.city ? user.city : 'Ekaterinburg'}
+                                            after={user.isTeamMember && <Icon24Work />}
+                                            caption={user.city && user.city}
                                             bottom={stringfySkills(user.skills)}
-                                            text={user.about ? user.about : 'Хороший человек'}
+                                            text={user.about && user.about}
                                             onClick={() => {
                                                 setUser(user);
                                                 setParticipantUser(user);

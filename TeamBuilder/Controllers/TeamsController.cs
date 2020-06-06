@@ -160,15 +160,17 @@ namespace TeamBuilder.Controllers
 			context.Remove(team);
 			await context.SaveChangesAsync();
 
-			return Ok("Deleted");
+			return Json("Deleted");
 		}
 
+		//Отклонить заявку пользователя / удалить пользователя из команды
+		//Пользователь сам удалился в меню команды / Пользователь отклонил приглашение в меню команды
 		[HttpPost]
 		public async Task<IActionResult> RejectedOrRemoveUser([FromBody]ManageUserTeamViewModel model)
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(model)}");
 
-			if (!await accessChecker.CanManageTeam(model.TeamId))
+			if (!await accessChecker.CanManageTeamOrSelfInTeam(model.TeamId, model.UserId))
 				return Forbid();
 
 			var team = await context.Teams
@@ -184,9 +186,10 @@ namespace TeamBuilder.Controllers
 			{
 				UserActionEnum.SentRequest => UserActionEnum.RejectedTeamRequest,
 				UserActionEnum.JoinedTeam => UserActionEnum.QuitTeam,
+				UserActionEnum.ConsideringOffer => UserActionEnum.RejectedTeamRequest,
 				_ => throw new Exception(
 					$"User '{model.UserId}' have invalid userAction '{userTeam.UserAction}' for team '{model.TeamId}'. " +
-					$"Available value: {UserActionEnum.SentRequest}, {UserActionEnum.JoinedTeam}")
+					$"Available value: {UserActionEnum.SentRequest}, {UserActionEnum.JoinedTeam}, {UserActionEnum.ConsideringOffer}")
 			};
 
 			context.Update(userTeam);
@@ -195,6 +198,7 @@ namespace TeamBuilder.Controllers
 			return Json(team);
 		}
 
+		//Отозвать приглашение которое выслали пользователю
 		[HttpPost]
 		public async Task<IActionResult> CancelRequestUser([FromBody]ManageUserTeamViewModel model)
 		{
@@ -223,18 +227,25 @@ namespace TeamBuilder.Controllers
 			return Json(team);
 		}
 
-		public async Task<IActionResult> JoinTeam(long userId, long teamId)
+		//Добавить пользователя в команду
+		[HttpPost]
+		public async Task<IActionResult> JoinTeam([FromBody]ManageUserTeamViewModel model)
 		{
 			logger.LogInformation($"GET Request {HttpContext.Request.Headers[":path"]}");
 			
-			if (!await accessChecker.CanManageTeam(teamId))
+			if (!await accessChecker.CanManageTeam(model.TeamId))
 				return Forbid();
 
 			var user = await context.Users
 				.Include(x => x.UserTeams)
-				.FirstOrDefaultAsync(u => u.Id == userId);
+				.FirstOrDefaultAsync(u => u.Id == model.UserId);
 
-			var userTeamToJoin = user.UserTeams.First(x => x.TeamId == teamId);
+			var userTeamToJoin = user.UserTeams.First(x => x.TeamId == model.TeamId);
+
+			if (userTeamToJoin.UserAction != UserActionEnum.SentRequest)
+				throw new Exception($"User '{model.UserId}' have invalid userAction '{userTeamToJoin.UserAction}' for team '{model.TeamId}'. " +
+				                    $"Available value: {UserActionEnum.SentRequest}");
+
 			userTeamToJoin.UserAction = UserActionEnum.JoinedTeam;
 
 			context.Update(user);
@@ -242,7 +253,7 @@ namespace TeamBuilder.Controllers
 
 			var updTeam = context.Teams
 				.Include(x => x.UserTeams)
-				.ThenInclude(y => y.User).FirstOrDefault(x => x.Id == teamId);
+				.ThenInclude(y => y.User).FirstOrDefault(x => x.Id == model.TeamId);
 
 			return Json(updTeam);
 		}
