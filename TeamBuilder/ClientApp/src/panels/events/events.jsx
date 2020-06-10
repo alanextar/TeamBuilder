@@ -1,17 +1,17 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 
-import { goBack, setPage } from '../store/router/actions';
-import { setEvent } from "../store/events/actions";
+import { goBack, setPage } from '../../store/router/actions';
+import { setEvent } from "../../store/events/actions";
 
-import useDebounce from '../infrastructure/use-debounce';
+import useDebounce from '../../infrastructure/use-debounce';
 import {
     Panel, PanelHeader, PanelSpinner, Search, RichCell, PullToRefresh,
     PanelHeaderButton, CardGrid, Card
 } from '@vkontakte/vkui';
 import InfiniteScroll from 'react-infinite-scroller';
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
-import { Api, Urls } from '../infrastructure/api';
+import { Api, Urls } from '../../infrastructure/api';
 
 const Events = props => {
     const { setPage, setEvent } = props;

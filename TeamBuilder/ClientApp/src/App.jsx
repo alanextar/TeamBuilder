@@ -22,10 +22,10 @@ import Icon28Users3Outline from '@vkontakte/icons/dist/28/users_3_outline';
 import Icon28FavoriteOutline from '@vkontakte/icons/dist/28/favorite_outline';
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 
-import Events from './panels/events'
-import EventCreate from './panels/eventCreate'
-import EventInfo from './panels/eventInfo'
-import EventEdit from './panels/eventEdit'
+import Events from './panels/events/events'
+import EventCreate from './panels/events/eventCreate'
+import EventInfo from './panels/events/eventInfo'
+import EventEdit from './panels/events/eventEdit'
 
 import Teams from './panels/teams/teams'
 import TeamInfo from './panels/teams/teamInfo'

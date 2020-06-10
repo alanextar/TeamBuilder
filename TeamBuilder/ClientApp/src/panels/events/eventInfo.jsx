@@ -2,16 +2,16 @@
 
 import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
-import { goBack, setPage, openPopout, closePopout } from "../store/router/actions";
-import { setTeam, setEventsTeam } from "../store/teams/actions";
+import { goBack, setPage, openPopout, closePopout } from "../../store/router/actions";
+import { setTeam, setEventsTeam } from "../../store/teams/actions";
 
 import {
     Panel, PanelHeader, Group, SimpleCell, InfoRow, Header, Avatar, Alert,
     PanelHeaderBack, Cell, List, PanelHeaderContent, PanelHeaderContext
 } from '@vkontakte/vkui';
 import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
-import { countConfirmed } from "../infrastructure/utils";
-import { Api } from '../infrastructure/api';
+import { countConfirmed } from "../../infrastructure/utils";
+import { Api } from '../../infrastructure/api';
 
 const EventInfo = props => {
     const { goBack, setPage, setTeam, setEventsTeam, activeView } = props;
