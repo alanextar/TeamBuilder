@@ -31,7 +31,7 @@ import Teams from './panels/teams/teams'
 import TeamInfo from './panels/teams/teamInfo'
 import TeamCreate from './panels/teams/teamCreate'
 import TeamEdit from './panels/teams/teamEdit'
-import EventsFilter from './panels/eventsFilter'
+import EventsFilter from './panels/teams/eventsFilter'
 
 import Users from './panels/users'
 import User from './panels/user'
