@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
-import useDebounce from '../infrastructure/use-debounce';
+import useDebounce from '../../infrastructure/use-debounce';
 import {
     Panel, PanelHeader, Avatar, Search, PanelSpinner, RichCell, PullToRefresh,
     CardGrid, Card
 } from '@vkontakte/vkui';
 import InfiniteScroll from 'react-infinite-scroller';
 import Icon24Work from '@vkontakte/icons/dist/24/work';
-import { Api, Urls } from '../infrastructure/api';
+import { Api, Urls } from '../../infrastructure/api';
 
-import { setUser, setParticipantUser } from "../store/user/actions";
-import { setPage } from '../store/router/actions';
+import { setUser, setParticipantUser } from "../../store/user/actions";
+import { setPage } from '../../store/router/actions';
 
 const Users = props => {
     const { setParticipantUser, setUser, setPage } = props;

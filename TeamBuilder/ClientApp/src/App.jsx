@@ -33,10 +33,10 @@ import TeamCreate from './panels/teams/teamCreate'
 import TeamEdit from './panels/teams/teamEdit'
 import EventsFilter from './panels/teams/eventsFilter'
 
-import Users from './panels/users'
-import User from './panels/user'
-import UserEdit from './panels/userEdit'
-import SetUserTeam from './panels/setUserTeam'
+import Users from './panels/users/users'
+import User from './panels/users/user'
+import UserEdit from './panels/users/userEdit'
+import SetUserTeam from './panels/users/setUserTeam'
 
 import { Api } from './infrastructure/api';
 
