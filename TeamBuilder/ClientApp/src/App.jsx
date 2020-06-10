@@ -92,8 +92,8 @@ const App = (props) => {
         Api.Events.getAll().then(result => setEvents(result))
     }
 
-    return (
-        <ConfigProvider isWebView={true} scheme={colorScheme}>
+	return (
+		<ConfigProvider isWebView={true} scheme={colorScheme}>
             <Epic activeStory={activeStory} tabbar={
                 <Tabbar>
                     <TabbarItem
@@ -123,7 +123,7 @@ const App = (props) => {
                         selected={activeStory === 'events'}
                         text="События"
                     ><Icon28FavoriteOutline /></TabbarItem>
-                    <TabbarItem style={{ color: !props.profileUser ? "red" : "" }}
+                    <TabbarItem style={{ color: props.profileUser === null ? "red" : "" }}
                         onClick={() => {
                             setStory('user', 'user');
                             setUser(profileUser);
