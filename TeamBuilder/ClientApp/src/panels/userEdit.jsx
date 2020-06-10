@@ -11,7 +11,7 @@ import {
 	Panel, PanelHeader, Group, Cell, Avatar, Button, Div, Input, Title,
 	FormLayoutGroup, Textarea, Separator, FormLayout, PanelHeaderBack, Switch
 } from '@vkontakte/vkui';
-import CreatableMulti from './CreatableMulti'
+import CreatableMulti from './components/CreatableMulti'
 import '@vkontakte/vkui/dist/vkui.css';
 
 import { Api } from '../infrastructure/api';

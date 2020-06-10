@@ -21,7 +21,7 @@ import * as Utils from '../infrastructure/utils';
 import { goBack, setPage } from '../store/router/actions';
 import { setUser, setProfileUser, setRecruitTeams } from '../store/user/actions';
 import { setActiveTab } from "../store/vk/actions";
-import SkillTokens from './SkillTokens';
+import SkillTokens from './components/SkillTokens';
 
 class User extends React.Component {
 	constructor(props) {
