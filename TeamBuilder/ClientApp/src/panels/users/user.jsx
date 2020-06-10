@@ -34,7 +34,8 @@ class User extends React.Component {
 			activeTab: props.activeTab[props.activeStory != "user" ? "user" : "profile"] || "main",
 			isSearchable: props.user?.isSearchable ? props.user.isSearchable : false,
 			readOnlyMode: props.activeStory != 'user',
-			recruitTeams: []
+			recruitTeams: [],
+			loading: true
 		}
 
 		this.confirmUser = this.confirmUser.bind(this);
@@ -56,24 +57,24 @@ class User extends React.Component {
 		setActiveTab(this.state.readOnlyMode ? "user" : "profile", this.state.activeTab);
 	}
 
-	fetchUserData() {
+	async fetchUserData() {
 		const { setRecruitTeams } = this.props;
 		let id = this.state.readOnlyMode ? this.state.user.id : this.state.vkProfile.id;
 		//TODO преобразовать в один запрос типа getProfileUserWithRelation - получить профиль с командами в которые можно вербовать юзера
-		Api.Users.get(id).then(user => {
-			setUser(user);
-			this.setState({ user: user });
-		});
+		let user = await Api.Users.get(id);
+		setUser(user);
+		this.setState({ user: user });
 
-		Api.Users.get(this.state.vkProfile.id).then(user => {
-			setProfileUser(user);
-		});
+		user = await Api.Users.get(this.state.vkProfile.id);
+		setProfileUser(user);
 
 		if (this.state.profileUser && this.state.profileUser.anyTeamOwner && this.state.user.isSearchable) {
-			Api.Users.getRecruitTeams(this.state.vkProfile.id, id)
-				.then(data => { setRecruitTeams(data); this.setState({ recruitTeams: data }) });
+			let teams = await Api.Users.getRecruitTeams(this.state.vkProfile.id, id);
+			setRecruitTeams(teams);
+			this.setState({ recruitTeams: teams });
 		}
 
+		this.setState({ loading: false });
 	}
 
 	async confirmUser() {
@@ -202,7 +203,7 @@ class User extends React.Component {
 							</Div>
 						</Group> :
 						<Group>
-							<UserTeams readOnlyMode={this.state.readOnlyMode} userTeams={this.state.user && this.state.user.userTeams} readOnlyMode={this.state.readOnlyMode} />
+							<UserTeams loading={this.state.loading} userTeams={this.state.user && this.state.user.userTeams} readOnlyMode={this.state.readOnlyMode} />
 						</Group>
 				}
 				<Div>

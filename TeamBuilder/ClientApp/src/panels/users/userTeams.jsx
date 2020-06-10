@@ -1,6 +1,6 @@
 ﻿import Icon28CheckCircleOutline from '@vkontakte/icons/dist/28/check_circle_outline';
 import Icon28InfoOutline from '@vkontakte/icons/dist/28/info_outline';
-import { Alert, Button, Card, CardGrid, Group, List, Placeholder, RichCell } from '@vkontakte/vkui';
+import { Alert, Button, Card, CardGrid, Group, List, Placeholder, RichCell, PanelSpinner } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import React from 'react';
 import { connect } from 'react-redux';
@@ -122,9 +122,11 @@ class UserTeams extends React.Component {
 
 	render() {
 		const { setPage, setTeam, activeView, setUserTeam } = this.props;
-		let isTeamsExists = countActiveUserTeams(this.state.userTeams);
+		let isTeamsExists = countActiveUserTeams(this.props.userTeams);
+		const loader = <PanelSpinner key={0} size="large" />
 
 		return (
+			this.props.loading ? loader :
 			<Group>
 				{!isTeamsExists && !this.props.readOnlyMode &&
 					<Placeholder header="Вступайте в команду">
@@ -138,8 +140,8 @@ class UserTeams extends React.Component {
 				<List>
 					<CardGrid>
 						{
-							this.state.userTeams &&
-							this.state.userTeams.map(userTeam => {
+							this.props.userTeams &&
+							this.props.userTeams.map(userTeam => {
 								return (
 									<Card key={userTeam.teamId} size="l" mode="shadow">
 										<RichCell key={userTeam.teamId}
