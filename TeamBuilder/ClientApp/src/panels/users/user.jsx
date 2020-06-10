@@ -31,7 +31,7 @@ class User extends React.Component {
 			vkProfile: props.profile,
 			profileUser: props.profileUser,
 			user: props.user,
-			activeTab: props.activeTab["profile"] || "main",
+			activeTab: props.activeTab[props.activeStory != "user" ? "user" : "profile"] || "main",
 			isSearchable: props.user?.isSearchable ? props.user.isSearchable : false,
 			readOnlyMode: props.activeStory != 'user',
 			recruitTeams: []
@@ -53,7 +53,7 @@ class User extends React.Component {
 
 	componentWillUnmount() {
 		const { setActiveTab } = this.props;
-		setActiveTab("profile", this.state.activeTab);
+		setActiveTab(this.state.readOnlyMode ? "user" : "profile", this.state.activeTab);
 	}
 
 	fetchUserData() {
