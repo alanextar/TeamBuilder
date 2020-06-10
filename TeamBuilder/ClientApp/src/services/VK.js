@@ -46,21 +46,21 @@ export const initProfile = () => async (dispatch) => {
 	dispatch(setProfileUser(bd));
 }
 
-//export const swipeBackOn = () => {
-//    return VKConnect.send("VKWebAppEnableSwipeBack", {}).then(data => {
-//        return data;
-//    }).catch(error => {
-//        return error;
-//    });
-//};
+export const swipeBackOn = () => {
+    return bridge.send("VKWebAppEnableSwipeBack", {}).then(data => {
+        return data;
+    }).catch(error => {
+        return error;
+    });
+};
 
-//export const swipeBackOff = () => {
-//    return VKConnect.send("VKWebAppDisableSwipeBack", {}).then(data => {
-//        return data;
-//    }).catch(error => {
-//        return error;
-//    });
-//};
+export const swipeBackOff = () => {
+    return bridge.send("VKWebAppDisableSwipeBack", {}).then(data => {
+        return data;
+    }).catch(error => {
+        return error;
+    });
+};
 
 export const APICall = (method, params) => {
 	params['access_token'] = store.getState().vkui.accessToken;

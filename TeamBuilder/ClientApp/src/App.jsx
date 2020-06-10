@@ -203,7 +203,8 @@ const App = (props) => {
                         <EventEdit id='eventEdit' owner={props.profile} />
                         <TeamInfo id='teaminfo' />
                         <TeamEdit id='teamEdit' />
-                        <User id='user' />
+						<User id='user' />
+						<SetUserTeam id='setUserTeam' />
                     </View>
                 </Root>
                 <Root id="user" activeView={activeView} popout={popout}>
