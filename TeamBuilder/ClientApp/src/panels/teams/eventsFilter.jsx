@@ -2,16 +2,16 @@
 import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
 
-import { goBack } from '../store/router/actions';
-import { setEvent, setTeamsEventFilter } from "../store/events/actions";
+import { goBack } from '../../store/router/actions';
+import { setEvent, setTeamsEventFilter } from "../../store/events/actions";
 
-import useDebounce from '../infrastructure/use-debounce';
+import useDebounce from '../../infrastructure/use-debounce';
 import {
     Panel, PanelHeader, PanelSpinner, Search, RichCell, PullToRefresh,
     PanelHeaderBack, CardGrid, Card
 } from '@vkontakte/vkui';
 import InfiniteScroll from 'react-infinite-scroller';
-import { Api, Urls } from '../infrastructure/api';
+import { Api, Urls } from '../../infrastructure/api';
 
 const EventsFilter = props => {
     const { goBack, setTeamsEventFilter } = props;

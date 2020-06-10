@@ -22,21 +22,21 @@ import Icon28Users3Outline from '@vkontakte/icons/dist/28/users_3_outline';
 import Icon28FavoriteOutline from '@vkontakte/icons/dist/28/favorite_outline';
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 
-import Events from './panels/events'
-import EventCreate from './panels/eventCreate'
-import EventInfo from './panels/eventInfo'
-import EventEdit from './panels/eventEdit'
+import Events from './panels/events/events'
+import EventCreate from './panels/events/eventCreate'
+import EventInfo from './panels/events/eventInfo'
+import EventEdit from './panels/events/eventEdit'
 
-import Teams from './panels/teams'
-import TeamInfo from './panels/teamInfo'
-import TeamCreate from './panels/teamCreate'
-import TeamEdit from './panels/teamEdit'
-import EventsFilter from './panels/eventsFilter'
+import Teams from './panels/teams/teams'
+import TeamInfo from './panels/teams/teamInfo'
+import TeamCreate from './panels/teams/teamCreate'
+import TeamEdit from './panels/teams/teamEdit'
+import EventsFilter from './panels/teams/eventsFilter'
 
-import Users from './panels/users'
-import User from './panels/user'
-import UserEdit from './panels/userEdit'
-import SetUserTeam from './panels/setUserTeam'
+import Users from './panels/users/users'
+import User from './panels/users/user'
+import UserEdit from './panels/users/userEdit'
+import SetUserTeam from './panels/users/setUserTeam'
 
 import { Api } from './infrastructure/api';
 

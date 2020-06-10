@@ -1,13 +1,13 @@
 ﻿import React from 'react';
-import { Api } from '../infrastructure/api';
+import { Api } from '../../infrastructure/api';
 
 import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
-import { goBack, setPage } from "../store/router/actions";
-import { setTeam } from "../store/teams/actions";
-import { setActiveTab } from "../store/vk/actions";
-import { setFormData } from "../store/formData/actions";
-import { setProfileUser } from "../store/user/actions";
+import { goBack, setPage } from "../../store/router/actions";
+import { setTeam } from "../../store/teams/actions";
+import { setActiveTab } from "../../store/vk/actions";
+import { setFormData } from "../../store/formData/actions";
+import { setProfileUser } from "../../store/user/actions";
 
 import {
     Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell,
