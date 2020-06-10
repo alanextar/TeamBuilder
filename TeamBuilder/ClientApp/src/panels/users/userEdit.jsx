@@ -69,6 +69,10 @@ class UserEdit extends React.Component {
 		this.props.setFormData('profile_form', this.state.inputData);
 	}
 
+	shouldComponentUpdate(nextProps, nextState) {
+		return nextState.inputData !== null;
+	}
+
 	async postEdit() {
 		let editUserViewModel = {
 			...this.state.inputData,
@@ -105,7 +109,7 @@ class UserEdit extends React.Component {
 	render() {
 		return (
 			<Panel id="userEdit">
-				<PanelHeader left={<PanelHeaderBack onClick={this.cancelForm} />}>Профиль</PanelHeader>
+				<PanelHeader left={<PanelHeaderBack onClick={() => this.cancelForm()} />}>Профиль</PanelHeader>
 				{this.props.profile &&
 					<Group title="VK Connect">
 						<Cell description={this.props.profile.city && this.props.profile.city.title ? this.props.profile.city.title : ''}
