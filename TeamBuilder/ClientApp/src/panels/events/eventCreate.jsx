@@ -2,15 +2,15 @@
 
 import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
-import { goBack, setPage } from "../store/router/actions";
-import { setEvent } from "../store/events/actions";
-import { setFormData } from "../store/formData/actions";
+import { goBack, setPage } from "../../store/router/actions";
+import { setEvent } from "../../store/events/actions";
+import { setFormData } from "../../store/formData/actions";
 
 import {
     Panel, PanelHeader, Group, Button, Textarea, FixedLayout,
     PanelHeaderBack, Input, FormLayout
 } from '@vkontakte/vkui';
-import { Api } from '../infrastructure/api';
+import { Api } from '../../infrastructure/api';
 
 const EventCreate = props => {
     let defaultInputData = {

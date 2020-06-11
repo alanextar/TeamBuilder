@@ -1,18 +1,18 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { goBack, setPage } from '../store/router/actions';
+import { goBack, setPage } from '../../store/router/actions';
 import {
     Panel, PanelHeader, Avatar, Search, PanelSpinner, RichCell, PullToRefresh,
     PanelHeaderButton, CardGrid, Card
 } from '@vkontakte/vkui';
 import InfiniteScroll from 'react-infinite-scroller';
-import { Api, Urls } from '../infrastructure/api';
-import useDebounce from '../infrastructure/use-debounce';
-import { setTeam, setTeamsTeam } from "../store/teams/actions";
+import { Api, Urls } from '../../infrastructure/api';
+import useDebounce from '../../infrastructure/use-debounce';
+import { setTeam, setTeamsTeam } from "../../store/teams/actions";
 
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
 import Icon24Filter from '@vkontakte/icons/dist/24/filter';
-import { countConfirmed } from "../infrastructure/utils";
+import { countConfirmed } from "../../infrastructure/utils";
 
 const Teams = props => {
     const { setPage, setTeam, setTeamsTeam } = props;

@@ -1,12 +1,12 @@
 ﻿import React from 'react';
-import { Api, Urls } from '../infrastructure/api';
+import { Api, Urls } from '../../infrastructure/api';
 
 import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
-import { goBack, setPage, openPopout, closePopout } from "../store/router/actions";
-import { setTeam } from "../store/teams/actions";
-import { setUser, setTeamUser, setProfileUser, addTeamToProfile } from "../store/user/actions";
-import { setActiveTab } from "../store/vk/actions";
+import { goBack, setPage, openPopout, closePopout } from "../../store/router/actions";
+import { setTeam } from "../../store/teams/actions";
+import { setUser, setTeamUser, setProfileUser, addTeamToProfile } from "../../store/user/actions";
+import { setActiveTab } from "../../store/vk/actions";
 
 import {
 	Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell, InfoRow,
@@ -16,7 +16,7 @@ import {
 
 import Icon28MessageOutline from '@vkontakte/icons/dist/28/message_outline';
 import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
-import { countConfirmed } from "../infrastructure/utils";
+import { countConfirmed } from "../../infrastructure/utils";
 
 class TeamInfo extends React.Component {
 	constructor(props) {

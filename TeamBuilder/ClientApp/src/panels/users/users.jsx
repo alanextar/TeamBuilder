@@ -1,21 +1,21 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-
-import { goBack, setPage } from '../store/router/actions';
-import { setEvent } from "../store/events/actions";
-
-import useDebounce from '../infrastructure/use-debounce';
+import { bindActionCreators } from "redux";
+import useDebounce from '../../infrastructure/use-debounce';
 import {
-    Panel, PanelHeader, PanelSpinner, Search, RichCell, PullToRefresh,
-    PanelHeaderButton, CardGrid, Card
+    Panel, PanelHeader, Avatar, Search, PanelSpinner, RichCell, PullToRefresh,
+    CardGrid, Card
 } from '@vkontakte/vkui';
 import InfiniteScroll from 'react-infinite-scroller';
-import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
-import { Api, Urls } from '../infrastructure/api';
+import Icon24Work from '@vkontakte/icons/dist/24/work';
+import { Api, Urls } from '../../infrastructure/api';
 
-const Events = props => {
-    const { setPage, setEvent } = props;
+import { setUser, setParticipantUser } from "../../store/user/actions";
+import { setPage } from '../../store/router/actions';
 
+const Users = props => {
+    const { setParticipantUser, setUser, setPage } = props;
+    
     const [isSearching, setIsSearching] = useState(false);
     const [fetching, setFetching] = useState(false);
 
@@ -30,7 +30,7 @@ const Events = props => {
     useEffect(
         () => {
             setIsSearching(true);
-            Api.Events.pagingSearch(debouncedSearchTerm)
+            Api.Users.pagingSearch(debouncedSearchTerm)
                 .then(result => {
                     setItems(result.collection);
                     setNextHref(result.nextHref);
@@ -41,10 +41,12 @@ const Events = props => {
         [debouncedSearchTerm]
     )
 
+    //#region Search
+
     const onRefresh = () => {
         setFetching(true);
         if (searchTerm) {
-            Api.Events.pagingSearch(debouncedSearchTerm)
+            Api.Users.pagingSearch(debouncedSearchTerm)
                 .then(result => {
                     setItems(result.collection);
                     setNextHref(result.nextHref);
@@ -53,7 +55,7 @@ const Events = props => {
                 });
         }
         else {
-            Api.Events.getPage()
+            Api.Users.getPage()
                 .then(result => {
                     setItems(result.collection);
                     setNextHref(result.nextHref);
@@ -63,8 +65,12 @@ const Events = props => {
         }
     };
 
+    //#endregion
+
+    //#region Scroll
+
     const loadItems = page => {
-        var url = `${Urls.Events.GetPage}`;
+        var url = `${Urls.Users.GetPage}`;
         if (nextHref) {
             url = nextHref;
         }
@@ -85,16 +91,18 @@ const Events = props => {
 
     const loader = <PanelSpinner key={0} size="large" />
 
+    const stringfySkills = (skills) => {
+        var joined = skills && skills.map(s => s.name).join(", ");
+        var max = 30;
+        var result = joined.length > max ? `${joined.substring(0, max)}...` : joined;
+        return result;
+    }
+
+    //#endregion
+
     return (
         <Panel id={props.id}>
-            {props.profileUser ?
-                <PanelHeader separator={false}
-                    left={<PanelHeaderButton onClick={() => { setPage('events', 'eventCreate'); }}>Создать</PanelHeaderButton>}>
-                    События
-                </PanelHeader> :
-                <PanelHeader separator={false}>
-                    События
-                </PanelHeader>}
+            <PanelHeader separator={false}>Участники</PanelHeader>
             <Search value={searchTerm} onChange={e => setSearchTerm(e.target.value)} after={null} />
             <PullToRefresh onRefresh={onRefresh} isFetching={fetching}>
                 {isSearching ? loader :
@@ -104,20 +112,27 @@ const Events = props => {
                         hasMore={hasMoreItems}
                         loader={loader}>
                         <CardGrid style={{ marginBottom: 10 }}>
-                            {items && items.map(event => (
-                                <Card size="l" mode="shadow" key={event.id}>
-                                    <RichCell
-                                        bottom={`Участвуют ${event.teams && event.teams.length} команд`}
-                                        caption={`${event.startDate} - ${event.startDate}`}
-                                        onClick={() => { setPage('events', 'eventInfo'); setEvent(event) }}
-                                    >
-                                        {event.name}
-                                    </RichCell>
+                            {items && items.map(user => (
+                                <Card size="l" mode="shadow" key={user.id}>
+                                    {user.isSearchable &&
+                                        <RichCell
+                                            before={<Avatar size={48} src={user.photo100} />}
+                                            after={user.isTeamMember && <Icon24Work />}
+                                            caption={user.city && user.city}
+                                            bottom={stringfySkills(user.skills)}
+                                            text={user.about && user.about}
+                                            onClick={() => {
+                                                setUser(user);
+                                                setParticipantUser(user);
+                                                setPage('users', 'user');
+                                            }}
+                                        >
+                                            {user.firstName} {user.lastName}
+                                        </RichCell>}
                                 </Card>
                             ))}
                         </CardGrid>
-                    </InfiniteScroll>
-                }
+                    </InfiniteScroll>}
             </PullToRefresh>
         </Panel>
     );
@@ -129,10 +144,11 @@ const mapStateToProps = (state) => {
     }
 };
 
-const mapDispatchToProps = {
-    setPage,
-    setEvent,
-    goBack
-};
+function mapDispatchToProps(dispatch) {
+    return {
+        dispatch,
+        ...bindActionCreators({ setPage, setUser, setParticipantUser }, dispatch)
+    }
+}
 
-export default connect(mapStateToProps, mapDispatchToProps)(Events);
+export default connect(mapStateToProps, mapDispatchToProps)(Users);

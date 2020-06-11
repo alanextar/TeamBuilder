@@ -2,18 +2,18 @@
 
 import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
-import { goBack, setPage } from "../store/router/actions";
-import { setTeam } from "../store/teams/actions";
-import { setActiveTab } from "../store/vk/actions";
-import { setFormData } from "../store/formData/actions";
+import { goBack, setPage } from "../../store/router/actions";
+import { setTeam } from "../../store/teams/actions";
+import { setActiveTab } from "../../store/vk/actions";
+import { setFormData } from "../../store/formData/actions";
 
 import {
 	Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell,
 	Div, Button, Textarea, FormLayout, Select, Input, Slider, FixedLayout, Link
 } from '@vkontakte/vkui';
-import { Api } from '../infrastructure/api';
-import { GetRandomPic } from '../infrastructure/utils';
-import { setProfileUser, addTeamToProfile } from '../store/user/actions';
+import { Api } from '../../infrastructure/api';
+import { GetRandomPic } from '../../infrastructure/utils';
+import { setProfileUser, addTeamToProfile } from '../../store/user/actions';
 
 class TeamCreate extends React.Component {
 	constructor(props) {
