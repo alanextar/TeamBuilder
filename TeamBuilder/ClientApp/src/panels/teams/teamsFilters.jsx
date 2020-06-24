@@ -16,7 +16,7 @@ class TeamFilters extends React.Component {
 		this.props.setTeamsEventFilter(null);
 		this.hideModal();
 	}
-	
+
 	chooseEvent = () => {
 		this.props.setPage('teams', 'eventsFilter');
 		this.hideModal();
@@ -39,13 +39,12 @@ class TeamFilters extends React.Component {
 							Фильтры
 							</ModalPageHeader>
 					}>
-					{!this.props.eventsIsEmpty &&
-						<FormLayout>
-							<SelectMimicry top="События" placeholder="Не выбрано"
-								onClick={() => this.chooseEvent()}>
-								{this.props.teamsEventFilter && this.props.teamsEventFilter.name}
-							</SelectMimicry>
-						</FormLayout>}
+					<FormLayout>
+						<SelectMimicry top="События" placeholder="Не выбрано"
+							onClick={() => this.chooseEvent()}>
+							{this.props.teamsEventFilter && this.props.teamsEventFilter.name}
+						</SelectMimicry>
+					</FormLayout>
 				</ModalPage>
 			</ModalRoot>
 		);

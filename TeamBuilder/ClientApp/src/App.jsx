@@ -38,8 +38,6 @@ import User from './panels/users/user'
 import UserEdit from './panels/users/userEdit'
 import SetUserTeam from './panels/users/setUserTeam'
 
-import { Api } from './infrastructure/api';
-
 const App = (props) => {
 	const [lastAndroidBackAction, setLastAndroidBackButton] = useState(0);
 	const [history, setHistory] = useState(null);
@@ -50,13 +48,10 @@ const App = (props) => {
 		eventsTeam, userTeam, usersTeam, setTeam, colorScheme
 	} = props;
 
-	const [events, setEvents] = useState(null);
 	const [activeModal, setActiveModal] = useState(null);
 
 	useEffect(() => {
 		const { goBack } = props;
-
-		getEvents();
 
 		window.onpopstate = () => {
 			let timeNow = +new Date();
@@ -80,10 +75,6 @@ const App = (props) => {
 		setHistory(history);
 		setPopout(popout);
 	});
-
-	const getEvents = () => {
-		Api.Events.getAll().then(result => setEvents(result))
-	}
 
 	return (
 		<ConfigProvider isWebView={true} scheme={colorScheme}>
@@ -131,7 +122,7 @@ const App = (props) => {
 					<View id='teams' activePanel={getActivePanel("teams")}
 						history={history}
 						onSwipeBack={() => goBack()}
-						modal={<TeamsFilters activeModal={activeModal} setActiveModal={setActiveModal} eventsIsEmpty={events ? false : true} />}>
+						modal={<TeamsFilters activeModal={activeModal} setActiveModal={setActiveModal} />}>
 						<Teams id='teams' activeStory={activeStory} onFiltersClick={(e) => { setActiveModal('filters'); }} />
 						<TeamInfo id='teaminfo' />
 						<TeamCreate id='teamCreate' />
