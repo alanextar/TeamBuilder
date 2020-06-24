@@ -123,7 +123,7 @@ const App = (props) => {
 						history={history}
 						onSwipeBack={() => goBack()}
 						modal={<TeamsFilters activeModal={activeModal} setActiveModal={setActiveModal} />}>
-						<Teams id='teams' activeStory={activeStory} onFiltersClick={(e) => { setActiveModal('filters'); }} />
+						<Teams id='teams' activeStory={activeStory} onFiltersClick={() => setActiveModal('filters') } />
 						<TeamInfo id='teaminfo' />
 						<TeamCreate id='teamCreate' />
 						<TeamEdit id='teamEdit' />
@@ -131,7 +131,7 @@ const App = (props) => {
 						<SetUserTeam id='setUserTeam' />
 						<EventCreate id='eventCreate' />
 						<EventInfo id='eventInfo' />
-						<EventsFilter id='eventsFilter' openFilter={(e) => setActiveModal('filters')} />
+						<EventsFilter id='eventsFilter' openFilter={() => setActiveModal('filters')} />
 						<EventEdit id='eventEdit' owner={props.profile} />
 					</View>
 				</Root>
