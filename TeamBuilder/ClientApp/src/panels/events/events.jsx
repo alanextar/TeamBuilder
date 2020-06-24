@@ -16,21 +16,20 @@ import { setEvent } from "../../store/events/actions";
 const Events = props => {
 	const { setPage, setEvent } = props;
 
-	const renderHeader = () => {
-		return (
-			props.profileUser
-				?
-				<PanelHeader
-					separator={false}
-					left={<PanelHeaderButton onClick={() => { setPage('events', 'eventCreate'); }}>Создать</PanelHeaderButton>}>
-					События
+	const renderHeader = (
+		props.profileUser
+			?
+			<PanelHeader
+				separator={false}
+				left={<PanelHeaderButton onClick={() => { setPage('events', 'eventCreate'); }}>Создать</PanelHeaderButton>}>
+				События
 					</PanelHeader>
-				:
-				<PanelHeader separator={false}>
-					События
+			:
+			<PanelHeader separator={false}>
+				События
 					</PanelHeader>
-		);
-	}
+	);
+
 
 	const renderItems = items => {
 		return (

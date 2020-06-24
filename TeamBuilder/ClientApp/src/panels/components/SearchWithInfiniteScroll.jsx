@@ -83,7 +83,7 @@ const SearchWithInfiniteScroll = ({ getPageHandler, pagingSearchHandler, getPage
 
 	return (
 		<Div style={{ padding: 0 }}>
-			{header()}
+			{header}
 			<FixedLayout vertical="top">
 				<Search value={searchTerm} onChange={e => setSearchTerm(e.target.value)} after={null} />
 			</FixedLayout>
@@ -107,7 +107,7 @@ SearchWithInfiniteScroll.propTypes = {
 	getPageHandler: PropTypes.func.isRequired,
 	pagingSearchHandler: PropTypes.func.isRequired,
 	getPageUrl: PropTypes.string.isRequired,
-	header: PropTypes.func.isRequired,
+	header: PropTypes.node.isRequired,
 	children: PropTypes.func.isRequired,
 }
 
