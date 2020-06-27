@@ -135,7 +135,14 @@ class TeamCreate extends React.Component {
 								onChange={this.handleInput}
 								value={inputData && inputData.eventId && inputData.eventId}
 								name="eventId"
-								bottom={<Link style={{ color: 'rebeccapurple', textAlign: "right" }} onClick={() => setPage('common', 'eventCreate')}>Создать событие</Link>}>
+								bottom={
+									<Link
+										style={{ color: 'rebeccapurple', textAlign: "right" }}
+										onClick={() => setPage('common', 'eventCreate')}>
+										Создать событие
+								</Link>
+								}
+							>
 								{this.state.events && this.state.events.map((ev, i) => {
 									return (
 										<option value={ev.id} key={i}>

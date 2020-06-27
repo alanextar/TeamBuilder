@@ -22,23 +22,13 @@ import Icon28FavoriteOutline from '@vkontakte/icons/dist/28/favorite_outline';
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 
 import Events from './panels/events/events'
-import EventCreate from './panels/events/eventCreate'
-import EventInfo from './panels/events/eventInfo'
-import EventEdit from './panels/events/eventEdit'
-
 import Teams from './panels/teams/teams'
-import TeamInfo from './panels/teams/teamInfo'
-import TeamCreate from './panels/teams/teamCreate'
-import TeamEdit from './panels/teams/teamEdit'
 import EventsFilter from './panels/teams/eventsFilter'
 import TeamsFilters from './panels/teams/teamsFilters'
-
 import Users from './panels/users/users'
 import User from './panels/users/user'
-import UserEdit from './panels/users/userEdit'
-import SetUserTeam from './panels/users/setUserTeam'
 
-import CommonPanels from './CommonPanels'
+import CommonView from './CommonView'
 
 const App = (props) => {
 	const [lastAndroidBackAction, setLastAndroidBackButton] = useState(0);
@@ -77,20 +67,6 @@ const App = (props) => {
 		setHistory(history);
 		setPopout(popout);
 	});
-
-	const commonView = <View id='common' activePanel={getActivePanel()}
-		history={history}
-		onSwipeBack={() => goBack()}>
-		<TeamInfo id='teaminfo' />
-		<TeamCreate id='teamCreate' />
-		<TeamEdit id='teamEdit' />
-		<User id='user' />
-		<UserEdit id='userEdit' />
-		<SetUserTeam id='setUserTeam' />
-		<EventInfo id='eventInfo' />
-		<EventCreate id='eventCreate' />
-		<EventEdit id='eventEdit' />
-	</View>
 
 	return (
 		<ConfigProvider isWebView={true} scheme={colorScheme}>
@@ -142,8 +118,8 @@ const App = (props) => {
 						<Teams id='teams' activeStory={activeStory} onFiltersClick={() => setActiveModal('filters')} />
 						<EventsFilter id='eventsFilter' openFilter={() => setActiveModal('filters')} />
 					</View>
-					{/* <CommonPanels history={history} getActivePanel={() => getActivePanel("teams")}/> */}
-					{commonView}
+					<CommonView id='common' activePanel={getActivePanel()}
+						history={history}/>
 				</Root>
 				<Root id="users" activeView={activeView} popout={popout}>
 					<View id="users" activePanel={getActivePanel("users")}
@@ -151,7 +127,8 @@ const App = (props) => {
 						onSwipeBack={() => goBack()}>
 						<Users id="users" />
 					</View>
-					{commonView}
+					<CommonView id='common' activePanel={getActivePanel()}
+						history={history}/>
 				</Root>
 				<Root id="events" activeView={activeView} popout={popout}>
 					<View id='events' activePanel={getActivePanel("events")}
@@ -159,7 +136,8 @@ const App = (props) => {
 						onSwipeBack={() => goBack()}>
 						<Events id='events' />
 					</View>
-					{commonView}
+					<CommonView id='common' activePanel={getActivePanel()}
+						history={history}/>
 				</Root>
 				<Root id="user" activeView={activeView} popout={popout}>
 					<View id='user' activePanel={getActivePanel("user")}
@@ -167,7 +145,8 @@ const App = (props) => {
 						onSwipeBack={() => goBack()}>
 						<User id='user' />
 					</View>
-					{commonView}
+					<CommonView id='common' activePanel={getActivePanel()}
+						history={history}/>
 				</Root>
 			</Epic>
 		</ConfigProvider>

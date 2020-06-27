@@ -4,40 +4,37 @@ import { bindActionCreators } from "redux";
 import { goBack } from "./store/router/actions";
 
 import {
-	View, PanelHeader, Avatar, RichCell,
-	CardGrid, Card
+	View
 } from '@vkontakte/vkui';
-import Icon24Work from '@vkontakte/icons/dist/24/work';
 
-import Events from './panels/events/events'
 import EventCreate from './panels/events/eventCreate'
 import EventInfo from './panels/events/eventInfo'
 import EventEdit from './panels/events/eventEdit'
 
-import Teams from './panels/teams/teams'
 import TeamInfo from './panels/teams/teamInfo'
 import TeamCreate from './panels/teams/teamCreate'
 import TeamEdit from './panels/teams/teamEdit'
-import EventsFilter from './panels/teams/eventsFilter'
-import TeamsFilters from './panels/teams/teamsFilters'
 
-import Users from './panels/users/users'
 import User from './panels/users/user'
 import UserEdit from './panels/users/userEdit'
 import SetUserTeam from './panels/users/setUserTeam'
 
-const CommonPanels = props => {
+const CommonView = props => {
 	return (
-		<View id='common' activePanel={props.getActivePanel()}
+		<View id={props.id} activePanel={console.log(`acPa: ${props.activePanel}`), props.activePanel}
 			history={props.history}
 			onSwipeBack={() => goBack()}>
+
 			<TeamInfo id='teaminfo' />
+			<TeamCreate id='teamCreate' />
 			<TeamEdit id='teamEdit' />
 			<User id='user' />
+			<UserEdit id='userEdit' />
 			<SetUserTeam id='setUserTeam' />
-			<EventCreate id='eventCreate' />
 			<EventInfo id='eventInfo' />
-			<EventEdit id='eventEdit' owner={props.profile} />
+			<EventCreate id='eventCreate' />
+			<EventEdit id='eventEdit' />
+			
 		</View>
 	);
 };
@@ -56,4 +53,4 @@ function mapDispatchToProps(dispatch) {
 	}
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(CommonPanels);
+export default connect(mapStateToProps, mapDispatchToProps)(CommonView);
