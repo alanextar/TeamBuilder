@@ -82,7 +82,7 @@ const SearchWithInfiniteScroll = ({ getPageHandler, pagingSearchHandler, getPage
 	const loader = <PanelSpinner key={0} size="large" />
 
 	return (
-		<Div style={{ padding: 0 }}>
+		<div>
 			{header}
 			<FixedLayout vertical="top">
 				<Search value={searchTerm} onChange={e => setSearchTerm(e.target.value)} after={null} />
@@ -99,7 +99,7 @@ const SearchWithInfiniteScroll = ({ getPageHandler, pagingSearchHandler, getPage
 					</InfiniteScroll>
 				}
 			</PullToRefresh>
-		</Div>
+		</div>
 	);
 };
 

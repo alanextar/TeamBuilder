@@ -146,7 +146,7 @@ class User extends React.Component {
 							<Header
 								mode="secondary"
 								aside={!this.state.readOnlyMode && this.state.user &&
-									<Icon24Write style={{ color: "#3f8ae0" }} onClick={() => setPage('user', 'userEdit')} />
+									<Icon24Write style={{ color: "#3f8ae0" }} onClick={() => setPage('common', 'userEdit')} />
 								}>
 								Информация
                                 </Header>}>
@@ -208,7 +208,7 @@ class User extends React.Component {
 				}
 				<Div>
 					{this.state.recruitTeams && this.state.recruitTeams.length > 0 && < Button mode="primary" size='xl'
-						onClick={() => setPage(activeView, 'setUserTeam')}
+						onClick={() => setPage('common', 'setUserTeam')}
 					>
 						Завербовать
                     </Button>}

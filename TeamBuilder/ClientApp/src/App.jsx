@@ -38,6 +38,8 @@ import User from './panels/users/user'
 import UserEdit from './panels/users/userEdit'
 import SetUserTeam from './panels/users/setUserTeam'
 
+import CommonPanels from './CommonPanels'
+
 const App = (props) => {
 	const [lastAndroidBackAction, setLastAndroidBackButton] = useState(0);
 	const [history, setHistory] = useState(null);
@@ -75,6 +77,20 @@ const App = (props) => {
 		setHistory(history);
 		setPopout(popout);
 	});
+
+	const commonView = <View id='common' activePanel={getActivePanel()}
+		history={history}
+		onSwipeBack={() => goBack()}>
+		<TeamInfo id='teaminfo' />
+		<TeamCreate id='teamCreate' />
+		<TeamEdit id='teamEdit' />
+		<User id='user' />
+		<UserEdit id='userEdit' />
+		<SetUserTeam id='setUserTeam' />
+		<EventInfo id='eventInfo' />
+		<EventCreate id='eventCreate' />
+		<EventEdit id='eventEdit' />
+	</View>
 
 	return (
 		<ConfigProvider isWebView={true} scheme={colorScheme}>
@@ -123,62 +139,35 @@ const App = (props) => {
 						history={history}
 						onSwipeBack={() => goBack()}
 						modal={<TeamsFilters activeModal={activeModal} setActiveModal={setActiveModal} />}>
-						<Teams id='teams' activeStory={activeStory} onFiltersClick={() => setActiveModal('filters') } />
-						<TeamInfo id='teaminfo' />
-						<TeamCreate id='teamCreate' />
-						<TeamEdit id='teamEdit' />
-						<User id='user' />
-						<SetUserTeam id='setUserTeam' />
-						<EventCreate id='eventCreate' />
-						<EventInfo id='eventInfo' />
+						<Teams id='teams' activeStory={activeStory} onFiltersClick={() => setActiveModal('filters')} />
 						<EventsFilter id='eventsFilter' openFilter={() => setActiveModal('filters')} />
-						<EventEdit id='eventEdit' owner={props.profile} />
 					</View>
+					{/* <CommonPanels history={history} getActivePanel={() => getActivePanel("teams")}/> */}
+					{commonView}
 				</Root>
 				<Root id="users" activeView={activeView} popout={popout}>
 					<View id="users" activePanel={getActivePanel("users")}
 						history={history}
-						onSwipeBack={() => goBack()}
-					>
+						onSwipeBack={() => goBack()}>
 						<Users id="users" />
-						<User id="user" />
-						<SetUserTeam id="setUserTeam" />
-						<TeamInfo id="teaminfo" />
-						<TeamEdit id="teamEdit" />
-						<EventCreate id='eventCreate' owner={props.profile} />
-						<EventInfo id='eventInfo' />
-						<EventEdit id='eventEdit' owner={props.profile} />
 					</View>
+					{commonView}
 				</Root>
 				<Root id="events" activeView={activeView} popout={popout}>
 					<View id='events' activePanel={getActivePanel("events")}
 						history={history}
-						onSwipeBack={() => goBack()}
-					>
+						onSwipeBack={() => goBack()}>
 						<Events id='events' />
-						<EventCreate id='eventCreate' owner={props.profile} />
-						<EventInfo id='eventInfo' />
-						<EventEdit id='eventEdit' owner={props.profile} />
-						<TeamInfo id='teaminfo' />
-						<TeamEdit id='teamEdit' />
-						<User id='user' />
-						<SetUserTeam id='setUserTeam' />
 					</View>
+					{commonView}
 				</Root>
 				<Root id="user" activeView={activeView} popout={popout}>
 					<View id='user' activePanel={getActivePanel("user")}
 						history={history}
-						onSwipeBack={() => goBack()}
-					>
+						onSwipeBack={() => goBack()}>
 						<User id='user' />
-						<UserEdit id='userEdit' />
-						<TeamInfo id='teaminfo' />
-						<SetUserTeam id='setUserTeam' />
-						<TeamEdit id='teamEdit' />
-						<EventCreate id='eventCreate' owner={props.profile} />
-						<EventInfo id='eventInfo' />
-						<EventEdit id='eventEdit' owner={props.profile} />
 					</View>
+					{commonView}
 				</Root>
 			</Epic>
 		</ConfigProvider>

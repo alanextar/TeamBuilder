@@ -43,7 +43,7 @@ const EventCreate = props => {
 
     const eventCreate = () => {
         Api.Events.create(inputData)
-            .then(result => { setEvent(result); setPage(activeView, 'eventInfo')});
+            .then(result => { setEvent(result); setPage('common', 'eventInfo')});
     }
 
     useEffect(() => {

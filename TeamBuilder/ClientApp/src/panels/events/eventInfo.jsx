@@ -71,7 +71,7 @@ const EventInfo = props => {
             <PanelHeaderContext opened={contextOpened} onClose={toggleContext}>
                 <List>
                     <Cell
-                        onClick={() => { setPage(activeView, 'eventEdit') }}>
+                        onClick={() => { setPage('common', 'eventEdit') }}>
                         Редактировать событие
                         </Cell>
                     <Cell
@@ -114,7 +114,7 @@ const EventInfo = props => {
                                 onClick={() => {
                                     setTeam(team);
                                     setEventsTeam(team);
-                                    setPage(activeView, 'teaminfo')
+                                    setPage('common', 'teaminfo')
                                 }}
                                 before={<Avatar size={48} src={team.photo100} />}>
                                 {team.name}

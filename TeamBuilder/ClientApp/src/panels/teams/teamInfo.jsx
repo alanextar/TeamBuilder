@@ -252,7 +252,7 @@ class TeamInfo extends React.Component {
 			this.state.team && <PanelHeaderContext opened={this.state.contextOpened} onClose={this.toggleContext}>
 				{(isOwner || isModerator) &&
 					<List>
-						<Cell onClick={() => setPage(activeView, 'teamEdit')}>
+						<Cell onClick={() => setPage('common', 'teamEdit')}>
 							Редактировать команду
                          </Cell>
 						<Cell onClick={() => { this.openPopoutDeleteTeam() }}>
@@ -382,7 +382,7 @@ class TeamInfo extends React.Component {
 										<InfoRow header='Участники'>
 											{teamCap && <SimpleCell key={-1}
 												onClick={() => {
-													setPage(activeView, 'user');
+													setPage('common', 'user');
 													setUser(teamCap);
 													setTeamUser(teamCap)
 												}}
@@ -397,7 +397,7 @@ class TeamInfo extends React.Component {
 														userTeam.userAction === 2 &&
 														<SimpleCell key={i}
 															onClick={() => {
-																setPage(activeView, 'user');
+																setPage('common', 'user');
 																setUser(userTeam.user);
 																setTeamUser(userTeam.user)
 															}}

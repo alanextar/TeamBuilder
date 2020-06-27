@@ -90,7 +90,7 @@ class TeamCreate extends React.Component {
 			userId: this.props.profileUser.id
 		};
 		this.props.addTeamToProfile(newUserTeam);
-		setPage('teams', 'teaminfo');
+		setPage('common', 'teaminfo');
 	}
 
 	render() {
@@ -135,8 +135,8 @@ class TeamCreate extends React.Component {
 								onChange={this.handleInput}
 								value={inputData && inputData.eventId && inputData.eventId}
 								name="eventId"
-								bottom={<Link style={{ color: 'rebeccapurple', textAlign: "right" }} onClick={() => setPage(activeView, 'eventCreate')}>Создать событие</Link>}>>
-                                {this.state.events && this.state.events.map((ev, i) => {
+								bottom={<Link style={{ color: 'rebeccapurple', textAlign: "right" }} onClick={() => setPage('common', 'eventCreate')}>Создать событие</Link>}>
+								{this.state.events && this.state.events.map((ev, i) => {
 									return (
 										<option value={ev.id} key={i}>
 											{ev.name}
