@@ -20,22 +20,32 @@ import UserEdit from './panels/users/userEdit'
 import SetUserTeam from './panels/users/setUserTeam'
 
 const CommonView = props => {
-	return (
-		<View id={props.id} activePanel={console.log(`acPa: ${props.activePanel}`), props.activePanel}
-			history={props.history}
-			onSwipeBack={() => goBack()}>
+	const h = React.createElement;
 
-			<TeamInfo id='teaminfo' />
-			<TeamCreate id='teamCreate' />
-			<TeamEdit id='teamEdit' />
-			<User id='user' />
-			<UserEdit id='userEdit' />
-			<SetUserTeam id='setUserTeam' />
-			<EventInfo id='eventInfo' />
-			<EventCreate id='eventCreate' />
-			<EventEdit id='eventEdit' />
-			
-		</View>
+	const panels = [
+		h(TeamInfo, { id: 'teaminfo' }),
+		h(TeamCreate, { id: 'teamCreate' }),
+		h(TeamEdit, { id: 'teamEdit' }),
+		h(User, { id: 'user' }),
+		h(UserEdit, { id: 'userEdit' }),
+		h(SetUserTeam, { id: 'setUserTeam' }),
+		h(EventInfo, { id: 'eventInfo' }),
+		h(EventCreate, { id: 'eventCreate' }),
+		h(EventEdit, { id: 'eventEdit' })
+	]
+
+	return (
+		h(
+			View,
+			{
+				id: props.id,
+				activePanel: props.activePanel,
+				history: props.history,
+				onSwipeBack: () => goBack(),
+				modal: props.modal
+			},
+			[...React.Children.toArray(props.children), ...panels]
+		)
 	);
 };
 

@@ -111,42 +111,28 @@ const App = (props) => {
 				</Tabbar>
 			}>
 				<Root id="teams" activeView={activeView} popout={popout}>
-					<View id='teams' activePanel={getActivePanel("teams")}
+					<CommonView id='teams' activePanel={getActivePanel('teams')}
 						history={history}
-						onSwipeBack={() => goBack()}
 						modal={<TeamsFilters activeModal={activeModal} setActiveModal={setActiveModal} />}>
-						<Teams id='teams' activeStory={activeStory} onFiltersClick={() => setActiveModal('filters')} />
+						<Teams id='teams' onFiltersClick={() => setActiveModal('filters')} />
 						<EventsFilter id='eventsFilter' openFilter={() => setActiveModal('filters')} />
-					</View>
-					<CommonView id='common' activePanel={getActivePanel()}
-						history={history}/>
+					</CommonView>
 				</Root>
 				<Root id="users" activeView={activeView} popout={popout}>
-					<View id="users" activePanel={getActivePanel("users")}
-						history={history}
-						onSwipeBack={() => goBack()}>
+					<CommonView id='users' activePanel={getActivePanel('users')}
+						history={history}>
 						<Users id="users" />
-					</View>
-					<CommonView id='common' activePanel={getActivePanel()}
-						history={history}/>
+					</CommonView>
 				</Root>
 				<Root id="events" activeView={activeView} popout={popout}>
-					<View id='events' activePanel={getActivePanel("events")}
-						history={history}
-						onSwipeBack={() => goBack()}>
+					<CommonView id='events' activePanel={getActivePanel('events')}
+						history={history}>
 						<Events id='events' />
-					</View>
-					<CommonView id='common' activePanel={getActivePanel()}
-						history={history}/>
+					</CommonView>
 				</Root>
 				<Root id="user" activeView={activeView} popout={popout}>
-					<View id='user' activePanel={getActivePanel("user")}
-						history={history}
-						onSwipeBack={() => goBack()}>
-						<User id='user' />
-					</View>
-					<CommonView id='common' activePanel={getActivePanel()}
-						history={history}/>
+					<CommonView id='user' activePanel={getActivePanel('user')}
+						history={history} />
 				</Root>
 			</Epic>
 		</ConfigProvider>

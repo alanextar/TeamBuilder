@@ -50,7 +50,7 @@ const Users = props => {
 	const handleSelectItem = user => {
 		setUser(user);
 		setParticipantUser(user);
-		setPage('common', 'user');
+		setPage('users', 'user');
 	}
 
 	return (

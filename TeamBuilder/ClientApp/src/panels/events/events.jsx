@@ -21,7 +21,7 @@ const Events = props => {
 			?
 			<PanelHeader
 				separator={false}
-				left={<PanelHeaderButton onClick={() => { setPage('common', 'eventCreate'); }}>Создать</PanelHeaderButton>}>
+				left={<PanelHeaderButton onClick={() => { setPage('events', 'eventCreate'); }}>Создать</PanelHeaderButton>}>
 				События
 					</PanelHeader>
 			:
@@ -39,7 +39,7 @@ const Events = props => {
 						<RichCell
 							bottom={`Участвуют ${event.teams && event.teams.length} команд`}
 							caption={`${event.startDate} - ${event.startDate}`}
-							onClick={() => { setPage('common', 'eventInfo'); setEvent(event) }}
+							onClick={() => { setPage('events', 'eventInfo'); setEvent(event) }}
 						>
 							{event.name}
 						</RichCell>

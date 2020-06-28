@@ -157,7 +157,7 @@ class TeamEdit extends React.Component {
                                     onChange={this.handleInput}
                                     name="eventId"
                                     value={inputData.eventId}
-                                    bottom={<Link style={{ color: 'rebeccapurple', textAlign: "right" }} onClick={() => setPage('common', 'eventCreate')}>Создать событие</Link>}>
+                                    bottom={<Link style={{ color: 'rebeccapurple', textAlign: "right" }} onClick={() => setPage(activeView, 'eventCreate')}>Создать событие</Link>}>
                                     {this.state.events && this.state.events.map((ev, i) => {
                                         return (
                                             <option value={ev.id} key={i}>

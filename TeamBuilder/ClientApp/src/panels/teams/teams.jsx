@@ -91,7 +91,7 @@ const Teams = props => {
         <Panel id={props.id}>
             {props.profileUser ?
                 <PanelHeader separator={false}
-                    left={<PanelHeaderButton onClick={() => { setPage('common', 'teamCreate'); }}>Создать</PanelHeaderButton>}>
+                    left={<PanelHeaderButton onClick={() => { setPage('teams', 'teamCreate'); }}>Создать</PanelHeaderButton>}>
                     Команды
                 </PanelHeader> :
                 <PanelHeader separator={false}>
@@ -117,7 +117,7 @@ const Teams = props => {
                                         caption={team.event && team.event.name}
                                         after={countConfirmed(team.userTeams) +
                                             '/' + team.numberRequiredMembers}
-                                        onClick={() => { setPage('common', 'teaminfo'); setTeam(team); setTeamsTeam(team) }}
+                                        onClick={() => { setPage('teams', 'teaminfo'); setTeam(team); setTeamsTeam(team) }}
                                     >
                                         {team.name}
                                     </RichCell>

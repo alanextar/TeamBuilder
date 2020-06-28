@@ -149,7 +149,7 @@ class UserTeams extends React.Component {
 											caption={"Событие: " + (userTeam?.team?.event ? userTeam.team.event.name : '')}
 											after={userTeam.userAction === 2 ? < Icon28CheckCircleOutline /> :
 												(userTeam.userAction === 1 && <Icon28InfoOutline />)}
-											onClick={() => { setTeam(userTeam.team); setUserTeam(userTeam.team); setPage('common', 'teaminfo') }}
+											onClick={() => { setTeam(userTeam.team); setUserTeam(userTeam.team); setPage(activeView, 'teaminfo') }}
 											actions={!this.props.readOnlyMode && (userTeam.userAction === 5 ?
 												<React.Fragment>
 													<Button onClick={(e) => this.handleJoin(e, userTeam.teamId)}>Принять</Button>
