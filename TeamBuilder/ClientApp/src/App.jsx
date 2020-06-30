@@ -111,7 +111,7 @@ const App = (props) => {
 				</Tabbar>
 			}>
 				<Root id="teams" activeView={activeView} popout={popout}>
-					<CommonView id='teams' activePanel={getActivePanel('teams')}
+					<CommonView id='teams' activePanel={getActivePanel('teams').panel}
 						history={history}
 						modal={<TeamsFilters activeModal={activeModal} setActiveModal={setActiveModal} />}>
 						<Teams id='teams' onFiltersClick={() => setActiveModal('filters')} />
@@ -119,19 +119,19 @@ const App = (props) => {
 					</CommonView>
 				</Root>
 				<Root id="users" activeView={activeView} popout={popout}>
-					<CommonView id='users' activePanel={getActivePanel('users')}
+					<CommonView id='users' activePanel={getActivePanel('users').panel}
 						history={history}>
 						<Users id="users" />
 					</CommonView>
 				</Root>
 				<Root id="events" activeView={activeView} popout={popout}>
-					<CommonView id='events' activePanel={getActivePanel('events')}
+					<CommonView id='events' activePanel={getActivePanel('events').panel}
 						history={history}>
 						<Events id='events' />
 					</CommonView>
 				</Root>
 				<Root id="user" activeView={activeView} popout={popout}>
-					<CommonView id='user' activePanel={getActivePanel('user')}
+					<CommonView id='user' activePanel={getActivePanel('user').panel}
 						history={history} />
 				</Root>
 			</Epic>

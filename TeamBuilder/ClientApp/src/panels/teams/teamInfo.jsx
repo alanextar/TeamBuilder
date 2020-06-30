@@ -246,8 +246,19 @@ class TeamInfo extends React.Component {
 		);
 	};
 
-	getPanelHeaderContext = (isOwner, isModerator, userAction, userInActiveTeam, isUserInActiveTeam, confirmedUser) => {
+	getPanelHeaderContext = () => {
 		const { setPage, activeView } = this.props;
+
+		let userInActiveTeam = this.state.vkProfile &&
+			this.state.team.userTeams?.
+				find(user => user.userId === this.state.vkProfile.id);
+
+		let isUserInActiveTeam = userInActiveTeam != null;
+		let isOwner = isUserInActiveTeam && userInActiveTeam?.isOwner;
+		let isModerator = this.state.profileUser?.isModerator;
+		let userAction = userInActiveTeam?.userAction;
+		let confirmedUser = countConfirmed(this.state.team.userTeams);
+
 		return (
 			this.state.team && <PanelHeaderContext opened={this.state.contextOpened} onClose={this.toggleContext}>
 				{(isOwner || isModerator) &&
@@ -304,14 +315,8 @@ class TeamInfo extends React.Component {
 
 	render() {
 		const { goBack, setTeamUser, setUser, setPage, activeView } = this.props;
-		let userInActiveTeam = this.state.vkProfile && this.state.team.userTeams &&
-			this.state.team.userTeams.find(user => user.userId === this.state.vkProfile.id);
-		let isUserInActiveTeam = userInActiveTeam != null;
-		let isOwner = isUserInActiveTeam && userInActiveTeam && userInActiveTeam.isOwner;
-		let isModerator = this.state.profileUser && this.state.profileUser.isModerator;
-		let userAction = userInActiveTeam && userInActiveTeam.userAction;
-		let confirmedUser = countConfirmed(this.state.team.userTeams);
-		let teamCap = this.state.team.userTeams.find(x => x.isOwner) && this.state.team.userTeams.find(x => x.isOwner).user
+
+		let teamCap = this.state.team.userTeams.find(x => x.isOwner)?.user;
 
 		return (
 			<Panel id={this.state.panelId}>
@@ -323,10 +328,10 @@ class TeamInfo extends React.Component {
 							aside={<Icon16Dropdown style={{ transform: `rotate(${this.state.contextOpened ? '180deg' : '0'})` }} />}
 							onClick={() => { this.toggleContext(); }}>
 							{this.state.team.name}
-                        </PanelHeaderContent> :
+						</PanelHeaderContent> :
 						`Команда`}
 				</PanelHeader>
-				{this.getPanelHeaderContext(isOwner, isModerator, userAction, userInActiveTeam, isUserInActiveTeam, confirmedUser)}
+				{this.getPanelHeaderContext()}
 				<Tabs>
 					<TabsItem
 						onClick={() => {
