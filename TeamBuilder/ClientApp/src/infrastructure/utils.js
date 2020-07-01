@@ -23,14 +23,20 @@ export function convertSkills(skills) {
 	})
 }
 
-export function countActiveUserTeams(userTeams) {
+export function countMyActiveTeams(userTeams) {
+	return countActiveUserTeams(userTeams, [1,2,5]);
+};
+
+export function countForeignActiveTeams(userTeams) {
+	return countActiveUserTeams(userTeams, [2]);
+};
+
+export function countActiveUserTeams(userTeams, activeActions) {
 	var count = !userTeams
 		? 0
 		: userTeams
-			.filter(x =>
-				x.userAction === 1 ||
-				x.userAction === 2 ||
-				x.userAction === 5 ||
+			.filter(x => 
+				activeActions.indexOf(x.userAction) !== -1 ||
 				x.isOwner)
 			.length;
 	return count;
