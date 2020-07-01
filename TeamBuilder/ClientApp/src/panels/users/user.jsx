@@ -123,7 +123,7 @@ class User extends React.Component {
 
 		return (
 			<Panel id="user">
-				<PanelHeader separator={false} left={this.props.activeStory !== 'user' &&
+				<PanelHeader separator={false} left={this.props.activeStory !== 'profile' &&
 					<PanelHeaderBack onClick={() => goBack()} />}>{this.state.readOnlyMode ? 'Участник' : 'Профиль'}</PanelHeader>
 				{this.state.readOnlyMode
 					? this.state.user &&

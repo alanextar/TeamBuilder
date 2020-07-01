@@ -97,11 +97,11 @@ const App = (props) => {
 					><Icon28FavoriteOutline /></TabbarItem>
 					<TabbarItem style={{ color: props.profileUser === null ? "red" : "" }}
 						onClick={() => {
-							setStory('user', 'user');
+							setStory('profile', 'user');
 							setUser(profileUser);
 							userTeam && setTeam(userTeam)
 						}}
-						selected={activeStory === 'user'}
+						selected={activeStory === 'profile'}
 						text="Профиль"
 					><Icon28Profile /></TabbarItem>
 				</Tabbar>
@@ -126,8 +126,8 @@ const App = (props) => {
 						<Events id='events' />
 					</CommonView>
 				</Root>
-				<Root id="user" activeView={activeView} popout={popout}>
-					<CommonView id='user' activePanel={getActivePanel('user').panel}
+				<Root id="profile" activeView={activeView} popout={popout}>
+					<CommonView id='profile' activePanel={getActivePanel('profile').panel}
 						history={history} />
 				</Root>
 			</Epic>
