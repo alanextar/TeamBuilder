@@ -16,16 +16,14 @@ import '@vkontakte/vkui/dist/vkui.css';
 
 import { Api } from '../../infrastructure/api';
 import * as Utils from '../../infrastructure/utils';
-import { getActivePanel } from "../../services/_functions";
 
 class UserEdit extends React.Component {
 	constructor(props) {
 		super(props);
 
+		this.bindingId = `profile`;
 		this.state = {
-			itemId: getActivePanel(props.activeView).itemId,
-
-			inputData: props.inputData['profile_form'],
+			inputData: props.inputData[this.bindingId],
 			allSkills: []
 		}
 
@@ -61,8 +59,14 @@ class UserEdit extends React.Component {
 		this.populateSkills();
 	}
 
+	componentDidUpdate(prevProps) {
+		if (this.props.inputData[this.bindingId] !== prevProps.inputData[this.bindingId]) {
+			this.setState({ inputData: this.props.inputData[this.bindingId] });
+		}
+	}
+
 	componentWillUnmount() {
-		this.props.setFormData('profile_form', this.state.inputData);
+		this.props.setFormData(this.bindingId, this.state.inputData);
 	}
 
 	shouldComponentUpdate(nextProps, nextState) {
@@ -85,7 +89,7 @@ class UserEdit extends React.Component {
 	}
 
 	fetchUser() {
-		Api.Users.get(this.state.itemId)
+		Api.Users.get(this.props.profile.id)
 			.then(user => {
 				this.setState({
 					inputData: {
@@ -118,7 +122,7 @@ class UserEdit extends React.Component {
 
 	render() {
 		return (
-			<Panel id="userEdit">
+			<Panel id={this.props.id}>
 				<PanelHeader left={<PanelHeaderBack onClick={() => this.cancelForm()} />}>Профиль</PanelHeader>
 				{this.props.profile &&
 					<Group title="VK Connect">

@@ -116,7 +116,7 @@ class User extends React.Component {
 		const { goBack, goToPage } = this.props;
 
 		return (
-				<Panel id="user">
+				<Panel id={this.props.id}>
 					<PanelHeader separator={false} left={this.props.activeStory !== 'profile' &&
 						<PanelHeaderBack onClick={() => goBack()} />}>{this.state.readOnlyMode ? 'Участник' : 'Профиль'}</PanelHeader>
 					{this.state.readOnlyMode
@@ -159,8 +159,8 @@ class User extends React.Component {
 							<Group header={
 								<Header
 									mode="secondary"
-									aside={!this.state.readOnlyMode && this.state.user &&
-										<Icon24Write style={{ color: "#3f8ae0" }} onClick={() => goToPage('userEdit', this.state.itemId)} />
+									aside={!this.state.readOnlyMode && 
+										<Icon24Write style={{ color: "#3f8ae0" }} onClick={() => goToPage('userEdit')} />
 									}>
 									Информация
                                 </Header>}>

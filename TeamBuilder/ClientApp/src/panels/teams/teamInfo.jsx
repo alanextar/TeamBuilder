@@ -248,7 +248,7 @@ class TeamInfo extends React.Component {
 	};
 
 	getPanelHeaderContext = () => {
-		const { setPage, activeView } = this.props;
+		const { goToPage } = this.props;
 
 		let userInActiveTeam = this.state.vkProfile &&
 			this.state.team.userTeams?.
@@ -264,7 +264,7 @@ class TeamInfo extends React.Component {
 			this.state.team && <PanelHeaderContext opened={this.state.contextOpened} onClose={this.toggleContext}>
 				{(isOwner || isModerator) &&
 					<List>
-						<Cell onClick={() => setPage(activeView, 'teamEdit')}>
+						<Cell onClick={() => goToPage('teamEdit', this.state.itemId)}>
 							Редактировать команду
                          </Cell>
 						<Cell onClick={() => { this.openPopoutDeleteTeam() }}>
