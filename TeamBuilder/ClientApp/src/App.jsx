@@ -5,7 +5,7 @@ import {
 import { connect } from 'react-redux';
 import '@vkontakte/vkui/dist/vkui.css';
 import { bindActionCreators } from 'redux'
-import { goBack, closeModal, setStory, setPage } from "./store/router/actions";
+import { goBack, closeModal, setStory } from "./store/router/actions";
 import { setTeam } from "./store/teams/actions";
 import { setUser } from "./store/user/actions";
 import { getActivePanel } from "./services/_functions";
@@ -32,8 +32,8 @@ const App = (props) => {
 	const [popout, setPopout] = useState(null);
 
 	const { setStory, activeView, activeStory, setUser,
-		profileUser, teamUser, eventUser, participantUser, teamsTeam,
-		eventsTeam, userTeam, usersTeam, setTeam, colorScheme
+		profileUser, eventUser,
+		eventsTeam, setTeam, colorScheme
 	} = props;
 
 	const [activeModal, setActiveModal] = useState(null);
@@ -74,11 +74,7 @@ const App = (props) => {
 						text="Команды"
 					><Icon28Users3Outline /></TabbarItem>
 					<TabbarItem
-						onClick={() => {
-							setStory('users', 'users');
-							participantUser && setUser(participantUser);
-							usersTeam && setTeam(usersTeam);
-						}}
+						onClick={() => setStory('users', 'users')}
 						selected={activeStory === 'users'}
 						text="Участники"
 					><Icon28Users /></TabbarItem>
@@ -91,7 +87,7 @@ const App = (props) => {
 						selected={activeStory === 'events'}
 						text="События"
 					><Icon28FavoriteOutline /></TabbarItem>
-					<TabbarItem style={{ color: props.profileUser === null ? "red" : "" }}
+					<TabbarItem style={{ color: profileUser === null ? "red" : "" }}
 						onClick={() => setStory('profile', 'user')}
 						selected={activeStory === 'profile'}
 						text="Профиль"
@@ -135,18 +131,10 @@ const mapStateToProps = (state) => {
 		popouts: state.router.popouts,
 		activeModals: state.router.activeModals,
 		colorScheme: state.vkui.colorScheme,
-		scrollPosition: state.router.scrollPosition,
 		profile: state.user.profile,
-		user: state.user.user,
 		profileUser: state.user.profileUser,
 		eventUser: state.user.eventUser,
-		teamUser: state.user.teamUser,
-		participantUser: state.user.participantUser,
-		teamsTeam: state.team.teamsTeam,
-		userTeam: state.team.userTeam,
-		usersTeam: state.team.usersTeam,
-		eventsTeam: state.team.eventsTeam,
-		event: state.event.event,
+		eventsTeam: state.team.eventsTeam
 	};
 };
 
@@ -155,7 +143,7 @@ function mapDispatchToProps(dispatch) {
 	return {
 		dispatch,
 		...bindActionCreators({
-			setStory, goBack, closeModal, setUser, setPage, setTeam
+			setStory, goBack, closeModal, setUser, setTeam
 		}, dispatch)
 	}
 }

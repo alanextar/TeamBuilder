@@ -2,7 +2,8 @@ import bridge from '@vkontakte/vk-bridge';
 
 import { store } from "../index";
 import { setColorScheme } from "../store/vk/actions";
-import { setProfile, setUser, setProfileUser } from "../store/user/actions";
+import { setProfile, setProfileUser } from "../store/user/actions";
+import { setStory } from "../store/router/actions";
 
 import { Api } from '../infrastructure/api';
 
@@ -42,7 +43,6 @@ export const initProfile = () => async (dispatch) => {
 	dispatch(setProfile(vk));
 
 	var bd = await Api.Users.get(vk.id);
-	dispatch(setUser(bd));
 	dispatch(setProfileUser(bd));
 }
 

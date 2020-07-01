@@ -41,7 +41,6 @@ class User extends React.Component {
 			itemId: itemIdInitial,
 
 			profile: props.profile,
-			profileUser: props.profileUser,
 			user: null,
 
 			activeTab: props.activeTab[`user_${itemIdInitial}`] || "main",
