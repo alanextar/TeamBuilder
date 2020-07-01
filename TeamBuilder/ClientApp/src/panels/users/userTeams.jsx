@@ -6,7 +6,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Api } from '../../infrastructure/api';
 import { countActiveUserTeams } from '../../infrastructure/utils';
-import { closePopout, openPopout, setPage } from '../../store/router/actions';
+import { goToPage, closePopout, openPopout, setPage } from '../../store/router/actions';
 import { setTeam, setUserTeam } from '../../store/teams/actions';
 import { setProfileUser, setUser } from '../../store/user/actions';
 
@@ -121,7 +121,7 @@ class UserTeams extends React.Component {
 	};
 
 	render() {
-		const { setPage, setTeam, activeView, setUserTeam } = this.props;
+		const { goToPage } = this.props;
 		let isTeamsExists = countActiveUserTeams(this.props.userTeams);
 		const loader = <PanelSpinner key={0} size="large" />
 
@@ -140,8 +140,7 @@ class UserTeams extends React.Component {
 				<List>
 					<CardGrid>
 						{
-							this.props.userTeams &&
-							this.props.userTeams.map(userTeam => {
+							this.props.userTeams?.map(userTeam => {
 								return (
 									<Card key={userTeam.teamId} size="l" mode="shadow">
 										<RichCell key={userTeam.teamId}
@@ -149,7 +148,7 @@ class UserTeams extends React.Component {
 											caption={"Событие: " + (userTeam?.team?.event ? userTeam.team.event.name : '')}
 											after={userTeam.userAction === 2 ? < Icon28CheckCircleOutline /> :
 												(userTeam.userAction === 1 && <Icon28InfoOutline />)}
-											onClick={() => { setTeam(userTeam.team); setUserTeam(userTeam.team); setPage(activeView, 'teaminfo') }}
+											onClick={() => { goToPage('teaminfo', userTeam.teamId) }}
 											actions={!this.props.readOnlyMode && (userTeam.userAction === 5 ?
 												<React.Fragment>
 													<Button onClick={(e) => this.handleJoin(e, userTeam.teamId)}>Принять</Button>
@@ -194,6 +193,7 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = {
+	goToPage,
 	setPage,
 	setTeam,
 	setUserTeam,

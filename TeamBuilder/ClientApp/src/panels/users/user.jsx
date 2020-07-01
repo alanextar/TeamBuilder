@@ -19,60 +19,79 @@ import Icon28HideOutline from '@vkontakte/icons/dist/28/hide_outline';
 import UserTeams from './userTeams'
 import { Api } from '../../infrastructure/api';
 import * as Utils from '../../infrastructure/utils';
+import { getActivePanel } from "../../services/_functions";
 import { goBack, setPage } from '../../store/router/actions';
 import { setUser, setProfileUser, setRecruitTeams } from '../../store/user/actions';
 import { setActiveTab } from "../../store/vk/actions";
 import SkillTokens from '../components/SkillTokens';
 
+
+// profile - заполняется данными из VK
+// User - заполняется данными из БД
+// profileUser - заполняется данными из БД (используется в App для определения  зарегестрирован пользователь или нет)
+
 class User extends React.Component {
 	constructor(props) {
 		super(props);
 
+		let itemIdInitial = getActivePanel(props.activeView).itemId || props.profile.id;
+		let isMyProfile = itemIdInitial == props.profile.id;
+
 		this.state = {
-			vkProfile: props.profile,
+			itemId: itemIdInitial,
+
+			profile: props.profile,
 			profileUser: props.profileUser,
 			user: props.user,
-			activeTab: props.activeTab[props.activeStory != "user" ? "user" : "profile"] || "main",
-			isSearchable: props.user?.isSearchable ? props.user.isSearchable : false,
-			readOnlyMode: props.activeStory != 'user',
+
+			activeTab: props.activeTab[`user_${itemIdInitial}`] || "main",
+			isSearchable: props.user?.isSearchable || false,
+			readOnlyMode: !isMyProfile,
 			recruitTeams: [],
 			loading: true
 		}
 
 		this.confirmUser = this.confirmUser.bind(this);
-
 	}
 
 	componentDidMount() {
-		this.state.vkProfile && this.fetchUserData();
+		this.fetchUserData();
 	}
 
 	componentDidUpdate(prevProps) {
 		if (this.props.user !== prevProps.user) {
 			this.setState({ user: this.props.user });
 		}
+		if (this.props.activeTab[`user_${this.state.itemId}`] !== prevProps.activeTab[`user_${this.state.itemId}`] ) {
+			this.setState({ activeTab : this.props.activeTab[`user_${this.state.itemId}`]})
+		}
 	}
 
 	componentWillUnmount() {
 		const { setActiveTab } = this.props;
-		setActiveTab(this.state.readOnlyMode ? "user" : "profile", this.state.activeTab);
+		setActiveTab(`user_${this.state.itemId}`, this.state.activeTab);
 	}
 
 	async fetchUserData() {
-		const { setRecruitTeams } = this.props;
-		let id = this.state.readOnlyMode ? this.state.user.id : this.state.vkProfile.id;
+		const { setUser, setProfileUser, setRecruitTeams } = this.props;
 		//TODO преобразовать в один запрос типа getProfileUserWithRelation - получить профиль с командами в которые можно вербовать юзера
-		let user = await Api.Users.get(id);
-		setUser(user);
+		let user = await Api.Users.get(this.state.itemId);
 		this.setState({ user: user });
+		setUser(user);
 
-		user = await Api.Users.get(this.state.vkProfile.id);
-		setProfileUser(user);
+		if (this.state.readOnlyMode) {
+			let updatedProfile = await Api.Users.get(this.state.profile.id);
+			setProfileUser(updatedProfile);
 
-		if (this.state.profileUser && this.state.profileUser.anyTeamOwner && this.state.user.isSearchable) {
-			let teams = await Api.Users.getRecruitTeams(this.state.vkProfile.id, id);
-			setRecruitTeams(teams);
-			this.setState({ recruitTeams: teams });
+			let needGetRecruitTeams = this.state.profileUser?.anyTeamOwner && this.state.user.isSearchable
+			if (needGetRecruitTeams) {
+				let teams = await Api.Users.getRecruitTeams(this.state.profile.id, this.state.itemId);
+				this.setState({ recruitTeams: teams });
+				setRecruitTeams(teams);
+			}
+		}
+		else {
+			setProfileUser(user)
 		}
 
 		this.setState({ loading: false });
@@ -81,15 +100,15 @@ class User extends React.Component {
 	async confirmUser() {
 		const { setUser, setProfileUser } = this.props;
 
-		if (!this.state.vkProfile)
+		if (!this.state.profile)
 			return;
 
 		var profileViewModel = {
-			id: this.state.vkProfile.id,
-			firstName: this.state.vkProfile.first_name,
-			lastName: this.state.vkProfile.last_name,
-			photo100: this.state.vkProfile.photo_100,
-			photo200: this.state.vkProfile.photo_200
+			id: this.state.profile.id,
+			firstName: this.state.profile.first_name,
+			lastName: this.state.profile.last_name,
+			photo100: this.state.profile.photo_100,
+			photo200: this.state.profile.photo_200
 		};
 
 		Api.Users.saveOrConfirm(profileViewModel)
@@ -104,7 +123,7 @@ class User extends React.Component {
 
 		return (
 			<Panel id="user">
-				<PanelHeader separator={false} left={this.state.readOnlyMode &&
+				<PanelHeader separator={false} left={this.props.activeStory !== 'user' &&
 					<PanelHeaderBack onClick={() => goBack()} />}>{this.state.readOnlyMode ? 'Участник' : 'Профиль'}</PanelHeader>
 				{this.state.readOnlyMode
 					? this.state.user &&
@@ -117,13 +136,13 @@ class User extends React.Component {
 							</Cell>
 						</Link>
 					</Group>
-					: this.state.vkProfile &&
+					: this.state.profile &&
 					<Group title="VK Connect">
-						<Link href={"https://m.vk.com/id" + this.state.vkProfile.id} target="_blank">
-							<Cell description={this.state.vkProfile.city && this.state.vkProfile.city.title ? this.state.vkProfile.city.title : ''}
-								before={this.state.vkProfile.photo_200 ? <Avatar src={this.state.vkProfile.photo_200} /> : null}
+						<Link href={"https://m.vk.com/id" + this.state.profile.id} target="_blank">
+							<Cell description={this.state.profile.city && this.state.profile.city.title ? this.state.profile.city.title : ''}
+								before={this.state.profile.photo_200 ? <Avatar src={this.state.profile.photo_200} /> : null}
 								asideContent={this.state.isSearchable ? <Icon28ViewOutline /> : <Icon28HideOutline />}>
-								{`${this.state.vkProfile.first_name} ${this.state.vkProfile.last_name}`}
+								{`${this.state.profile.first_name} ${this.state.profile.last_name}`}
 							</Cell>
 						</Link>
 					</Group>
@@ -152,19 +171,19 @@ class User extends React.Component {
 								Информация
                                 </Header>}>
 							{this.state.user?.mobile &&
-								<Cell before={<Icon24Phone style={{paddingTop: 0, paddingBottom: 0}}/>}>
+								<Cell before={<Icon24Phone style={{ paddingTop: 0, paddingBottom: 0 }} />}>
 									<Link href={"tel:" + this.state.user.mobile}>{this.state.user.mobile}</Link>
 								</Cell>}
 							{this.state.user?.telegram &&
-								<Cell before={<Icon24Send style={{paddingTop: 0, paddingBottom: 0}}/>}>
+								<Cell before={<Icon24Send style={{ paddingTop: 0, paddingBottom: 0 }} />}>
 									<Link href={"tg://resolve?domain=" + this.state.user.telegram}>@{this.state.user.telegram}</Link>
 								</Cell>}
 							{this.state.user?.email &&
-								<Cell before={<Icon24Mention style={{paddingTop: 0, paddingBottom: 0}}/>}>
+								<Cell before={<Icon24Mention style={{ paddingTop: 0, paddingBottom: 0 }} />}>
 									<Link href={"mailto:" + this.state.user.email}>{this.state.user.email}</Link>
 								</Cell>}
 							{this.state.user?.about &&
-								<Cell multiline before={<Icon24Article style={{paddingTop: 0, paddingBottom: 0}}/>}>
+								<Cell multiline before={<Icon24Article style={{ paddingTop: 0, paddingBottom: 0 }} />}>
 									{this.state.user.about}
 								</Cell>}
 							{/* {this.state.user?.mobile &&

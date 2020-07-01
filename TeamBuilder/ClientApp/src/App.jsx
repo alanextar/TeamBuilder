@@ -6,12 +6,8 @@ import { connect } from 'react-redux';
 import '@vkontakte/vkui/dist/vkui.css';
 import { bindActionCreators } from 'redux'
 import { goBack, closeModal, setStory, setPage } from "./store/router/actions";
-import { setTeam, setTeamsTeam, setEventsTeam, setUserTeam, setUsersTeam } from "./store/teams/actions";
-import {
-	setUser, setProfile, setProfileUser, setTeamUser,
-	setEventUser, setParticipantUser
-} from "./store/user/actions";
-import { setEvent } from "./store/events/actions"
+import { setTeam } from "./store/teams/actions";
+import { setUser } from "./store/user/actions";
 import { getActivePanel } from "./services/_functions";
 
 import Icon24Done from '@vkontakte/icons/dist/24/done';
@@ -167,9 +163,7 @@ function mapDispatchToProps(dispatch) {
 	return {
 		dispatch,
 		...bindActionCreators({
-			setStory, goBack, closeModal, setProfile, setUser, setProfileUser, setPage, setEvent,
-			setEventUser, setTeamUser, setParticipantUser, setTeam, setTeamsTeam,
-			setEventsTeam, setUsersTeam, setUserTeam,
+			setStory, goBack, closeModal, setUser, setPage, setTeam
 		}, dispatch)
 	}
 }
