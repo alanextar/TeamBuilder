@@ -20,8 +20,8 @@ import UserTeams from './userTeams'
 import { Api } from '../../infrastructure/api';
 import * as Utils from '../../infrastructure/utils';
 import { getActivePanel } from "../../services/_functions";
-import { goBack, setPage, goToPage } from '../../store/router/actions';
-import { setProfileUser, setRecruitTeams } from '../../store/user/actions';
+import { goBack, goToPage } from '../../store/router/actions';
+import { setProfileUser } from '../../store/user/actions';
 import { setActiveTab } from "../../store/vk/actions";
 import SkillTokens from '../components/SkillTokens';
 
@@ -46,7 +46,7 @@ class User extends React.Component {
 
 			activeTab: props.activeTab[`user_${itemIdInitial}`] || "main",
 			readOnlyMode: !isMyProfile,
-			recruitTeams: [],
+			isRecruitTeamsExist: false,
 			loading: true
 		}
 
@@ -58,8 +58,8 @@ class User extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		if (this.props.activeTab[`user_${this.state.itemId}`] !== prevProps.activeTab[`user_${this.state.itemId}`] ) {
-			this.setState({ activeTab : this.props.activeTab[`user_${this.state.itemId}`]})
+		if (this.props.activeTab[`user_${this.state.itemId}`] !== prevProps.activeTab[`user_${this.state.itemId}`]) {
+			this.setState({ activeTab: this.props.activeTab[`user_${this.state.itemId}`] })
 		}
 	}
 
@@ -69,7 +69,7 @@ class User extends React.Component {
 	}
 
 	async fetchUserData() {
-		const { setProfileUser, setRecruitTeams } = this.props;
+		const { setProfileUser } = this.props;
 		//TODO преобразовать в один запрос типа getProfileUserWithRelation - получить профиль с командами в которые можно вербовать юзера
 		let user = await Api.Users.get(this.state.itemId);
 		this.setState({ user: user });
@@ -78,11 +78,10 @@ class User extends React.Component {
 			let updatedProfile = await Api.Users.get(this.state.profile.id);
 			setProfileUser(updatedProfile);
 
-			let needGetRecruitTeams = this.state.profileUser?.anyTeamOwner && this.state.user.isSearchable
+			let needGetRecruitTeams = updatedProfile?.anyTeamOwner && user?.isSearchable
 			if (needGetRecruitTeams) {
 				let teams = await Api.Users.getRecruitTeams(this.state.profile.id, this.state.itemId);
-				this.setState({ recruitTeams: teams });
-				setRecruitTeams(teams);
+				this.setState({ isRecruitTeamsExist: teams.length > 0 });
 			}
 		}
 		else {
@@ -114,74 +113,74 @@ class User extends React.Component {
 	}
 
 	render() {
-		const { setPage, goBack, activeView, goToPage } = this.props;
+		const { goBack, goToPage } = this.props;
 
 		return (
-			<Panel id="user">
-				<PanelHeader separator={false} left={this.props.activeStory !== 'profile' &&
-					<PanelHeaderBack onClick={() => goBack()} />}>{this.state.readOnlyMode ? 'Участник' : 'Профиль'}</PanelHeader>
-				{this.state.readOnlyMode
-					? this.state.user &&
-					<Group title="VK Connect">
-						<Link href={"https://m.vk.com/id" + this.state.user.id} target="_blank">
-							<Cell description={this.state.user.city ? this.state.user.city : ''}
-								before={this.state.user.photo100 ? <Avatar src={this.state.user.photo100} /> : null}
-								asideContent={this.state.user?.isSearchable ? <Icon28ViewOutline /> : <Icon28HideOutline />}>
-								{`${this.state.user.firstName} ${this.state.user.lastName}`}
-							</Cell>
-						</Link>
-					</Group>
-					: this.state.profile &&
-					<Group title="VK Connect">
-						<Link href={"https://m.vk.com/id" + this.state.profile.id} target="_blank">
-							<Cell description={this.state.profile.city && this.state.profile.city.title ? this.state.profile.city.title : ''}
-								before={this.state.profile.photo_200 ? <Avatar src={this.state.profile.photo_200} /> : null}
-								asideContent={this.state.user?.isSearchable ? <Icon28ViewOutline /> : <Icon28HideOutline />}>
-								{`${this.state.profile.first_name} ${this.state.profile.last_name}`}
-							</Cell>
-						</Link>
-					</Group>
-				}
-				<Separator />
-				<Tabs>
-					<TabsItem
-						onClick={() => this.setState({ activeTab: 'main' })}
-						selected={this.state.activeTab === 'main'}>
-						Основное
+				<Panel id="user">
+					<PanelHeader separator={false} left={this.props.activeStory !== 'profile' &&
+						<PanelHeaderBack onClick={() => goBack()} />}>{this.state.readOnlyMode ? 'Участник' : 'Профиль'}</PanelHeader>
+					{this.state.readOnlyMode
+						? this.state.user &&
+						<Group title="VK Connect">
+							<Link href={"https://m.vk.com/id" + this.state.user.id} target="_blank">
+								<Cell description={this.state.user.city ? this.state.user.city : ''}
+									before={this.state.user.photo100 ? <Avatar src={this.state.user.photo100} /> : null}
+									asideContent={this.state.user?.isSearchable ? <Icon28ViewOutline /> : <Icon28HideOutline />}>
+									{`${this.state.user.firstName} ${this.state.user.lastName}`}
+								</Cell>
+							</Link>
+						</Group>
+						: this.state.profile &&
+						<Group title="VK Connect">
+							<Link href={"https://m.vk.com/id" + this.state.profile.id} target="_blank">
+								<Cell description={this.state.profile.city && this.state.profile.city.title ? this.state.profile.city.title : ''}
+									before={this.state.profile.photo_200 ? <Avatar src={this.state.profile.photo_200} /> : null}
+									asideContent={this.state.user?.isSearchable ? <Icon28ViewOutline /> : <Icon28HideOutline />}>
+									{`${this.state.profile.first_name} ${this.state.profile.last_name}`}
+								</Cell>
+							</Link>
+						</Group>
+					}
+					<Separator />
+					<Tabs>
+						<TabsItem
+							onClick={() => this.setState({ activeTab: 'main' })}
+							selected={this.state.activeTab === 'main'}>
+							Основное
 						</TabsItem>
-					<TabsItem
-						onClick={() => this.setState({ activeTab: 'teams' })}
-						selected={this.state.activeTab === 'teams'}>
-						Команды
+						<TabsItem
+							onClick={() => this.setState({ activeTab: 'teams' })}
+							selected={this.state.activeTab === 'teams'}>
+							Команды
 						</TabsItem>
-				</Tabs>
-				{
-					this.state.activeTab === 'main' ?
-						<Group header={
-							<Header
-								mode="secondary"
-								aside={!this.state.readOnlyMode && this.state.user &&
-									<Icon24Write style={{ color: "#3f8ae0" }} onClick={() => goToPage('userEdit', this.state.itemId)} />
-								}>
-								Информация
+					</Tabs>
+					{
+						this.state.activeTab === 'main' ?
+							<Group header={
+								<Header
+									mode="secondary"
+									aside={!this.state.readOnlyMode && this.state.user &&
+										<Icon24Write style={{ color: "#3f8ae0" }} onClick={() => goToPage('userEdit', this.state.itemId)} />
+									}>
+									Информация
                                 </Header>}>
-							{this.state.user?.mobile &&
-								<Cell before={<Icon24Phone style={{ paddingTop: 0, paddingBottom: 0 }} />}>
-									<Link href={"tel:" + this.state.user.mobile}>{this.state.user.mobile}</Link>
-								</Cell>}
-							{this.state.user?.telegram &&
-								<Cell before={<Icon24Send style={{ paddingTop: 0, paddingBottom: 0 }} />}>
-									<Link href={"tg://resolve?domain=" + this.state.user.telegram}>@{this.state.user.telegram}</Link>
-								</Cell>}
-							{this.state.user?.email &&
-								<Cell before={<Icon24Mention style={{ paddingTop: 0, paddingBottom: 0 }} />}>
-									<Link href={"mailto:" + this.state.user.email}>{this.state.user.email}</Link>
-								</Cell>}
-							{this.state.user?.about &&
-								<Cell multiline before={<Icon24Article style={{ paddingTop: 0, paddingBottom: 0 }} />}>
-									{this.state.user.about}
-								</Cell>}
-							{/* {this.state.user?.mobile &&
+								{this.state.user?.mobile &&
+									<Cell before={<Icon24Phone style={{ paddingTop: 0, paddingBottom: 0 }} />}>
+										<Link href={"tel:" + this.state.user.mobile}>{this.state.user.mobile}</Link>
+									</Cell>}
+								{this.state.user?.telegram &&
+									<Cell before={<Icon24Send style={{ paddingTop: 0, paddingBottom: 0 }} />}>
+										<Link href={"tg://resolve?domain=" + this.state.user.telegram}>@{this.state.user.telegram}</Link>
+									</Cell>}
+								{this.state.user?.email &&
+									<Cell before={<Icon24Mention style={{ paddingTop: 0, paddingBottom: 0 }} />}>
+										<Link href={"mailto:" + this.state.user.email}>{this.state.user.email}</Link>
+									</Cell>}
+								{this.state.user?.about &&
+									<Cell multiline before={<Icon24Article style={{ paddingTop: 0, paddingBottom: 0 }} />}>
+										{this.state.user.about}
+									</Cell>}
+								{/* {this.state.user?.mobile &&
 								<Cell>
 									<InfoRow header="Телефон">
 										<Link href={"tel:" + this.state.user.mobile}>{this.state.user.mobile}</Link>
@@ -205,32 +204,32 @@ class User extends React.Component {
 										{this.state.user.about}
 									</InfoRow>
 								</Cell>} */}
-							{this.state.user?.userSkills?.length > 0 &&
-								<Cell>
-									<InfoRow header="Навыки">
-										<SkillTokens selectedSkills={Utils.convertUserSkills(this.state.user?.userSkills)} />
-									</InfoRow>
-								</Cell>}
-							<Div>
-								{!this.state.readOnlyMode && !this.props.profileUser &&
-									<Button mode="destructive" size='xl'
-										onClick={() => this.confirmUser()}>
-										Зарегистрироваться
+								{this.state.user?.userSkills?.length > 0 &&
+									<Cell>
+										<InfoRow header="Навыки">
+											<SkillTokens selectedSkills={Utils.convertUserSkills(this.state.user?.userSkills)} />
+										</InfoRow>
+									</Cell>}
+								<Div>
+									{!this.state.readOnlyMode && !this.props.profileUser &&
+										<Button mode="destructive" size='xl'
+											onClick={() => this.confirmUser()}>
+											Зарегистрироваться
 									</Button>}
-							</Div>
-						</Group> :
-						<Group>
-							<UserTeams loading={this.state.loading} userTeams={this.state.user && this.state.user.userTeams} readOnlyMode={this.state.readOnlyMode} />
-						</Group>
-				}
-				<Div>
-					{this.state.recruitTeams && this.state.recruitTeams.length > 0 && < Button mode="primary" size='xl'
-						onClick={() => setPage(activeView, 'setUserTeam')}
-					>
-						Завербовать
-                    </Button>}
-				</Div>
-			</Panel>
+								</Div>
+							</Group> :
+							<Group>
+								<UserTeams loading={this.state.loading} userTeams={this.state.user?.userTeams} readOnlyMode={this.state.readOnlyMode} />
+							</Group>
+					}
+					<Div>
+						{this.state.isRecruitTeamsExist &&
+							<Button mode="primary" size='xl'
+								onClick={() => goToPage('setUserTeam', this.state.itemId)}>
+								Завербовать
+							</Button>}
+					</Div>
+				</Panel>
 		)
 	}
 }
@@ -248,10 +247,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = {
 	goToPage,
-	setPage,
 	setProfileUser,
 	goBack,
-	setRecruitTeams,
 	setActiveTab
 };
 
