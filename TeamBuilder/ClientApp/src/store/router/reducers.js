@@ -38,6 +38,8 @@ export const routerReducer = (state = initialState, action) => {
 
 		case GO_TO_PAGE: {
 			let Panel = action.payload.panel + "_" + action.payload.itemId;
+			let View = state.activeView;
+			
 			// let ItemId = action.payload.itemId;
 
 			// let userId = state.activeUserId;
