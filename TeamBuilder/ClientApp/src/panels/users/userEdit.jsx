@@ -25,7 +25,7 @@ class UserEdit extends React.Component {
 		this.state = {
 			itemId: getActivePanel(props.activeView).itemId,
 
-			inputData: props.inputData['profile_form'] && props.inputData['profile_form'],
+			inputData: props.inputData['profile_form'],
 			allSkills: []
 		}
 
@@ -57,7 +57,7 @@ class UserEdit extends React.Component {
 	}
 
 	componentDidMount() {
-		this.fetchUser();
+		this.state.inputData || this.fetchUser();
 		this.populateSkills();
 	}
 
@@ -70,15 +70,17 @@ class UserEdit extends React.Component {
 	}
 
 	async postEdit() {
+		const { setProfileUser, goBack } = this.props;
 		let editUserViewModel = {
 			...this.state.inputData,
 			skillsIds: this.state.inputData.selectedSkills.map(s => s.id)
 		}
 		delete editUserViewModel.userSkills;
 		delete editUserViewModel.selectedSkills;
+
 		let updatedUser = await Api.Users.edit(editUserViewModel);
-		const { setProfileUser, goBack } = this.props;
 		setProfileUser(updatedUser);
+
 		goBack();
 	}
 
