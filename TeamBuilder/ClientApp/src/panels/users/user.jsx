@@ -2,15 +2,16 @@
 import { connect } from 'react-redux';
 import {
 	Panel, PanelHeader, Group, Cell, Avatar, Button, Div, PanelHeaderBack,
-	Tabs, TabsItem, Separator, Checkbox, InfoRow, Header, Title, Link, Switch
+	Tabs, TabsItem, Separator, Checkbox, InfoRow, Header, Title, Link, Switch, List
 } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
-import Icon28PhoneOutline from '@vkontakte/icons/dist/28/phone_outline';
-import Icon28ArticleOutline from '@vkontakte/icons/dist/28/article_outline';
+import Icon24Phone from '@vkontakte/icons/dist/24/phone';
+import Icon24Article from '@vkontakte/icons/dist/24/article';
 import Icon28MailOutline from '@vkontakte/icons/dist/28/mail_outline';
+import Icon24Mention from '@vkontakte/icons/dist/24/mention';
 import Icon24Write from '@vkontakte/icons/dist/24/write';
 import Icon28WriteOutline from '@vkontakte/icons/dist/28/write_outline';
-import Icon28Send from '@vkontakte/icons/dist/28/send';
+import Icon24Send from '@vkontakte/icons/dist/24/send';
 
 import Icon28ViewOutline from '@vkontakte/icons/dist/28/view_outline';
 import Icon28HideOutline from '@vkontakte/icons/dist/28/hide_outline';
@@ -150,21 +151,23 @@ class User extends React.Component {
 								}>
 								Информация
                                 </Header>}>
-							{/* <List>
-                                <Cell before={<Icon28PhoneOutline />}>
-                                    тел.: {this.state.user && <Link href={"tel:" + this.state.user.mobile}>{this.state.user.mobile}</Link>}
-                                </Cell>
-                                <Cell before={<Icon28Send />}>
-                                    telegram: {this.state.user && <Link href={"tg://resolve?domain=" + this.state.user.telegram}>{this.state.user.telegram}</Link>}
-                                </Cell>
-                                <Cell before={<Icon28MailOutline />}>
-                                    email: {this.state.user && <Link href={"mailto:" + this.state.user.email}>{this.state.user.email}</Link>}
-                                </Cell>
-                                <Cell before={<Icon28ArticleOutline />}>
-                                    дополнительно: {this.state.user && this.state.user.about}
-                                </Cell>
-                            </List> */}
 							{this.state.user?.mobile &&
+								<Cell before={<Icon24Phone style={{paddingTop: 0, paddingBottom: 0}}/>}>
+									<Link href={"tel:" + this.state.user.mobile}>{this.state.user.mobile}</Link>
+								</Cell>}
+							{this.state.user?.telegram &&
+								<Cell before={<Icon24Send style={{paddingTop: 0, paddingBottom: 0}}/>}>
+									<Link href={"tg://resolve?domain=" + this.state.user.telegram}>@{this.state.user.telegram}</Link>
+								</Cell>}
+							{this.state.user?.email &&
+								<Cell before={<Icon24Mention style={{paddingTop: 0, paddingBottom: 0}}/>}>
+									<Link href={"mailto:" + this.state.user.email}>{this.state.user.email}</Link>
+								</Cell>}
+							{this.state.user?.about &&
+								<Cell multiline before={<Icon24Article style={{paddingTop: 0, paddingBottom: 0}}/>}>
+									{this.state.user.about}
+								</Cell>}
+							{/* {this.state.user?.mobile &&
 								<Cell>
 									<InfoRow header="Телефон">
 										<Link href={"tel:" + this.state.user.mobile}>{this.state.user.mobile}</Link>
@@ -187,7 +190,7 @@ class User extends React.Component {
 									<InfoRow header="Дополнительно">
 										{this.state.user.about}
 									</InfoRow>
-								</Cell>}
+								</Cell>} */}
 							{this.state.user?.userSkills?.length > 0 &&
 								<Cell>
 									<InfoRow header="Навыки">
