@@ -69,11 +69,7 @@ const App = (props) => {
 			<Epic activeStory={activeStory} tabbar={
 				<Tabbar>
 					<TabbarItem
-						onClick={() => {
-							setStory('teams', 'teams');
-							teamUser && setUser(teamUser);
-							teamsTeam && setTeam(teamsTeam);
-						}}
+						onClick={() => setStory('teams', 'teams')}
 						selected={activeStory === 'teams'}
 						text="Команды"
 					><Icon28Users3Outline /></TabbarItem>
@@ -96,11 +92,7 @@ const App = (props) => {
 						text="События"
 					><Icon28FavoriteOutline /></TabbarItem>
 					<TabbarItem style={{ color: props.profileUser === null ? "red" : "" }}
-						onClick={() => {
-							setStory('profile', 'user');
-							setUser(profileUser);
-							userTeam && setTeam(userTeam)
-						}}
+						onClick={() => setStory('profile', 'user')}
 						selected={activeStory === 'profile'}
 						text="Профиль"
 					><Icon28Profile /></TabbarItem>

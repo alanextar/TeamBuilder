@@ -20,15 +20,15 @@ import UserTeams from './userTeams'
 import { Api } from '../../infrastructure/api';
 import * as Utils from '../../infrastructure/utils';
 import { getActivePanel } from "../../services/_functions";
-import { goBack, setPage } from '../../store/router/actions';
-import { setUser, setProfileUser, setRecruitTeams } from '../../store/user/actions';
+import { goBack, setPage, goToPage } from '../../store/router/actions';
+import { setProfileUser, setRecruitTeams } from '../../store/user/actions';
 import { setActiveTab } from "../../store/vk/actions";
 import SkillTokens from '../components/SkillTokens';
 
 
 // profile - заполняется данными из VK
-// User - заполняется данными из БД
 // profileUser - заполняется данными из БД (используется в App для определения  зарегестрирован пользователь или нет)
+// User - заполняется данными из БД (при инициализации пользователя, далее любого участика 0_о)
 
 class User extends React.Component {
 	constructor(props) {
@@ -42,10 +42,9 @@ class User extends React.Component {
 
 			profile: props.profile,
 			profileUser: props.profileUser,
-			user: props.user,
+			user: null,
 
 			activeTab: props.activeTab[`user_${itemIdInitial}`] || "main",
-			isSearchable: props.user?.isSearchable || false,
 			readOnlyMode: !isMyProfile,
 			recruitTeams: [],
 			loading: true
@@ -59,9 +58,6 @@ class User extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		if (this.props.user !== prevProps.user) {
-			this.setState({ user: this.props.user });
-		}
 		if (this.props.activeTab[`user_${this.state.itemId}`] !== prevProps.activeTab[`user_${this.state.itemId}`] ) {
 			this.setState({ activeTab : this.props.activeTab[`user_${this.state.itemId}`]})
 		}
@@ -73,11 +69,10 @@ class User extends React.Component {
 	}
 
 	async fetchUserData() {
-		const { setUser, setProfileUser, setRecruitTeams } = this.props;
+		const { setProfileUser, setRecruitTeams } = this.props;
 		//TODO преобразовать в один запрос типа getProfileUserWithRelation - получить профиль с командами в которые можно вербовать юзера
 		let user = await Api.Users.get(this.state.itemId);
 		this.setState({ user: user });
-		setUser(user);
 
 		if (this.state.readOnlyMode) {
 			let updatedProfile = await Api.Users.get(this.state.profile.id);
@@ -98,7 +93,7 @@ class User extends React.Component {
 	}
 
 	async confirmUser() {
-		const { setUser, setProfileUser } = this.props;
+		const { setProfileUser } = this.props;
 
 		if (!this.state.profile)
 			return;
@@ -113,13 +108,13 @@ class User extends React.Component {
 
 		Api.Users.saveOrConfirm(profileViewModel)
 			.then(user => {
-				setUser(user);
+				this.setState({ user: user });
 				setProfileUser(user);
 			});
 	}
 
 	render() {
-		const { setPage, goBack, activeView } = this.props;
+		const { setPage, goBack, activeView, goToPage } = this.props;
 
 		return (
 			<Panel id="user">
@@ -131,7 +126,7 @@ class User extends React.Component {
 						<Link href={"https://m.vk.com/id" + this.state.user.id} target="_blank">
 							<Cell description={this.state.user.city ? this.state.user.city : ''}
 								before={this.state.user.photo100 ? <Avatar src={this.state.user.photo100} /> : null}
-								asideContent={this.state.isSearchable ? <Icon28ViewOutline /> : <Icon28HideOutline />}>
+								asideContent={this.state.user?.isSearchable ? <Icon28ViewOutline /> : <Icon28HideOutline />}>
 								{`${this.state.user.firstName} ${this.state.user.lastName}`}
 							</Cell>
 						</Link>
@@ -141,7 +136,7 @@ class User extends React.Component {
 						<Link href={"https://m.vk.com/id" + this.state.profile.id} target="_blank">
 							<Cell description={this.state.profile.city && this.state.profile.city.title ? this.state.profile.city.title : ''}
 								before={this.state.profile.photo_200 ? <Avatar src={this.state.profile.photo_200} /> : null}
-								asideContent={this.state.isSearchable ? <Icon28ViewOutline /> : <Icon28HideOutline />}>
+								asideContent={this.state.user?.isSearchable ? <Icon28ViewOutline /> : <Icon28HideOutline />}>
 								{`${this.state.profile.first_name} ${this.state.profile.last_name}`}
 							</Cell>
 						</Link>
@@ -166,7 +161,7 @@ class User extends React.Component {
 							<Header
 								mode="secondary"
 								aside={!this.state.readOnlyMode && this.state.user &&
-									<Icon24Write style={{ color: "#3f8ae0" }} onClick={() => setPage('user', 'userEdit')} />
+									<Icon24Write style={{ color: "#3f8ae0" }} onClick={() => goToPage('userEdit', this.state.itemId)} />
 								}>
 								Информация
                                 </Header>}>
@@ -243,7 +238,6 @@ class User extends React.Component {
 const mapStateToProps = (state) => {
 
 	return {
-		user: state.user.user,
 		profileUser: state.user.profileUser,
 		profile: state.user.profile,
 		activeStory: state.router.activeStory,
@@ -253,8 +247,8 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = {
+	goToPage,
 	setPage,
-	setUser,
 	setProfileUser,
 	goBack,
 	setRecruitTeams,

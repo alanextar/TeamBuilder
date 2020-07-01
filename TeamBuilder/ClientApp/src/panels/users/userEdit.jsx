@@ -16,17 +16,16 @@ import '@vkontakte/vkui/dist/vkui.css';
 
 import { Api } from '../../infrastructure/api';
 import * as Utils from '../../infrastructure/utils';
+import { getActivePanel } from "../../services/_functions";
 
 class UserEdit extends React.Component {
 	constructor(props) {
 		super(props);
 
 		this.state = {
-			user: props.user,
-			inputData: props.inputData['profile_form'] ? props.inputData['profile_form'] : {
-				...props.user,
-				selectedSkills: Utils.convertUserSkills(props.user?.userSkills)
-			},
+			itemId: getActivePanel(props.activeView).itemId,
+
+			inputData: props.inputData['profile_form'] && props.inputData['profile_form'],
 			allSkills: []
 		}
 
@@ -40,10 +39,6 @@ class UserEdit extends React.Component {
 			this.setState({
 				inputData: {
 					...this.state.inputData,
-					[e.currentTarget.name]: value
-				},
-				user: {
-					...this.state.user,
 					[e.currentTarget.name]: value
 				}
 			})
@@ -62,6 +57,7 @@ class UserEdit extends React.Component {
 	}
 
 	componentDidMount() {
+		this.fetchUser();
 		this.populateSkills();
 	}
 
@@ -81,10 +77,21 @@ class UserEdit extends React.Component {
 		delete editUserViewModel.userSkills;
 		delete editUserViewModel.selectedSkills;
 		let updatedUser = await Api.Users.edit(editUserViewModel);
-		const { setProfileUser, setUser, goBack } = this.props;
-		setUser(updatedUser);
+		const { setProfileUser, goBack } = this.props;
 		setProfileUser(updatedUser);
 		goBack();
+	}
+
+	fetchUser() {
+		Api.Users.get(this.state.itemId)
+			.then(user => {
+				this.setState({
+					inputData: {
+						...user,
+						selectedSkills: Utils.convertUserSkills(user?.userSkills)
+					}
+				})
+			})
 	}
 
 	populateSkills() {
@@ -103,7 +110,8 @@ class UserEdit extends React.Component {
 	};
 
 	getOrEmpty = (name) => {
-		return this.state.inputData[name] ? this.state.inputData[name] : '';
+		console.log(`getOrEmpty`);
+		return this.state.inputData && this.state.inputData[name] ? this.state.inputData[name] : '';
 	}
 
 	render() {
@@ -138,7 +146,7 @@ class UserEdit extends React.Component {
 								<Switch
 									name="isSearchable"
 									onChange={this.handleInput}
-									checked={this.state.user.isSearchable} />}>
+									checked={this.getOrEmpty('isSearchable')} />}>
 								Ищу команду
                                     </Cell>
 						</Div>
@@ -156,9 +164,9 @@ class UserEdit extends React.Component {
 const mapStateToProps = (state) => {
 
 	return {
-		user: state.user.user,
 		profile: state.user.profile,
 		inputData: state.formData.forms,
+		activeView: state.router.activeView,
 	};
 };
 
