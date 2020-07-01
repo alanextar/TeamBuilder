@@ -36,6 +36,7 @@ class User extends React.Component {
 
 		let itemIdInitial = getActivePanel(props.activeView).itemId || props.profile.id;
 		let isMyProfile = itemIdInitial == props.profile.id;
+		this.bindingId = `user_${itemIdInitial}`;
 
 		this.state = {
 			itemId: itemIdInitial,
@@ -43,7 +44,7 @@ class User extends React.Component {
 			profile: props.profile,
 			user: null,
 
-			activeTab: props.activeTab[`user_${itemIdInitial}`] || "main",
+			activeTab: props.activeTab[this.bindingId] || "main",
 			readOnlyMode: !isMyProfile,
 			isRecruitTeamsExist: false,
 			loading: true
@@ -57,14 +58,14 @@ class User extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		if (this.props.activeTab[`user_${this.state.itemId}`] !== prevProps.activeTab[`user_${this.state.itemId}`]) {
-			this.setState({ activeTab: this.props.activeTab[`user_${this.state.itemId}`] })
+		if (this.props.activeTab[this.bindingId] !== prevProps.activeTab[this.bindingId]) {
+			this.setState({ activeTab: this.props.activeTab[this.bindingId] })
 		}
 	}
 
 	componentWillUnmount() {
 		const { setActiveTab } = this.props;
-		setActiveTab(`user_${this.state.itemId}`, this.state.activeTab);
+		setActiveTab(this.bindingId, this.state.activeTab);
 	}
 
 	async fetchUserData() {

@@ -1,10 +1,9 @@
 ﻿import React from 'react';
-import { Api, Urls } from '../../infrastructure/api';
+import { Api } from '../../infrastructure/api';
 
 import { connect } from 'react-redux';
-import { goBack, setPage, openPopout, closePopout, goToPage } from "../../store/router/actions";
-import { setTeam } from "../../store/teams/actions";
-import { setUser, setTeamUser, setProfileUser, addTeamToProfile } from "../../store/user/actions";
+import { goBack, openPopout, closePopout, goToPage } from "../../store/router/actions";
+import { setProfileUser, addTeamToProfile } from "../../store/user/actions";
 import { setActiveTab } from "../../store/vk/actions";
 
 import {
@@ -23,10 +22,12 @@ class TeamInfo extends React.Component {
 		super(props);
 
 		let itemIdInitial = getActivePanel(props.activeView).itemId;
+		this.bindingId = `teamInfo_${itemIdInitial}`;
+
 		this.state = {
 			itemId: itemIdInitial,
 			team: {},
-			activeTab: props.activeTab[`teamInfo_${itemIdInitial}`] || "teamDescription",
+			activeTab: props.activeTab[this.bindingId] || "teamDescription",
 			edit: true,
 			contextOpened: false,
 			vkProfile: props.profile,
@@ -57,13 +58,12 @@ class TeamInfo extends React.Component {
 
 	componentWillUnmount() {
 		const { setActiveTab } = this.props;
-		setActiveTab(`teamInfo_${this.state.itemId}`, this.state.activeTab);
+		setActiveTab(this.bindingId, this.state.activeTab);
 	}
 
 	async populateTeamData() {
-		const { setTeam } = this.props;
 		Api.Teams.get(this.state.itemId)
-			.then(result => { setTeam(result); this.setState({ team: result }) });
+			.then(result => this.setState({ team: result }) );
 	}
 
 	toggleContext() {
@@ -432,12 +432,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = {
 	goToPage,
-	setPage,
-	setTeam,
-	setUser,
 	goBack,
 	setActiveTab,
-	setTeamUser,
 	setProfileUser,
 	openPopout,
 	closePopout,
