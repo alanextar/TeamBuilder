@@ -116,7 +116,7 @@ const Teams = props => {
 										caption={team.event && team.event.name}
 										after={countConfirmed(team.userTeams) +
 											'/' + team.numberRequiredMembers}
-										onClick={() => goToPage('teaminfo', team.id)}
+										onClick={() => goToPage('teamInfo', team.id)}
 									>
 										{team.name}
 									</RichCell>

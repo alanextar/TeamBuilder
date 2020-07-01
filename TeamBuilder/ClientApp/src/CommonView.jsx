@@ -23,7 +23,7 @@ const CommonView = props => {
 	const h = React.createElement;
 
 	const panels = [
-		h(TeamInfo, { id: 'teaminfo' }),
+		h(TeamInfo, { id: 'teamInfo' }),
 		h(TeamCreate, { id: 'teamCreate' }),
 		h(TeamEdit, { id: 'teamEdit' }),
 		h(User, { id: 'user' }),

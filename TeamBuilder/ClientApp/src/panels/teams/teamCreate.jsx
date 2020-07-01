@@ -90,7 +90,7 @@ class TeamCreate extends React.Component {
 			userId: this.props.profileUser.id
 		};
 		this.props.addTeamToProfile(newUserTeam);
-		setPage('teams', 'teaminfo');
+		setPage('teams', 'teamInfo');
 	}
 
 	render() {

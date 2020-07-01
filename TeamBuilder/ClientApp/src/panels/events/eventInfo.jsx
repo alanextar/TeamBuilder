@@ -114,7 +114,7 @@ const EventInfo = props => {
                                 onClick={() => {
                                     setTeam(team);
                                     setEventsTeam(team);
-                                    setPage(activeView, 'teaminfo')
+                                    setPage(activeView, 'teamInfo')
                                 }}
                                 before={<Avatar size={48} src={team.photo100} />}>
                                 {team.name}
