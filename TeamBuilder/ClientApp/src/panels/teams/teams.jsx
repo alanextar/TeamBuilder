@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { goToPage, goBack, setPage } from '../../store/router/actions';
+import { goToPage, goBack } from '../../store/router/actions';
 import {
 	Panel, PanelHeader, Avatar, Search, PanelSpinner, RichCell, PullToRefresh,
 	PanelHeaderButton, CardGrid, Card
@@ -14,7 +14,7 @@ import Icon24Filter from '@vkontakte/icons/dist/24/filter';
 import { countConfirmed } from "../../infrastructure/utils";
 
 const Teams = props => {
-	const { goToPage, setPage } = props;
+	const { goToPage } = props;
 
 	const [isSearching, setIsSearching] = useState(false);
 	const [fetching, setFetching] = useState(false);
@@ -90,7 +90,7 @@ const Teams = props => {
 		<Panel id={props.id}>
 			{props.profileUser ?
 				<PanelHeader separator={false}
-					left={<PanelHeaderButton onClick={() => { setPage('teams', 'teamCreate'); }}>Создать</PanelHeaderButton>}>
+					left={<PanelHeaderButton onClick={() => goToPage('teamCreate') }>Создать</PanelHeaderButton>}>
 					Команды
                 </PanelHeader> :
 				<PanelHeader separator={false}>
@@ -139,7 +139,6 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = {
 	goToPage,
-	setPage,
 	goBack
 };
 

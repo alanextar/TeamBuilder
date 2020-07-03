@@ -61,6 +61,9 @@ export const routerReducer = (state = initialState, action) => {
 			window.history.pushState(null, null); // Это вопрос конечно, стоит ли это делать
 
 			let panelsHistory = state.panelsHistory[View] || [];
+			if (action.payload.rmPrevPageFromHistory) {
+				panelsHistory.pop();
+			}
 			panelsHistory = [...panelsHistory, Panel];
 
 			if (panelsHistory.length > 1) {

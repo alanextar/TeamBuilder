@@ -1,11 +1,12 @@
 import { GO_TO_PAGE, SET_PAGE, SET_STORY, GO_BACK, OPEN_POPOUT, CLOSE_POPOUT, OPEN_MODAL, CLOSE_MODAL } from './actionTypes';
 
-export const goToPage = (panel, itemId = null) => (
+export const goToPage = (panel, itemId = null, rmPrevPageFromHistory = false) => (
 	{
 		type: GO_TO_PAGE,
 		payload: {
 			panel: panel,
-			itemId: itemId
+			itemId: itemId,
+			rmPrevPageFromHistory: rmPrevPageFromHistory
 		}
 	}
 );

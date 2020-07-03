@@ -2,7 +2,7 @@
 import { Api } from '../../infrastructure/api';
 
 import { connect } from 'react-redux';
-import { goBack, setPage } from "../../store/router/actions";
+import { goBack, goToPage } from "../../store/router/actions";
 import { setTeam } from "../../store/teams/actions";
 import { setActiveTab } from "../../store/vk/actions";
 import { setFormData } from "../../store/formData/actions";
@@ -57,10 +57,11 @@ class TeamEdit extends React.Component {
 	}
 
 	componentDidMount() {
-		this.state.inputData || this.fetchTeams();
+		this.state.inputData || this.fetchTeams(); // Если есть inputData брать её, если нет - загрузить с сервера
 		this.populateEventsData();
 	}
 
+	// Для того чтобы получать актуальную inputData если редактируем эту же форму на другой story
 	componentDidUpdate(prevProps) {
 		if (this.props.inputData[this.bindingId] !== prevProps.inputData[this.bindingId]) {
 			this.setState({ inputData: this.props.inputData[this.bindingId] });
@@ -130,7 +131,7 @@ class TeamEdit extends React.Component {
 	}
 
 	render() {
-		const { goBack, setPage, activeView } = this.props;
+		const { goToPage, activeView } = this.props;
 		var inputData = this.state.inputData;
 
 		return (
@@ -163,7 +164,7 @@ class TeamEdit extends React.Component {
 									onChange={this.handleInput}
 									name="eventId"
 									value={inputData.eventId}
-									bottom={<Link style={{ color: 'rebeccapurple', textAlign: "right" }} onClick={() => setPage(activeView, 'eventCreate')}>Создать событие</Link>}>
+									bottom={<Link style={{ color: 'rebeccapurple', textAlign: "right" }} onClick={() => goToPage('eventCreate')}>Создать событие</Link>}>
 									{this.state.events && this.state.events.map((ev, i) => {
 										return (
 											<option value={ev.id} key={i}>
@@ -248,7 +249,7 @@ const mapStateToProps = (state) => {
 
 
 const mapDispatchToProps = {
-	setPage,
+	goToPage,
 	setTeam,
 	goBack,
 	setActiveTab,
