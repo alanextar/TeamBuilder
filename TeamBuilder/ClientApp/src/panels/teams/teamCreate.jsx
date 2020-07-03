@@ -85,7 +85,7 @@ class TeamCreate extends React.Component {
 
 	async getAllEvents() {
 		Api.Events.getAll()
-			.then(result => this.setState({ events: result, }));
+			.then(result => this.setState({ events: result }));
 	}
 
 	async postCreate() {
@@ -102,6 +102,9 @@ class TeamCreate extends React.Component {
 			userId: this.props.profileUser.id
 		};
 		this.props.addTeamToProfile(newUserTeam);
+		this.setState({
+			inputData: null
+		})
 		this.props.goToPage('teamInfo', result.id, true);
 	}
 
