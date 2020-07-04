@@ -5,7 +5,7 @@ import { bindActionCreators } from "redux";
 
 import { goBack } from "../../store/router/actions";
 import { setFormData } from "../../store/formData/actions";
-import { setUser, setProfileUser } from "../../store/user/actions";
+import { setProfileUser } from "../../store/user/actions";
 
 import {
 	Panel, PanelHeader, Group, Cell, Avatar, Button, Div, Input, Title,
@@ -116,7 +116,6 @@ class UserEdit extends React.Component {
 	};
 
 	getOrEmpty = (name) => {
-		console.log(`getOrEmpty`);
 		return this.state.inputData && this.state.inputData[name] ? this.state.inputData[name] : '';
 	}
 
@@ -179,7 +178,7 @@ const mapStateToProps = (state) => {
 function mapDispatchToProps(dispatch) {
 	return {
 		dispatch,
-		...bindActionCreators({ goBack, setUser, setProfileUser, setFormData }, dispatch)
+		...bindActionCreators({ goBack, setProfileUser, setFormData }, dispatch)
 	}
 }
 

@@ -6,8 +6,6 @@ import { connect } from 'react-redux';
 import '@vkontakte/vkui/dist/vkui.css';
 import { bindActionCreators } from 'redux'
 import { goBack, closeModal, setStory } from "./store/router/actions";
-import { setTeam } from "./store/teams/actions";
-import { setUser } from "./store/user/actions";
 import { getActivePanel } from "./services/_functions";
 
 import Icon24Done from '@vkontakte/icons/dist/24/done';
@@ -31,10 +29,7 @@ const App = (props) => {
 	const [history, setHistory] = useState(null);
 	const [popout, setPopout] = useState(null);
 
-	const { setStory, activeView, activeStory, setUser,
-		profileUser, eventUser,
-		eventsTeam, setTeam, colorScheme
-	} = props;
+	const { setStory, activeView, activeStory, profileUser, colorScheme	} = props;
 
 	const [activeModal, setActiveModal] = useState(null);
 
@@ -79,18 +74,15 @@ const App = (props) => {
 						text="Участники"
 					><Icon28Users /></TabbarItem>
 					<TabbarItem
-						onClick={() => {
-							setStory('events', 'events');
-							eventUser && setUser(eventUser);
-							eventsTeam && setTeam(eventsTeam);
-						}}
+						onClick={() => setStory('events', 'events')}
 						selected={activeStory === 'events'}
 						text="События"
 					><Icon28FavoriteOutline /></TabbarItem>
-					<TabbarItem style={{ color: profileUser === null ? "red" : "" }}
+					<TabbarItem
 						onClick={() => setStory('profile', 'user')}
 						selected={activeStory === 'profile'}
 						text="Профиль"
+						style={{ color: profileUser === null ? "red" : "" }}
 					><Icon28Profile /></TabbarItem>
 				</Tabbar>
 			}>
@@ -143,7 +135,7 @@ function mapDispatchToProps(dispatch) {
 	return {
 		dispatch,
 		...bindActionCreators({
-			setStory, goBack, closeModal, setUser, setTeam
+			setStory, goBack, closeModal
 		}, dispatch)
 	}
 }

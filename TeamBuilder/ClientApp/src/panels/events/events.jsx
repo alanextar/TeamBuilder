@@ -10,18 +10,17 @@ import { Api, Urls } from '../../infrastructure/api';
 
 import SearchWithInfiniteScroll from '../components/SearchWithInfiniteScroll';
 
-import { setPage } from '../../store/router/actions';
-import { setEvent } from "../../store/events/actions";
+import { goToPage } from '../../store/router/actions';
 
 const Events = props => {
-	const { setPage, setEvent } = props;
+	const { goToPage } = props;
 
 	const renderHeader = (
 		props.profileUser
 			?
 			<PanelHeader
 				separator={false}
-				left={<PanelHeaderButton onClick={() => { setPage('events', 'eventCreate'); }}>Создать</PanelHeaderButton>}>
+				left={<PanelHeaderButton onClick={() => goToPage('eventCreate')}>Создать</PanelHeaderButton>}>
 				События
 					</PanelHeader>
 			:
@@ -34,13 +33,12 @@ const Events = props => {
 	const renderItems = items => {
 		return (
 			<CardGrid>
-				{items && items.map(event => (
+				{items?.map(event => (
 					<Card size="l" mode="shadow" key={event.id}>
 						<RichCell
-							bottom={`Участвуют ${event.teams && event.teams.length} команд`}
+							bottom={`Участвуют ${event.teams?.length} команд`}
 							caption={`${event.startDate} - ${event.startDate}`}
-							onClick={() => { setPage('events', 'eventInfo'); setEvent(event) }}
-						>
+							onClick={() => goToPage('eventInfo', event.id)}>
 							{event.name}
 						</RichCell>
 					</Card>
@@ -69,8 +67,7 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = {
-	setPage,
-	setEvent
+	goToPage
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(Events);

@@ -50,12 +50,6 @@ class TeamInfo extends React.Component {
 		this.populateTeamData();
 	}
 
-	componentDidUpdate(prevProps) {
-		if (this.props.activeTeam !== prevProps.activeTeam) {
-			this.setState({ team: this.props.activeTeam });
-		}
-	}
-
 	componentWillUnmount() {
 		const { setActiveTab } = this.props;
 		setActiveTab(this.bindingId, this.state.activeTab);
@@ -366,9 +360,9 @@ class TeamInfo extends React.Component {
 											{this.state.team.description}
 										</InfoRow>
 									</SimpleCell>
-									<SimpleCell>
+									<SimpleCell expandable onClick={() => goToPage('eventInfo', this.state.team.event?.id)}>
 										<InfoRow header='Участвуем в '>
-											{this.state.team.event && this.state.team.event.name}
+											{this.state.team.event?.name}
 										</InfoRow>
 									</SimpleCell>
 								</Cell>
@@ -422,7 +416,6 @@ class TeamInfo extends React.Component {
 
 const mapStateToProps = (state) => {
 	return {
-		activeTeam: state.team.activeTeam,
 		activeView: state.router.activeView,
 		profile: state.user.profile,
 		profileUser: state.user.profileUser,

@@ -89,6 +89,8 @@ class TeamCreate extends React.Component {
 	}
 
 	async postCreate() {
+		if (!this.state.inputData?.name)
+			return;
 		let createTeamViewModel = {
 			...this.state.inputData,
 			photo100: GetRandomPic()
@@ -179,10 +181,7 @@ class TeamCreate extends React.Component {
 					<Div>
 						<Button
 							stretched={true}
-							onClick={(e) => {
-								inputData && inputData.name &&
-									this.postCreate();
-							}}>
+							onClick={() => this.postCreate()}>
 							Создать Команду
                             </Button>
 					</Div>
