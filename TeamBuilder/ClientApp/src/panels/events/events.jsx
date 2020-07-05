@@ -1,16 +1,17 @@
 ﻿import React from 'react';
 import { connect } from 'react-redux';
 
+import { goToPage } from '../../store/router/actions';
+
 import {
 	Panel, PanelHeader, RichCell,
 	PanelHeaderButton, CardGrid, Card
 } from '@vkontakte/vkui';
 
 import { Api, Urls } from '../../infrastructure/api';
+import { renderEventDate } from "../../infrastructure/utils";
 
 import SearchWithInfiniteScroll from '../components/SearchWithInfiniteScroll';
-
-import { goToPage } from '../../store/router/actions';
 
 const Events = props => {
 	const { goToPage } = props;
@@ -27,8 +28,7 @@ const Events = props => {
 			<PanelHeader separator={false}>
 				События
 					</PanelHeader>
-	);
-
+	)
 
 	const renderItems = items => {
 		return (
@@ -37,7 +37,7 @@ const Events = props => {
 					<Card size="l" mode="shadow" key={event.id}>
 						<RichCell
 							bottom={`Участвуют ${event.teams?.length} команд`}
-							caption={`${event.startDate} - ${event.startDate}`}
+							caption={renderEventDate(event)}
 							onClick={() => goToPage('eventInfo', event.id)}>
 							{event.name}
 						</RichCell>

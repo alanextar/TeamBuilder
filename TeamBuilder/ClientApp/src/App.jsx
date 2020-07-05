@@ -17,7 +17,7 @@ import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 
 import Events from './panels/events/events'
 import Teams from './panels/teams/teams'
-import EventsFilter from './panels/teams/eventsFilter'
+import EventsListToFilter from './panels/events/eventsListToFilter'
 import TeamsFilters from './panels/teams/teamsFilters'
 import Users from './panels/users/users'
 import User from './panels/users/user'
@@ -91,7 +91,7 @@ const App = (props) => {
 						history={history}
 						modal={<TeamsFilters activeModal={activeModal} setActiveModal={setActiveModal} />}>
 						<Teams id='teams' onFiltersClick={() => setActiveModal('filters')} />
-						<EventsFilter id='eventsFilter' openFilter={() => setActiveModal('filters')} />
+						<EventsListToFilter id='eventsListToFilter' openFilter={() => setActiveModal('filters')} />
 					</CommonView>
 				</Root>
 				<Root id="users" activeView={activeView} popout={popout}>

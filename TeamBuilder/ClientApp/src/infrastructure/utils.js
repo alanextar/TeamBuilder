@@ -1,5 +1,5 @@
 export function countConfirmed(userTeams) {
-	var count = userTeams ? userTeams.filter(x => x.userAction === 2 || x.isOwner).length : 0;
+	let count = userTeams ? userTeams.filter(x => x.userAction === 2 || x.isOwner).length : 0;
 	return count;
 };
 
@@ -32,7 +32,7 @@ export function countForeignActiveTeams(userTeams) {
 };
 
 export function countActiveUserTeams(userTeams, activeActions) {
-	var count = !userTeams
+	let count = !userTeams
 		? 0
 		: userTeams
 			.filter(x => 
@@ -41,6 +41,21 @@ export function countActiveUserTeams(userTeams, activeActions) {
 			.length;
 	return count;
 };
+
+export function renderEventDate(event) {
+	const startDate = event.startDate;
+	const finishDate = event.finishDate;
+
+	if (startDate && finishDate) {
+		return `${startDate} - ${finishDate}`
+	}
+	if (startDate && !finishDate) {
+		return `c ${startDate}`
+	}
+	if (!startDate && finishDate) {
+		return `по ${finishDate}`
+	}
+}
 
 export function GetRandomPic() {
 	let url = ``;

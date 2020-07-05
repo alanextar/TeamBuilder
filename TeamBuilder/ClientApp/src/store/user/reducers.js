@@ -1,8 +1,8 @@
 import { SET_PROFILE, SET_PROFILE_USER, ADD_TEAM_TO_PROFILE } from './actionTypes';
 
 const initialState = {
-	profile: null,
-	profileUser: null
+	profile: undefined,
+	profileUser: undefined
 };
 
 export const userReducer = (state = initialState, action) => {

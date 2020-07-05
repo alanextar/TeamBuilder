@@ -18,7 +18,7 @@ class TeamFilters extends React.Component {
 	}
 
 	chooseEvent = () => {
-		this.props.goToPage('eventsFilter');
+		this.props.goToPage('eventsListToFilter');
 		this.hideModal();
 	}
 
