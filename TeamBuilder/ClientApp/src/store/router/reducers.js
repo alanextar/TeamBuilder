@@ -39,24 +39,6 @@ export const routerReducer = (state = initialState, action) => {
 		case GO_TO_PAGE: {
 			let Panel = action.payload.panel + "_" + action.payload.itemId;
 			let View = state.activeView;
-			
-			// let ItemId = action.payload.itemId;
-
-			// let userId = state.activeUserId;
-			// let teamId = state.activeTeamId;
-			// let eventId = state.activeEventsId;
-
-			// if (ItemId) {
-			// 	if (Panel = 'user') {
-			// 		userId = ItemId;
-			// 	}
-			// 	if (Panel = 'teaminfo') {
-			// 		teamId = ItemId
-			// 	}
-			// 	if (Panel = 'eventinfo') {
-			// 		eventId = ItemId
-			// 	}
-			// }
 
 			window.history.pushState(null, null); // Это вопрос конечно, стоит ли это делать
 
@@ -74,10 +56,6 @@ export const routerReducer = (state = initialState, action) => {
 				...state,
 				activePanel: Panel,
 
-				// activeUserId: userId,
-				// activeTeamId: teamId,
-				// activeEventsId: eventId,
-
 				panelsHistory: {
 					...state.panelsHistory,
 					[View]: panelsHistory,
@@ -90,6 +68,7 @@ export const routerReducer = (state = initialState, action) => {
 			};
 		}
 
+		//TODO Obsolete
 		case SET_PAGE: {
 			let View = action.payload.view;
 			let Panel = action.payload.panel;

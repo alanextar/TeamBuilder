@@ -1,6 +1,6 @@
 ﻿import React from 'react';
 import { connect } from 'react-redux';
-import { setPage } from "../../store/router/actions";
+import { goToPage } from "../../store/router/actions";
 import { setTeamsEventFilter } from "../../store/events/actions";
 
 import {
@@ -18,7 +18,7 @@ class TeamFilters extends React.Component {
 	}
 
 	chooseEvent = () => {
-		this.props.setPage('teams', 'eventsFilter');
+		this.props.goToPage('eventsFilter');
 		this.hideModal();
 	}
 
@@ -42,7 +42,7 @@ class TeamFilters extends React.Component {
 					<FormLayout>
 						<SelectMimicry top="События" placeholder="Не выбрано"
 							onClick={() => this.chooseEvent()}>
-							{this.props.teamsEventFilter && this.props.teamsEventFilter.name}
+							{this.props.teamsEventFilter?.name}
 						</SelectMimicry>
 					</FormLayout>
 				</ModalPage>
@@ -59,7 +59,7 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = {
-	setPage,
+	goToPage,
 	setTeamsEventFilter
 }
 

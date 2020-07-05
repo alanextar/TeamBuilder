@@ -21,6 +21,7 @@ export const setStory = (story, initial_panel) => (
 	}
 );
 
+//TODO Obsolete
 export const setPage = (view, panel) => {
 	return {
 		type: SET_PAGE,
