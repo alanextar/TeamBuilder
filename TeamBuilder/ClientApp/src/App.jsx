@@ -124,9 +124,7 @@ const mapStateToProps = (state) => {
 		activeModals: state.router.activeModals,
 		colorScheme: state.vkui.colorScheme,
 		profile: state.user.profile,
-		profileUser: state.user.profileUser,
-		eventUser: state.user.eventUser,
-		eventsTeam: state.team.eventsTeam
+		profileUser: state.user.profileUser
 	};
 };
 

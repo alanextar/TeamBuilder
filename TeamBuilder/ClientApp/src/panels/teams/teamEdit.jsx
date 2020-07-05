@@ -3,7 +3,6 @@ import { Api } from '../../infrastructure/api';
 
 import { connect } from 'react-redux';
 import { goBack, goToPage } from "../../store/router/actions";
-import { setTeam } from "../../store/teams/actions";
 import { setActiveTab } from "../../store/vk/actions";
 import { setFormData } from "../../store/formData/actions";
 import { setProfileUser } from "../../store/user/actions";
@@ -126,8 +125,7 @@ class TeamEdit extends React.Component {
 	};
 
 	updateTeam(newTeam) {
-		const { setTeam } = this.props;
-		setTeam(newTeam);
+		this.setState({ inputData: newTeam })
 	}
 
 	render() {
@@ -165,9 +163,9 @@ class TeamEdit extends React.Component {
 									name="eventId"
 									value={inputData.eventId}
 									bottom={<Link style={{ color: 'rebeccapurple', textAlign: "right" }} onClick={() => goToPage('eventCreate')}>Создать событие</Link>}>
-									{this.state.events && this.state.events.map((ev, i) => {
+									{this.state.events?.map(ev => {
 										return (
-											<option value={ev.id} key={i}>
+											<option value={ev.id} key={ev.id}>
 												{ev.name}
 											</option>
 										)
@@ -192,8 +190,7 @@ class TeamEdit extends React.Component {
 								</Group>
 								<Group>
 									<Header mode="secondary">Участники</Header>
-									{inputData.userTeams &&
-										inputData.userTeams.map(userTeam => {
+									{inputData.userTeams?.map(userTeam => {
 											return (
 												(userTeam.userAction === 1 || userTeam.userAction === 2 || userTeam.userAction === 5) &&
 												<RichCell key={userTeam.userId}
@@ -250,7 +247,6 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = {
 	goToPage,
-	setTeam,
 	goBack,
 	setActiveTab,
 	setFormData,
