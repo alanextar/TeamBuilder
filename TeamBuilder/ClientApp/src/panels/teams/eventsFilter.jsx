@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from "redux";
 
 import { goBack } from '../../store/router/actions';
-import { setEvent, setTeamsEventFilter } from "../../store/events/actions";
+import { setTeamsEventFilter } from "../../store/events/actions";
 
 import useDebounce from '../../infrastructure/use-debounce';
 import {
