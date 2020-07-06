@@ -5,10 +5,9 @@ import '@vkontakte/vkui/dist/vkui.css';
 import React from 'react';
 import { connect } from 'react-redux';
 import { Api } from '../../infrastructure/api';
-import { countActiveUserTeams } from '../../infrastructure/utils';
-import { closePopout, openPopout, setPage } from '../../store/router/actions';
-import { setTeam, setUserTeam } from '../../store/teams/actions';
-import { setProfileUser, setUser } from '../../store/user/actions';
+import { countMyActiveTeams, countForeignActiveTeams } from '../../infrastructure/utils';
+import { goToPage, closePopout, openPopout } from '../../store/router/actions';
+import { setProfileUser } from '../../store/user/actions';
 
 class UserTeams extends React.Component {
 	constructor(props) {
@@ -48,7 +47,6 @@ class UserTeams extends React.Component {
 			userTeams: userTeams
 		});
 		this.setState({ userTeams: userTeams });
-		this.props.setUser(this.props.profileUser)
 	};
 
 	openPopoutExit = (e, teamId) => {
@@ -121,65 +119,67 @@ class UserTeams extends React.Component {
 	};
 
 	render() {
-		const { setPage, setTeam, activeView, setUserTeam } = this.props;
-		let isTeamsExists = countActiveUserTeams(this.props.userTeams);
+		const { goToPage } = this.props;
+		let isTeamsExistsForProfile = countMyActiveTeams(this.props.userTeams) !== 0;
+		let isTeamsExistsForUser = countForeignActiveTeams(this.props.userTeams) !== 0;
 		const loader = <PanelSpinner key={0} size="large" />
 
 		return (
 			this.props.loading ? loader :
-			<Group>
-				{!isTeamsExists && !this.props.readOnlyMode &&
-					<Placeholder header="Вступайте в команду">
-						Или создайте свою и пригласите других участников. Здесь можно будет принять
-						приглашение от команд или отозвать заявку.
-                </Placeholder>}
-				{!isTeamsExists && this.props.readOnlyMode &&
-					<Placeholder header="Нет команд">
-						Пользователь пока не состоит ни в одной из команд. Вы можете отправить ему приглашение, чтобы он присоединился к вам.
-                </Placeholder>}
-				<List>
-					<CardGrid>
-						{
-							this.props.userTeams &&
-							this.props.userTeams.map(userTeam => {
-								return (
-									<Card key={userTeam.teamId} size="l" mode="shadow">
-										<RichCell key={userTeam.teamId}
-											text={userTeam?.team?.description}
-											caption={"Событие: " + (userTeam?.team?.event ? userTeam.team.event.name : '')}
-											after={userTeam.userAction === 2 ? < Icon28CheckCircleOutline /> :
-												(userTeam.userAction === 1 && <Icon28InfoOutline />)}
-											onClick={() => { setTeam(userTeam.team); setUserTeam(userTeam.team); setPage(activeView, 'teaminfo') }}
-											actions={!this.props.readOnlyMode && (userTeam.userAction === 5 ?
-												<React.Fragment>
-													<Button onClick={(e) => this.handleJoin(e, userTeam.teamId)}>Принять</Button>
-													<Button onClick={(e) => this.openPopoutDecline(e, userTeam.teamId)}
-														mode="secondary">Отклонить</Button>
-												</React.Fragment> :
-												((userTeam.userAction === 2 || userTeam.userAction === 1 && !userTeam.isOwner) && <React.Fragment>
-													{
-														userTeam.userAction === 2
-															?
-															<Button onClick={(e) => this.openPopoutExit(e, userTeam.teamId)} mode="secondary">
-																Выйти
+				<Group>
+					{!isTeamsExistsForProfile && !this.props.readOnlyMode &&
+						<Placeholder header="Вступайте в команду">
+							Или создайте свою и пригласите других участников. Здесь можно будет принять
+							приглашение от команд или отозвать заявку.
+							</Placeholder>}
+					{!isTeamsExistsForUser && this.props.readOnlyMode &&
+						<Placeholder header="Нет команд">
+							Пользователь пока не состоит ни в одной из команд. Вы можете отправить ему приглашение, чтобы он присоединился к вам.
+							</Placeholder>}
+					<List>
+						<CardGrid>
+							{
+								this.props.userTeams?.map(userTeam => {
+									if (this.props.readOnlyMode && userTeam.userAction !== 2 && !userTeam.isOwner)
+										return;
+									return (
+										<Card key={userTeam.teamId} size="l" mode="shadow">
+											<RichCell key={userTeam.teamId}
+												text={userTeam?.team?.description}
+												caption={"Событие: " + (userTeam?.team?.event ? userTeam.team.event.name : '')}
+												after={userTeam.userAction === 2 ? < Icon28CheckCircleOutline /> :
+													(userTeam.userAction === 1 && <Icon28InfoOutline />)}
+												onClick={() => { goToPage('teamInfo', userTeam.teamId) }}
+												actions={!this.props.readOnlyMode && (userTeam.userAction === 5 ?
+													<React.Fragment>
+														<Button onClick={(e) => this.handleJoin(e, userTeam.teamId)}>Принять</Button>
+														<Button onClick={(e) => this.openPopoutDecline(e, userTeam.teamId)}
+															mode="secondary">Отклонить</Button>
+													</React.Fragment> :
+													((userTeam.userAction === 2 || userTeam.userAction === 1 && !userTeam.isOwner) && <React.Fragment>
+														{
+															userTeam.userAction === 2
+																?
+																<Button onClick={(e) => this.openPopoutExit(e, userTeam.teamId)} mode="secondary">
+																	Выйти
                                                         </Button>
-															:
-															(userTeam.userAction === 1 ?
-																<Button onClick={(e) => this.openPopoutAbort(e, userTeam.teamId)} mode="secondary">
-																	Отозвать заявку
+																:
+																(userTeam.userAction === 1 ?
+																	<Button onClick={(e) => this.openPopoutAbort(e, userTeam.teamId)} mode="secondary">
+																		Отозвать заявку
                                                     </Button> : '')
-													}
-												</React.Fragment>
-												))}>
-											{userTeam.team.name}
-										</RichCell>
-									</Card>
-								)
-							})
-						}
-					</CardGrid>
-				</List>
-			</Group>
+														}
+													</React.Fragment>
+													))}>
+												{userTeam.team.name}
+											</RichCell>
+										</Card>
+									)
+								})
+							}
+						</CardGrid>
+					</List>
+				</Group>
 		)
 	}
 
@@ -194,13 +194,10 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = {
-	setPage,
-	setTeam,
-	setUserTeam,
+	goToPage,
 	openPopout,
 	closePopout,
-	setProfileUser,
-	setUser
+	setProfileUser
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(UserTeams);

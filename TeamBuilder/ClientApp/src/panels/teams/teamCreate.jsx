@@ -1,9 +1,7 @@
 ﻿import React from 'react';
 
 import { connect } from 'react-redux';
-import { bindActionCreators } from "redux";
-import { goBack, setPage } from "../../store/router/actions";
-import { setTeam } from "../../store/teams/actions";
+import { goBack, goToPage } from "../../store/router/actions";
 import { setActiveTab } from "../../store/vk/actions";
 import { setFormData } from "../../store/formData/actions";
 
@@ -13,24 +11,26 @@ import {
 } from '@vkontakte/vkui';
 import { Api } from '../../infrastructure/api';
 import { GetRandomPic } from '../../infrastructure/utils';
-import { setProfileUser, addTeamToProfile } from '../../store/user/actions';
+import { addTeamToProfile } from '../../store/user/actions';
 
 class TeamCreate extends React.Component {
 	constructor(props) {
 		super(props);
 
-		let defaultInputData = {
+		this.defaultInputData = {
 			name: '',
 			eventId: null,
 			numberRequiredMembers: 2,
 			descriptionRequiredMembers: ''
 		};
 
+		this.bindingId = 'teamCreate';
+
 		this.state = {
 			events: [],
 			id: props.id,
-			activeTab: props.activeTab["teamCreate"] || "teamDescription",
-			inputData: props.inputData['teamCreate'] || defaultInputData
+			activeTab: props.activeTab[this.bindingId] || "teamDescription",
+			inputData: props.inputData[this.bindingId] || this.defaultInputData
 		};
 
 		this.handleInput = (e) => {
@@ -60,41 +60,58 @@ class TeamCreate extends React.Component {
 	}
 
 	componentDidMount() {
-		this.populateTeamData();
+		this.getAllEvents();
+	}
+
+	// Для того чтобы получать актуальную inputData\activeTab если редактируем эту же форму на другой story
+	componentDidUpdate(prevProps) {
+		if (this.props.inputData[this.bindingId] !== prevProps.inputData[this.bindingId]) {
+			this.setState({
+				inputData: this.props.inputData[this.bindingId] || this.defaultInputData
+			});
+		}
+		if (this.props.activeTab[this.bindingId] !== prevProps.activeTab[this.bindingId]) {
+			this.setState({
+				activeTab: this.props.activeTab[this.bindingId] || "teamDescription"
+			});
+		}
 	}
 
 	componentWillUnmount() {
 		const { setActiveTab, setFormData } = this.props;
-		setActiveTab("teamCreate", this.state.activeTab);
-		setFormData('teamCreate', this.state.inputData);
+		setActiveTab(this.bindingId, this.state.activeTab);
+		setFormData(this.bindingId, this.state.inputData);
 	}
 
-	async populateTeamData() {
+	async getAllEvents() {
 		Api.Events.getAll()
-			.then(result => this.setState({ events: result, }));
+			.then(result => this.setState({ events: result }));
 	}
 
 	async postCreate() {
-		const { setTeam, setPage } = this.props;
+		if (!this.state.inputData?.name)
+			return;
 		let createTeamViewModel = {
 			...this.state.inputData,
 			photo100: GetRandomPic()
 		}
 		let result = await Api.Teams.create(createTeamViewModel)
-		setTeam(result);
 		let newUserTeam = {
 			isOwner: true,
 			team: result,
 			teamId: result.id,
-			userAction: 0,
+			userAction: 2,
 			userId: this.props.profileUser.id
 		};
 		this.props.addTeamToProfile(newUserTeam);
-		setPage('teams', 'teaminfo');
+		this.setState({
+			inputData: null
+		})
+		this.props.goToPage('teamInfo', result.id, true);
 	}
 
 	render() {
-		const { setPage, activeView } = this.props;
+		const { goToPage } = this.props;
 		var inputData = this.state.inputData;
 
 		return (
@@ -133,10 +150,10 @@ class TeamCreate extends React.Component {
 								top="Выберете событие"
 								placeholder="Событие"
 								onChange={this.handleInput}
-								value={inputData && inputData.eventId && inputData.eventId}
+								value={inputData?.eventId || ''}
 								name="eventId"
-								bottom={<Link style={{ color: 'rebeccapurple', textAlign: "right" }} onClick={() => setPage(activeView, 'eventCreate')}>Создать событие</Link>}>>
-                                {this.state.events && this.state.events.map((ev, i) => {
+								bottom={<Link style={{ color: 'rebeccapurple', textAlign: "right" }} onClick={() => goToPage('eventCreate')}>Создать событие</Link>}>>
+                                {this.state.events?.map((ev, i) => {
 									return (
 										<option value={ev.id} key={i}>
 											{ev.name}
@@ -164,10 +181,7 @@ class TeamCreate extends React.Component {
 					<Div>
 						<Button
 							stretched={true}
-							onClick={(e) => {
-								inputData && inputData.name &&
-									this.postCreate();
-							}}>
+							onClick={() => this.postCreate()}>
 							Создать Команду
                             </Button>
 					</Div>
@@ -181,7 +195,6 @@ class TeamCreate extends React.Component {
 
 const mapStateToProps = (state) => {
 	return {
-		activeView: state.router.activeView,
 		activeTab: state.vkui.activeTab,
 		inputData: state.formData.forms,
 		profileUser: state.user.profileUser
@@ -189,12 +202,10 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = {
-	setPage,
+	goToPage,
 	goBack,
-	setTeam,
 	setActiveTab,
 	setFormData,
-	setProfileUser,
 	addTeamToProfile
 }
 

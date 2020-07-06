@@ -5,7 +5,7 @@ import { bindActionCreators } from "redux";
 
 import { goBack } from "../../store/router/actions";
 import { setFormData } from "../../store/formData/actions";
-import { setUser, setProfileUser } from "../../store/user/actions";
+import { setProfileUser } from "../../store/user/actions";
 
 import {
 	Panel, PanelHeader, Group, Cell, Avatar, Button, Div, Input, Title,
@@ -21,12 +21,9 @@ class UserEdit extends React.Component {
 	constructor(props) {
 		super(props);
 
+		this.bindingId = `profile`;
 		this.state = {
-			user: props.user,
-			inputData: props.inputData['profile_form'] ? props.inputData['profile_form'] : {
-				...props.user,
-				selectedSkills: Utils.convertUserSkills(props.user?.userSkills)
-			},
+			inputData: props.inputData[this.bindingId],
 			allSkills: []
 		}
 
@@ -40,10 +37,6 @@ class UserEdit extends React.Component {
 			this.setState({
 				inputData: {
 					...this.state.inputData,
-					[e.currentTarget.name]: value
-				},
-				user: {
-					...this.state.user,
 					[e.currentTarget.name]: value
 				}
 			})
@@ -62,11 +55,18 @@ class UserEdit extends React.Component {
 	}
 
 	componentDidMount() {
+		this.state.inputData || this.fetchUser();
 		this.populateSkills();
 	}
 
+	componentDidUpdate(prevProps) {
+		if (this.props.inputData[this.bindingId] !== prevProps.inputData[this.bindingId]) {
+			this.setState({ inputData: this.props.inputData[this.bindingId] });
+		}
+	}
+
 	componentWillUnmount() {
-		this.props.setFormData('profile_form', this.state.inputData);
+		this.props.setFormData(this.bindingId, this.state.inputData);
 	}
 
 	shouldComponentUpdate(nextProps, nextState) {
@@ -74,17 +74,30 @@ class UserEdit extends React.Component {
 	}
 
 	async postEdit() {
+		const { setProfileUser, goBack } = this.props;
 		let editUserViewModel = {
 			...this.state.inputData,
 			skillsIds: this.state.inputData.selectedSkills.map(s => s.id)
 		}
 		delete editUserViewModel.userSkills;
 		delete editUserViewModel.selectedSkills;
+
 		let updatedUser = await Api.Users.edit(editUserViewModel);
-		const { setProfileUser, setUser, goBack } = this.props;
-		setUser(updatedUser);
 		setProfileUser(updatedUser);
+
 		goBack();
+	}
+
+	fetchUser() {
+		Api.Users.get(this.props.profile.id)
+			.then(user => {
+				this.setState({
+					inputData: {
+						...user,
+						selectedSkills: Utils.convertUserSkills(user?.userSkills)
+					}
+				})
+			})
 	}
 
 	populateSkills() {
@@ -103,12 +116,12 @@ class UserEdit extends React.Component {
 	};
 
 	getOrEmpty = (name) => {
-		return this.state.inputData[name] ? this.state.inputData[name] : '';
+		return this.state.inputData && this.state.inputData[name] ? this.state.inputData[name] : '';
 	}
 
 	render() {
 		return (
-			<Panel id="userEdit">
+			<Panel id={this.props.id}>
 				<PanelHeader left={<PanelHeaderBack onClick={() => this.cancelForm()} />}>Профиль</PanelHeader>
 				{this.props.profile &&
 					<Group title="VK Connect">
@@ -138,7 +151,7 @@ class UserEdit extends React.Component {
 								<Switch
 									name="isSearchable"
 									onChange={this.handleInput}
-									checked={this.state.user.isSearchable} />}>
+									checked={this.getOrEmpty('isSearchable')} />}>
 								Ищу команду
                                     </Cell>
 						</Div>
@@ -156,16 +169,16 @@ class UserEdit extends React.Component {
 const mapStateToProps = (state) => {
 
 	return {
-		user: state.user.user,
 		profile: state.user.profile,
 		inputData: state.formData.forms,
+		activeView: state.router.activeView,
 	};
 };
 
 function mapDispatchToProps(dispatch) {
 	return {
 		dispatch,
-		...bindActionCreators({ goBack, setUser, setProfileUser, setFormData }, dispatch)
+		...bindActionCreators({ goBack, setProfileUser, setFormData }, dispatch)
 	}
 }
 

@@ -1,5 +1,5 @@
 export function countConfirmed(userTeams) {
-	var count = userTeams ? userTeams.filter(x => x.userAction === 2 || x.isOwner).length : 0;
+	let count = userTeams ? userTeams.filter(x => x.userAction === 2 || x.isOwner).length : 0;
 	return count;
 };
 
@@ -23,18 +23,39 @@ export function convertSkills(skills) {
 	})
 }
 
-export function countActiveUserTeams(userTeams) {
-	var count = !userTeams
+export function countMyActiveTeams(userTeams) {
+	return countActiveUserTeams(userTeams, [1,2,5]);
+};
+
+export function countForeignActiveTeams(userTeams) {
+	return countActiveUserTeams(userTeams, [2]);
+};
+
+export function countActiveUserTeams(userTeams, activeActions) {
+	let count = !userTeams
 		? 0
 		: userTeams
-			.filter(x =>
-				x.userAction === 1 ||
-				x.userAction === 2 ||
-				x.userAction === 5 ||
+			.filter(x => 
+				activeActions.indexOf(x.userAction) !== -1 ||
 				x.isOwner)
 			.length;
 	return count;
 };
+
+export function renderEventDate(event) {
+	const startDate = event.startDate;
+	const finishDate = event.finishDate;
+
+	if (startDate && finishDate) {
+		return `${startDate} - ${finishDate}`
+	}
+	if (startDate && !finishDate) {
+		return `c ${startDate}`
+	}
+	if (!startDate && finishDate) {
+		return `по ${finishDate}`
+	}
+}
 
 export function GetRandomPic() {
 	let url = ``;

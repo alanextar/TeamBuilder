@@ -1,4 +1,5 @@
-﻿import * as api from "./apiBase";
+﻿import * as apiMethods from "./commonApiMethods";
+import * as api from "./apiBase";
 import * as users from "./apiUsers";
 import * as teams from "./apiTeams";
 import * as events from "./apiEvents";
@@ -7,15 +8,15 @@ import * as skills from "./apiSkills";
 export class Api {
 
     static Users = {
-        pagingSearch: (value, filter = {}) => users.pagingSearch(value, filter),
+        pagingSearch: (value, filter = {}) => apiMethods.pagingSearch(Urls.Users.PagingSearch, value, filter),
         getPage: (params = {}) => users.getPage(params),
         saveOrConfirm: (data) => users.saveOrConfirm(data),
         checkConfirmation: (id) => users.checkConfirmation(id),
         getSkills: (id) => users.getSkills(id),
         getTeams: (id) => users.getTeams(id),
-        get: (id) => users.get(id),
+        get: (id) => apiMethods.get(Urls.Users.Get, id),
         getRecruitTeams: (vkProfileId, id) => users.getRecruitTeams(vkProfileId, id),
-        edit: (data) => users.edit(data),
+        edit: (data) => apiMethods.edit(Urls.Users.Edit, data),
         joinTeam: (teamId) => users.joinTeam(teamId),
         quitOrDeclineTeam: (teamId) => users.quitOrDeclineTeam(teamId),
         cancelRequestTeam: (teamId) => users.cancelRequestTeam(teamId),
@@ -24,22 +25,22 @@ export class Api {
     };
 
     static Events = {
-        pagingSearch: (value) => events.pagingSearch(value),
+        pagingSearch: (value, filter = {}) => apiMethods.pagingSearch(Urls.Events.PagingSearch, value, filter),
         getPage: () => events.getPage(),
         getAll: () => events.getAll(),
-        get: (id) => events.get(id),
-        create: (data) => events.create(data),
-        edit: (data) => events.edit(data),
-        delete: (id) => events.Delete(id)
+        get: (id) => apiMethods.get(Urls.Events.Get, id),
+        create: (data) => apiMethods.create(Urls.Events.Create, data),
+        edit: (data) => apiMethods.edit(Urls.Events.Edit, data),
+        delete: (id) => apiMethods.Delete(Urls.Events.Delete, id)
     };
     
     static Teams = {
-        pagingSearch: (value, filter = {}) => teams.pagingSearch(value, filter),
+        pagingSearch: (value, filter = {}) => apiMethods.pagingSearch(Urls.Teams.PagingSearch, value, filter),
         getPage: (params = {}) => teams.getPage(params),
-        get: (id) => teams.get(id),
-        create: async (data) => await teams.create(data),
-        edit: (data) => teams.edit(data),
-        delete: (id) => teams.Delete(id),
+        get: (id) => apiMethods.get(Urls.Teams.Get, id),
+        create: (data) => apiMethods.create(Urls.Teams.Create, data),
+        edit: (data) => apiMethods.edit(Urls.Teams.Edit, data),
+        delete: (id) => apiMethods.Delete(Urls.Teams.Delete, id),
         rejectedOrRemoveUser: (data) => teams.rejectedOrRemoveUser(data),
         cancelRequestUser: (data) => teams.cancelRequestUser(data),
         joinTeam: (userId, teamId) => teams.joinTeam(userId, teamId),
