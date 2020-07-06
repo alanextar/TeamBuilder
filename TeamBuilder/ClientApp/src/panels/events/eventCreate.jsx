@@ -42,11 +42,11 @@ const EventCreate = props => {
 		goBack();
 	};
 
-	const eventCreate = () => {
-		if (!inputData?.name)
-			return;
-		Api.Events.create(inputData)
-			.then(result => goToPage('eventInfo', result.id, true));
+	const eventCreate = async () => {
+		if (!inputData?.name) return;
+		var result = await Api.Events.create(inputData);
+		setInputData(defaultInputData);
+		goToPage('eventInfo', result.id, true)
 	}
 
 	useEffect(() => {

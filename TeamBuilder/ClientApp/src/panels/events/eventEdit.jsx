@@ -11,6 +11,7 @@ import {
 } from '@vkontakte/vkui';
 
 import { Api } from '../../infrastructure/api';
+import * as utils from '../../infrastructure/utils';
 import { getActivePanel } from "../../services/_functions";
 
 const EventEdit = props => {
@@ -86,8 +87,8 @@ const EventEdit = props => {
 				<Input top="Название события" type="text" onChange={handleInput} name="name" value={getOrEmpty('name')} status={inputData?.name ? 'valid' : 'error'} placeholder="Введите название события" />
 				<Textarea top="Описание события" onChange={handleInput} name="description" value={getOrEmpty('description')} />
 				<Input top="Ссылка на событие" type="text" onChange={handleInput} name="link" value={getOrEmpty('link')} />
-				<Input top="Дата начала события" type="date" onChange={handleInput} name="startDate" value={getOrEmpty('startDate')} />
-				<Input top="Дата завершения события" type="date" onChange={handleInput} name="finishDate" value={getOrEmpty('finishDate')} />
+				<Input top="Дата начала события" type="date" onChange={handleInput} name="startDate" value={utils.convertDateToWebType(getOrEmpty('startDate'))} />
+				<Input top="Дата завершения события" type="date" onChange={handleInput} name="finishDate" value={utils.convertDateToWebType(getOrEmpty('finishDate'))} />
 				<Button
 					size='xl'
 					onClick={() => eventEdit()}>
