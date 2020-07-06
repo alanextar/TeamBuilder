@@ -1,9 +1,10 @@
 import * as api from "./apiBase";
 import { Urls } from "./api"
 
-export function pagingSearch(value) {
+export function pagingSearch(value, filter) {
     console.log(`events.pagingSearch ${value}`);
-    return api.get(Urls.Events.PagingSearch, { search: value });
+    let search = {search: value};
+    return api.get(Urls.Events.PagingSearch, {...search, ...filter});
 };
 
 export function getPage(params = {}) {

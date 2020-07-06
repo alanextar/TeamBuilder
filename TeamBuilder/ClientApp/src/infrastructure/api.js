@@ -24,7 +24,7 @@ export class Api {
     };
 
     static Events = {
-        pagingSearch: (value) => events.pagingSearch(value),
+        pagingSearch: (value, filter = {}) => events.pagingSearch(value, filter),
         getPage: () => events.getPage(),
         getAll: () => events.getAll(),
         get: (id) => events.get(id),

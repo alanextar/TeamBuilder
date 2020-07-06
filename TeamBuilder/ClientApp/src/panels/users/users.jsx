@@ -19,13 +19,13 @@ const Users = props => {
 	
 	const renderItems = items => {
 		return (
-			<CardGrid style={{ marginBottom: 10 }}>
-				{items && items.map(user => (
+			<CardGrid style={{ marginTop: 10, marginBottom: 10 }}>
+				{items?.map(user => (
 					<Card size="l" mode="shadow" key={user.id}>
 						{user.isSearchable &&
 							<RichCell
 								before={<Avatar size={48} src={user.photo100} />}
-								after={user.isTeamMember && <Icon24Work />}
+								after={user.isTeamMember && <Icon24Work  />}
 								caption={user.city && user.city}
 								bottom={stringfySkills(user.skills)}
 								text={user.about && user.about}
@@ -49,7 +49,7 @@ const Users = props => {
 	return (
 		<Panel id={props.id}>
 			<SearchWithInfiniteScroll
-				getPageHandler={Api.Users.getPage}
+				id={props.id}
 				pagingSearchHandler={Api.Users.pagingSearch}
 				getPageUrl={Urls.Users.GetPage}
 				header={<PanelHeader separator={false}>Участники</PanelHeader>}>

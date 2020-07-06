@@ -21,7 +21,12 @@ const EventsListToFilter = props => {
 	const itemClickHandler = (event) => {
 		goBack();
 		setTeamsEventFilter(event);
-		props.openFilter()
+		props.openFilter();
+	}
+
+	const backClickHandler = () => {
+		goBack();
+		props.openFilter();
 	}
 
 	const renderItems = items => {
@@ -44,11 +49,12 @@ const EventsListToFilter = props => {
 	return (
 		<Panel id={props.id}>
 			<SearchWithInfiniteScroll
+				id={props.id}
 				getPageHandler={Api.Events.getPage}
 				pagingSearchHandler={Api.Events.pagingSearch}
 				getPageUrl={Urls.Events.GetPage}
 				header=
-				{<PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />} >
+				{<PanelHeader separator={false} left={<PanelHeaderBack onClick={() => backClickHandler()} />} >
 					Выберите мероприятие
                 </PanelHeader>}>
 				{renderItems}

@@ -32,7 +32,7 @@ const Events = props => {
 
 	const renderItems = items => {
 		return (
-			<CardGrid>
+			<CardGrid style={{ marginTop: 10, marginBottom: 10 }}>
 				{items?.map(event => (
 					<Card size="l" mode="shadow" key={event.id}>
 						<RichCell
@@ -50,7 +50,7 @@ const Events = props => {
 	return (
 		<Panel id={props.id}>
 			<SearchWithInfiniteScroll
-				getPageHandler={Api.Events.getPage}
+				id={props.id}
 				pagingSearchHandler={Api.Events.pagingSearch}
 				getPageUrl={Urls.Events.GetPage}
 				header={renderHeader}>
