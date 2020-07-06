@@ -25,17 +25,15 @@ const Teams = props => {
 	}, [props.teamsEventFilter?.id])
 
 	const renderHeader = (
-		props.profileUser
-			?
-			<PanelHeader
-				separator={false}
-				left={<PanelHeaderButton onClick={() => goToPage('eventCreate')}>Создать</PanelHeaderButton>}>
-				События
-					</PanelHeader>
-			:
+		props.profileUser ?
+			<PanelHeader separator={false}
+				left={<PanelHeaderButton onClick={() => goToPage('teamCreate')}>Создать</PanelHeaderButton>}>
+				Команды
+	            </PanelHeader> :
 			<PanelHeader separator={false}>
-				События
-					</PanelHeader>
+				Команды
+	            </PanelHeader>
+
 	)
 
 	const renderItems = items => {
