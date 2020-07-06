@@ -109,8 +109,10 @@ const SearchWithInfiniteScroll =
 						value={searchTerm}
 						onChange={e => setSearchTerm(e.target.value)}
 						after={null}
-						// icon={onFiltersClickHandler && <Icon24Filter />}
-						icon={onFiltersClickHandler && <IconIndicator counter={countNotEmptyAttr()}><Icon24Filter /></IconIndicator>}
+						icon={onFiltersClickHandler &&
+							<IconIndicator counter={countNotEmptyAttr()}>
+								<Icon24Filter />
+							</IconIndicator>}
 						onIconClick={() => onFiltersClickHandler()}
 					/>
 				</FixedLayout>
