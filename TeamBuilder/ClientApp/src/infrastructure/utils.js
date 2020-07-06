@@ -57,6 +57,11 @@ export function renderEventDate(event) {
 	}
 }
 
+export function convertDateToWebType (date) {
+	let splitted = date.split('.');
+	return `${splitted[2]}-${splitted[1]}-${splitted[0]}`;
+}
+
 export function GetRandomPic() {
 	let url = ``;
 

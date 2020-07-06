@@ -7,7 +7,7 @@ import { setFormData } from "../../store/formData/actions";
 
 import {
 	Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell,
-	Div, Button, Textarea, FormLayout, Select, Input, Slider, FixedLayout, Link
+	Div, Button, Textarea, FormLayout, Select, Input, Link
 } from '@vkontakte/vkui';
 import { Api } from '../../infrastructure/api';
 import { GetRandomPic } from '../../infrastructure/utils';
@@ -19,8 +19,9 @@ class TeamCreate extends React.Component {
 
 		this.defaultInputData = {
 			name: '',
-			eventId: null,
-			numberRequiredMembers: 2,
+			description: '',
+			eventId: '',
+			numberRequiredMembers: '',
 			descriptionRequiredMembers: ''
 		};
 
@@ -39,20 +40,17 @@ class TeamCreate extends React.Component {
 			if (e.currentTarget.type === 'checkbox') {
 				value = e.currentTarget.checked;
 			}
-			console.log(value);
+
 			this.setState({
 				inputData: {
 					...this.state.inputData,
 					[e.currentTarget.name]: value
 				}
 			})
-			console.log(this.state.inputData);
 		}
 
 		this.cancelForm = () => {
-			this.setState({
-				inputData: null
-			})
+			this.cleanFormData();
 			props.goBack();
 		};
 
@@ -104,10 +102,15 @@ class TeamCreate extends React.Component {
 			userId: this.props.profileUser.id
 		};
 		this.props.addTeamToProfile(newUserTeam);
-		this.setState({
-			inputData: null
-		})
+		this.cleanFormData();
 		this.props.goToPage('teamInfo', result.id, true);
+	}
+
+	cleanFormData() {
+		this.setState({
+			inputData: null,
+			activeTab: null
+		});
 	}
 
 	render() {
@@ -139,23 +142,23 @@ class TeamCreate extends React.Component {
 				</Tabs>
 				<Group>
 					{this.state.activeTab === 'teamDescription' ?
-						<FormLayout >
+						<FormLayout>
 							<Input top="Название команды" type="text" placeholder="Введите название команды"
 								onChange={this.handleInput}
 								name="name"
-								value={inputData && inputData.name}
-								status={inputData && inputData.name ? 'valid' : 'error'} />
-							<Textarea top="Описание команды" onChange={this.handleInput} name="description" value={inputData && inputData.description} />
+								value={inputData?.name}
+								status={inputData?.name ? 'valid' : 'error'} />
+							<Textarea top="Описание команды" onChange={this.handleInput} name="description" value={inputData?.description} />
 							<Select
 								top="Выберете событие"
 								placeholder="Событие"
 								onChange={this.handleInput}
 								value={inputData?.eventId || ''}
 								name="eventId"
-								bottom={<Link style={{ color: 'rebeccapurple', textAlign: "right" }} onClick={() => goToPage('eventCreate')}>Создать событие</Link>}>>
-                                {this.state.events?.map((ev, i) => {
+								bottom={<Link style={{ color: 'rebeccapurple', textAlign: "right" }} onClick={() => goToPage('eventCreate')}>Создать событие</Link>}>
+								{this.state.events?.map(ev => {
 									return (
-										<option value={ev.id} key={i}>
+										<option value={ev.id} key={ev.id}>
 											{ev.name}
 										</option>
 									)
@@ -164,18 +167,12 @@ class TeamCreate extends React.Component {
 						</FormLayout>
 						:
 						<Cell>
-							<FormLayout >
-								{/*<Slider
-                                    step={1}
-                                    min={2}
-                                    max={10}
-                                    name="numberRequiredMembers"
-                                    value={Number(inputData.numberRequiredMembers)}
-                                    onChange={this.handleInput}
-                                    top="Количество участников в команде"
-                                />*/}
-								<Input name="numberRequiredMembers" value={inputData && inputData.numberRequiredMembers} onChange={this.handleInput} type="number" />
-								<Textarea name="descriptionRequiredMembers" value={inputData && inputData.descriptionRequiredMembers} top="Описание участников и их задач" onChange={this.handleInput} />
+							<FormLayout>
+								<Input top="Количество участников" type="text" placeholder="Введите количество участников"
+									onChange={this.handleInput}
+									name="numberRequiredMembers"
+									value={inputData?.numberRequiredMembers}/>
+								<Textarea name="descriptionRequiredMembers" value={inputData?.descriptionRequiredMembers} top="Описание участников и их задач" onChange={this.handleInput} />
 							</FormLayout>
 						</Cell>}
 					<Div>
