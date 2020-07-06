@@ -1,12 +1,6 @@
 import * as api from "./apiBase";
 import { Urls } from "./api"
 
-export function pagingSearch(value, filter) {
-    console.log(`users.search ${value}`);
-    let search = { search: value };
-    return api.get(Urls.Users.PagingSearch, { ...search, ...filter });
-};
-
 export function getPage(params) {
     console.log(`users.getPage`);
     return api.get(Urls.Users.GetPage, params);
@@ -32,19 +26,9 @@ export function getTeams(id) {
     return api.get(Urls.Users.GetTeams, { id: id });
 };
 
-export function get(id) {
-    console.log(`users.get`);
-    return api.get(Urls.Users.Get, { id: id });
-};
-
 export function getRecruitTeams(vkProfileId, id) {
     console.log(`users.getRecruitTeams`);
     return api.get(Urls.Users.GetRecruitTeams, { vkProfileId: vkProfileId, id: id });
-};
-
-export function edit(data) {
-    console.log(`users.edit`);
-    return api.post(Urls.Users.Edit, data);
 };
 
 export function joinTeam(teamId) {
