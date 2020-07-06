@@ -4,3 +4,20 @@ a, div, img, p, button {
     -webkit-touch-callout: none;
     -webkit-tap-highlight-color: transparent;
 }
+
+.indicator {
+	height: 14px;
+	width: 14px;
+	background-color: rgb(255, 46, 46);
+	border-radius: 50%;
+	position: absolute;
+    top: -2px;
+	right: -3px;
+	
+	font-size: 8pt;
+	color: #fff;
+	line-height: 14px;
+	text-align: center;
+	vertical-align: middle;
+	display: table-cell;
+}

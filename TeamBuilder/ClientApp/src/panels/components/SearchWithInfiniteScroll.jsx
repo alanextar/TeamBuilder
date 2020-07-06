@@ -9,6 +9,8 @@ import {
 } from '@vkontakte/vkui';
 import Icon24Filter from '@vkontakte/icons/dist/24/filter';
 
+import IconIndicator from './IconIndicator';
+
 import { Api } from '../../infrastructure/api';
 import useDebounce from '../../infrastructure/use-debounce';
 
@@ -44,7 +46,7 @@ const SearchWithInfiniteScroll =
 
 		const populateItems = (dataWaiter) => {
 			dataWaiter(true);
-			pagingSearchHandler(debouncedSearchTerm, filterValue || {})
+			pagingSearchHandler(debouncedSearchTerm, getNotEmptyAttr() || {})
 				.then(result => {
 					updateItems(result);
 					dataWaiter(false);
@@ -77,6 +79,26 @@ const SearchWithInfiniteScroll =
 				});
 		};
 
+		const countNotEmptyAttr = () => {
+			let filtered = getNotEmptyAttr();
+			return filtered
+				? Object.keys(filtered).length
+				: 0;
+		}
+
+		const getNotEmptyAttr = () => {
+			if (filterValue) {
+				const filtered = Object.keys(filterValue)
+					.filter(key => filterValue[key])
+					.reduce((obj, key) => {
+						obj[key] = filterValue[key];
+						return obj;
+					}, {});
+
+				return filtered;
+			}
+		}
+
 		const loader = <PanelSpinner key={0} size="large" />
 
 		return (
@@ -87,7 +109,8 @@ const SearchWithInfiniteScroll =
 						value={searchTerm}
 						onChange={e => setSearchTerm(e.target.value)}
 						after={null}
-						icon={onFiltersClickHandler && <Icon24Filter />}
+						// icon={onFiltersClickHandler && <Icon24Filter />}
+						icon={onFiltersClickHandler && <IconIndicator counter={countNotEmptyAttr()}><Icon24Filter /></IconIndicator>}
 						onIconClick={() => onFiltersClickHandler()}
 					/>
 				</FixedLayout>
