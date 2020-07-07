@@ -17,20 +17,20 @@ class TeamCreate extends React.Component {
 	constructor(props) {
 		super(props);
 
+		this.bindingId = props.id;
+		this.defaultActiveTab = 'teamDescription';
 		this.defaultInputData = {
 			name: '',
 			description: '',
 			eventId: '',
-			numberRequiredMembers: '',
+			numberRequiredMembers: 2,
 			descriptionRequiredMembers: ''
 		};
-
-		this.bindingId = 'teamCreate';
 
 		this.state = {
 			events: [],
 			id: props.id,
-			activeTab: props.activeTab[this.bindingId] || "teamDescription",
+			activeTab: props.activeTab[this.bindingId] || this.defaultActiveTab,
 			inputData: props.inputData[this.bindingId] || this.defaultInputData
 		};
 
@@ -70,7 +70,7 @@ class TeamCreate extends React.Component {
 		}
 		if (this.props.activeTab[this.bindingId] !== prevProps.activeTab[this.bindingId]) {
 			this.setState({
-				activeTab: this.props.activeTab[this.bindingId] || "teamDescription"
+				activeTab: this.props.activeTab[this.bindingId] || this.defaultActiveTab
 			});
 		}
 	}
@@ -108,8 +108,8 @@ class TeamCreate extends React.Component {
 
 	cleanFormData() {
 		this.setState({
-			inputData: null,
-			activeTab: null
+			inputData: this.defaultInputData,
+			activeTab: this.defaultActiveTab
 		});
 	}
 
@@ -121,24 +121,18 @@ class TeamCreate extends React.Component {
 			<Panel id={this.state.id}>
 				<PanelHeader separator={false} left={<PanelHeaderBack onClick={this.cancelForm} />}>
 					Создание
-                </PanelHeader>
+				</PanelHeader>
 				<Tabs>
 					<TabsItem
-						onClick={() => {
-							this.setState({ activeTab: 'teamDescription' })
-						}}
-						selected={this.state.activeTab === 'teamDescription'}
-					>
+						onClick={() => this.setState({ activeTab: 'teamDescription' })}
+						selected={this.state.activeTab === 'teamDescription'}>
 						Описание
-                    </TabsItem>
+					</TabsItem>
 					<TabsItem
-						onClick={() => {
-							this.setState({ activeTab: 'teamUsers' })
-						}}
-						selected={this.state.activeTab === 'teamUsers'}
-					>
+						onClick={() => this.setState({ activeTab: 'teamUsers' })}
+						selected={this.state.activeTab === 'teamUsers'}>
 						Участники
-                    </TabsItem>
+					</TabsItem>
 				</Tabs>
 				<Group>
 					{this.state.activeTab === 'teamDescription' ?
@@ -148,12 +142,15 @@ class TeamCreate extends React.Component {
 								name="name"
 								value={inputData?.name}
 								status={inputData?.name ? 'valid' : 'error'} />
-							<Textarea top="Описание команды" onChange={this.handleInput} name="description" value={inputData?.description} />
+							<Textarea top="Описание команды" type="text" placeholder="Краткое описание команды"
+								onChange={this.handleInput}
+								name="description"
+								value={inputData?.description} />
 							<Select
 								top="Выберете событие"
 								placeholder="Событие"
 								onChange={this.handleInput}
-								value={inputData?.eventId || ''}
+								value={inputData?.eventId}
 								name="eventId"
 								bottom={<Link style={{ color: 'rebeccapurple', textAlign: "right" }} onClick={() => goToPage('eventCreate')}>Создать событие</Link>}>
 								{this.state.events?.map(ev => {
@@ -168,19 +165,23 @@ class TeamCreate extends React.Component {
 						:
 						<Cell>
 							<FormLayout>
-								<Input top="Количество участников" type="text" placeholder="Введите количество участников"
+								<Input top="Количество участников" type="number" placeholder="Введите количество участников"
 									onChange={this.handleInput}
 									name="numberRequiredMembers"
-									value={inputData?.numberRequiredMembers}/>
-								<Textarea name="descriptionRequiredMembers" value={inputData?.descriptionRequiredMembers} top="Описание участников и их задач" onChange={this.handleInput} />
+									value={inputData?.numberRequiredMembers} />
+								<Textarea top="Описание участников и их задач" type="text" placeholder="Опишите какие роли в команде вам нужны"
+									onChange={this.handleInput}
+									name="descriptionRequiredMembers"
+									value={inputData?.descriptionRequiredMembers} />
 							</FormLayout>
 						</Cell>}
 					<Div>
 						<Button
 							stretched={true}
+							size='xl'
 							onClick={() => this.postCreate()}>
 							Создать Команду
-                            </Button>
+						</Button>
 					</Div>
 				</Group>
 			</Panel>
