@@ -45,9 +45,9 @@ namespace TeamBuilder.Controllers
 
 			if (!context.UserTeams.Any())
 			{
-				logger.LogInformation($"EasterEggs Running");
+				logger.LogInformation("EasterEggs Running");
 				await EasterEggs.Eggs(context);
-				logger.LogInformation($"EasterEggs Finished");
+				logger.LogInformation("EasterEggs Finished");
 			}
 
 			if (pageSize == 0)

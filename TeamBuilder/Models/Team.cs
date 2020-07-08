@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Reflection.Emit;
 using TeamBuilder.Controllers.Paging;
 using TeamBuilder.Models.Enums;
 
@@ -13,10 +11,6 @@ namespace TeamBuilder.Models
 		public string Name { get; set; }
 		public string Description { get; set; }
 		public string Link { get; set; }
-
-		//TODO убрать после перехода на хранение в базе
-		public string Photo100 { get; set; }
-		public string Photo200 { get; set; }
 
 		[ForeignKey(nameof(ImageId))]
 		public Image Image { get; set; }
@@ -36,8 +30,6 @@ namespace TeamBuilder.Models
 		public string Name { get; set; }
 		public string Description { get; set; }
 		public string Link { get; set; }
-		public string Photo100 { get; set; }
-		public string Photo200 { get; set; }
 		public int NumberRequiredMembers { get; set; }
 		public string DescriptionRequiredMembers { get; set; }
 		public Event Event { get; set; }
