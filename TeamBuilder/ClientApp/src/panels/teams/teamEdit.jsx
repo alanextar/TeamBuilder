@@ -161,7 +161,7 @@ class TeamEdit extends React.Component {
 									placeholder="Событие"
 									onChange={this.handleInput}
 									name="eventId"
-									value={inputData.eventId}
+									value={inputData.eventId || ''}
 									bottom={<Link style={{ color: 'rebeccapurple', textAlign: "right" }} onClick={() => goToPage('eventCreate')}>Создать событие</Link>}>
 									{this.state.events?.map(ev => {
 										return (
@@ -191,38 +191,39 @@ class TeamEdit extends React.Component {
 								<Group>
 									<Header mode="secondary">Участники</Header>
 									{inputData.userTeams?.map(userTeam => {
-											return (
-												(userTeam.userAction === 1 || userTeam.userAction === 2 || userTeam.userAction === 5) &&
-												<RichCell key={userTeam.userId}
-													before={<Avatar size={48} src={userTeam.user.photo100} />}
-													after={userTeam.userAction === 2 && <Icon24DismissDark
-														onClick={(e) => this.dropUser(e, userTeam)} />}
-													actions={
-														userTeam.userAction === 1 &&
-														<React.Fragment>
-															<Button
-																onClick={(e) => this.handleJoin(e, userTeam)}>Принять</Button>
-															<Button mode="secondary" style={{ marginLeft: 2 }}
-																onClick={(e) => this.dropUser(e, userTeam)}>Отклонить</Button>
-														</React.Fragment> ||
-														userTeam.userAction === 5 &&
-														<React.Fragment>
-															<Button mode="secondary"
-																onClick={(e) => this.cancelUser(e, userTeam)}>Отозвать предложение</Button>
-														</React.Fragment>
-													}
-												>
-													{userTeam.user.fullName}
-												</RichCell>
-											)
-										}
-										)}
+										return (
+											(userTeam.userAction === 1 || userTeam.userAction === 2 || userTeam.userAction === 5) &&
+											<RichCell key={userTeam.userId}
+												before={<Avatar size={48} src={userTeam.user.photo100} />}
+												after={userTeam.userAction === 2 && <Icon24DismissDark
+													onClick={(e) => this.dropUser(e, userTeam)} />}
+												actions={
+													userTeam.userAction === 1 &&
+													<React.Fragment>
+														<Button
+															onClick={(e) => this.handleJoin(e, userTeam)}>Принять</Button>
+														<Button mode="secondary" style={{ marginLeft: 2 }}
+															onClick={(e) => this.dropUser(e, userTeam)}>Отклонить</Button>
+													</React.Fragment> ||
+													userTeam.userAction === 5 &&
+													<React.Fragment>
+														<Button mode="secondary"
+															onClick={(e) => this.cancelUser(e, userTeam)}>Отозвать предложение</Button>
+													</React.Fragment>
+												}
+											>
+												{userTeam.user.fullName}
+											</RichCell>
+										)
+									}
+									)}
 								</Group>
 
 							</Group>
 					)}
 					<Div>
 						<Button
+							size="xl"
 							stretched
 							onClick={() => this.postEdit()}>
 							Сохранить
