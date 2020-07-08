@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
@@ -57,17 +54,6 @@ namespace TeamBuilder.Controllers
 			bool Filter(Event @event) => @event.Name.ToLowerInvariant().Contains(search?.ToLowerInvariant() ?? string.Empty);
 			var result = context.Events.Include(e => e.Teams).GetPage(pageSize, HttpContext.Request, page, prev, Filter);
 			result.NextHref = result.NextHref == null ? null : $"{result.NextHref}&search={search}";
-			logger.LogInformation($"Response EventsCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
-			                      $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
-
-			return Json(result);
-		}
-
-		public IActionResult GetPage(int pageSize = 20, int page = 0, bool prev = false)
-		{
-			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
-
-			var result = context.Events.Include(e => e.Teams).GetPage(pageSize, HttpContext.Request, page, prev);
 			logger.LogInformation($"Response EventsCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
 			                      $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
 

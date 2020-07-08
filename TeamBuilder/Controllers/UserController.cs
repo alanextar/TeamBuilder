@@ -31,7 +31,7 @@ namespace TeamBuilder.Controllers
 		[HttpPost]
 		public async Task<IActionResult> SaveOrConfirm([FromBody]ProfileViewModel profileViewModel)
 		{
-			logger.LogInformation($"POST Request Confirm. Body: {JsonConvert.SerializeObject(profileViewModel)}");
+			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(profileViewModel)}");
 
 			var user = context.Users.Include(x => x.UserSkills)
 				.ThenInclude(y => y.Skill).FirstOrDefault(u => u.Id == profileViewModel.Id);
@@ -73,7 +73,7 @@ namespace TeamBuilder.Controllers
 		[HttpGet]
 		public IActionResult CheckConfirmation(long id)
 		{
-			logger.LogInformation($"Request CheckConfirmation/{id}");
+			logger.LogInformation($"GET Request {HttpContext.Request.Headers[":path"]}");
 
 			var isConfirmed = context.Users.FirstOrDefault(x => x.Id == id) != null ? true : false;
 
@@ -83,7 +83,7 @@ namespace TeamBuilder.Controllers
 		//TODO не используется
 		public List<Skill> GetSkills(long id)
 		{
-			logger.LogInformation($"Request GetSkills/{id}");
+			logger.LogInformation($"GET Request {HttpContext.Request.Headers[":path"]}");
 
 			var userSkills = context.Users.Include(x => x.UserSkills)
 				.ThenInclude(y => y.Skill)
@@ -101,7 +101,7 @@ namespace TeamBuilder.Controllers
 		//Команды других могут просматривать все
 		public User GetTeams(long id)
 		{
-			logger.LogInformation($"Request GetTeams/{id}");
+			logger.LogInformation($"GET Request {HttpContext.Request.Headers[":path"]}");
 
 			var user = context.Users.Include(x => x.UserTeams).FirstOrDefault(x => x.Id == id);
 
@@ -111,7 +111,7 @@ namespace TeamBuilder.Controllers
 		[HttpGet]
 		public IActionResult Get(long id)
 		{
-			logger.LogInformation($"Request Get/{id}");
+			logger.LogInformation($"GET Request {HttpContext.Request.Headers[":path"]}");
 
 			var user = context.Users.Include(x => x.UserTeams)
 				.ThenInclude(y => y.Team)
@@ -135,7 +135,7 @@ namespace TeamBuilder.Controllers
 		[HttpGet]
 		public IActionResult GetRecruitTeams(long vkProfileId, long id)
 		{
-			logger.LogInformation($"Request GetRecruitTeams/?vkProfielId={vkProfileId}&id={id}");
+			logger.LogInformation($"GET Request {HttpContext.Request.Headers[":path"]}");
 
 			var user = context.Users.Include(x => x.UserTeams)
 				.ThenInclude(y => y.Team)
@@ -350,25 +350,6 @@ namespace TeamBuilder.Controllers
 			logger.LogInformation($"Response UsersCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
 								  $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
 
-			return Json(result);
-		}
-
-		public IActionResult GetPage(int pageSize = 20, int page = 0, bool prev = false)
-		{
-			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
-
-			if (pageSize == 0)
-				return NoContent();
-
-			var result = context.Users
-				.Include(u => u.UserSkills)
-				.ThenInclude(us => us.Skill)
-				.Include(u => u.UserTeams)
-				.GetPage(pageSize, HttpContext.Request, page, prev)
-				.HackForReferenceLoop();
-
-			logger.LogInformation($"Response UsersCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
-									  $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
 			return Json(result);
 		}
 

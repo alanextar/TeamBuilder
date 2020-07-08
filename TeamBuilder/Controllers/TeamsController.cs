@@ -72,20 +72,6 @@ namespace TeamBuilder.Controllers
 			return Json(result);
 		}
 
-		public IActionResult GetPage(int pageSize = 20, int page = 0, bool prev = false)
-		{
-			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
-
-			if (pageSize == 0)
-				return NoContent();
-
-			var teams = context.Teams.Include(x => x.Event).Include(x => x.UserTeams).GetPage(pageSize, HttpContext.Request, page, prev);
-
-			logger.LogInformation($"Response TeamsCount:{teams.Collection.Count()} / from:{teams.Collection.FirstOrDefault()?.Id} / " +
-								  $"to:{teams.Collection.LastOrDefault()?.Id} / NextHref:{teams.NextHref}");
-			return Json(teams);
-		}
-
 		public Team Get(int id)
 		{
 			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");

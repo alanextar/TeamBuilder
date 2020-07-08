@@ -9,7 +9,6 @@ export class Api {
 
     static Users = {
         pagingSearch: (value, filter = {}) => apiMethods.pagingSearch(Urls.Users.PagingSearch, value, filter),
-        getPage: (params = {}) => users.getPage(params),
         saveOrConfirm: (data) => users.saveOrConfirm(data),
         checkConfirmation: (id) => users.checkConfirmation(id),
         getSkills: (id) => users.getSkills(id),
@@ -26,7 +25,6 @@ export class Api {
 
     static Events = {
         pagingSearch: (value, filter = {}) => apiMethods.pagingSearch(Urls.Events.PagingSearch, value, filter),
-        getPage: () => events.getPage(),
         getAll: () => events.getAll(),
         get: (id) => apiMethods.get(Urls.Events.Get, id),
         create: (data) => apiMethods.create(Urls.Events.Create, data),
@@ -36,7 +34,6 @@ export class Api {
     
     static Teams = {
         pagingSearch: (value, filter = {}) => apiMethods.pagingSearch(Urls.Teams.PagingSearch, value, filter),
-        getPage: (params = {}) => teams.getPage(params),
         get: (id) => apiMethods.get(Urls.Teams.Get, id),
         create: (data) => apiMethods.create(Urls.Teams.Create, data),
         edit: (data) => apiMethods.edit(Urls.Teams.Edit, data),
@@ -56,54 +53,52 @@ export class Api {
 
 export class Urls {
     static baseUrl = '';
-    static prefix = 'api';
-    static teamsStr = 'teams';
-    static userStr = 'user';
-    static eventStr = 'event';
-    static skillStr = 'skill';
+	static prefix = 'api';
+	
+    static teamsController = 'teams';
+    static userController = 'user';
+    static eventController = 'event';
+    static skillController = 'skill';
 
     static Teams = {
-        Get: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/get`,
-        GetAll: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/getAll`,
-        GetPage: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/getPage`,
-        Create: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/create`,
-        Delete: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/delete`,
-        Edit: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/edit`,
-        PagingSearch: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/pagingSearch`,
-        RejectedOrRemoveUser: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/rejectedOrRemoveUser`,
-        CancelRequestUser: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/cancelRequestUser`,
-        JoinTeam: `${this.baseUrl}/${this.prefix}/${this.teamsStr}/joinTeam`,
+        Get: `${this.baseUrl}/${this.prefix}/${this.teamsController}/get`,
+        GetAll: `${this.baseUrl}/${this.prefix}/${this.teamsController}/getAll`,
+        Create: `${this.baseUrl}/${this.prefix}/${this.teamsController}/create`,
+        Delete: `${this.baseUrl}/${this.prefix}/${this.teamsController}/delete`,
+        Edit: `${this.baseUrl}/${this.prefix}/${this.teamsController}/edit`,
+        PagingSearch: `${this.baseUrl}/${this.prefix}/${this.teamsController}/pagingSearch`,
+        RejectedOrRemoveUser: `${this.baseUrl}/${this.prefix}/${this.teamsController}/rejectedOrRemoveUser`,
+        CancelRequestUser: `${this.baseUrl}/${this.prefix}/${this.teamsController}/cancelRequestUser`,
+        JoinTeam: `${this.baseUrl}/${this.prefix}/${this.teamsController}/joinTeam`,
     };
 
     static Users = {
-        Get: `${this.baseUrl}/${this.prefix}/${this.userStr}/get`,
-        GetAll: `${this.baseUrl}/${this.prefix}/${this.userStr}/getAll`,
-        GetPage: `${this.baseUrl}/${this.prefix}/${this.userStr}/getPage`,
-        Edit: `${this.baseUrl}/${this.prefix}/${this.userStr}/edit`,
-        PagingSearch: `${this.baseUrl}/${this.prefix}/${this.userStr}/pagingSearch`,
-        SaveOrConfirm: `${this.baseUrl}/${this.prefix}/${this.userStr}/saveOrConfirm`,
-        CheckConfirmation: `${this.baseUrl}/${this.prefix}/${this.userStr}/checkConfirmation`,
-        GetRecruitTeams: `${this.baseUrl}/${this.prefix}/${this.userStr}/getRecruitTeams`,
-        GetSkills: `${this.baseUrl}/${this.prefix}/${this.userStr}/getSkills`,
-        GetTeams: `${this.baseUrl}/${this.prefix}/${this.userStr}/getTeams`,
-        JoinTeam: `${this.baseUrl}/${this.prefix}/${this.userStr}/joinTeam`,
-        QuitOrDeclineTeam: `${this.baseUrl}/${this.prefix}/${this.userStr}/quitOrDeclineTeam`,
-        CancelRequestTeam: `${this.baseUrl}/${this.prefix}/${this.userStr}/cancelRequestTeam`,
-        SetTeam: `${this.baseUrl}/${this.prefix}/${this.userStr}/setTeam`,
-        GetOwnerTeams: `${this.baseUrl}/${this.prefix}/${this.userStr}/getOwnerTeams`
+        Get: `${this.baseUrl}/${this.prefix}/${this.userController}/get`,
+        GetAll: `${this.baseUrl}/${this.prefix}/${this.userController}/getAll`,
+        Edit: `${this.baseUrl}/${this.prefix}/${this.userController}/edit`,
+        PagingSearch: `${this.baseUrl}/${this.prefix}/${this.userController}/pagingSearch`,
+        SaveOrConfirm: `${this.baseUrl}/${this.prefix}/${this.userController}/saveOrConfirm`,
+        CheckConfirmation: `${this.baseUrl}/${this.prefix}/${this.userController}/checkConfirmation`,
+        GetRecruitTeams: `${this.baseUrl}/${this.prefix}/${this.userController}/getRecruitTeams`,
+        GetSkills: `${this.baseUrl}/${this.prefix}/${this.userController}/getSkills`,
+        GetTeams: `${this.baseUrl}/${this.prefix}/${this.userController}/getTeams`,
+        JoinTeam: `${this.baseUrl}/${this.prefix}/${this.userController}/joinTeam`,
+        QuitOrDeclineTeam: `${this.baseUrl}/${this.prefix}/${this.userController}/quitOrDeclineTeam`,
+        CancelRequestTeam: `${this.baseUrl}/${this.prefix}/${this.userController}/cancelRequestTeam`,
+        SetTeam: `${this.baseUrl}/${this.prefix}/${this.userController}/setTeam`,
+        GetOwnerTeams: `${this.baseUrl}/${this.prefix}/${this.userController}/getOwnerTeams`
     };
 
     static Events = {
-        Get: `${this.baseUrl}/${this.prefix}/${this.eventStr}/get`,
-        GetAll: `${this.baseUrl}/${this.prefix}/${this.eventStr}/getall`,
-        GetPage: `${this.baseUrl}/${this.prefix}/${this.eventStr}/getPage`,
-        Create: `${this.baseUrl}/${this.prefix}/${this.eventStr}/create`,
-        Delete: `${this.baseUrl}/${this.prefix}/${this.eventStr}/delete`,
-        Edit: `${this.baseUrl}/${this.prefix}/${this.eventStr}/edit`,
-        PagingSearch: `${this.baseUrl}/${this.prefix}/${this.eventStr}/pagingSearch`
+        Get: `${this.baseUrl}/${this.prefix}/${this.eventController}/get`,
+        GetAll: `${this.baseUrl}/${this.prefix}/${this.eventController}/getall`,
+        Create: `${this.baseUrl}/${this.prefix}/${this.eventController}/create`,
+        Delete: `${this.baseUrl}/${this.prefix}/${this.eventController}/delete`,
+        Edit: `${this.baseUrl}/${this.prefix}/${this.eventController}/edit`,
+        PagingSearch: `${this.baseUrl}/${this.prefix}/${this.eventController}/pagingSearch`
     };
 
     static Skills = {
-        GetAll: `${this.baseUrl}/${this.prefix}/${this.skillStr}/getall`,
+        GetAll: `${this.baseUrl}/${this.prefix}/${this.skillController}/getall`,
     };
 }
