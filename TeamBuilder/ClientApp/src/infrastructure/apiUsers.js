@@ -1,11 +1,6 @@
 import * as api from "./apiBase";
 import { Urls } from "./api"
 
-export function getPage(params) {
-    console.log(`users.getPage`);
-    return api.get(Urls.Users.GetPage, params);
-};
-
 export function saveOrConfirm(data) {
     console.log(`users.saveOrConfirm`);
     return api.post(Urls.Users.SaveOrConfirm, data);

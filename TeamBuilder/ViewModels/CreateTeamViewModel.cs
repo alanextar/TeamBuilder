@@ -6,6 +6,7 @@
 		public string Description { get; set; }
 		public int? EventId { get; set; }
 		public string Photo100 { get; set; }
+		public string imageAsDataUrl { get; set; }
 
 		public int NumberRequiredMembers { get; set; }
 		public string DescriptionRequiredMembers { get; set; }

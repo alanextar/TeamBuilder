@@ -51,7 +51,7 @@ const Users = props => {
 			<SearchWithInfiniteScroll
 				id={props.id}
 				pagingSearchHandler={Api.Users.pagingSearch}
-				getPageUrl={Urls.Users.GetPage}
+				getPageUrl={Urls.Users.PagingSearch}
 				header={<PanelHeader separator={false}>Участники</PanelHeader>}>
 				{renderItems}
 			</SearchWithInfiniteScroll>

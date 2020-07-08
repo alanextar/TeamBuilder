@@ -1,11 +1,6 @@
 import * as api from "./apiBase";
 import { Urls } from "./api"
 
-export function getPage(params) {
-    console.log(`teams.getPage`);
-    return api.get(Urls.Teams.GetPage, params);
-};
-
 export function rejectedOrRemoveUser(data) {
     console.log(`teams.rejectedOrRemoveUser`);
     return api.post(Urls.Teams.RejectedOrRemoveUser, data);

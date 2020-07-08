@@ -11,8 +11,11 @@ namespace TeamBuilder.Models
 		public string Name { get; set; }
 		public string Description { get; set; }
 		public string Link { get; set; }
-		public string Photo100 { get; set; }
-		public string Photo200 { get; set; }
+
+		[ForeignKey(nameof(ImageId))]
+		public Image Image { get; set; }
+		public long? ImageId { get; set; }
+
 		public int NumberRequiredMembers { get; set; }
 		public string DescriptionRequiredMembers { get; set; }
 		[ForeignKey(nameof(EventId))]
@@ -27,8 +30,6 @@ namespace TeamBuilder.Models
 		public string Name { get; set; }
 		public string Description { get; set; }
 		public string Link { get; set; }
-		public string Photo100 { get; set; }
-		public string Photo200 { get; set; }
 		public int NumberRequiredMembers { get; set; }
 		public string DescriptionRequiredMembers { get; set; }
 		public Event Event { get; set; }

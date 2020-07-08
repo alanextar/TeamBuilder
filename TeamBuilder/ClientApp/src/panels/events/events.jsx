@@ -52,7 +52,7 @@ const Events = props => {
 			<SearchWithInfiniteScroll
 				id={props.id}
 				pagingSearchHandler={Api.Events.pagingSearch}
-				getPageUrl={Urls.Events.GetPage}
+				getPageUrl={Urls.Events.PagingSearch}
 				header={renderHeader}>
 				{renderItems}
 			</SearchWithInfiniteScroll>

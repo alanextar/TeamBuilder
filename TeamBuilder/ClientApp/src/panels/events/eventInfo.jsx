@@ -123,7 +123,7 @@ const EventInfo = props => {
 							expandable
 							indicator={countConfirmed(team.userTeams) + '/' + team.numberRequiredMembers}
 							onClick={() => goToPage('teamInfo', team.id)}
-							before={<Avatar size={48} src={team.photo100} />}>
+							before={<Avatar size={48} src={team.image?.dataURL} />}>
 							{team.name}
 						</Cell>
 					)

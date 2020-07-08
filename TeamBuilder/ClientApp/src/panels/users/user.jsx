@@ -129,13 +129,13 @@ class User extends React.Component {
 								{`${this.state.user.firstName} ${this.state.user.lastName}`}
 							</Cell>
 						</Link>
-						<Div>
-							{this.state.isRecruitTeamsExist &&
+						{this.state.isRecruitTeamsExist &&
+							<Div>
 								<Button mode="primary" size='xl'
 									onClick={() => goToPage('setUserTeam', this.state.itemId)}>
 									Завербовать
-							</Button>}
-						</Div>
+							</Button>
+							</Div>}
 					</Group>
 					: this.state.profile &&
 					<Group title="VK Connect">
@@ -146,13 +146,13 @@ class User extends React.Component {
 								{`${this.state.profile.first_name} ${this.state.profile.last_name}`}
 							</Cell>
 						</Link>
-						<Div>
-							{this.state.isRecruitTeamsExist &&
-								<Button mode="primary" size='xl'
-									onClick={() => goToPage('setUserTeam', this.state.itemId)}>
-									Завербовать
-							</Button>}
-						</Div>
+						{!this.props.profileUser &&
+							<Div>
+								<Button mode="destructive" size='xl'
+									onClick={() => this.confirmUser()}>
+									Зарегистрироваться
+									</Button>
+							</Div>}
 					</Group>
 				}
 				<Separator />
@@ -194,43 +194,12 @@ class User extends React.Component {
 								<Cell multiline before={<Icon24Article style={{ paddingTop: 0, paddingBottom: 0 }} />}>
 									{this.state.user.about}
 								</Cell>}
-							{/* {this.state.user?.mobile &&
-								<Cell>
-									<InfoRow header="Телефон">
-										<Link href={"tel:" + this.state.user.mobile}>{this.state.user.mobile}</Link>
-									</InfoRow>
-								</Cell>}
-							{this.state.user?.telegram &&
-								<Cell>
-									<InfoRow header="Telegram">
-										<Link href={"tg://resolve?domain=" + this.state.user.telegram}>@{this.state.user.telegram}</Link>
-									</InfoRow>
-								</Cell>}
-							{this.state.user?.email &&
-								<Cell>
-									<InfoRow header="Email">
-										<Link href={"mailto:" + this.state.user.email}>{this.state.user.email}</Link>
-									</InfoRow>
-								</Cell>}
-							{this.state.user?.about &&
-								<Cell multiline>
-									<InfoRow header="Дополнительно">
-										{this.state.user.about}
-									</InfoRow>
-								</Cell>} */}
 							{this.state.user?.userSkills?.length > 0 &&
 								<Cell>
 									<InfoRow header="Навыки">
 										<SkillTokens selectedSkills={Utils.convertUserSkills(this.state.user?.userSkills)} />
 									</InfoRow>
 								</Cell>}
-							<Div>
-								{!this.state.readOnlyMode && !this.props.profileUser &&
-									<Button mode="destructive" size='xl'
-										onClick={() => this.confirmUser()}>
-										Зарегистрироваться
-									</Button>}
-							</Div>
 						</Group> :
 						<Group>
 							<UserTeams loading={this.state.loading} userTeams={this.state.user?.userTeams} readOnlyMode={this.state.readOnlyMode} />

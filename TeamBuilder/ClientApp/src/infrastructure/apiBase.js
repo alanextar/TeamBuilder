@@ -47,6 +47,7 @@ export async function post(url, data = {}) {
     var init = initPost;
     init.body = JSON.stringify(data);
     try {
+		console.log(`post request: ${url}`);
         const resp = await fetch(url, init);
         const json = await resp.json();
         return json;

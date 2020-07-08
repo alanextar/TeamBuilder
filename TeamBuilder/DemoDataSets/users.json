@@ -335,13 +335,13 @@
     "IsModerator": true
   },
   {
-    "id": 252814030,
-    "FirstName": "Даниил",
-    "LastName": "Мильков",
-    "screen_name": "vitalyavolyn",
-    "Photo100": "",
-    "Photo200": "",
-    "IsSearchable": true,
-    "IsModerator": true
+	"id": 252814030,
+	"FirstName": "Даниил",
+	"LastName": "Мильков",
+	"screen_name": "vitalyavolyn",
+	"Photo100": "https://sun9-63.userapi.com/McO10qE_WwP8Ngxr88ihyRMIGj_UKnEfUoSM0Q/YthZC2hyQi4.jpg?ava=1",
+	"Photo200": "https://sun9-44.userapi.com/LK0HS3nng8l9BxsozfpEuCDxOe52NjA_F2ZPgQ/eD2CN3-gYEg.jpg?ava=1",
+	"IsSearchable": true,
+	"IsModerator": true
   }
 ]

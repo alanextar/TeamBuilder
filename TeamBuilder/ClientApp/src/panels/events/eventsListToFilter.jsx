@@ -50,9 +50,8 @@ const EventsListToFilter = props => {
 		<Panel id={props.id}>
 			<SearchWithInfiniteScroll
 				id={props.id}
-				getPageHandler={Api.Events.getPage}
 				pagingSearchHandler={Api.Events.pagingSearch}
-				getPageUrl={Urls.Events.GetPage}
+				getPageUrl={Urls.Events.PagingSearch}
 				header=
 				{<PanelHeader separator={false} left={<PanelHeaderBack onClick={() => backClickHandler()} />} >
 					Выберите мероприятие
