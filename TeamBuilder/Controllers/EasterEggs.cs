@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 using TeamBuilder.Models;
 using TeamBuilder.Models.Enums;
 
-namespace TeamBuilder.Services
+namespace TeamBuilder.Controllers
 {
 	public class EasterEggs
 	{

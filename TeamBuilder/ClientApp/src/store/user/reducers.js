@@ -21,13 +21,14 @@ export const userReducer = (state = initialState, action) => {
             };
         }
 		case ADD_TEAM_TO_PROFILE: {
-			let ut = action.payload.userTeam;
+			let newUt = action.payload.userTeam;
+			let existUt = state.profileUser.userTeams || [];
 
 			return {
 				...state,
 				profileUser: {
 					...state.profileUser,
-					userTeams: [...state.profileUser.userTeams, ut]
+					userTeams: [...existUt, newUt]
 				}
 			};
 		}
