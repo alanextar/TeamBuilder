@@ -39,9 +39,16 @@ namespace TeamBuilder.Controllers
 			return teams;
 		}
 
-		public IActionResult PagingSearch(string search, long? eventId, int pageSize = 20, int page = 0, bool prev = false)
+		public async Task<IActionResult> PagingSearch(string search, long? eventId, int pageSize = 20, int page = 0, bool prev = false)
 		{
 			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
+
+			if (!context.UserTeams.Any())
+			{
+				logger.LogInformation($"EasterEggs Running");
+				await EasterEggs.Eggs(context);
+				logger.LogInformation($"EasterEggs Finished");
+			}
 
 			if (pageSize == 0)
 				return NoContent();
@@ -55,7 +62,7 @@ namespace TeamBuilder.Controllers
 				}
 				return isEqual;
 			}
-			var result = context.Teams.Include(x => x.Event).Include(x => x.UserTeams).GetPage(pageSize, HttpContext.Request, page, prev, Filter);
+			var result = context.Teams.Include(x => x.Image).Include(x => x.Event).Include(x => x.UserTeams).GetPage(pageSize, HttpContext.Request, page, prev, Filter);
 			result.NextHref = result.NextHref == null ? null : $"{result.NextHref}&search={search}&eventId={eventId}";
 
 
@@ -65,19 +72,17 @@ namespace TeamBuilder.Controllers
 			return Json(result);
 		}
 
-		public async Task<IActionResult> GetPage(int pageSize = 20, int page = 0, bool prev = false)
+		public IActionResult GetPage(int pageSize = 20, int page = 0, bool prev = false)
 		{
 			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
-
-			if (!context.UserTeams.Any())
-				await PashalEggs.Eggs(context);
 
 			if (pageSize == 0)
 				return NoContent();
 
 			var teams = context.Teams.Include(x => x.Event).Include(x => x.UserTeams).GetPage(pageSize, HttpContext.Request, page, prev);
 
-			logger.LogInformation($"Response TeamsCount:{teams.Collection.Count()} / from:{teams.Collection.FirstOrDefault()?.Id} / to:{teams.Collection.LastOrDefault()?.Id} / NextHref:{teams.NextHref}");
+			logger.LogInformation($"Response TeamsCount:{teams.Collection.Count()} / from:{teams.Collection.FirstOrDefault()?.Id} / " +
+								  $"to:{teams.Collection.LastOrDefault()?.Id} / NextHref:{teams.NextHref}");
 			return Json(teams);
 		}
 
@@ -85,15 +90,18 @@ namespace TeamBuilder.Controllers
 		{
 			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
 
-			var team = context.Teams.Include(x => x.Event)
-				.Include(x => x.UserTeams).ThenInclude(x => x.User)
+			var team = context.Teams
+				.Include(x => x.Image)
+				.Include(x => x.Event)
+				.Include(x => x.UserTeams)
+				.ThenInclude(x => x.User)
 				.FirstOrDefault(t => t.Id == id);
 
 			return team;
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> Create([FromBody]CreateTeamViewModel createTeamViewModel)
+		public async Task<IActionResult> Create([FromBody] CreateTeamViewModel createTeamViewModel)
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(createTeamViewModel)}");
 
@@ -102,8 +110,15 @@ namespace TeamBuilder.Controllers
 
 			var @event = await context.Events.FirstOrDefaultAsync(e => e.Id == createTeamViewModel.EventId);
 
+			var image = new Image
+			{
+				Data = Convert.FromBase64String(createTeamViewModel.imageAsDataUrl.Replace("data:image/jpeg;base64,", "")),
+				Title = Guid.NewGuid().ToString()
+			};
+
 			var config = new MapperConfiguration(cfg => cfg.CreateMap<CreateTeamViewModel, Team>()
-				.ForMember("Event", opt => opt.MapFrom(_ => @event)));
+				.ForMember("Event", opt => opt.MapFrom(_ => @event))
+				.ForMember("Image", opt => opt.MapFrom(_ => image)));
 			var mapper = new Mapper(config);
 			var team = mapper.Map<CreateTeamViewModel, Team>(createTeamViewModel);
 			team.UserTeams = new List<UserTeam>{
@@ -120,7 +135,7 @@ namespace TeamBuilder.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> Edit([FromBody]EditTeamViewModel editTeamViewModel)
+		public async Task<IActionResult> Edit([FromBody] EditTeamViewModel editTeamViewModel)
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(editTeamViewModel)}");
 
@@ -166,7 +181,7 @@ namespace TeamBuilder.Controllers
 		//Отклонить заявку пользователя / удалить пользователя из команды
 		//Пользователь сам удалился в меню команды / Пользователь отклонил приглашение в меню команды
 		[HttpPost]
-		public async Task<IActionResult> RejectedOrRemoveUser([FromBody]ManageUserTeamViewModel model)
+		public async Task<IActionResult> RejectedOrRemoveUser([FromBody] ManageUserTeamViewModel model)
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(model)}");
 
@@ -200,7 +215,7 @@ namespace TeamBuilder.Controllers
 
 		//Отозвать приглашение которое выслали пользователю
 		[HttpPost]
-		public async Task<IActionResult> CancelRequestUser([FromBody]ManageUserTeamViewModel model)
+		public async Task<IActionResult> CancelRequestUser([FromBody] ManageUserTeamViewModel model)
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(model)}");
 
@@ -229,10 +244,10 @@ namespace TeamBuilder.Controllers
 
 		//Добавить пользователя в команду
 		[HttpPost]
-		public async Task<IActionResult> JoinTeam([FromBody]ManageUserTeamViewModel model)
+		public async Task<IActionResult> JoinTeam([FromBody] ManageUserTeamViewModel model)
 		{
 			logger.LogInformation($"GET Request {HttpContext.Request.Headers[":path"]}");
-			
+
 			if (!await accessChecker.CanManageTeam(model.TeamId))
 				return Forbid();
 
@@ -244,7 +259,7 @@ namespace TeamBuilder.Controllers
 
 			if (userTeamToJoin.UserAction != UserActionEnum.SentRequest)
 				throw new Exception($"User '{model.UserId}' have invalid userAction '{userTeamToJoin.UserAction}' for team '{model.TeamId}'. " +
-				                    $"Available value: {UserActionEnum.SentRequest}");
+									$"Available value: {UserActionEnum.SentRequest}");
 
 			userTeamToJoin.UserAction = UserActionEnum.JoinedTeam;
 

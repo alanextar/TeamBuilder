@@ -57,7 +57,7 @@ class TeamInfo extends React.Component {
 
 	async populateTeamData() {
 		Api.Teams.get(this.state.itemId)
-			.then(result => this.setState({ team: result }) );
+			.then(result => this.setState({ team: result }));
 	}
 
 	toggleContext() {
@@ -319,7 +319,7 @@ class TeamInfo extends React.Component {
 					{this.state.profileUser ?
 						<PanelHeaderContent
 							status={`${countConfirmed(this.state.team.userTeams)} участников`}
-							before={<Avatar size={36} src={this.state.team.photo100} />}
+							before={<Avatar size={36} src={this.state.team.image?.dataURL} />}
 							aside={<Icon16Dropdown style={{ transform: `rotate(${this.state.contextOpened ? '180deg' : '0'})` }} />}
 							onClick={() => { this.toggleContext(); }}>
 							{this.state.team.name}

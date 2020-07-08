@@ -42,7 +42,7 @@ const Teams = props => {
 				{items?.map(team => (
 					<Card size="l" mode="shadow" key={team.id}>
 						<RichCell
-							before={<Avatar size={64} src={team.photo100} />}
+							before={<Avatar size={64} src={team.image?.dataURL} />}
 							text={team.description}
 							caption={team.event?.name}
 							after={countConfirmed(team.userTeams) +

@@ -1,8 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using TeamBuilder.Models;
 
 namespace TeamBuilder
@@ -15,8 +11,9 @@ namespace TeamBuilder
         public DbSet<UserSkill> UserSkills { get; set; }
         public DbSet<Team> Teams { get; set; }
         public DbSet<Event> Events { get; set; }
+		public DbSet<Image> Images { get; set; }
 
-        public ApplicationContext(DbContextOptions<ApplicationContext> options)
+		public ApplicationContext(DbContextOptions<ApplicationContext> options)
             : base(options)
         {
             //Database.EnsureCreated();

@@ -1,20 +1,20 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using TeamBuilder.Migrations;
 using TeamBuilder.Models;
 using TeamBuilder.Models.Enums;
 
-namespace TeamBuilder.Controllers
+namespace TeamBuilder.Services
 {
-	public class PashalEggs
+	public class EasterEggs
 	{
 		public static async Task Eggs(ApplicationContext context)
 		{
+			var httpClient = new HttpClient();
 			await Initialize(context);
 
 			var users = await context.Users
@@ -22,7 +22,7 @@ namespace TeamBuilder.Controllers
 				.Include(u => u.UserTeams).ThenInclude(ut => ut.Team)
 				.ToListAsync();
 			var skills = await context.Skills.Include(s => s.UserSkills).ThenInclude(us => us.User).ToListAsync();
-			var teams = await context.Teams.Include(t => t.Event).Include(t => t.UserTeams).ToListAsync();
+			var teams = await context.Teams.Include(t => t.Image).Include(t => t.Event).Include(t => t.UserTeams).ToListAsync();
 			var events = await context.Events.ToListAsync();
 
 			var random = new Random();
@@ -43,6 +43,7 @@ namespace TeamBuilder.Controllers
 						UserAction = (UserActionEnum)random.Next(1, 6)
 					}));
 				team.Event = events[random.Next(0, events.Count)];
+				team.Image = await GetRandomImage(httpClient);
 				var id = random.Next(0, team.UserTeams.Count);
 				team.UserTeams[id].IsOwner = true;
 				team.UserTeams[id].UserAction = UserActionEnum.None;
@@ -58,6 +59,17 @@ namespace TeamBuilder.Controllers
 			context.UpdateRange(teams);
 			context.UpdateRange(events);
 			await context.SaveChangesAsync();
+
+			httpClient.Dispose();
+		}
+
+		private static async Task<Image> GetRandomImage(HttpClient httpClient)
+		{
+			var newGuid = Guid.NewGuid().ToString();
+			var url = @$"https://picsum.photos/seed/{newGuid}/100";
+			var data = await httpClient.GetByteArrayAsync(url);
+
+			return new Image{Data = data, Title = newGuid};
 		}
 
 

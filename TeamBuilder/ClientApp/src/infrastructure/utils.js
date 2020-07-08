@@ -24,7 +24,7 @@ export function convertSkills(skills) {
 }
 
 export function countMyActiveTeams(userTeams) {
-	return countActiveUserTeams(userTeams, [1,2,5]);
+	return countActiveUserTeams(userTeams, [1, 2, 5]);
 };
 
 export function countForeignActiveTeams(userTeams) {
@@ -35,7 +35,7 @@ export function countActiveUserTeams(userTeams, activeActions) {
 	let count = !userTeams
 		? 0
 		: userTeams
-			.filter(x => 
+			.filter(x =>
 				activeActions.indexOf(x.userAction) !== -1 ||
 				x.isOwner)
 			.length;
@@ -57,21 +57,21 @@ export function renderEventDate(event) {
 	}
 }
 
-export function convertDateToWebType (date) {
+export function convertDateToWebType(date) {
 	let splitted = date.split('.');
 	return `${splitted[2]}-${splitted[1]}-${splitted[0]}`;
 }
 
-export function GetRandomPic() {
+export async function GetRandomPicUrl() {
 	let url = ``;
 
 	let count = 0
 	while (count < 10) {
-		url = `https://picsum.photos/id/${getRandomInt()}/100`;
-		if (UrlExists(url)) {
-			return url;
+		url = `https://picsum.photos/seed/${getRandomInt()}/100`;
+		const response = await fetch(url);
+		if (response.ok) {
+			return await readBlobAsDataURL(await response.blob());
 		}
-		console.log(`count: ${count}`);
 		count++;
 	}
 	return url;
@@ -83,10 +83,18 @@ function getRandomInt() {
 	return Math.floor(Math.random() * (+max - +min)) + +min;
 }
 
-function UrlExists(url) {
-	var http = new XMLHttpRequest();
-	http.open('GET', url);
-	http.responseType = 'blob';
-	http.send();
-	return http.status != 404
-}
+function readBlobAsDataURL(blob) {
+	const temporaryFileReader = new FileReader();
+
+	return new Promise((resolve, reject) => {
+		temporaryFileReader.onerror = () => {
+			temporaryFileReader.abort();
+			reject(new DOMException("Problem parsing input file."));
+		};
+
+		temporaryFileReader.onload = () => {
+			resolve(temporaryFileReader.result);
+		};
+		temporaryFileReader.readAsDataURL(blob);
+	});
+};

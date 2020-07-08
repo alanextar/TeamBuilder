@@ -38,7 +38,12 @@ namespace TeamBuilder.Controllers
 		public async Task<IActionResult> Get(int id)
 		{
 			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
-			var @event = await context.Events.Include(e => e.Teams).ThenInclude(t => t.UserTeams).FirstOrDefaultAsync(e => e.Id == id);
+			var @event = await context.Events
+				.Include(e => e.Teams)
+				.ThenInclude(t => t.UserTeams)
+				.Include(t => t.Teams)
+				.ThenInclude(t => t.Image)
+				.FirstOrDefaultAsync(e => e.Id == id);
 			return Json(@event);
 		}
 

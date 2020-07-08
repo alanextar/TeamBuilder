@@ -51,6 +51,24 @@ namespace TeamBuilder.Migrations
                     b.ToTable("Events");
                 });
 
+            modelBuilder.Entity("TeamBuilder.Models.Image", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<byte[]>("Data")
+                        .HasColumnType("bytea");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Images");
+                });
+
             modelBuilder.Entity("TeamBuilder.Models.Skill", b =>
                 {
                     b.Property<long>("Id")
@@ -85,6 +103,9 @@ namespace TeamBuilder.Migrations
                     b.Property<long?>("EventId")
                         .HasColumnType("bigint");
 
+                    b.Property<long?>("ImageId")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Link")
                         .HasColumnType("text");
 
@@ -103,6 +124,8 @@ namespace TeamBuilder.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("EventId");
+
+                    b.HasIndex("ImageId");
 
                     b.ToTable("Teams");
                 });
@@ -203,6 +226,10 @@ namespace TeamBuilder.Migrations
                     b.HasOne("TeamBuilder.Models.Event", "Event")
                         .WithMany("Teams")
                         .HasForeignKey("EventId");
+
+                    b.HasOne("TeamBuilder.Models.Image", "Image")
+                        .WithMany()
+                        .HasForeignKey("ImageId");
                 });
 
             modelBuilder.Entity("TeamBuilder.Models.UserSkill", b =>

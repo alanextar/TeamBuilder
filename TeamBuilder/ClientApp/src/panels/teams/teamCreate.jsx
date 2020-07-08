@@ -10,7 +10,7 @@ import {
 	Div, Button, Textarea, FormLayout, Select, Input, Link
 } from '@vkontakte/vkui';
 import { Api } from '../../infrastructure/api';
-import { GetRandomPic } from '../../infrastructure/utils';
+import { GetRandomPicUrl as GetRandomPic } from '../../infrastructure/utils';
 import { addTeamToProfile } from '../../store/user/actions';
 
 class TeamCreate extends React.Component {
@@ -91,14 +91,14 @@ class TeamCreate extends React.Component {
 			return;
 		let createTeamViewModel = {
 			...this.state.inputData,
-			photo100: GetRandomPic()
+			imageAsDataUrl: await GetRandomPic()
 		}
 		let result = await Api.Teams.create(createTeamViewModel)
 		let newUserTeam = {
 			isOwner: true,
 			team: result,
 			teamId: result.id,
-			userAction: 2,
+			userAction: 0,
 			userId: this.props.profileUser.id
 		};
 		this.props.addTeamToProfile(newUserTeam);
@@ -163,18 +163,16 @@ class TeamCreate extends React.Component {
 							</Select>
 						</FormLayout>
 						:
-						<Cell>
-							<FormLayout>
-								<Input top="Количество участников" type="number" placeholder="Введите количество участников"
-									onChange={this.handleInput}
-									name="numberRequiredMembers"
-									value={inputData?.numberRequiredMembers} />
-								<Textarea top="Описание участников и их задач" type="text" placeholder="Опишите какие роли в команде вам нужны"
-									onChange={this.handleInput}
-									name="descriptionRequiredMembers"
-									value={inputData?.descriptionRequiredMembers} />
-							</FormLayout>
-						</Cell>}
+						<FormLayout>
+							<Input top="Количество участников" type="number" placeholder="Введите количество участников"
+								onChange={this.handleInput}
+								name="numberRequiredMembers"
+								value={inputData?.numberRequiredMembers} />
+							<Textarea top="Описание участников и их задач" type="text" placeholder="Опишите какие роли в команде вам нужны"
+								onChange={this.handleInput}
+								name="descriptionRequiredMembers"
+								value={inputData?.descriptionRequiredMembers} />
+						</FormLayout>}
 					<Div>
 						<Button
 							stretched={true}

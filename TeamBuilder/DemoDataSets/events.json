@@ -3,63 +3,63 @@
     "Id": 16,
     "Name": "VK Fresh Code",
     "Description": "VK Fresh Code — грантово-образовательная программа для тех, кто хочет научиться создавать мини-приложения или уже делает их.",
-    "FinishDate": "10.12.2020",
+    "FinishDate": "2020-12-10",
     "Link": "https:\/\/vk.com\/@vkappsdev-vkfreshcode",
-    "StartDate": "28.04.2020",
+    "StartDate": "2020-04-28",
     "OwnerId": null
   },
   {
     "Id": 17,
     "Name": "Цифровой Прорыв. Xакатон‎ #1",
     "Description": "36-часовой онлайн-хакатон, до 200 команд-участников",
-    "FinishDate": "7.06.2020",
+    "FinishDate": "2020-06-7",
     "Link": "https:\/\/leadersofdigital.ru\/",
-    "StartDate": "5.06.2020",
+    "StartDate": "2020-06-5",
     "OwnerId": null
   },
   {
     "Id": 18,
     "Name": "Цифровой Прорыв. Xакатон‎ #2",
     "Description": "36-часовой онлайн-хакатон, до 200 команд-участников",
-    "FinishDate": "21.06.2020",
+    "FinishDate": "2020-06-21",
     "Link": "https:\/\/leadersofdigital.ru\/",
-    "StartDate": "19.06.2020",
+    "StartDate": "2020-06-19",
     "OwnerId": null
   },
   {
     "Id": 19,
     "Name": "Цифровой Прорыв. Чемпионат",
     "Description": "индивидуальное онлайн-соревнование, неограниченное количество участников, тематики: Data Science, Machine Learning, Big Data, искусственный интеллект, аналитика",
-    "FinishDate": "25.07.2020",
+    "FinishDate": "2020-07-25",
     "Link": "https:\/\/leadersofdigital.ru\/",
-    "StartDate": "25.06.2020",
+    "StartDate": "2020-06-25",
     "OwnerId": null
   },
   {
     "Id": 20,
     "Name": "Pandemic Hackathon, online",
     "Description": "Участвуй в конкурсе проектов, помогающих бороться с пандемией Covid-19 и ее последствиями!",
-    "FinishDate": "28.05.2020",
+    "FinishDate": "2020-05-28",
     "Link": "https:\/\/pandemichack.ru\/",
-    "StartDate": "26.05.2020",
+    "StartDate": "2020-05-26",
     "OwnerId": null
   },
   {
     "Id": 21,
     "Name": "Your Student Hackathon",
     "Description": "Цель: создание образовательной игры для \"Всероссийской онлайн-мастерской разработки игр для обучения школьников и студентов\"",
-    "FinishDate": "24.05.2020",
+    "FinishDate": "2020-05-24",
     "Link": "http:\/\/yshack.tilda.ws\/",
-    "StartDate": "23.05.2020",
+    "StartDate": "2020-05-23",
     "OwnerId": null
   },
   {
     "Id": 22,
     "Name": "FinNet Challenge, онлайн",
     "Description": "Если для тебя machine learning и Big Data Science не пустые слова — узнай, насколько круто в этом разбираешься!",
-    "FinishDate": "27.05.2020",
+    "FinishDate": "2020-05-27",
     "Link": "https:\/\/job.tochka.com\/challenge",
-    "StartDate": "4.05.2020",
+    "StartDate": "2020-05-4",
     "OwnerId": null
   }
 ]
