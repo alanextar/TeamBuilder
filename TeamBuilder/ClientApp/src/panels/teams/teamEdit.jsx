@@ -110,7 +110,7 @@ class TeamEdit extends React.Component {
 
 	//Удалить из команды / отклонить заявку
 	async dropUser(e, userTeam) {
-		Api.Teams.rejectedOrRemoveUser({ teamId: userTeam.teamId, userId: userTeam.userId })
+		Api.Teams.rejectedOrRemoveUser(userTeam.userId, userTeam.teamId)
 			.then(newTeam => {
 				this.updateTeam(newTeam);
 			})
@@ -118,7 +118,7 @@ class TeamEdit extends React.Component {
 
 	//Отменить приглашение
 	async cancelUser(e, userTeam) {
-		Api.Teams.cancelRequestUser({ teamId: userTeam.teamId, userId: userTeam.userId })
+		Api.Teams.cancelRequestUser(userTeam.userId, userTeam.teamId)
 			.then(newTeam => {
 				this.updateTeam(newTeam)
 			})
