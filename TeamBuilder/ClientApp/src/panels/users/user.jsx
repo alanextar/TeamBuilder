@@ -38,10 +38,9 @@ class User extends React.Component {
 		let isMyProfile = itemIdInitial == props.profile.id;
 		this.bindingId = `user_${itemIdInitial}`;
 
+		//TODO activeTab можно убрать из state
 		this.state = {
 			itemId: itemIdInitial,
-
-			profile: props.profile,
 			user: null,
 
 			activeTab: props.activeTab[this.bindingId] || "main",
@@ -75,12 +74,12 @@ class User extends React.Component {
 		this.setState({ user: user });
 
 		if (this.state.readOnlyMode) {
-			let updatedProfile = await Api.Users.get(this.state.profile.id);
+			let updatedProfile = await Api.Users.get(this.props.profile.id);
 			setProfileUser(updatedProfile);
 
 			let needGetRecruitTeams = updatedProfile?.anyTeamOwner && user?.isSearchable
 			if (needGetRecruitTeams) {
-				let teams = await Api.Users.getRecruitTeams(this.state.profile.id, this.state.itemId);
+				let teams = await Api.Users.getRecruitTeams(this.props.profile.id, this.state.itemId);
 				this.setState({ isRecruitTeamsExist: teams.length > 0 });
 			}
 		}
@@ -94,15 +93,15 @@ class User extends React.Component {
 	async confirmUser() {
 		const { setProfileUser } = this.props;
 
-		if (!this.state.profile)
+		if (!this.props.profile)
 			return;
 
 		var profileViewModel = {
-			id: this.state.profile.id,
-			firstName: this.state.profile.first_name,
-			lastName: this.state.profile.last_name,
-			photo100: this.state.profile.photo_100,
-			photo200: this.state.profile.photo_200
+			id: this.props.profile.id,
+			firstName: this.props.profile.first_name,
+			lastName: this.props.profile.last_name,
+			photo100: this.props.profile.photo_100,
+			photo200: this.props.profile.photo_200
 		};
 
 		Api.Users.saveOrConfirm(profileViewModel)
@@ -137,13 +136,13 @@ class User extends React.Component {
 							</Button>
 							</Div>}
 					</Group>
-					: this.state.profile &&
+					: this.props.profile &&
 					<Group title="VK Connect">
-						<Link href={"https://m.vk.com/id" + this.state.profile.id} target="_blank">
-							<Cell description={this.state.profile.city?.title || ''}
-								before={this.state.profile.photo_200 ? <Avatar src={this.state.profile.photo_200} /> : null}
+						<Link href={"https://m.vk.com/id" + this.props.profile.id} target="_blank">
+							<Cell description={this.props.profile.city?.title || ''}
+								before={this.props.profile.photo_200 ? <Avatar src={this.props.profile.photo_200} /> : null}
 								asideContent={this.state.user?.isSearchable ? <Icon28ViewOutline /> : <Icon28HideOutline />}>
-								{`${this.state.profile.first_name} ${this.state.profile.last_name}`}
+								{`${this.props.profile.first_name} ${this.props.profile.last_name}`}
 							</Cell>
 						</Link>
 						{!this.props.profileUser &&

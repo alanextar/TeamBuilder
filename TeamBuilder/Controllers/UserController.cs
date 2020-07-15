@@ -29,7 +29,7 @@ namespace TeamBuilder.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> SaveOrConfirm([FromBody]ProfileViewModel profileViewModel)
+		public async Task<IActionResult> SaveOrConfirm([FromBody] ProfileViewModel profileViewModel)
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(profileViewModel)}");
 
@@ -122,9 +122,11 @@ namespace TeamBuilder.Controllers
 
 			if (user?.UserTeams != null)
 			{
-				user.UserTeams = user.UserTeams.Where(x => x.UserAction == UserActionEnum.ConsideringOffer ||
-				x.UserAction == UserActionEnum.JoinedTeam ||
-				x.UserAction == UserActionEnum.SentRequest || x.IsOwner).ToList();
+				user.UserTeams = user.UserTeams.Where(x =>
+					x.UserAction == UserActionEnum.ConsideringOffer ||
+					x.UserAction == UserActionEnum.JoinedTeam ||
+					x.UserAction == UserActionEnum.SentRequest || 
+					x.IsOwner).ToList();
 
 				user.AnyTeamOwner = user.UserTeams.Any(x => x.IsOwner);
 			}
@@ -156,7 +158,7 @@ namespace TeamBuilder.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> Edit([FromBody]EditUserViewModel editUserModel)
+		public async Task<IActionResult> Edit([FromBody] EditUserViewModel editUserModel)
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");
 
@@ -294,7 +296,7 @@ namespace TeamBuilder.Controllers
 		{
 			logger.LogInformation("Request SetTeam");
 
-			var dbTeam = context.Teams.Include(x => x.UserTeams).ThenInclude(x => x.User).FirstOrDefault(x => x.Id == teamId);
+			var dbTeam = context.Teams.Include(x => x.UserTeams).ThenInclude(x => x.Team).ThenInclude(x => x.Event).FirstOrDefault(x => x.Id == teamId);
 			if (dbTeam == null)
 				return NotFound();
 
