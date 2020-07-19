@@ -3,7 +3,6 @@ import { Api } from '../../infrastructure/api';
 
 import { connect } from 'react-redux';
 import { goBack, goToPage } from "../../store/router/actions";
-import { setActiveTab } from "../../store/vk/actions";
 import { setFormData } from "../../store/formData/actions";
 
 import {
@@ -11,8 +10,6 @@ import {
 	Div, Button, Textarea, FormLayout, Select, Input, Header, InfoRow, Avatar,
 	RichCell, Link
 } from '@vkontakte/vkui';
-
-import Icon24DismissDark from '@vkontakte/icons/dist/24/dismiss_dark';
 
 import { getActivePanel } from "../../services/_functions";
 
@@ -26,7 +23,6 @@ class TeamEdit extends React.Component {
 		this.state = {
 			itemId: itemIdInitial,
 
-			activeTab: props.activeTab[this.bindingId] || "teamDescription",
 			inputData: props.inputData[this.bindingId],
 			events: []
 		};
@@ -67,8 +63,7 @@ class TeamEdit extends React.Component {
 	}
 
 	componentWillUnmount() {
-		const { setActiveTab, setFormData } = this.props;
-		setActiveTab(this.bindingId, this.state.activeTab);
+		const { setFormData } = this.props;
 		setFormData(this.bindingId, this.state.inputData);
 	}
 
@@ -92,37 +87,8 @@ class TeamEdit extends React.Component {
 		goBack();
 	};
 
-	//Принять в команду
-	async handleJoin(e, userTeam) {
-		e.stopPropagation();
-		Api.Teams.joinTeam(userTeam.userId, userTeam.teamId)
-			.then(newTeam => {
-				this.updateTeam(newTeam)
-			});
-	};
-
-	//Удалить из команды / отклонить заявку
-	async dropUser(e, userTeam) {
-		Api.Teams.rejectedOrRemoveUser(userTeam.userId, userTeam.teamId)
-			.then(newTeam => {
-				this.updateTeam(newTeam);
-			})
-	};
-
-	//Отменить приглашение
-	async cancelUser(e, userTeam) {
-		Api.Teams.cancelRequestUser(userTeam.userId, userTeam.teamId)
-			.then(newTeam => {
-				this.updateTeam(newTeam)
-			})
-	};
-
-	updateTeam(newTeam) {
-		this.setState({ inputData: newTeam })
-	}
-
 	render() {
-		const { goToPage, activeView } = this.props;
+		const { goToPage } = this.props;
 		var inputData = this.state.inputData;
 
 		return (
@@ -130,90 +96,38 @@ class TeamEdit extends React.Component {
 				<PanelHeader separator={false} left={<PanelHeaderBack onClick={this.cancelForm} />}>
 					Редактировать
                 </PanelHeader>
-				<Tabs>
-					<TabsItem
-						onClick={() => { this.setState({ activeTab: 'teamDescription' }) }}
-						selected={this.state.activeTab === 'teamDescription'}>
-						Описание
-                        </TabsItem>
-					<TabsItem
-						onClick={() => { this.setState({ activeTab: 'teamUsers' }) }}
-						selected={this.state.activeTab === 'teamUsers'}>
-						Участники
-                        </TabsItem>
-				</Tabs>
 				<Group>
-					{inputData && (
-						this.state.activeTab === 'teamDescription' ?
-							<FormLayout >
-								<Input name="name" top="Название команды" type="text" value={inputData.name}
-									onChange={this.handleInput} status={inputData.name ? 'valid' : 'error'} placeholder='Введите название команды' />
-								<Textarea top="Описание команды" name="description" value={inputData.description} onChange={this.handleInput} />
-								<Select
-									top='Выберете событие'
-									placeholder="Событие"
-									onChange={this.handleInput}
-									name="eventId"
-									value={inputData.eventId || ''}
-									bottom={<Link style={{ color: 'rebeccapurple', textAlign: "right" }} onClick={() => goToPage('eventCreate')}>Создать событие</Link>}>
-									{this.state.events?.map(ev => {
-										return (
-											<option value={ev.id} key={ev.id}>
-												{ev.name}
-											</option>
-										)
-									})}
-								</Select>
-							</FormLayout>
-							:
-							<Group>
-								<Group>
-									<FormLayout>
-										<Input top="Количество требуемых участников"
-											name="numberRequiredMembers"
-											value={String(inputData.numberRequiredMembers)}
-											onChange={this.handleInput}
-											type="number" />
-										<Textarea
-											top="Описание участников и их задач"
-											name="descriptionRequiredMembers"
-											value={inputData.descriptionRequiredMembers}
-											onChange={this.handleInput} />
-									</FormLayout>
-								</Group>
-								<Group>
-									<Header mode="secondary">Участники</Header>
-									{inputData.userTeams?.map(userTeam => {
-										return (
-											(userTeam.userAction === 1 || userTeam.userAction === 2 || userTeam.userAction === 5) &&
-											<RichCell key={userTeam.userId}
-												before={<Avatar size={48} src={userTeam.user.photo100} />}
-												after={userTeam.userAction === 2 && <Icon24DismissDark
-													onClick={(e) => this.dropUser(e, userTeam)} />}
-												actions={
-													userTeam.userAction === 1 &&
-													<React.Fragment>
-														<Button
-															onClick={(e) => this.handleJoin(e, userTeam)}>Принять</Button>
-														<Button mode="secondary" style={{ marginLeft: 2 }}
-															onClick={(e) => this.dropUser(e, userTeam)}>Отклонить</Button>
-													</React.Fragment> ||
-													userTeam.userAction === 5 &&
-													<React.Fragment>
-														<Button mode="secondary"
-															onClick={(e) => this.cancelUser(e, userTeam)}>Отозвать предложение</Button>
-													</React.Fragment>
-												}
-											>
-												{userTeam.user.fullName}
-											</RichCell>
-										)
-									}
-									)}
-								</Group>
-
-							</Group>
-					)}
+					{inputData &&
+						<FormLayout >
+							<Input name="name" top="Название команды" type="text" value={inputData.name}
+								onChange={this.handleInput} status={inputData.name ? 'valid' : 'error'} placeholder='Введите название команды' />
+							<Textarea top="Описание команды" name="description" value={inputData.description} onChange={this.handleInput} />
+							<Select
+								top='Выберете событие'
+								placeholder="Событие"
+								onChange={this.handleInput}
+								name="eventId"
+								value={inputData.eventId || ''}
+								bottom={<Link style={{ color: 'rebeccapurple', textAlign: "right" }} onClick={() => goToPage('eventCreate')}>Создать событие</Link>}>
+								{this.state.events?.map(ev => {
+									return (
+										<option value={ev.id} key={ev.id}>
+											{ev.name}
+										</option>
+									)
+								})}
+							</Select>
+							<Input top="Количество требуемых участников"
+								name="numberRequiredMembers"
+								value={String(inputData.numberRequiredMembers)}
+								onChange={this.handleInput}
+								type="number" />
+							<Textarea
+								top="Описание участников и их задач"
+								name="descriptionRequiredMembers"
+								value={inputData.descriptionRequiredMembers}
+								onChange={this.handleInput} />
+						</FormLayout>}
 					<Div>
 						<Button
 							size="xl"
@@ -232,7 +146,6 @@ class TeamEdit extends React.Component {
 const mapStateToProps = (state) => {
 	return {
 		activeView: state.router.activeView,
-		activeTab: state.vkui.activeTab,
 		inputData: state.formData.forms
 	};
 };
@@ -241,7 +154,6 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
 	goToPage,
 	goBack,
-	setActiveTab,
 	setFormData
 }
 

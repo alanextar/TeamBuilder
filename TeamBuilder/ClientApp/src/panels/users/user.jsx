@@ -34,8 +34,8 @@ class User extends React.Component {
 	constructor(props) {
 		super(props);
 
-		let itemIdInitial = getActivePanel(props.activeView).itemId || props.profile.id;
-		let isMyProfile = itemIdInitial == props.profile.id;
+		let itemIdInitial = getActivePanel(props.activeView).itemId || props.profile?.id;
+		let isMyProfile = itemIdInitial == props.profile?.id;
 		this.bindingId = `user_${itemIdInitial}`;
 
 		//TODO activeTab можно убрать из state
@@ -58,7 +58,7 @@ class User extends React.Component {
 
 	componentDidUpdate(prevProps) {
 		if (this.props.activeTab[this.bindingId] !== prevProps.activeTab[this.bindingId]) {
-			this.setState({ activeTab: this.props.activeTab[this.bindingId] })
+			this.setState({ activeTab: this.props.activeTab[this.bindingId] });
 		}
 	}
 
@@ -74,12 +74,12 @@ class User extends React.Component {
 		this.setState({ user: user });
 
 		if (this.state.readOnlyMode) {
-			let updatedProfile = await Api.Users.get(this.props.profile.id);
+			let updatedProfile = await Api.Users.get(this.props.profile?.id);
 			setProfileUser(updatedProfile);
 
 			let needGetRecruitTeams = updatedProfile?.anyTeamOwner && user?.isSearchable
 			if (needGetRecruitTeams) {
-				let teams = await Api.Users.getRecruitTeams(this.props.profile.id, this.state.itemId);
+				let teams = await Api.Users.getRecruitTeams(this.props.profile?.id, this.state.itemId);
 				this.setState({ isRecruitTeamsExist: teams.length > 0 });
 			}
 		}

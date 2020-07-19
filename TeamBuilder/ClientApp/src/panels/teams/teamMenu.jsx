@@ -12,68 +12,61 @@ import { countConfirmed } from "../../infrastructure/utils";
 const TeamMenu = (props) => {
 	const { goToPage } = props;
 
-	const [team, setTeam] = useState(props.team);
-
-	useEffect(() => {
-		if (props.team !== team) {
-			setTeam(props.team);
-		}
-	}, [props.team]);
-
 	const userInActiveTeam =
 		props.profile &&
-		team.userTeams?.find((user) => user.userId === props.profile.id);
+		props.team.userTeams?.find((user) => user.userId === props.profile.id);
 
 	const isUserInActiveTeam = userInActiveTeam != null;
 	const isOwner = isUserInActiveTeam && userInActiveTeam?.isOwner;
 	const isModerator = props.profileUser?.isModerator;
 	const userAction = userInActiveTeam?.userAction;
-	const confirmedUser = countConfirmed(team.userTeams);
+	const confirmedUser = countConfirmed(props.team.userTeams);
 
 	const canEdit = isOwner || isModerator;
 	const canSendRequest =
 		(!isUserInActiveTeam || userAction == 3 || userAction == 4) &&
-		confirmedUser < team.numberRequiredMembers;
-	const fullTank = confirmedUser >= team.numberRequiredMembers;
+		confirmedUser < props.team.numberRequiredMembers;
+	const fullTank = confirmedUser >= props.team.numberRequiredMembers;
 
 	const sendRequestHandler = async () => {
-		let updatedTeam = await TeamManagement.sendRequest(team.id);
+		let updatedTeam = await TeamManagement.sendRequest(props.team.id);
 		setUserTeams(updatedTeam.userTeams);
 	};
 
 	const dropUserHandler = async () => {
-		let updatedTeam = await TeamManagement.dropUser(team.id);
+		let updatedTeam = await TeamManagement.dropUser(props.team.id);
 		setUserTeams(updatedTeam.userTeams);
 	};
 
 	const canselRequestHandler = async () => {
-		let updatedTeam = await TeamManagement.cancelUser(team.id);
+		let updatedTeam = await TeamManagement.cancelUser(props.team.id);
 		setUserTeams(updatedTeam.userTeams);
 	};
 
 	const joinTeamHandler = async () => {
-		let updatedTeam = await TeamManagement.joinTeam(team.id);
+		let updatedTeam = await TeamManagement.joinTeam(props.team.id);
 		setUserTeams(updatedTeam.userTeams);
 	};
 
-	const setUserTeams = (userTeams) =>
-		setTeam({
-			...team,
+	const setUserTeams = (userTeams) => {
+		props.updateTeam({
+			...props.team,
 			userTeams: userTeams,
 		});
+	}
 
 	return (
-		team && (
+		props.team && (
 			<PanelHeaderContext opened={props.opened} onClose={props.onClose}>
 				<List>
 					{(canEdit && (
 						<>
-							<Cell onClick={() => goToPage("teamEdit", team.id)}>
+							<Cell onClick={() => goToPage("teamEdit", props.team.id)}>
 								Редактировать команду
 							</Cell>
 							<Cell
 								onClick={() =>
-									Alerts.DeleteTeamPopout(team.id, team.name)
+									Alerts.DeleteTeamPopout(props.team.id, props.team.name)
 								}
 							>
 								Удалить команду
@@ -88,7 +81,7 @@ const TeamMenu = (props) => {
 						(userAction === 2 && (
 							<Cell
 								onClick={() =>
-									Alerts.LeaveTeamPopout(team.name, dropUserHandler)
+									Alerts.LeaveTeamPopout(props.team.name, dropUserHandler)
 								}
 							>
 								Выйти из команды
@@ -101,7 +94,7 @@ const TeamMenu = (props) => {
 								</Cell>
 								<Cell
 									onClick={() =>
-										Alerts.DeclineTeamInvitePopout(team.name, dropUserHandler)
+										Alerts.DeclineTeamInvitePopout(props.team.name, dropUserHandler)
 									}
 								>
 									Отклонить приглашение

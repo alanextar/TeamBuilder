@@ -2,11 +2,10 @@
 
 import { connect } from 'react-redux';
 import { goBack, goToPage } from "../../store/router/actions";
-import { setActiveTab } from "../../store/vk/actions";
 import { setFormData } from "../../store/formData/actions";
 
 import {
-	Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell,
+	Panel, PanelHeader, PanelHeaderBack, Group,
 	Div, Button, Textarea, FormLayout, Select, Input, Link
 } from '@vkontakte/vkui';
 import { Api } from '../../infrastructure/api';
@@ -17,7 +16,6 @@ class TeamCreate extends React.Component {
 		super(props);
 
 		this.bindingId = props.id;
-		this.defaultActiveTab = 'teamDescription';
 		this.defaultInputData = {
 			name: '',
 			description: '',
@@ -29,7 +27,6 @@ class TeamCreate extends React.Component {
 		this.state = {
 			events: [],
 			id: props.id,
-			activeTab: props.activeTab[this.bindingId] || this.defaultActiveTab,
 			inputData: props.inputData[this.bindingId] || this.defaultInputData
 		};
 
@@ -67,16 +64,10 @@ class TeamCreate extends React.Component {
 				inputData: this.props.inputData[this.bindingId] || this.defaultInputData
 			});
 		}
-		if (this.props.activeTab[this.bindingId] !== prevProps.activeTab[this.bindingId]) {
-			this.setState({
-				activeTab: this.props.activeTab[this.bindingId] || this.defaultActiveTab
-			});
-		}
 	}
 
 	componentWillUnmount() {
-		const { setActiveTab, setFormData } = this.props;
-		setActiveTab(this.bindingId, this.state.activeTab);
+		const { setFormData } = this.props;
 		setFormData(this.bindingId, this.state.inputData);
 	}
 
@@ -99,8 +90,7 @@ class TeamCreate extends React.Component {
 
 	cleanFormData() {
 		this.setState({
-			inputData: this.defaultInputData,
-			activeTab: this.defaultActiveTab
+			inputData: this.defaultInputData
 		});
 	}
 
@@ -113,60 +103,44 @@ class TeamCreate extends React.Component {
 				<PanelHeader separator={false} left={<PanelHeaderBack onClick={this.cancelForm} />}>
 					Создание
 				</PanelHeader>
-				<Tabs>
-					<TabsItem
-						onClick={() => this.setState({ activeTab: 'teamDescription' })}
-						selected={this.state.activeTab === 'teamDescription'}>
-						Описание
-					</TabsItem>
-					<TabsItem
-						onClick={() => this.setState({ activeTab: 'teamUsers' })}
-						selected={this.state.activeTab === 'teamUsers'}>
-						Участники
-					</TabsItem>
-				</Tabs>
 				<Group>
-					{this.state.activeTab === 'teamDescription' ?
-						<FormLayout>
-							<Input top="Название команды" type="text" placeholder="Введите название команды"
-								onChange={this.handleInput}
-								name="name"
-								value={inputData?.name}
-								status={inputData?.name ? 'valid' : 'error'} />
-							<Textarea top="Описание команды" type="text" placeholder="Краткое описание команды"
-								onChange={this.handleInput}
-								name="description"
-								value={inputData?.description} />
-							<Select
-								top="Выберете событие"
-								placeholder="Событие"
-								onChange={this.handleInput}
-								value={inputData?.eventId}
-								name="eventId"
-								bottom={<Link style={{ color: 'rebeccapurple', textAlign: "right" }} onClick={() => goToPage('eventCreate')}>Создать событие</Link>}>
-								{this.state.events?.map(ev => {
-									return (
-										<option value={ev.id} key={ev.id}>
-											{ev.name}
-										</option>
-									)
-								})}
-							</Select>
-						</FormLayout>
-						:
-						<FormLayout>
-							<Input top="Количество участников" type="number" placeholder="Введите количество участников"
-								onChange={this.handleInput}
-								name="numberRequiredMembers"
-								value={inputData?.numberRequiredMembers} />
-							<Textarea top="Описание участников и их задач" type="text" placeholder="Опишите какие роли в команде вам нужны"
-								onChange={this.handleInput}
-								name="descriptionRequiredMembers"
-								value={inputData?.descriptionRequiredMembers} />
-						</FormLayout>}
+					<FormLayout>
+						<Input top="Название команды" type="text" placeholder="Введите название команды"
+							onChange={this.handleInput}
+							name="name"
+							value={inputData?.name}
+							status={inputData?.name ? 'valid' : 'error'} />
+						<Textarea top="Описание команды" type="text" placeholder="Краткое описание команды"
+							onChange={this.handleInput}
+							name="description"
+							value={inputData?.description} />
+						<Select
+							top="Выберете событие"
+							placeholder="Событие"
+							onChange={this.handleInput}
+							value={inputData?.eventId}
+							name="eventId"
+							bottom={<Link style={{ color: 'rebeccapurple', textAlign: "right" }} onClick={() => goToPage('eventCreate')}>Создать событие</Link>}>
+							{this.state.events?.map(ev => {
+								return (
+									<option value={ev.id} key={ev.id}>
+										{ev.name}
+									</option>
+								)
+							})}
+						</Select>
+						<Input top="Количество участников" type="number" placeholder="Введите количество участников"
+							onChange={this.handleInput}
+							name="numberRequiredMembers"
+							value={inputData?.numberRequiredMembers} />
+						<Textarea top="Описание участников и их задач" type="text" placeholder="Опишите какие роли в команде вам нужны"
+							onChange={this.handleInput}
+							name="descriptionRequiredMembers"
+							value={inputData?.descriptionRequiredMembers} />
+					</FormLayout>
 					<Div>
 						<Button
-							stretched={true}
+							stretched
 							size='xl'
 							onClick={() => this.postCreate()}>
 							Создать Команду
@@ -182,7 +156,6 @@ class TeamCreate extends React.Component {
 
 const mapStateToProps = (state) => {
 	return {
-		activeTab: state.vkui.activeTab,
 		inputData: state.formData.forms,
 		profileUser: state.user.profileUser
 	};
@@ -191,7 +164,6 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
 	goToPage,
 	goBack,
-	setActiveTab,
 	setFormData
 }
 

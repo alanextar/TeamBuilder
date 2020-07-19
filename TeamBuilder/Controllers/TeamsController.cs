@@ -175,6 +175,7 @@ namespace TeamBuilder.Controllers
 				return Forbid();
 
 			var team = await context.Teams
+				.Include(t => t.Image)
 				.Include(u => u.UserTeams)
 				.ThenInclude(ut => ut.User)
 				.FirstOrDefaultAsync(u => u.Id == model.TeamId);
@@ -206,6 +207,7 @@ namespace TeamBuilder.Controllers
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(model)}");
 
 			var team = await context.Teams
+				.Include(t => t.Image)
 				.Include(u => u.UserTeams)
 				.ThenInclude(ut => ut.User)
 				.FirstOrDefaultAsync(u => u.Id == model.TeamId);
@@ -261,6 +263,7 @@ namespace TeamBuilder.Controllers
 			await context.SaveChangesAsync();
 
 			var updTeam = context.Teams
+				.Include(t => t.Image)
 				.Include(x => x.UserTeams)
 				.ThenInclude(y => y.User).FirstOrDefault(x => x.Id == model.TeamId);
 

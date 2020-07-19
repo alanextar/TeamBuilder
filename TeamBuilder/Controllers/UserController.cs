@@ -241,7 +241,7 @@ namespace TeamBuilder.Controllers
 				_ => throw new Exception($"User '{profileId}' have invalid userAction '{userTeam.UserAction}' for team '{teamId}'. " +
 										 $"Available value: {UserActionEnum.ConsideringOffer}, {UserActionEnum.JoinedTeam}")
 			};
-			
+
 			context.Update(user);
 			await context.SaveChangesAsync();
 
@@ -286,7 +286,14 @@ namespace TeamBuilder.Controllers
 		{
 			logger.LogInformation("Request SetTeam");
 
-			var dbTeam = context.Teams.Include(x => x.UserTeams).ThenInclude(x => x.Team).ThenInclude(x => x.Event).FirstOrDefault(x => x.Id == teamId);
+			var dbTeam = await context.Teams
+				.Include(x => x.Image)
+				.Include(x => x.UserTeams)
+				.ThenInclude(x => x.User)
+				.Include(x => x.UserTeams)
+				.ThenInclude(x => x.Team)
+				.ThenInclude(x => x.Event)
+				.FirstOrDefaultAsync(x => x.Id == teamId);
 			if (dbTeam == null)
 				return NotFound();
 
