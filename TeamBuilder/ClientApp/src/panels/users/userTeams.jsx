@@ -1,125 +1,112 @@
 ﻿import Icon28CheckCircleOutline from '@vkontakte/icons/dist/28/check_circle_outline';
 import Icon28InfoOutline from '@vkontakte/icons/dist/28/info_outline';
-import { Alert, Button, Card, CardGrid, Group, List, Placeholder, RichCell, PanelSpinner } from '@vkontakte/vkui';
+import { Button, Card, CardGrid, Group, List, Placeholder, RichCell, PanelSpinner } from '@vkontakte/vkui';
+import * as Alerts from "../components/Alerts.js";
 import '@vkontakte/vkui/dist/vkui.css';
 import React from 'react';
 import { connect } from 'react-redux';
 import { Api } from '../../infrastructure/api';
 import { countMyActiveTeams, countForeignActiveTeams } from '../../infrastructure/utils';
-import { goToPage, closePopout, openPopout } from '../../store/router/actions';
-import { setProfileUser } from '../../store/user/actions';
+import { goToPage } from '../../store/router/actions';
 
 class UserTeams extends React.Component {
 	constructor(props) {
 		super(props);
 
 		this.state = {
+			userTeams: props.userTeams,
 			fetching: false,
 		}
 	}
 
-	componentDidMount() {
-
+	componentDidUpdate(prevProps) {
+		if (this.props.userTeams !== prevProps.userTeams) {
+			this.setState({ userTeams: this.props.userTeams })
+		}
 	}
 
-	async handleJoin(e, teamId) {
-		e.stopPropagation();
-		Api.Users.joinTeam(teamId)
-			.then(data => this.updateUserTeams(data));
+	handleJoin(e, teamId) {
+		this.commonHandler(e, async () => {
+			let updatedUserTeams = await Api.Users.joinTeam(teamId);
+			this.setState({ userTeams: updatedUserTeams });
+		});
 	}
 
-	async handleQuitOrDecline(e, teamId) {
-		e.stopPropagation();
-		Api.Users.quitOrDeclineTeam(teamId)
-			.then(data => this.updateUserTeams(data));
+	async handleQuitOrDecline(e, teamId, teamName, alert) {
+		let action = async () => {
+			let updatedUserTeams = await Api.Users.quitOrDeclineTeam(teamId);
+			this.setState({ userTeams: updatedUserTeams });
+		}
+		this.commonHandler(e, action, (handler) => alert(teamName, handler));
 	}
 
-	async handleCancelRequestTeam(e, teamId) {
+	async handleCancelRequestToTeam(e, teamId, teamName) {
+		let action = async () => {
+			let updatedUserTeams = await Api.Users.cancelRequestTeam(teamId);
+			this.setState({ userTeams: updatedUserTeams });
+		}
+		let alert = (handler) => Alerts.CanselRequestToTeamPopout(teamName, handler);
+		this.commonHandler(e, action, alert);
+	}
+
+	commonHandler = async (e, action, alert) => {
 		e.stopPropagation();
-		Api.Users.cancelRequestTeam(teamId)
-			.then(data => this.updateUserTeams(data));
+
+		let handler = async () => {
+			Alerts.BlockScreen();
+			await action();
+			Alerts.UnblockScreen();
+		};
+
+		if (alert) {
+			alert(handler);
+		}
+
+		await handler();
 	}
 
 	updateUserTeams = (userTeams) => {
-		this.props.setProfileUser({
-			...this.props.profileUser,
-			userTeams: userTeams
-		});
+		this.setState({ userTeams: userTeams })
 	};
 
-	openPopoutExit = (e, teamId) => {
-		e.stopPropagation();
-		this.props.openPopout(
-			<Alert
-				actionsLayout="vertical"
-				actions={[{
-					title: 'Выйти из команды',
-					autoclose: true,
-					mode: 'destructive',
-					action: () => this.handleQuitOrDecline(e, teamId),
-				}, {
-					title: 'Отмена',
-					autoclose: true,
-					mode: 'cancel'
-				}]}
-				onClose={() => this.props.closePopout()}
-			>
-				<h2>Подтвердите действие</h2>
-				<p>Вы уверены, что хотите выйти из команды?</p>
-			</Alert>
-		);
-	};
+	buildTeamAction = (userTeam) => {
+		if (this.props.readOnlyMode) {
+			return;
+		}
 
-	openPopoutDecline = (e, teamId) => {
-		e.stopPropagation();
-		this.props.openPopout(
-			<Alert
-				actionsLayout="vertical"
-				actions={[{
-					title: 'Отклонить приглашение',
-					autoclose: true,
-					mode: 'destructive',
-					action: () => this.handleQuitOrDecline(e, teamId),
-				}, {
-					title: 'Отмена',
-					autoclose: true,
-					mode: 'cancel'
-				}]}
-				onClose={() => this.props.closePopout()}
-			>
-				<h2>Подтвердите действие</h2>
-				<p>Вы уверены, что хотите отклонить приглашение?</p>
-			</Alert>
-		);
-	};
+		if (userTeam.userAction === 5) {
+			return (
+				<>
+					<Button onClick={(e) => this.handleJoin(e, userTeam.teamId)}>Принять</Button>
+					<Button onClick={(e) => this.handleQuitOrDecline(e, userTeam.teamId, userTeam.team.name, Alerts.DeclineTeamInvitePopout)}
+						mode="secondary">
+						Отклонить
+						</Button>
+				</>
+			);
+		}
 
-	openPopoutAbort = (e, teamId) => {
-		e.stopPropagation();
-		this.props.openPopout(
-			<Alert
-				actionsLayout="vertical"
-				actions={[{
-					title: 'Отменить заявку',
-					autoclose: true,
-					mode: 'destructive',
-					action: () => this.handleCancelRequestTeam(e, teamId),
-				}, {
-					title: 'Отмена',
-					autoclose: true,
-					mode: 'cancel'
-				}]}
-				onClose={() => this.props.closePopout()}
-			>
-				<h2>Подтвердите действие</h2>
-				<p>Вы уверены, что хотите отменить заявку?</p>
-			</Alert>
-		);
-	};
+		if (userTeam.userAction === 1 && !userTeam.isOwner) {
+			return (
+				<Button onClick={(e) => this.handleCancelRequestToTeam(e, userTeam.teamId, userTeam.team.name)} mode="secondary">
+					Отозвать заявку
+				</Button>
+			);
+		}
+
+		if (userTeam.userAction === 2 && !userTeam.isOwner) {
+			return (
+				<Button onClick={(e) => this.handleQuitOrDecline(e, userTeam.teamId, userTeam.team.name, Alerts.LeaveTeamPopout)} mode="secondary">
+					Выйти
+				</Button>
+			);
+		}
+	}
 
 	render() {
 		const { goToPage } = this.props;
-		let isTeamsExistsForProfile = countMyActiveTeams(this.props.userTeams) !== 0;
-		let isTeamsExistsForUser = countForeignActiveTeams(this.props.userTeams) !== 0;
+		let isTeamsExistsForProfile = countMyActiveTeams(this.state.userTeams) !== 0;
+		let isTeamsExistsForUser = countForeignActiveTeams(this.state.userTeams) !== 0;
 		const loader = <PanelSpinner key={0} size="large" />
 
 		return (
@@ -137,7 +124,7 @@ class UserTeams extends React.Component {
 					<List>
 						<CardGrid>
 							{
-								this.props.userTeams?.map(userTeam => {
+								this.state.userTeams?.map(userTeam => {
 									if (this.props.readOnlyMode && userTeam.userAction !== 2 && !userTeam.isOwner)
 										return;
 									return (
@@ -148,27 +135,7 @@ class UserTeams extends React.Component {
 												after={userTeam.userAction === 2 ? < Icon28CheckCircleOutline /> :
 													(userTeam.userAction === 1 && <Icon28InfoOutline />)}
 												onClick={() => { goToPage('teamInfo', userTeam.teamId) }}
-												actions={!this.props.readOnlyMode && (userTeam.userAction === 5 ?
-													<React.Fragment>
-														<Button onClick={(e) => this.handleJoin(e, userTeam.teamId)}>Принять</Button>
-														<Button onClick={(e) => this.openPopoutDecline(e, userTeam.teamId)}
-															mode="secondary">Отклонить</Button>
-													</React.Fragment> :
-													((userTeam.userAction === 2 || userTeam.userAction === 1 && !userTeam.isOwner) && <React.Fragment>
-														{
-															userTeam.userAction === 2
-																?
-																<Button onClick={(e) => this.openPopoutExit(e, userTeam.teamId)} mode="secondary">
-																	Выйти
-                                                        </Button>
-																:
-																(userTeam.userAction === 1 ?
-																	<Button onClick={(e) => this.openPopoutAbort(e, userTeam.teamId)} mode="secondary">
-																		Отозвать заявку
-                                                    </Button> : '')
-														}
-													</React.Fragment>
-													))}>
+												actions={this.buildTeamAction(userTeam)}>
 												{userTeam.team.name}
 											</RichCell>
 										</Card>
@@ -183,19 +150,8 @@ class UserTeams extends React.Component {
 
 }
 
-const mapStateToProps = (state) => {
-
-	return {
-		activeView: state.router.activeView,
-		profileUser: state.user.profileUser
-	};
-};
-
 const mapDispatchToProps = {
-	goToPage,
-	openPopout,
-	closePopout,
-	setProfileUser
+	goToPage
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UserTeams);
+export default connect(null, mapDispatchToProps)(UserTeams);

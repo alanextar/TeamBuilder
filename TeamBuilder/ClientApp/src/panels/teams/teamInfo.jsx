@@ -29,9 +29,7 @@ class TeamInfo extends React.Component {
 			team: {},
 			activeTab: props.activeTab[this.bindingId] || "teamDescription",
 			edit: true,
-			contextOpened: false,
-			vkProfile: props.profile,
-			profileUser: props.profileUser,
+			contextOpened: false
 		};
 
 		this.onRefresh = async () => {
@@ -72,7 +70,7 @@ class TeamInfo extends React.Component {
 		return (
 			<Panel id={this.props.id}>
 				<PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
-					{this.state.profileUser ?
+					{this.props.profileUser ?
 						<PanelHeaderContent
 							status={`${countConfirmed(this.state.team.userTeams)} участников`}
 							before={<Avatar size={36} src={this.state.team.image?.dataURL} />}
@@ -82,7 +80,7 @@ class TeamInfo extends React.Component {
 						</PanelHeaderContent> :
 						`Команда`}
 				</PanelHeader>
-				<TeamMenu team={this.state.team} opened={this.state.contextOpened} onClose={this.toggleContext}/>
+				<TeamMenu team={this.state.team} opened={this.state.contextOpened} onClose={this.toggleContext} />
 				<Tabs>
 					<TabsItem
 						onClick={() => {

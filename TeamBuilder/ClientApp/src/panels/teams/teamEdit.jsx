@@ -5,7 +5,6 @@ import { connect } from 'react-redux';
 import { goBack, goToPage } from "../../store/router/actions";
 import { setActiveTab } from "../../store/vk/actions";
 import { setFormData } from "../../store/formData/actions";
-import { setProfileUser } from "../../store/user/actions";
 
 import {
 	Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell,
@@ -89,13 +88,7 @@ class TeamEdit extends React.Component {
 		if (!this.state.inputData.name)
 			return;
 
-		let updatedTeam = await Api.Teams.edit(this.state.inputData)
-
-		let profileUser = this.props.profileUser;
-		let ut = profileUser.userTeams.find(x => x.teamId == updatedTeam.id);
-		ut.team = updatedTeam;
-		this.props.setProfileUser(profileUser);
-
+		await Api.Teams.edit(this.state.inputData);
 		goBack();
 	};
 
@@ -240,8 +233,7 @@ const mapStateToProps = (state) => {
 	return {
 		activeView: state.router.activeView,
 		activeTab: state.vkui.activeTab,
-		inputData: state.formData.forms,
-		profileUser: state.user.profileUser
+		inputData: state.formData.forms
 	};
 };
 
@@ -250,8 +242,7 @@ const mapDispatchToProps = {
 	goToPage,
 	goBack,
 	setActiveTab,
-	setFormData,
-	setProfileUser
+	setFormData
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(TeamEdit);

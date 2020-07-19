@@ -122,12 +122,7 @@ namespace TeamBuilder.Controllers
 
 			if (user?.UserTeams != null)
 			{
-				user.UserTeams = user.UserTeams.Where(x =>
-					x.UserAction == UserActionEnum.ConsideringOffer ||
-					x.UserAction == UserActionEnum.JoinedTeam ||
-					x.UserAction == UserActionEnum.SentRequest || 
-					x.IsOwner).ToList();
-
+				user.UserTeams = user.GetActiveUserTeams().ToList();
 				user.AnyTeamOwner = user.UserTeams.Any(x => x.IsOwner);
 			}
 
@@ -192,23 +187,24 @@ namespace TeamBuilder.Controllers
 			return Json(updUser);
 		}
 
+		// Принимает приглашение (из профиля)
 		public async Task<IActionResult> JoinTeam(long teamId)
 		{
-			logger.LogInformation("Request JoinTeamm");
+			logger.LogInformation($"GET Request {HttpContext.Request.Headers[":path"]}");
 
 			if (!accessChecker.IsConfirm(out var profileId))
 				return Forbid();
 
-			var user = context.Users
+			var user = await context.Users
 				.Include(x => x.UserTeams)
 				.ThenInclude(x => x.Team)
 				.ThenInclude(y => y.Event)
-				.FirstOrDefault(u => u.Id == profileId);
+				.FirstOrDefaultAsync(u => u.Id == profileId);
 
-			var userTeamToJoin = user.UserTeams.First(x => x.TeamId == teamId);
+			var userTeamToJoin = user?.UserTeams.First(x => x.TeamId == teamId);
 
-			if (userTeamToJoin.UserAction != UserActionEnum.ConsideringOffer)
-				throw new Exception($"User '{user.Id}' have invalid userAction '{userTeamToJoin.UserAction}' for team '{teamId}'. " +
+			if (userTeamToJoin?.UserAction != UserActionEnum.ConsideringOffer)
+				throw new Exception($"User '{user?.Id}' have invalid userAction '{userTeamToJoin?.UserAction}' for team '{teamId}'. " +
 									$"Available value: {UserActionEnum.ConsideringOffer}");
 
 			userTeamToJoin.UserAction = UserActionEnum.JoinedTeam;
@@ -216,26 +212,24 @@ namespace TeamBuilder.Controllers
 			context.Update(user);
 			await context.SaveChangesAsync();
 
-			var activeUserTeams = user.UserTeams.Where(x => x.UserAction == UserActionEnum.ConsideringOffer ||
-				x.UserAction == UserActionEnum.JoinedTeam ||
-				x.UserAction == UserActionEnum.SentRequest || x.IsOwner);
+			var activeUserTeams = user.GetActiveUserTeams();
 
 			return Json(activeUserTeams);
 		}
 
-		//Пользователь выходит из команды / отказывается от приглашения из меню профиля
+		//Пользователь выходит из команды / отказывается от приглашения (из профиля)
 		public async Task<IActionResult> QuitOrDeclineTeam(long teamId)
 		{
-			logger.LogInformation("Request JoinTeamm");
+			logger.LogInformation($"GET Request {HttpContext.Request.Headers[":path"]}");
 
 			if (!accessChecker.IsConfirm(out var profileId))
 				return Forbid();
 
-			var user = context.Users
+			var user = await context.Users
 				.Include(x => x.UserTeams)
 				.ThenInclude(x => x.Team)
 				.ThenInclude(y => y.Event)
-				.FirstOrDefault(x => x.Id == profileId);
+				.FirstOrDefaultAsync(x => x.Id == profileId);
 
 			var userTeam = user.UserTeams
 				.First(y => y.TeamId == teamId);
@@ -247,17 +241,16 @@ namespace TeamBuilder.Controllers
 				_ => throw new Exception($"User '{profileId}' have invalid userAction '{userTeam.UserAction}' for team '{teamId}'. " +
 										 $"Available value: {UserActionEnum.ConsideringOffer}, {UserActionEnum.JoinedTeam}")
 			};
-
+			
+			context.Update(user);
 			await context.SaveChangesAsync();
 
-			var activeUserTeams = user.UserTeams.Where(x => x.UserAction == UserActionEnum.ConsideringOffer ||
-				x.UserAction == UserActionEnum.JoinedTeam ||
-				x.UserAction == UserActionEnum.SentRequest || x.IsOwner);
+			var activeUserTeams = user.GetActiveUserTeams();
 
 			return Json(activeUserTeams);
 		}
 
-		//Пользователь сам отменяет заявку в команду
+		//Пользователь сам отменяет заявку в команду (из профиля)
 		public async Task<IActionResult> CancelRequestTeam(long teamId)
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");
@@ -282,10 +275,7 @@ namespace TeamBuilder.Controllers
 			context.Remove(userTeam);
 			await context.SaveChangesAsync();
 
-			var activeUserTeams = user.UserTeams
-				.Where(x => x.UserAction == UserActionEnum.ConsideringOffer ||
-							x.UserAction == UserActionEnum.JoinedTeam ||
-							x.UserAction == UserActionEnum.SentRequest || x.IsOwner);
+			var activeUserTeams = user.GetActiveUserTeams();
 			return Json(activeUserTeams);
 		}
 

@@ -1,6 +1,6 @@
 ﻿import React from 'react';
 
-import { Alert } from '@vkontakte/vkui';
+import { Alert, ScreenSpinner } from '@vkontakte/vkui';
 
 import { store } from "../../index";
 import { goBack, openPopout, closePopout, goToPage } from "../../store/router/actions";
@@ -28,7 +28,7 @@ export const DeleteTeamPopout = (teamId, teamName) => {
 	));
 };
 
-export const LeaveTeamPopout = (teamName, dropUserHandler) => {
+export const LeaveTeamPopout = (teamName, leaveTeamHandler) => {
 	store.dispatch(openPopout(
 		<Alert
 			actionsLayout="vertical"
@@ -36,7 +36,7 @@ export const LeaveTeamPopout = (teamName, dropUserHandler) => {
 				title: 'Выйти из команды',
 				autoclose: true,
 				mode: 'destructive',
-				action: () => dropUserHandler(),
+				action: () => leaveTeamHandler(),
 			}, {
 				title: 'Отмена',
 				autoclose: true,
@@ -50,7 +50,7 @@ export const LeaveTeamPopout = (teamName, dropUserHandler) => {
 	));
 };
 
-export const DeclineInvitePopout = (teamName, dropUserHandler) => {
+export const DeclineTeamInvitePopout = (teamName, declineTeamInviteHandler) => {
 	store.dispatch(openPopout(
 		<Alert
 			actionsLayout="vertical"
@@ -58,7 +58,7 @@ export const DeclineInvitePopout = (teamName, dropUserHandler) => {
 				title: 'Отклонить приглашение',
 				autoclose: true,
 				mode: 'destructive',
-				action: () => dropUserHandler(),
+				action: () => declineTeamInviteHandler(),
 			}, {
 				title: 'Отмена',
 				autoclose: true,
@@ -71,3 +71,35 @@ export const DeclineInvitePopout = (teamName, dropUserHandler) => {
 		</Alert>
 	));
 };
+
+export const CanselRequestToTeamPopout = (teamName, canselRequestToTeamHandler) => {
+	store.dispatch(openPopout(
+		<Alert
+			actionsLayout="vertical"
+			actions={[{
+				title: 'Отозвать заявку',
+				autoclose: true,
+				mode: 'destructive',
+				action: () => canselRequestToTeamHandler(),
+			}, {
+				title: 'Отмена',
+				autoclose: true,
+				mode: 'cancel'
+			}]}
+			onClose={() => store.dispatch(closePopout())}
+		>
+			<h2>Подтвердите действие</h2>
+			<p>Вы уверены, что хотите отозвать заявку в команду «{teamName}»?</p>
+		</Alert>
+	));
+};
+
+export const BlockScreen = () => {
+	store.dispatch(openPopout(
+		<ScreenSpinner />
+	));
+}
+
+export const UnblockScreen = () => {
+	store.dispatch(closePopout())
+}

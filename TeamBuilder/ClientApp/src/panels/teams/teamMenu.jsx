@@ -1,18 +1,11 @@
 ﻿import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
-import {
-	goBack,
-	openPopout,
-	closePopout,
-	goToPage,
-} from "../../store/router/actions";
-import { setProfileUser, addTeamToProfile } from "../../store/user/actions";
+import { goToPage } from "../../store/router/actions";
 
-import { Alert, List, PanelHeaderContext, Cell } from "@vkontakte/vkui";
+import { List, PanelHeaderContext, Cell } from "@vkontakte/vkui";
 
 import * as Alerts from "../components/Alerts.js";
 
-import { Api } from "../../infrastructure/api";
 import * as TeamManagement from "../../services/teamManagement";
 import { countConfirmed } from "../../infrastructure/utils";
 
@@ -95,10 +88,7 @@ const TeamMenu = (props) => {
 						(userAction === 2 && (
 							<Cell
 								onClick={() =>
-									Alerts.LeaveTeamPopout(
-										team.name,
-										dropUserHandler
-									)
+									Alerts.LeaveTeamPopout(team.name, dropUserHandler)
 								}
 							>
 								Выйти из команды
@@ -111,10 +101,7 @@ const TeamMenu = (props) => {
 								</Cell>
 								<Cell
 									onClick={() =>
-										Alerts.DeclineInvitePopout(
-											team.name,
-											dropUserHandler
-										)
+										Alerts.DeclineTeamInvitePopout(team.name, dropUserHandler)
 									}
 								>
 									Отклонить приглашение
@@ -141,12 +128,7 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = {
-	goToPage,
-	goBack,
-	setProfileUser,
-	addTeamToProfile,
-	openPopout,
-	closePopout,
+	goToPage
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(TeamMenu);

@@ -1,4 +1,4 @@
-import { SET_PROFILE, SET_PROFILE_USER, ADD_TEAM_TO_PROFILE } from './actionTypes';
+import { SET_PROFILE, SET_PROFILE_USER } from './actionTypes';
 
 const initialState = {
 	profile: undefined,
@@ -15,32 +15,12 @@ export const userReducer = (state = initialState, action) => {
 			};
 		}
 		case SET_PROFILE_USER: {
-			return {
-				...state,
-				profileUser: action.payload.profileUser
-			};
-		}
-		case ADD_TEAM_TO_PROFILE: {
-			let newUt = action.payload.userTeam;
-			let existUt = state.profileUser.userTeams || [];
-
-			let existUtIndexForNewUt = existUt.findIndex(ut => ut.teamId === newUt.teamId);
-
-			let result;
-			if (existUtIndexForNewUt === -1) {
-				result = [...existUt, newUt];
-			}
-			else {
-				existUt[existUtIndexForNewUt] = newUt;
-				result = existUt;
-			}
+			let profileUser = { ...action.payload.profileUser };
+			delete profileUser.userTeams;
 
 			return {
 				...state,
-				profileUser: {
-					...state.profileUser,
-					userTeams: result
-				}
+				profileUser: profileUser
 			};
 		}
 

@@ -11,7 +11,6 @@ import {
 } from '@vkontakte/vkui';
 import { Api } from '../../infrastructure/api';
 import { GetRandomPicUrl as GetRandomPic } from '../../infrastructure/utils';
-import { addTeamToProfile } from '../../store/user/actions';
 
 class TeamCreate extends React.Component {
 	constructor(props) {
@@ -93,15 +92,7 @@ class TeamCreate extends React.Component {
 			...this.state.inputData,
 			imageAsDataUrl: await GetRandomPic()
 		}
-		let result = await Api.Teams.create(createTeamViewModel)
-		let newUserTeam = {
-			isOwner: true,
-			team: result,
-			teamId: result.id,
-			userAction: 0,
-			userId: this.props.profileUser.id
-		};
-		this.props.addTeamToProfile(newUserTeam);
+		let result = await Api.Teams.create(createTeamViewModel);
 		this.cleanFormData();
 		this.props.goToPage('teamInfo', result.id, true);
 	}
@@ -201,8 +192,7 @@ const mapDispatchToProps = {
 	goToPage,
 	goBack,
 	setActiveTab,
-	setFormData,
-	addTeamToProfile
+	setFormData
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(TeamCreate);
