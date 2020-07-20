@@ -94,6 +94,50 @@ export const CanselRequestToTeamPopout = (teamName, canselRequestToTeamHandler) 
 	));
 };
 
+export const RejectUserRequestPopout = (userName, rejectUserRequestHandler) => {
+	store.dispatch(openPopout(
+		<Alert
+			actionsLayout="vertical"
+			actions={[{
+				title: 'Отклонить заявку',
+				autoclose: true,
+				mode: 'destructive',
+				action: () => rejectUserRequestHandler(),
+			}, {
+				title: 'Отмена',
+				autoclose: true,
+				mode: 'cancel'
+			}]}
+			onClose={() => store.dispatch(closePopout())}
+		>
+			<h2>Подтвердите действие</h2>
+			<p>Вы уверены, что хотите отклонить заявку от «{userName}»?</p>
+		</Alert>
+	));
+};
+
+export const RemoveUserFromTeamPopout = (userName, removeUserFromTeamHandler) => {
+	store.dispatch(openPopout(
+		<Alert
+			actionsLayout="vertical"
+			actions={[{
+				title: 'Удалить пользователя',
+				autoclose: true,
+				mode: 'destructive',
+				action: () => removeUserFromTeamHandler(),
+			}, {
+				title: 'Отмена',
+				autoclose: true,
+				mode: 'cancel'
+			}]}
+			onClose={() => store.dispatch(closePopout())}
+		>
+			<h2>Подтвердите действие</h2>
+			<p>Вы уверены, что хотите удалить из команды «{userName}»?</p>
+		</Alert>
+	));
+};
+
 export const BlockScreen = () => {
 	store.dispatch(openPopout(
 		<ScreenSpinner />
