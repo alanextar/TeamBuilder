@@ -59,7 +59,10 @@ export function renderEventDate(event) {
 
 export function convertDateToWebType(date) {
 	let splitted = date.split('.');
-	return `${splitted[2]}-${splitted[1]}-${splitted[0]}`;
+	if (splitted.length === 3) {
+		return `${splitted[2]}-${splitted[1]}-${splitted[0]}`;
+	}
+	return date;
 }
 
 export async function GetRandomPicUrl() {

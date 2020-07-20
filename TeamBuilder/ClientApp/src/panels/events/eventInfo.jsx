@@ -100,7 +100,7 @@ const EventInfo = props => {
 				</SimpleCell>
 				<SimpleCell>
 					<InfoRow header="Ссылка">
-						<a href={event?.link}>{event?.link}</a>
+						<a style={{color: 'rgb(0, 125, 255)'}} href={event?.link}>{event?.link}</a>
 					</InfoRow>
 				</SimpleCell>
 				<SimpleCell multiline>

@@ -101,7 +101,8 @@ class User extends React.Component {
 			firstName: this.props.profile.first_name,
 			lastName: this.props.profile.last_name,
 			photo100: this.props.profile.photo_100,
-			photo200: this.props.profile.photo_200
+			photo200: this.props.profile.photo_200,
+			isSearchable: true
 		};
 
 		Api.Users.saveOrConfirm(profileViewModel)
