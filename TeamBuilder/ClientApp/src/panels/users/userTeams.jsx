@@ -131,7 +131,7 @@ class UserTeams extends React.Component {
 										<Card key={userTeam.teamId} size="l" mode="shadow">
 											<RichCell key={userTeam.teamId}
 												text={userTeam?.team?.description}
-												caption={"Событие: " + (userTeam.team.event?.name && '')}
+												caption={userTeam.team.event?.name}
 												after={userTeam.userAction === 2 ? < Icon28CheckCircleOutline /> :
 													(userTeam.userAction === 1 && <Icon28InfoOutline />)}
 												onClick={() => { goToPage('teamInfo', userTeam.teamId) }}

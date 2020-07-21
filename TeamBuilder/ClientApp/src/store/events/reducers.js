@@ -1,9 +1,9 @@
 import {
-    SET_TEAMS_EVENT_FILTER
+	SET_TEAMS_EVENT_FILTER
 } from './actionTypes';
 
 const initialState = {
-    teamsEventFilter: null
+	teamsEventFilter: null
 };
 
 export const eventReducer = (state = initialState, action) => {
@@ -15,7 +15,7 @@ export const eventReducer = (state = initialState, action) => {
                 ...state,
                 teamsEventFilter: action.payload.teamsEventFilter
             };
-        }
+		}
 
         default: {
             return state;

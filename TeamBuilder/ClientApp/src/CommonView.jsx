@@ -7,6 +7,8 @@ import { View } from '@vkontakte/vkui';
 import EventCreate from './panels/events/eventCreate'
 import EventInfo from './panels/events/eventInfo'
 import EventEdit from './panels/events/eventEdit'
+import EventsListToFilter from './panels/events/eventsListToFilter'
+import EventsListToTeam from './panels/events/eventsListToTeam'
 
 import TeamInfo from './panels/teams/teamInfo'
 import TeamCreate from './panels/teams/teamCreate'
@@ -28,7 +30,9 @@ const CommonView = props => {
 		h(SetUserTeam, { id: 'setUserTeam', key: 'setUserTeam' }),
 		h(EventInfo, { id: 'eventInfo', key: 'eventInfo' }),
 		h(EventCreate, { id: 'eventCreate', key: 'eventCreate' }),
-		h(EventEdit, { id: 'eventEdit', key: 'eventEdit' })
+		h(EventEdit, { id: 'eventEdit', key: 'eventEdit' }),
+		h(EventsListToFilter, { id: 'eventsListToFilter', key: 'eventsListToFilter', openFilter:  () => props.setActiveModal('filters')}),
+		h(EventsListToTeam, { id: 'eventsListToTeam', key: 'eventsListToTeam'})
 	]
 
 	return (

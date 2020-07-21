@@ -6,9 +6,8 @@ import { goBack, goToPage } from "../../store/router/actions";
 import { setFormData } from "../../store/formData/actions";
 
 import {
-	Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell,
-	Div, Button, Textarea, FormLayout, Select, Input, Header, InfoRow, Avatar,
-	RichCell, Link
+	Panel, PanelHeader, PanelHeaderBack, SelectMimicry, Group,
+	Div, Button, Textarea, FormLayout, Input, Link
 } from '@vkontakte/vkui';
 
 import { getActivePanel } from "../../services/_functions";
@@ -18,7 +17,8 @@ class TeamEdit extends React.Component {
 		super(props);
 
 		let itemIdInitial = getActivePanel(props.activeView).itemId;
-		this.bindingId = `teamEdit_${itemIdInitial}`;
+		this.bindingId = `${props.id}_${itemIdInitial}`;
+		this.eventsPage = 'eventsListToTeam';
 
 		this.state = {
 			itemId: itemIdInitial,
@@ -46,12 +46,25 @@ class TeamEdit extends React.Component {
 			this.setState({
 				inputData: null
 			})
+
+			props.setFormData(`${this.props.activeView}_${this.eventsPage}`, null);
 			props.goBack();
+		};
+
+		this.clearEvent = () => {
+			this.setState({
+				inputData: {
+					...this.state.inputData,
+					event: null,
+					eventId: null
+				}
+			})
 		};
 	}
 
 	componentDidMount() {
-		this.state.inputData || this.fetchTeams(); // Если есть inputData брать её, если нет - загрузить с сервера
+		// Если есть inputData брать её, если нет - загрузить с сервера
+		this.state.inputData || this.fetchTeams();
 		this.populateEventsData();
 	}
 
@@ -78,13 +91,11 @@ class TeamEdit extends React.Component {
 	}
 
 	async postEdit() {
-		const { goBack } = this.props;
-
 		if (!this.state.inputData.name)
 			return;
 
 		await Api.Teams.edit(this.state.inputData);
-		goBack();
+		this.cancelForm();
 	};
 
 	render() {
@@ -102,21 +113,28 @@ class TeamEdit extends React.Component {
 							<Input name="name" top="Название команды" type="text" value={inputData.name}
 								onChange={this.handleInput} status={inputData.name ? 'valid' : 'error'} placeholder='Введите название команды' />
 							<Textarea top="Описание команды" name="description" value={inputData.description} onChange={this.handleInput} />
-							<Select
-								top='Выберете событие'
-								placeholder="Событие"
+							<SelectMimicry
+								top="Событие"
+								placeholder="Не выбрано"
+								onClick={() => goToPage(this.eventsPage, this.bindingId)}
 								onChange={this.handleInput}
-								name="eventId"
-								value={inputData.eventId || ''}
-								bottom={<Link style={{ color: 'rebeccapurple', textAlign: "right" }} onClick={() => goToPage('eventCreate')}>Создать событие</Link>}>
-								{this.state.events?.map(ev => {
-									return (
-										<option value={ev.id} key={ev.id}>
-											{ev.name}
-										</option>
-									)
-								})}
-							</Select>
+								name="event"
+								value={inputData.event || ''}
+								defaultValue
+								bottom=
+								{
+									<div>
+										<p style={{ float: 'left', margin: 0 }}>
+											<Link style={{ color: '#99334b' }} onClick={this.clearEvent}>Отчистить</Link>
+										</p>
+										<p style={{ float: 'right', margin: 0 }}>
+											<Link style={{ color: 'rebeccapurple' }} onClick={() => goToPage('eventCreate')}>Создать событие</Link>
+										</p>
+										<div style={{ clear: 'both' }}></div>
+									</div>
+								}>
+								{inputData.event?.name}
+							</SelectMimicry>
 							<Input top="Количество требуемых участников"
 								name="numberRequiredMembers"
 								value={String(inputData.numberRequiredMembers)}

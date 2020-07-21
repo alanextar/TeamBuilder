@@ -18,7 +18,7 @@ const EventEdit = props => {
 	const { goBack, setFormData } = props;
 
 	const itemIdInitial = getActivePanel(props.activeView).itemId;
-	const bindingId = `eventEdit_${itemIdInitial}`;
+	const bindingId = `${props.id}_${itemIdInitial}`;
 
 	const [itemId] = useState(itemIdInitial);
 	const [inputData, setInputData] = useState(props.inputData[bindingId]);

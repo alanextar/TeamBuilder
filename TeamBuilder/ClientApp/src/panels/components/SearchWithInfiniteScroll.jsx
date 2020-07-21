@@ -15,7 +15,7 @@ import { Api } from '../../infrastructure/api';
 import useDebounce from '../../infrastructure/use-debounce';
 
 const SearchWithInfiniteScroll =
-	({ id, pagingSearchHandler, getPageUrl, onFiltersClickHandler, filterValue, header, children, inputData, setFormData }) => {
+	({ id, pagingSearchHandler, getPageUrl, onFiltersClickHandler, filterValue, header, ...props }) => {
 
 		const [isSearching, setIsSearching] = useState(false);
 		const [fetching, setFetching] = useState(false);
@@ -25,7 +25,8 @@ const SearchWithInfiniteScroll =
 
 		const [items, setItems] = useState([]);
 
-		const [searchTerm, setSearchTerm] = useState(inputData[id] || '');
+		const bindingId = `${props.activeView}_${id}`;
+		const [searchTerm, setSearchTerm] = useState(props.inputData[bindingId] || '');
 		const searchTermRef = useRef();
 		const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
@@ -36,7 +37,7 @@ const SearchWithInfiniteScroll =
 
 		useEffect(() => {
 			return () => {
-				setFormData(id, searchTermRef.current);
+				props.setFormData(bindingId, searchTermRef.current);
 			};
 		}, []);
 
@@ -125,7 +126,7 @@ const SearchWithInfiniteScroll =
 							hasMore={hasMoreItems}
 							loader={loader}
 						>
-							{children(items)}
+							{props.children(items)}
 						</InfiniteScroll>
 					}
 				</PullToRefresh>
@@ -145,7 +146,8 @@ SearchWithInfiniteScroll.propTypes = {
 
 const mapStateToProps = (state) => {
 	return {
-		inputData: state.formData.forms,
+		activeView: state.router.activeView,
+		inputData: state.formData.forms
 	}
 };
 
