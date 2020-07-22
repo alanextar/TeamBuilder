@@ -5,7 +5,7 @@ import { bindActionCreators } from "redux";
 import { goBack, goToPage, openPopout, closePopout } from "../../store/router/actions";
 
 import {
-	Panel, PanelHeader, Group, SimpleCell, InfoRow, Header, Avatar, Alert,
+	Panel, PanelHeader, Group, SimpleCell, InfoRow, Header, Avatar, Alert, PullToRefresh,
 	PanelHeaderBack, Cell, List, PanelHeaderContent, PanelHeaderContext
 } from '@vkontakte/vkui';
 import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
@@ -17,6 +17,7 @@ const EventInfo = props => {
 	const { goBack, goToPage } = props;
 
 	const [itemId] = useState(getActivePanel(props.activeView).itemId);
+	const [fetching, setFetching] = useState(false);
 	const [event, setEvent] = useState(null);
 	const [contextOpened, setContextOpened] = useState(false);
 
@@ -24,13 +25,19 @@ const EventInfo = props => {
 		populateEventData();
 	}, [])
 
+	const onRefresh = async () => {
+		setFetching(true);
+		await populateEventData();
+		setFetching(false);
+	};
+
 	const toggleContext = () => {
 		setContextOpened(!contextOpened);
 	};
 
-	const populateEventData = () => {
-		Api.Events.get(itemId)
-			.then(result => setEvent(result));
+	const populateEventData = async () => {
+		let event = await Api.Events.get(itemId);
+		setEvent(event);
 	}
 
 	const canEdit = () => {
@@ -92,44 +99,46 @@ const EventInfo = props => {
                         </Cell>
 				</List>
 			</PanelHeaderContext>
-			<Group>
-				<SimpleCell multiline>
-					<InfoRow header="Название">
-						{event?.name}
-					</InfoRow>
-				</SimpleCell>
-				<SimpleCell>
-					<InfoRow header="Ссылка">
-						<a style={{color: 'rgb(0, 125, 255)'}} href={event?.link}>{event?.link}</a>
-					</InfoRow>
-				</SimpleCell>
-				<SimpleCell multiline>
-					<InfoRow header="Описание">
-						{event?.description}
-					</InfoRow>
-				</SimpleCell>
-				<SimpleCell>
-					<InfoRow header="Время проведения">
-						{event?.startDate} - {event?.finishDate}
-					</InfoRow>
-				</SimpleCell>
-			</Group>
-			<Group>
-				<Header mode="secondary">Участвующие команды</Header>
-				{event?.teams?.map(team => {
-					return (
-						<Cell
-							key={team.id}
-							expandable
-							indicator={countConfirmed(team.userTeams) + '/' + team.numberRequiredMembers}
-							onClick={() => goToPage('teamInfo', team.id)}
-							before={<Avatar size={48} src={team.image?.dataURL} />}>
-							{team.name}
-						</Cell>
-					)
-				}
-				)}
-			</Group>
+			<PullToRefresh onRefresh={onRefresh} isFetching={fetching}>
+				<Group>
+					<SimpleCell multiline>
+						<InfoRow header="Название">
+							{event?.name}
+						</InfoRow>
+					</SimpleCell>
+					<SimpleCell>
+						<InfoRow header="Ссылка">
+							<a style={{ color: 'rgb(0, 125, 255)' }} href={event?.link}>{event?.link}</a>
+						</InfoRow>
+					</SimpleCell>
+					<SimpleCell multiline>
+						<InfoRow header="Описание">
+							{event?.description}
+						</InfoRow>
+					</SimpleCell>
+					<SimpleCell>
+						<InfoRow header="Время проведения">
+							{event?.startDate} - {event?.finishDate}
+						</InfoRow>
+					</SimpleCell>
+				</Group>
+				<Group>
+					<Header mode="secondary">Участвующие команды</Header>
+					{event?.teams?.map(team => {
+						return (
+							<Cell
+								key={team.id}
+								expandable
+								indicator={countConfirmed(team.userTeams) + '/' + team.numberRequiredMembers}
+								onClick={() => goToPage('teamInfo', team.id)}
+								before={<Avatar size={48} src={team.image?.dataURL} />}>
+								{team.name}
+							</Cell>
+						)
+					}
+					)}
+				</Group>
+			</PullToRefresh>
 		</Panel>
 	);
 }

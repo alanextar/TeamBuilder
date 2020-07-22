@@ -6,9 +6,9 @@ import { goBack, goToPage } from "../../store/router/actions";
 import { setActiveTab } from "../../store/vk/actions";
 
 import {
-	Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Button, InfoRow,
-	SimpleCell, Avatar, RichCell, PullToRefresh, PanelHeaderContent, Separator,
-	withPlatform, ANDROID, IOS
+	Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, InfoRow,
+	SimpleCell, Avatar, PullToRefresh, PanelHeaderContent, Separator,
+	withPlatform, ANDROID
 } from '@vkontakte/vkui';
 
 import TeamMenu from './teamMenu';
