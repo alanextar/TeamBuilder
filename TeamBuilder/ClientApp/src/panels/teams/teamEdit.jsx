@@ -47,6 +47,7 @@ class TeamEdit extends React.Component {
 				inputData: null
 			})
 
+			//Отчистка поиска в панели выбора события
 			props.setFormData(`${this.props.activeView}_${this.eventsPage}`, null);
 			props.goBack();
 		};

@@ -6,7 +6,7 @@ import { setFormData } from "../../store/formData/actions";
 
 import {
 	Panel, PanelHeader, PanelHeaderBack, Group,
-	Div, Button, Textarea, FormLayout, Select, Input, Link
+	Div, Button, Textarea, FormLayout, SelectMimicry, Input, Link
 } from '@vkontakte/vkui';
 import { Api } from '../../infrastructure/api';
 import { GetRandomPicUrl as GetRandomPic } from '../../infrastructure/utils';
@@ -15,6 +15,7 @@ class TeamCreate extends React.Component {
 	constructor(props) {
 		super(props);
 
+		this.eventsPage = 'eventsListToTeam';
 		this.bindingId = props.id;
 		this.defaultInputData = {
 			name: '',
@@ -45,9 +46,31 @@ class TeamCreate extends React.Component {
 			})
 		}
 
-		this.cancelForm = () => {
+		this.prepareCancelForm = () => {
 			this.cleanFormData();
+			//Отчистка поиска в панели выбора события
+			props.setFormData(`${this.props.activeView}_${this.eventsPage}`, null);
+		};
+
+		this.backClickHandler = () => {
+			this.prepareCancelForm();
 			props.goBack();
+		};
+
+		this.cleanFormData = () => {
+			this.setState({
+				inputData: this.defaultInputData
+			});
+		}
+
+		this.clearEvent = () => {
+			this.setState({
+				inputData: {
+					...this.state.inputData,
+					event: null,
+					eventId: null
+				}
+			})
 		};
 
 		this.postCreate = this.postCreate.bind(this);
@@ -84,14 +107,8 @@ class TeamCreate extends React.Component {
 			imageAsDataUrl: await GetRandomPic()
 		}
 		let result = await Api.Teams.create(createTeamViewModel);
-		this.cleanFormData();
+		this.prepareCancelForm();
 		this.props.goToPage('teamInfo', result.id, true);
-	}
-
-	cleanFormData() {
-		this.setState({
-			inputData: this.defaultInputData
-		});
 	}
 
 	render() {
@@ -100,7 +117,7 @@ class TeamCreate extends React.Component {
 
 		return (
 			<Panel id={this.state.id}>
-				<PanelHeader separator={false} left={<PanelHeaderBack onClick={this.cancelForm} />}>
+				<PanelHeader separator={false} left={<PanelHeaderBack onClick={this.backClickHandler} />}>
 					Создание
 				</PanelHeader>
 				<Group>
@@ -114,21 +131,28 @@ class TeamCreate extends React.Component {
 							onChange={this.handleInput}
 							name="description"
 							value={inputData?.description} />
-						<Select
-							top="Выберете событие"
-							placeholder="Событие"
+						<SelectMimicry
+							top="Событие"
+							placeholder="Не выбрано"
+							onClick={() => goToPage(this.eventsPage, this.bindingId)}
 							onChange={this.handleInput}
-							value={inputData?.eventId}
-							name="eventId"
-							bottom={<Link style={{ color: 'rebeccapurple', textAlign: "right" }} onClick={() => goToPage('eventCreate')}>Создать событие</Link>}>
-							{this.state.events?.map(ev => {
-								return (
-									<option value={ev.id} key={ev.id}>
-										{ev.name}
-									</option>
-								)
-							})}
-						</Select>
+							name="event"
+							value={inputData.event || ''}
+							defaultValue
+							bottom=
+							{
+								<div>
+									<p style={{ float: 'left', margin: 0 }}>
+										<Link style={{ color: '#99334b' }} onClick={this.clearEvent}>Отчистить</Link>
+									</p>
+									<p style={{ float: 'right', margin: 0 }}>
+										<Link style={{ color: 'rebeccapurple' }} onClick={() => goToPage('eventCreate')}>Создать событие</Link>
+									</p>
+									<div style={{ clear: 'both' }}></div>
+								</div>
+							}>
+							{inputData.event?.name}
+						</SelectMimicry>
 						<Input top="Количество участников" type="number" placeholder="Введите количество участников"
 							onChange={this.handleInput}
 							name="numberRequiredMembers"
