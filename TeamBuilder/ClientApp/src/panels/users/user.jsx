@@ -126,112 +126,109 @@ class User extends React.Component {
 	render() {
 		const { goBack, goToPage, setActiveTab } = this.props;
 		let user = this.state.user;
+		let hasBack = this.props.panelsHistory[this.props.activeView].length > 1;
 
-		if (!this.state.user) {
-			return (
-				<Panel id={this.props.id}>
-					{this.loader}
-				</Panel>
-			);
-		}
-		else {
-			return (
-				<Panel id={this.props.id}>
-					<PanelHeader separator={false}
-						left={this.props.activeStory !== 'profile' &&
-							<PanelHeaderBack onClick={() => goBack()} />}>{this.state.readOnlyMode ? 'Участник' : 'Профиль'}
-					</PanelHeader>
-					<PullToRefresh onRefresh={this.onRefresh} isFetching={this.state.fetching}>
-						{this.state.readOnlyMode
-							? user &&
-							<Group title="VK Connect">
-								<Link href={"https://m.vk.com/id" + user.id} target="_blank">
-									<Cell description={user.city || ''}
-										before={user.photo100 ? <Avatar src={user.photo100} /> : null}
-										asideContent={user?.isSearchable ? <Icon28ViewOutline /> : <Icon28HideOutline />}>
-										{`${user.firstName} ${user.lastName}`}
-									</Cell>
-								</Link>
-								{this.state.isRecruitTeamsExist &&
-									<Div>
-										<Button mode="primary" size='xl'
-											onClick={() => goToPage('setUserTeam', this.state.itemId)}>
-											Завербовать
-							</Button>
-									</Div>}
-							</Group>
-							: this.props.profile &&
-							<Group title="VK Connect">
-								<Link href={"https://m.vk.com/id" + this.props.profile.id} target="_blank">
-									<Cell description={this.props.profile.city?.title || ''}
-										before={this.props.profile.photo_200 ? <Avatar src={this.props.profile.photo_200} /> : null}
-										asideContent={user?.isSearchable ? <Icon28ViewOutline /> : <Icon28HideOutline />}>
-										{`${this.props.profile.first_name} ${this.props.profile.last_name}`}
-									</Cell>
-								</Link>
-								{!this.props.profileUser &&
-									<Div>
-										<Button mode="destructive" size='xl'
-											onClick={() => this.confirmUser()}>
-											Зарегистрироваться
-									</Button>
-									</Div>}
-							</Group>
-						}
-						<Separator />
-						<Tabs>
-							<TabsItem
-								onClick={() => setActiveTab(this.bindingId, null)}
-								selected={!this.props.activeTab[this.bindingId]}>
-								Основное
-						</TabsItem>
-							<TabsItem
-								onClick={() => setActiveTab(this.bindingId, 'teams')}
-								selected={this.props.activeTab[this.bindingId] === 'teams'}>
-								Команды
-						</TabsItem>
-						</Tabs>
-						{
-							this.props.activeTab[this.bindingId] !== 'teams' ?
-								<Group header={
-									<Header
-										mode="secondary"
-										aside={!this.state.readOnlyMode &&
-											<Icon24Write style={{ color: "#3f8ae0" }} onClick={() => goToPage('userEdit')} />
-										}>
-										Информация
-                                </Header>}>
-									{user?.mobile &&
-										<Cell before={<Icon24Phone style={{ paddingTop: 0, paddingBottom: 0 }} />}>
-											<Link href={"tel:" + user.mobile}>{user.mobile}</Link>
-										</Cell>}
-									{user?.telegram &&
-										<Cell before={<Icon24Send style={{ paddingTop: 0, paddingBottom: 0 }} />}>
-											<Link href={"tg://resolve?domain=" + user.telegram}>@{user.telegram}</Link>
-										</Cell>}
-									{user?.email &&
-										<Cell before={<Icon24Mention style={{ paddingTop: 0, paddingBottom: 0 }} />}>
-											<Link href={"mailto:" + user.email}>{user.email}</Link>
-										</Cell>}
-									{user?.about &&
-										<Cell multiline before={<Icon24Article style={{ paddingTop: 0, paddingBottom: 0 }} />}>
-											{user.about}
-										</Cell>}
-									{user?.userSkills?.length > 0 &&
-										<Cell>
-											<InfoRow header="Навыки">
-												<SkillTokens selectedSkills={Utils.convertUserSkills(user?.userSkills)} />
-											</InfoRow>
-										</Cell>}
-								</Group> :
-								<Group>
-									<UserTeams loading={this.state.loading} userTeams={user?.userTeams} readOnlyMode={this.state.readOnlyMode} />
+		return (
+			<Panel id={this.props.id}>
+				{!user
+					? <PanelSpinner key={0} size="large" />
+					: <>
+						<PanelHeader separator={false}
+							left={hasBack &&
+								<PanelHeaderBack onClick={() => goBack()} />}>{this.state.readOnlyMode ? 'Участник' : 'Профиль'}
+						</PanelHeader>
+						<PullToRefresh onRefresh={this.onRefresh} isFetching={this.state.fetching}>
+							{this.state.readOnlyMode
+								? user &&
+								<Group title="VK Connect">
+									<Link href={"https://m.vk.com/id" + user.id} target="_blank">
+										<Cell description={user.city || ''}
+											before={user.photo100 ? <Avatar src={user.photo100} /> : null}
+											asideContent={user?.isSearchable ? <Icon28ViewOutline /> : <Icon28HideOutline />}>
+											{`${user.firstName} ${user.lastName}`}
+										</Cell>
+									</Link>
+									{this.state.isRecruitTeamsExist &&
+										<Div>
+											<Button mode="primary" size='xl'
+												onClick={() => goToPage('setUserTeam', this.state.itemId)}>
+												Завербовать
+												</Button>
+										</Div>}
 								</Group>
-						}
-					</PullToRefresh>
-				</Panel>
-			)
-		}
+								: this.props.profile &&
+								<Group title="VK Connect">
+									<Link href={"https://m.vk.com/id" + this.props.profile.id} target="_blank">
+										<Cell description={this.props.profile.city?.title || ''}
+											before={this.props.profile.photo_200 ? <Avatar src={this.props.profile.photo_200} /> : null}
+											asideContent={user?.isSearchable ? <Icon28ViewOutline /> : <Icon28HideOutline />}>
+											{`${this.props.profile.first_name} ${this.props.profile.last_name}`}
+										</Cell>
+									</Link>
+									{!this.props.profileUser &&
+										<Div>
+											<Button mode="destructive" size='xl'
+												onClick={() => this.confirmUser()}>
+												Зарегистрироваться
+									</Button>
+										</Div>}
+								</Group>
+							}
+							<Separator />
+							<Tabs>
+								<TabsItem
+									onClick={() => setActiveTab(this.bindingId, null)}
+									selected={!this.props.activeTab[this.bindingId]}>
+									Основное
+						</TabsItem>
+								<TabsItem
+									onClick={() => setActiveTab(this.bindingId, 'teams')}
+									selected={this.props.activeTab[this.bindingId] === 'teams'}>
+									Команды
+						</TabsItem>
+							</Tabs>
+							{
+								this.props.activeTab[this.bindingId] !== 'teams' ?
+									<Group header={
+										<Header
+											mode="secondary"
+											aside={!this.state.readOnlyMode &&
+												<Icon24Write style={{ color: "#3f8ae0" }} onClick={() => goToPage('userEdit')} />
+											}>
+											Информация
+                                </Header>}>
+										{user?.mobile &&
+											<Cell before={<Icon24Phone style={{ paddingTop: 0, paddingBottom: 0 }} />}>
+												<Link href={"tel:" + user.mobile}>{user.mobile}</Link>
+											</Cell>}
+										{user?.telegram &&
+											<Cell before={<Icon24Send style={{ paddingTop: 0, paddingBottom: 0 }} />}>
+												<Link href={"tg://resolve?domain=" + user.telegram}>@{user.telegram}</Link>
+											</Cell>}
+										{user?.email &&
+											<Cell before={<Icon24Mention style={{ paddingTop: 0, paddingBottom: 0 }} />}>
+												<Link href={"mailto:" + user.email}>{user.email}</Link>
+											</Cell>}
+										{user?.about &&
+											<Cell multiline before={<Icon24Article style={{ paddingTop: 0, paddingBottom: 0 }} />}>
+												{user.about}
+											</Cell>}
+										{user?.userSkills?.length > 0 &&
+											<Cell>
+												<InfoRow header="Навыки">
+													<SkillTokens selectedSkills={Utils.convertUserSkills(user?.userSkills)} />
+												</InfoRow>
+											</Cell>}
+									</Group> :
+									<Group>
+										<UserTeams loading={this.state.loading} userTeams={user?.userTeams} readOnlyMode={this.state.readOnlyMode} />
+									</Group>
+							}
+						</PullToRefresh>
+					</>
+				}
+			</Panel>
+		)
 	}
 }
 
@@ -240,9 +237,9 @@ const mapStateToProps = (state) => {
 	return {
 		profileUser: state.user.profileUser,
 		profile: state.user.profile,
-		activeStory: state.router.activeStory,
 		activeView: state.router.activeView,
-		activeTab: state.vkui.activeTab
+		activeTab: state.vkui.activeTab,
+		panelsHistory: state.router.panelsHistory
 	};
 };
 
