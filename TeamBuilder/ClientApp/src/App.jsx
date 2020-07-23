@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect } from 'react';
 import {
-	View, Epic, Tabbar, TabbarItem, ConfigProvider, Root
+	Epic, Tabbar, TabbarItem, ConfigProvider, Root
 } from '@vkontakte/vkui';
 import { connect } from 'react-redux';
 import '@vkontakte/vkui/dist/vkui.css';
@@ -17,10 +17,8 @@ import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 
 import Events from './panels/events/events'
 import Teams from './panels/teams/teams'
-import EventsListToFilter from './panels/events/eventsListToFilter'
 import TeamsFilters from './panels/teams/teamsFilters'
 import Users from './panels/users/users'
-import User from './panels/users/user'
 
 import CommonView from './CommonView'
 

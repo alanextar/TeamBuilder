@@ -25,12 +25,11 @@ class TeamInfo extends React.Component {
 		super(props);
 
 		let itemIdInitial = getActivePanel(props.activeView).itemId;
-		this.bindingId = `teamInfo_${itemIdInitial}`;
+		this.bindingId = `${props.id}_${itemIdInitial}`;
 
 		this.state = {
 			itemId: itemIdInitial,
 			team: {},
-			edit: true,
 			contextOpened: false
 		};
 
