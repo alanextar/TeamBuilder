@@ -40,13 +40,14 @@ export async function get(url, params = {}) {
 			return json;
 		}
 		else {
-			const text = await resp.text();
-			return text;
+			// const text = await resp.text();
+			// return text;
+			return null;
 		}
 	}
 	catch (error) {
 		console.log(`Error for get request '${url}'. Details: ${error}`);
-		return {};
+		// return {};
 	}
 }
 

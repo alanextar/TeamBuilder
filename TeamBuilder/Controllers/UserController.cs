@@ -120,6 +120,9 @@ namespace TeamBuilder.Controllers
 				.ThenInclude(y => y.Skill)
 				.FirstOrDefault(u => u.Id == id);
 
+			if (user == null)
+				return NotFound("Не нашли пользователя");
+
 			if (user?.UserTeams != null)
 			{
 				user.UserTeams = user.GetActiveUserTeams().ToList();

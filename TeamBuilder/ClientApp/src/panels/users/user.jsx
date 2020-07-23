@@ -131,7 +131,9 @@ class User extends React.Component {
 
 		return (
 			<Panel id={this.props.id}>
-				{user &&
+				{user === undefined && this.props.profileUser === undefined
+				? <PanelSpinner key={0} size="large" />
+				:
 					<>
 						<PanelHeader separator={false}
 							left={hasBack &&
@@ -139,7 +141,7 @@ class User extends React.Component {
 						</PanelHeader>
 						<PullToRefresh onRefresh={this.onRefresh} isFetching={this.state.fetching}>
 							{this.state.readOnlyMode
-								? user &&
+								? user && 
 								<Group title="VK Connect">
 									<Link href={"https://m.vk.com/id" + user.id} target="_blank">
 										<Cell description={user.city || ''}
@@ -168,7 +170,7 @@ class User extends React.Component {
 											{`${this.props.profile.first_name} ${this.props.profile.last_name}`}
 										</Cell>
 									</Link>
-									{!this.props.profileUser &&
+									{this.props.profileUser === null &&
 										<Div>
 											<Button mode="destructive" size='xl'
 												onClick={() => this.confirmUser()}>

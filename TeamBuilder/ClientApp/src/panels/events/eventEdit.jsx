@@ -1,7 +1,6 @@
 ﻿import React, { useState, useEffect, useRef } from 'react';
 
 import { connect } from 'react-redux';
-import { bindActionCreators } from "redux";
 import { goBack } from "../../store/router/actions";
 import { setFormData } from "../../store/formData/actions";
 
@@ -12,7 +11,7 @@ import {
 
 import { Api } from '../../infrastructure/api';
 import * as utils from '../../infrastructure/utils';
-import { getActivePanel } from "../../services/_functions";
+import { getActivePanel, longOperationWrapper } from "../../services/_functions";
 
 const EventEdit = props => {
 	const { goBack, setFormData } = props;
@@ -48,11 +47,13 @@ const EventEdit = props => {
 		setInputData(props.inputData[bindingId] || fetchEvent())
 	}, [props.inputData[bindingId]]);
 
-	const eventEdit = () => {
-		if (!inputData.name)
-			return;
-		Api.Events.edit(inputData)
-			.then(_ => goBack());
+	const eventEdit = async () => {
+		if (!inputData.name) return;
+
+		let action = async () => await Api.Events.edit(inputData)
+		let postAction = () => goBack();
+
+		await longOperationWrapper({ action, postAction });
 	}
 
 	const handleInput = (e) => {
@@ -105,11 +106,9 @@ const mapStateToProps = (state) => {
 	};
 };
 
-function mapDispatchToProps(dispatch) {
-	return {
-		dispatch,
-		...bindActionCreators({ goBack, setFormData }, dispatch)
-	}
+const mapDispatchToProps = {
+	goBack,
+	setFormData
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(EventEdit);

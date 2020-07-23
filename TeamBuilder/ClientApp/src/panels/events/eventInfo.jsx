@@ -1,16 +1,18 @@
 ﻿import React, { useState, useEffect } from 'react';
 
 import { connect } from 'react-redux';
-import { bindActionCreators } from "redux";
-import { goBack, goToPage, openPopout, closePopout } from "../../store/router/actions";
+import { goBack, goToPage } from "../../store/router/actions";
 
 import {
-	Panel, PanelHeader, Group, SimpleCell, InfoRow, Header, Avatar, Alert, PullToRefresh,
+	Panel, PanelHeader, Group, SimpleCell, InfoRow, Header, Avatar, PullToRefresh,
 	PanelHeaderBack, Cell, List, PanelHeaderContent, PanelHeaderContext
 } from '@vkontakte/vkui';
 import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
+
+import * as Alerts from "../components/Alerts.js";
+
 import { countConfirmed } from "../../infrastructure/utils";
-import { getActivePanel } from "../../services/_functions";
+import { getActivePanel, longOperationWrapper } from "../../services/_functions";
 import { Api } from '../../infrastructure/api';
 
 const EventInfo = props => {
@@ -47,30 +49,11 @@ const EventInfo = props => {
 	};
 
 	const deleteEvent = () => {
-		Api.Events.delete(event.id);
-		goBack();
-	};
+		let action = async () => await Api.Events.delete(event.id);
+		let postAction = () => goBack();
+		let handler = () => longOperationWrapper({action, postAction});
 
-	const openPopoutDeleteEvent = () => {
-		props.openPopout(
-			<Alert
-				actionsLayout="vertical"
-				actions={[{
-					title: 'Удалить событие',
-					autoclose: true,
-					mode: 'destructive',
-					action: () => deleteEvent(),
-				}, {
-					title: 'Отмена',
-					autoclose: true,
-					mode: 'cancel'
-				}]}
-				onClose={() => props.closePopout()}
-			>
-				<h2>Подтвердите действие</h2>
-				<p>Вы уверены, что хотите удалить событие?</p>
-			</Alert>
-		);
+		Alerts.DeleteEventPopout(event.name, handler);
 	};
 
 	return (
@@ -94,7 +77,7 @@ const EventInfo = props => {
 						Редактировать событие
                         </Cell>
 					<Cell
-						onClick={() => openPopoutDeleteEvent()}>
+						onClick={() => deleteEvent()}>
 						Удалить событие
                         </Cell>
 				</List>
@@ -151,12 +134,9 @@ const mapStateToProps = (state) => {
 	};
 };
 
-
-function mapDispatchToProps(dispatch) {
-	return {
-		dispatch,
-		...bindActionCreators({ goToPage, goBack, openPopout, closePopout }, dispatch)
-	}
+const mapDispatchToProps = {
+	goToPage,
+	goBack
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(EventInfo);

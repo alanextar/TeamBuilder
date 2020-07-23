@@ -8,7 +8,29 @@ import { openPopout, closePopout} from "../../store/router/actions";
 const clickHandlerWrapper = (handler) => {
 	store.dispatch(closePopout());
 	handler && handler();
-}
+};
+
+export const DeleteEventPopout = (eventName, clickHandler) => {
+	store.dispatch(openPopout(
+		<Alert
+			actionsLayout="vertical"
+			actions={[{
+				title: 'Удалить событие',
+				autoclose: false,
+				mode: 'destructive',
+				action: () => clickHandlerWrapper(clickHandler),
+			}, {
+				title: 'Отмена',
+				autoclose: true,
+				mode: 'cancel'
+			}]}
+			onClose={() => store.dispatch(closePopout())}
+		>
+			<h2>Подтвердите действие</h2>
+			<p>Вы уверены, что хотите удалить событие «{eventName}»?</p>
+		</Alert>
+	))
+};
  
 export const DeleteTeamPopout = async (teamName, clickHandler) => {
 	store.dispatch(openPopout(

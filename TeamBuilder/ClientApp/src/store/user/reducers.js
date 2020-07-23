@@ -15,12 +15,9 @@ export const userReducer = (state = initialState, action) => {
 			};
 		}
 		case SET_PROFILE_USER: {
-			let profileUser = { ...action.payload.profileUser };
-			delete profileUser.userTeams;
-
 			return {
 				...state,
-				profileUser: profileUser
+				profileUser: action.payload.profileUser
 			};
 		}
 
