@@ -8,8 +8,10 @@ import {
 	Panel, PanelHeader, PanelHeaderBack, Group,
 	Div, Button, Textarea, FormLayout, SelectMimicry, Input, Link
 } from '@vkontakte/vkui';
+
 import { Api } from '../../infrastructure/api';
 import { GetRandomPicUrl as GetRandomPic } from '../../infrastructure/utils';
+import { longOperationWrapper } from "../../services/_functions";
 
 class TeamCreate extends React.Component {
 	constructor(props) {
@@ -102,13 +104,18 @@ class TeamCreate extends React.Component {
 	async postCreate() {
 		if (!this.state.inputData?.name)
 			return;
-		let createTeamViewModel = {
-			...this.state.inputData,
-			imageAsDataUrl: await GetRandomPic()
+
+		let action = async () => {
+			let createTeamViewModel = {
+				...this.state.inputData,
+				imageAsDataUrl: await GetRandomPic()
+			}
+			let result = await Api.Teams.create(createTeamViewModel);
+			this.prepareCancelForm();
+			this.props.goToPage('teamInfo', result.id, true);
 		}
-		let result = await Api.Teams.create(createTeamViewModel);
-		this.prepareCancelForm();
-		this.props.goToPage('teamInfo', result.id, true);
+
+		await longOperationWrapper({action});
 	}
 
 	render() {
@@ -166,7 +173,7 @@ class TeamCreate extends React.Component {
 						<Button
 							stretched
 							size='xl'
-							onClick={() => this.postCreate()}>
+							onClick={this.postCreate}>
 							Создать Команду
 						</Button>
 					</Div>

@@ -1,16 +1,17 @@
-﻿import React, { useState, useEffect } from "react";
+﻿import React from "react";
 import { connect } from "react-redux";
-import { goToPage } from "../../store/router/actions";
+import { goToPage, goBack } from "../../store/router/actions";
 
 import { List, PanelHeaderContext, Cell } from "@vkontakte/vkui";
 
 import * as Alerts from "../components/Alerts.js";
 
-import * as TeamManagement from "../../services/teamManagement";
+import { Api } from '../../infrastructure/api';
 import { countConfirmed } from "../../infrastructure/utils";
+import { longOperationWrapper } from "../../services/_functions";
 
 const TeamMenu = (props) => {
-	const { goToPage } = props;
+	const { goToPage, goBack } = props;
 
 	const userInActiveTeam =
 		props.profile &&
@@ -28,32 +29,57 @@ const TeamMenu = (props) => {
 		confirmedUser < props.team.numberRequiredMembers;
 	const fullTank = confirmedUser >= props.team.numberRequiredMembers;
 
-	const sendRequestHandler = async () => {
-		let updatedTeam = await TeamManagement.sendRequest(props.team.id);
-		setUserTeams(updatedTeam.userTeams);
+	const deleteTeamHandler = async () => {
+			let action = async () => await Api.Teams.delete(props.team.id);
+			let postAction = () => goBack();
+			let handler = () => longOperationWrapper({action, postAction});
+
+			Alerts.DeleteTeamPopout(props.team.name, handler);
 	};
 
-	const dropUserHandler = async () => {
-		let updatedTeam = await TeamManagement.dropUser(props.team.id);
-		setUserTeams(updatedTeam.userTeams);
+	const sendRequestHandler = async () => {
+		let action = async () => {
+			let updatedTeam = await Api.Users.setTeam(props.profileUser.id, props.team.id, false);
+			setUserTeams(updatedTeam.userTeams);
+		}
+
+		await longOperationWrapper({action});
+	};
+
+	const dropUserHandler = async (alert) => {
+		let action = async () => {
+			let updatedTeam = await Api.Teams.rejectedOrRemoveUser(props.profileUser.id, props.team.id);
+			setUserTeams(updatedTeam.userTeams);
+		}
+		let handler = () => longOperationWrapper({action});
+
+		alert(props.team.name, handler)
 	};
 
 	const canselRequestHandler = async () => {
-		let updatedTeam = await TeamManagement.cancelUser(props.team.id);
-		setUserTeams(updatedTeam.userTeams);
+		let action = async () => {
+			let updatedTeam = await Api.Teams.cancelRequestUser(props.profileUser.id, props.team.id);
+			setUserTeams(updatedTeam.userTeams);
+		}
+
+		await longOperationWrapper({action});
 	};
 
 	const joinTeamHandler = async () => {
-		let updatedTeam = await TeamManagement.joinTeam(props.team.id);
-		setUserTeams(updatedTeam.userTeams);
+		let action = async () => {
+			let updatedTeam = await Api.Teams.joinTeam(props.profileUser.id, props.team.id);
+			setUserTeams(updatedTeam.userTeams);
+		}
+
+		await longOperationWrapper({action});
 	};
 
 	const setUserTeams = (userTeams) => {
 		props.updateTeam({
 			...props.team,
-			userTeams: userTeams,
+			userTeams: userTeams
 		});
-	}
+	};
 
 	return (
 		props.team && (
@@ -65,10 +91,7 @@ const TeamMenu = (props) => {
 								Редактировать команду
 							</Cell>
 							<Cell
-								onClick={() =>
-									Alerts.DeleteTeamPopout(props.team.id, props.team.name)
-								}
-							>
+								onClick={() => deleteTeamHandler()}>
 								Удалить команду
 							</Cell>
 						</>
@@ -80,10 +103,7 @@ const TeamMenu = (props) => {
 						)) ||
 						(userAction === 2 && (
 							<Cell
-								onClick={() =>
-									Alerts.LeaveTeamPopout(props.team.name, dropUserHandler)
-								}
-							>
+								onClick={() => dropUserHandler(Alerts.LeaveTeamPopout)}>
 								Выйти из команды
 							</Cell>
 						)) ||
@@ -93,16 +113,13 @@ const TeamMenu = (props) => {
 									Принять приглашение
 								</Cell>
 								<Cell
-									onClick={() =>
-										Alerts.DeclineTeamInvitePopout(props.team.name, dropUserHandler)
-									}
-								>
+									onClick={() => dropUserHandler(Alerts.DeclineTeamInvitePopout)}>
 									Отклонить приглашение
 								</Cell>
 							</>
 						)) ||
 						(canSendRequest && (
-							<Cell onClick={sendRequestHandler}>
+							<Cell onClick={() => sendRequestHandler()}>
 								Подать заявку в команду
 							</Cell>
 						)) ||
@@ -121,7 +138,8 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = {
-	goToPage
+	goToPage,
+	goBack
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(TeamMenu);

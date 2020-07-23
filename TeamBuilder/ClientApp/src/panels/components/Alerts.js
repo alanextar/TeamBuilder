@@ -3,18 +3,22 @@
 import { Alert, ScreenSpinner } from '@vkontakte/vkui';
 
 import { store } from "../../index";
-import { goBack, openPopout, closePopout, goToPage } from "../../store/router/actions";
-import * as TeamManagement from '../../services/teamManagement';
+import { openPopout, closePopout} from "../../store/router/actions";
 
-export const DeleteTeamPopout = (teamId, teamName) => {
+const clickHandlerWrapper = (handler) => {
+	store.dispatch(closePopout());
+	handler && handler();
+}
+ 
+export const DeleteTeamPopout = async (teamName, clickHandler) => {
 	store.dispatch(openPopout(
 		<Alert
 			actionsLayout="vertical"
 			actions={[{
 				title: 'Удалить команду',
-				autoclose: true,
+				autoclose: false,
 				mode: 'destructive',
-				action: () => TeamManagement.deleteTeam(teamId),
+				action: () => clickHandlerWrapper(clickHandler),
 			}, {
 				title: 'Отмена',
 				autoclose: true,
@@ -23,7 +27,7 @@ export const DeleteTeamPopout = (teamId, teamName) => {
 			onClose={() => store.dispatch(closePopout())}
 		>
 			<h2>Подтвердите действие</h2>
-			<p>Вы уверены, что хотите удалить команду «{teamName}»?`</p>
+			<p>Вы уверены, что хотите удалить команду «{teamName}»?</p>
 		</Alert>
 	));
 };

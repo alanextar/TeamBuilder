@@ -10,7 +10,7 @@ import {
 	Div, Button, Textarea, FormLayout, Input, Link
 } from '@vkontakte/vkui';
 
-import { getActivePanel } from "../../services/_functions";
+import { getActivePanel, longOperationWrapper } from "../../services/_functions";
 
 class TeamEdit extends React.Component {
 	constructor(props) {
@@ -61,6 +61,8 @@ class TeamEdit extends React.Component {
 				}
 			})
 		};
+
+		this.postEdit = this.postEdit.bind(this);
 	}
 
 	componentDidMount() {
@@ -95,8 +97,9 @@ class TeamEdit extends React.Component {
 		if (!this.state.inputData.name)
 			return;
 
-		await Api.Teams.edit(this.state.inputData);
-		this.cancelForm();
+		let action = async () => await Api.Teams.edit(this.state.inputData);
+		let postAction = () => this.cancelForm();
+		await longOperationWrapper({ action, postAction });
 	};
 
 	render() {
@@ -151,7 +154,7 @@ class TeamEdit extends React.Component {
 						<Button
 							size="xl"
 							stretched
-							onClick={() => this.postEdit()}>
+							onClick={this.postEdit}>
 							Сохранить
                         </Button>
 					</Div>

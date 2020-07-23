@@ -4,53 +4,54 @@ import { goToPage } from "../../store/router/actions";
 
 import { RichCell, Group, Button, Avatar } from "@vkontakte/vkui";
 
-import Icon24DismissDark from '@vkontakte/icons/dist/24/dismiss_dark';
+import Icon24Dismiss from '@vkontakte/icons/dist/24/dismiss';
 import * as Alerts from "../components/Alerts.js";
 
 import { Api } from '../../infrastructure/api';
+import { longOperationWrapper } from "../../services/_functions";
 
 const TeamManagment = (props) => {
 
 	//Принять в команду
 	const handleJoin = async (e, userTeam) => {
-		commonHandler(e, async () => {
+		e.preventDefault();
+
+		let action = async () => {
 			let updatedTeam = await Api.Teams.joinTeam(userTeam.userId, userTeam.teamId);
 			props.updateTeam(updatedTeam);
-		});
+		}
+
+		await longOperationWrapper({ e, action });
 	};
 
 	//Удалить из команды / отклонить заявку
 	const dropUser = async (e, userTeam, alert) => {
+		e.preventDefault();
+
 		let action = async () => {
 			let updatedTeam = await Api.Teams.rejectedOrRemoveUser(userTeam.userId, userTeam.teamId);
 			props.updateTeam(updatedTeam);
 		}
-		commonHandler(e, action, (handler) => alert(userTeam.user.fullName, handler));
+		let handler = () => longOperationWrapper({ action });
+
+		alert(userTeam.user.fullName, handler);
 	};
 
 	//Отменить приглашение
 	const cancelUser = async (e, userTeam) => {
-		commonHandler(e, async () => {
+		e.preventDefault();
+
+		let action = async () => {
 			let updatedTeam = await Api.Teams.cancelRequestUser(userTeam.userId, userTeam.teamId);
 			props.updateTeam(updatedTeam);
-		});
+		}
+
+		await longOperationWrapper({ e, action });
 	};
 
-	const commonHandler = async (e, action, alert) => {
-		e.stopPropagation();
-		
-		let handler = async () => {
-			Alerts.BlockScreen();
-			await action();
-			Alerts.UnblockScreen();
-		};
-
-		if (alert) {
-			alert(handler);
-		}
-		else {
-			await handler();
-		}
+	const goToUser = (e, userId) => {
+		if (e.defaultPrevented) return;
+		props.goToPage("user", userId);
 	}
 
 	return (
@@ -58,12 +59,14 @@ const TeamManagment = (props) => {
 			{props.userTeams?.map(userTeam => {
 				return (
 					(userTeam.userAction === 1 || userTeam.userAction === 2 || userTeam.userAction === 5) &&
-					<RichCell key={userTeam.userId}
+					<RichCell
+						key={userTeam.userId}
 						before={<Avatar size={48} src={userTeam.user.photo100} />}
 						after={
 							userTeam.userAction === 2 &&
-							<Icon24DismissDark onClick={e => dropUser(e, userTeam, Alerts.RemoveUserFromTeamPopout)} />
+							<Icon24Dismiss onClick={e => dropUser(e, userTeam, Alerts.RemoveUserFromTeamPopout)} />
 						}
+						onClick={(e) => goToUser(e, userTeam.userId)}
 						actions={
 							userTeam.userAction === 1 &&
 							<React.Fragment>
