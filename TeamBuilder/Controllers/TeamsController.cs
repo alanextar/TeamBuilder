@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using TeamBuilder.Models;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -93,6 +94,11 @@ namespace TeamBuilder.Controllers
 
 			if (!accessChecker.IsConfirm(out var profileId))
 				return Forbid();
+			
+			var teamsNames = await context.Teams.Select(t => t.Name).ToListAsync();
+
+			if (teamsNames.Contains(createTeamViewModel.Name))
+				return BadRequest("Команда с таким именем уже существует");
 
 			var @event = await context.Events.FirstOrDefaultAsync(e => e.Id == createTeamViewModel.EventId);
 
@@ -128,7 +134,7 @@ namespace TeamBuilder.Controllers
 			var teamId = editTeamViewModel.Id;
 			if (!await accessChecker.CanManageTeam(teamId))
 				return Forbid();
-
+			
 			var team = await context.Teams.FirstOrDefaultAsync(t => t.Id == teamId);
 			if (team == null)
 				return NotFound($"Team '{teamId}' not found");
@@ -173,7 +179,7 @@ namespace TeamBuilder.Controllers
 
 			if (!await accessChecker.CanManageTeamOrSelfInTeam(model.TeamId, model.UserId))
 				return Forbid();
-
+			
 			var team = await context.Teams
 				.Include(t => t.Image)
 				.Include(u => u.UserTeams)
@@ -205,7 +211,7 @@ namespace TeamBuilder.Controllers
 		public async Task<IActionResult> CancelRequestUser([FromBody] ManageUserTeamViewModel model)
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(model)}");
-
+			
 			var team = await context.Teams
 				.Include(t => t.Image)
 				.Include(u => u.UserTeams)

@@ -16,6 +16,7 @@ import '@vkontakte/vkui/dist/vkui.css';
 
 import { Api } from '../../infrastructure/api';
 import * as Utils from '../../infrastructure/utils';
+import { longOperationWrapper } from "../../services/_functions";
 
 class UserEdit extends React.Component {
 	constructor(props) {
@@ -73,19 +74,23 @@ class UserEdit extends React.Component {
 		return nextState.inputData !== null;
 	}
 
-	async postEdit() {
+	async postEdit(e) {
 		const { setProfileUser, goBack } = this.props;
-		let editUserViewModel = {
-			...this.state.inputData,
-			skillsIds: this.state.inputData.selectedSkills.map(s => s.id)
+
+		let action = async () => {
+			let editUserViewModel = {
+				...this.state.inputData,
+				skillsIds: this.state.inputData.selectedSkills.map(s => s.id)
+			}
+			delete editUserViewModel.userSkills;
+			delete editUserViewModel.selectedSkills;
+
+			let updatedUser = await Api.Users.edit(editUserViewModel);
+			setProfileUser(updatedUser);
 		}
-		delete editUserViewModel.userSkills;
-		delete editUserViewModel.selectedSkills;
+		let postAction = () => goBack();
 
-		let updatedUser = await Api.Users.edit(editUserViewModel);
-		setProfileUser(updatedUser);
-
-		goBack();
+		await longOperationWrapper({ action, postAction });
 	}
 
 	fetchUser() {
@@ -158,7 +163,7 @@ class UserEdit extends React.Component {
 					</FormLayoutGroup>
 				</FormLayout>
 				<Div style={{ display: 'flex' }}>
-					<Button size="l" onClick={() => this.postEdit()} stretched style={{ marginRight: 8 }}>Принять</Button>
+					<Button size="l" onClick={e => this.postEdit(e)} stretched style={{ marginRight: 8 }}>Принять</Button>
 					<Button size="l" onClick={() => this.cancelForm()} stretched mode="secondary">Отменить</Button>
 				</Div>
 			</Panel>

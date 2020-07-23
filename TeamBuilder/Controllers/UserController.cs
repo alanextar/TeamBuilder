@@ -130,26 +130,34 @@ namespace TeamBuilder.Controllers
 		}
 
 		[HttpGet]
-		public IActionResult GetRecruitTeams(long vkProfileId, long id)
+		public async Task<IActionResult> GetRecruitTeams(long vkProfileId, long id)
 		{
 			logger.LogInformation($"GET Request {HttpContext.Request.Headers[":path"]}");
 
-			var user = context.Users.Include(x => x.UserTeams)
+			var user = await context.Users
+				.Include(x => x.UserTeams)
 				.ThenInclude(y => y.Team)
-				.ThenInclude(y => y.Event)
-				.FirstOrDefault(u => u.Id == id);
-
+				.FirstOrDefaultAsync(u => u.Id == id);
+			
 			if (user.IsSearchable)
 			{
-				var profileTeams = context.Users.Include(x => x.UserTeams)
-				.ThenInclude(y => y.Team).SelectMany(x => x.UserTeams)
-				.Where(x => x.IsOwner && x.UserId == vkProfileId).Select(x => x.Team).ToList();
+				var profile = await context.Users
+					.Include(x => x.UserTeams)
+					.ThenInclude(y => y.Team)
+					.FirstOrDefaultAsync(x => x.Id == vkProfileId);
+
+				var profileTeams = profile.UserTeams
+					.Where(x => x.IsOwner)
+					.Select(x => x.Team)
+					.ToList();
 
 				//команды оунера в которых не состоит юзер
-				user.TeamsToRecruit = profileTeams.Except(user.UserTeams.Select(x => x.Team).ToList()).ToList();
+				user.TeamsToRecruit = profileTeams.Except(user.GetActiveUserTeams().Select(x => x.Team).ToList()).ToList();
+				return Json(user.TeamsToRecruit);
 			}
 
-			return Json(user.TeamsToRecruit);
+			return BadRequest("Пользователь не ищет команду");
+
 		}
 
 		[HttpPost]

@@ -50,30 +50,6 @@ export const getActivePanel = (view) => {
 	return { panel };
 };
 
-// /**
-//  * [longOperationHandler Блокирует экран на время выполнения action]
-//  * @param  {[type]} arg1 [description]
-//  * @param  {[type]} arg2 [description]
-//  * @return {[type]}      [description]
-//  */
-// export const longOperationHandler = async (e, action, alert, afterAction) => {
-// 	e.stopPropagation();
-
-// 	let handler = async () => {
-// 		Alerts.BlockScreen();
-// 		await action();
-// 		Alerts.UnblockScreen();
-// 		afterAction && await afterAction();
-// 	};
-
-// 	if (alert) {
-// 		alert(handler);
-// 	}
-// 	else {
-// 		await handler();
-// 	}
-// }
-
 //action, preAction, postAction
 export const longOperationWrapper = async (longOperation) => {
 	longOperation.preAction && await longOperation.preAction();

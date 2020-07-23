@@ -7,6 +7,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Api } from '../../infrastructure/api';
 import { countMyActiveTeams, countForeignActiveTeams } from '../../infrastructure/utils';
+import { longOperationWrapper } from "../../services/_functions";
 import { goToPage } from '../../store/router/actions';
 
 class UserTeams extends React.Component {
@@ -14,8 +15,7 @@ class UserTeams extends React.Component {
 		super(props);
 
 		this.state = {
-			userTeams: props.userTeams,
-			fetching: false,
+			userTeams: props.userTeams
 		}
 	}
 
@@ -25,49 +25,45 @@ class UserTeams extends React.Component {
 		}
 	}
 
-	handleJoin(e, teamId) {
-		this.commonHandler(e, async () => {
+	async handleJoin(e, teamId) {
+		e.preventDefault();
+
+		let action = async () => {
 			let updatedUserTeams = await Api.Users.joinTeam(teamId);
 			this.setState({ userTeams: updatedUserTeams });
-		});
+		}
+
+		await longOperationWrapper({ action });
 	}
 
 	async handleQuitOrDecline(e, teamId, teamName, alert) {
+		e.preventDefault();
+
 		let action = async () => {
 			let updatedUserTeams = await Api.Users.quitOrDeclineTeam(teamId);
 			this.setState({ userTeams: updatedUserTeams });
 		}
-		this.commonHandler(e, action, (handler) => alert(teamName, handler));
+		let handler = () => longOperationWrapper({ action });
+
+		alert(teamName, handler)
 	}
 
 	async handleCancelRequestToTeam(e, teamId, teamName) {
+		e.preventDefault();
+
 		let action = async () => {
 			let updatedUserTeams = await Api.Users.cancelRequestTeam(teamId);
 			this.setState({ userTeams: updatedUserTeams });
 		}
-		let alert = (handler) => Alerts.CanselRequestToTeamPopout(teamName, handler);
-		this.commonHandler(e, action, alert);
+		let handler = () => longOperationWrapper({ action });
+
+		Alerts.CanselRequestToTeamPopout(teamName, handler);
 	}
 
-	commonHandler = async (e, action, alert) => {
-		e.stopPropagation();
-
-		let handler = async () => {
-			Alerts.BlockScreen();
-			await action();
-			Alerts.UnblockScreen();
-		};
-
-		if (alert) {
-			alert(handler);
-		}
-
-		await handler();
+	goToTeam = (e, teamId) => {
+		if (e.defaultPrevented) return;
+		this.props.goToPage('teamInfo', teamId);
 	}
-
-	updateUserTeams = (userTeams) => {
-		this.setState({ userTeams: userTeams })
-	};
 
 	buildTeamAction = (userTeam) => {
 		if (this.props.readOnlyMode) {
@@ -104,7 +100,6 @@ class UserTeams extends React.Component {
 	}
 
 	render() {
-		const { goToPage } = this.props;
 		let isTeamsExistsForProfile = countMyActiveTeams(this.state.userTeams) !== 0;
 		let isTeamsExistsForUser = countForeignActiveTeams(this.state.userTeams) !== 0;
 		const loader = <PanelSpinner key={0} size="large" />
@@ -122,25 +117,24 @@ class UserTeams extends React.Component {
 							Пользователь пока не состоит ни в одной из команд. Вы можете отправить ему приглашение, чтобы он присоединился к вам.
 							</Placeholder>}
 					<List>
-						<CardGrid>
-							{
-								this.state.userTeams?.map(userTeam => {
-									if (this.props.readOnlyMode && userTeam.userAction !== 2 && !userTeam.isOwner)
-										return;
-									return (
-										<Card key={userTeam.teamId} size="l" mode="shadow">
-											<RichCell key={userTeam.teamId}
-												text={userTeam?.team?.description}
-												caption={userTeam.team.event?.name}
-												after={userTeam.userAction === 2 ? < Icon28CheckCircleOutline /> :
-													(userTeam.userAction === 1 && <Icon28InfoOutline />)}
-												onClick={() => { goToPage('teamInfo', userTeam.teamId) }}
-												actions={this.buildTeamAction(userTeam)}>
-												{userTeam.team.name}
-											</RichCell>
-										</Card>
-									)
-								})
+						<CardGrid style={{ marginTop: 10, marginBottom: 10 }}>
+							{this.state.userTeams?.map(userTeam => {
+								if (this.props.readOnlyMode && userTeam.userAction !== 2 && !userTeam.isOwner)
+									return;
+								return (
+									<Card key={userTeam.teamId} size="l" mode="shadow">
+										<RichCell key={userTeam.teamId}
+											text={userTeam?.team?.description}
+											caption={userTeam.team.event?.name}
+											after={userTeam.userAction === 2 ? < Icon28CheckCircleOutline /> :
+												(userTeam.userAction === 1 && <Icon28InfoOutline />)}
+											onClick={(e) => this.goToTeam(e, userTeam.teamId)}
+											actions={this.buildTeamAction(userTeam)}>
+											{userTeam.team.name}
+										</RichCell>
+									</Card>
+								)
+							})
 							}
 						</CardGrid>
 					</List>

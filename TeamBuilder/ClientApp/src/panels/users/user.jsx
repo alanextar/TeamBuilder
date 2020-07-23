@@ -33,13 +33,12 @@ class User extends React.Component {
 		let itemIdInitial = getActivePanel(props.activeView).itemId || props.profile?.id;
 		let isMyProfile = itemIdInitial == props.profile?.id;
 
-		//TODO activeTab можно убрать из state
 		this.state = {
 			itemId: itemIdInitial,
 			user: null,
 
 			readOnlyMode: !isMyProfile,
-			isRecruitTeamsExist: false,
+			isRecruitTeamsExist: undefined,
 			loading: true
 		}
 
@@ -66,6 +65,7 @@ class User extends React.Component {
 			let isMyProfile = itemIdInitial == this.props.profile?.id;
 
 			this.setState({ itemId: itemIdInitial, readOnlyMode: !isMyProfile });
+			this.bindingId = `${this.props.id}_${itemIdInitial}`;
 
 			this.fetchUserData(itemIdInitial);
 		}
@@ -90,6 +90,9 @@ class User extends React.Component {
 			if (needGetRecruitTeams) {
 				let teams = await Api.Users.getRecruitTeams(this.props.profile?.id, itemId);
 				this.setState({ isRecruitTeamsExist: teams.length > 0 });
+			}
+			else {
+				this.setState({ isRecruitTeamsExist: null });
 			}
 		}
 		else {
@@ -121,8 +124,6 @@ class User extends React.Component {
 			});
 	}
 
-	loader = <PanelSpinner key={0} size="large" />
-
 	render() {
 		const { goBack, goToPage, setActiveTab } = this.props;
 		let user = this.state.user;
@@ -130,9 +131,8 @@ class User extends React.Component {
 
 		return (
 			<Panel id={this.props.id}>
-				{!user
-					? <PanelSpinner key={0} size="large" />
-					: <>
+				{user &&
+					<>
 						<PanelHeader separator={false}
 							left={hasBack &&
 								<PanelHeaderBack onClick={() => goBack()} />}>{this.state.readOnlyMode ? 'Участник' : 'Профиль'}
@@ -148,7 +148,10 @@ class User extends React.Component {
 											{`${user.firstName} ${user.lastName}`}
 										</Cell>
 									</Link>
-									{this.state.isRecruitTeamsExist &&
+									{this.state.isRecruitTeamsExist === undefined
+										? <PanelSpinner key={0} size="regular" height="69px" />
+										:
+										this.state.isRecruitTeamsExist &&
 										<Div>
 											<Button mode="primary" size='xl'
 												onClick={() => goToPage('setUserTeam', this.state.itemId)}>
