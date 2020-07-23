@@ -6,25 +6,34 @@ import { goBack } from "../../store/router/actions";
 import { setFormData } from "../../store/formData/actions";
 
 import {
-	Panel, PanelHeader, Button, Div, FormLayoutGroup, Separator, FormLayout, Select, PanelHeaderBack
+	Panel, PanelHeader, Button, Div, FormLayoutGroup, PullToRefresh,
+	Separator, FormLayout, Select, PanelHeaderBack, PanelSpinner
 } from '@vkontakte/vkui';
 
 import { Api } from '../../infrastructure/api';
-import { getActivePanel } from "../../services/_functions";
+import { getActivePanel, longOperationWrapper } from "../../services/_functions";
 
 class SetUserTeam extends React.Component {
 	constructor(props) {
 		super(props);
 
 		let itemIdInitial = getActivePanel(props.activeView).itemId;
-		this.bindingId = `setUserTeam_${itemIdInitial}`;
+		this.bindingId = `${props.id}_${itemIdInitial}`;
+
 		this.state = {
 			itemId: itemIdInitial,
-			recruitTeams: [],
+			recruitTeams: undefined,
 			inputData: props.inputData[this.bindingId]
 		}
 
-		this.post = this.post.bind(this);
+		this.onRefresh = async () => {
+			this.setState({ fetching: true });
+			await this.populateData();
+			this.setState({
+				fetching: false
+			});
+
+		};
 
 		this.handleInput = (e) => {
 			let value = e.currentTarget.value;
@@ -47,11 +56,17 @@ class SetUserTeam extends React.Component {
 			})
 			this.props.goBack();
 		};
+
+		this.post = this.post.bind(this);
 	}
 
 	componentDidMount() {
-		Api.Users.getRecruitTeams(this.props.profile.id, this.state.itemId).
-			then(teams => this.setState({ recruitTeams: teams }));
+		this.populateData();
+	}
+
+	async populateData() {
+		let teams = await Api.Users.getRecruitTeams(this.props.profile.id, this.state.itemId);
+		this.setState({ recruitTeams: teams });
 	}
 
 	componentWillUnmount() {
@@ -61,43 +76,53 @@ class SetUserTeam extends React.Component {
 	post() {
 		let userId = this.state.itemId;
 		let teamId = this.state.inputData.teamId;
-		Api.Users.setTeam(userId, teamId)
-			.then(_ => this.props.goBack());
+
+		let action = async () => await Api.Users.setTeam(userId, teamId);
+		let postAction = () => this.props.goBack();
+
+		longOperationWrapper({ action, postAction });
 	}
 
 	render() {
 		let inputData = this.state.inputData;
+		const loader = <PanelSpinner key={0} size="large" />
 
 		return (
 			<Panel id={this.props.id}>
 				<PanelHeader left={<PanelHeaderBack onClick={this.cancelForm} />}>Выбор команды</PanelHeader>
 				<Separator />
-				<FormLayout>
-					<FormLayoutGroup top="Завербовать">
-						<Select
-							top="Выберите команду"
-							placeholder="Команда"
-							onChange={this.handleInput}
-							status={inputData ? 'valid' : 'error'}
-							bottom={inputData ? '' : 'Пожалуйста, выберете или создайте команду'}
-							name="teamId"
-							value={inputData?.teamId}
-						>
-							{this.state.recruitTeams?.map(team => {
-								return (
-									<option ket={team.id} value={team.id}>
-										{team.name}
-									</option>
-								)
-							})}
+				{!this.state.recruitTeams
+					? loader
+					:
+					<PullToRefresh onRefresh={this.onRefresh} isFetching={this.state.fetching}>
+						<FormLayout>
+							<FormLayoutGroup top="Завербовать">
+								<Select
+									top="Выберите команду"
+									placeholder="Команда"
+									onChange={this.handleInput}
+									status={inputData ? 'valid' : 'error'}
+									bottom={inputData ? '' : 'Пожалуйста, выберете или создайте команду'}
+									name="teamId"
+									value={inputData?.teamId}
+								>
+									{this.state.recruitTeams?.map(team => {
+										return (
+											<option key={team.id} value={team.id}>
+												{team.name}
+											</option>
+										)
+									})}
 
-						</Select>
-					</FormLayoutGroup>
-				</FormLayout>
-				<Div style={{ display: 'flex' }}>
-					<Button size="l" onClick={() => this.post()} stretched style={{ marginRight: 8 }}>Принять</Button>
-					<Button size="l" onClick={this.cancelForm} stretched mode="secondary">Отменить</Button>
-				</Div>
+								</Select>
+							</FormLayoutGroup>
+						</FormLayout>
+						<Div style={{ display: 'flex' }}>
+							<Button size="l" onClick={this.post} stretched style={{ marginRight: 8 }}>Принять</Button>
+							<Button size="l" onClick={this.cancelForm} stretched mode="secondary">Отменить</Button>
+						</Div>
+					</PullToRefresh>
+				}
 			</Panel>
 		)
 	}

@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect } from 'react';
 import {
-	View, Epic, Tabbar, TabbarItem, ConfigProvider, Root
+	Epic, Tabbar, TabbarItem, ConfigProvider, Root
 } from '@vkontakte/vkui';
 import { connect } from 'react-redux';
 import '@vkontakte/vkui/dist/vkui.css';
@@ -17,10 +17,8 @@ import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 
 import Events from './panels/events/events'
 import Teams from './panels/teams/teams'
-import EventsListToFilter from './panels/events/eventsListToFilter'
 import TeamsFilters from './panels/teams/teamsFilters'
 import Users from './panels/users/users'
-import User from './panels/users/user'
 
 import CommonView from './CommonView'
 
@@ -29,7 +27,7 @@ const App = (props) => {
 	const [history, setHistory] = useState(null);
 	const [popout, setPopout] = useState(null);
 
-	const { setStory, activeView, activeStory, profileUser, colorScheme	} = props;
+	const { setStory, activeView, activeStory, profileUser, colorScheme } = props;
 
 	const [activeModal, setActiveModal] = useState(null);
 
@@ -89,26 +87,29 @@ const App = (props) => {
 				<Root id="teams" activeView={activeView} popout={popout}>
 					<CommonView id='teams' activePanel={getActivePanel('teams').panel}
 						history={history}
-						modal={<TeamsFilters activeModal={activeModal} setActiveModal={setActiveModal} />}>
+						modal={<TeamsFilters activeModal={activeModal} setActiveModal={setActiveModal} />}
+						setActiveModal={setActiveModal}>
 						<Teams id='teams' onFiltersClick={() => setActiveModal('filters')} />
-						<EventsListToFilter id='eventsListToFilter' openFilter={() => setActiveModal('filters')} />
 					</CommonView>
 				</Root>
 				<Root id="users" activeView={activeView} popout={popout}>
 					<CommonView id='users' activePanel={getActivePanel('users').panel}
-						history={history}>
+						history={history}
+						setActiveModal={setActiveModal}>
 						<Users id="users" />
 					</CommonView>
 				</Root>
 				<Root id="events" activeView={activeView} popout={popout}>
 					<CommonView id='events' activePanel={getActivePanel('events').panel}
-						history={history}>
+						history={history}
+						setActiveModal={setActiveModal}>
 						<Events id='events' />
 					</CommonView>
 				</Root>
 				<Root id="profile" activeView={activeView} popout={popout}>
 					<CommonView id='profile' activePanel={getActivePanel('profile').panel}
-						history={history} />
+						history={history} 
+						setActiveModal={setActiveModal}/>
 				</Root>
 			</Epic>
 		</ConfigProvider>

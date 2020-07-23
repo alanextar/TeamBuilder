@@ -1,4 +1,5 @@
 import { store } from "../index";
+import * as Alerts from "../panels/components/Alerts.js";
 
 export const smoothScrollToTop = () => {
 	const c = document.documentElement.scrollTop || document.body.scrollTop;
@@ -38,10 +39,25 @@ export const getActivePanel = (view) => {
 		panel = panelsHistory[view][panelsHistory[view].length - 1];
 	}
 
-	let splited = panel.split('_');
-	if (splited.length === 2) {
-		return { panel: splited[0], itemId: splited[1] }
+	let separatorIndex = panel.indexOf('_');
+	if (separatorIndex !== -1) {
+		return {
+			panel: panel.substring(0, separatorIndex),
+			itemId: panel.substring(++separatorIndex)
+		}
 	}
 
 	return { panel };
 };
+
+//action, preAction, postAction
+export const longOperationWrapper = async (longOperation) => {
+	longOperation.preAction && await longOperation.preAction();
+
+	Alerts.BlockScreen();
+	longOperation.action && await longOperation.action();
+	Alerts.UnblockScreen();
+
+	longOperation.postAction && await longOperation.postAction();
+}
+

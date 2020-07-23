@@ -1,15 +1,16 @@
 ﻿import React, { useState, useEffect, useRef } from 'react';
 
 import { connect } from 'react-redux';
-import { bindActionCreators } from "redux";
 import { goBack, goToPage } from "../../store/router/actions";
 import { setFormData } from "../../store/formData/actions";
 
 import {
-	Panel, PanelHeader, Group, Button, Textarea, FixedLayout,
+	Panel, PanelHeader, Button, Textarea,
 	PanelHeaderBack, Input, FormLayout
 } from '@vkontakte/vkui';
+
 import { Api } from '../../infrastructure/api';
+import { longOperationWrapper } from "../../services/_functions";
 
 const EventCreate = props => {
 	const bindingId = `${props.activeView}_eventCreate`;
@@ -44,9 +45,14 @@ const EventCreate = props => {
 
 	const eventCreate = async () => {
 		if (!inputData?.name) return;
-		var result = await Api.Events.create(inputData);
-		setInputData(defaultInputData);
-		goToPage('eventInfo', result.id, true)
+
+		let action = async () => {
+			var result = await Api.Events.create(inputData);
+			setInputData(defaultInputData);
+			goToPage('eventInfo', result.id, true)
+		}
+
+		await longOperationWrapper({ action });
 	}
 
 	useEffect(() => {
@@ -66,10 +72,7 @@ const EventCreate = props => {
 
 	return (
 		<Panel id={props.id}>
-			<PanelHeader left={<PanelHeaderBack onClick={cancelForm} />}>
-				Создание
-        </PanelHeader>
-
+			<PanelHeader left={<PanelHeaderBack onClick={cancelForm} />}>Создание</PanelHeader>
 			<FormLayout>
 				<Input top="Название события" type="text" onChange={handleInput} name="name" value={inputData.name} placeholder="Введите название события" status={inputData.name ? 'valid' : 'error'} />
 				<Textarea top="Описание события" onChange={handleInput} name="description" value={inputData.description} />
@@ -78,7 +81,7 @@ const EventCreate = props => {
 				<Input top="Дата завершения события" type="date" onChange={handleInput} name="finishDate" value={inputData.finishDate} />
 				<Button
 					size='xl'
-					onClick={() => eventCreate()}>
+					onClick={eventCreate}>
 					Создать событие
                 </Button>
 			</FormLayout>
@@ -93,11 +96,10 @@ const mapStateToProps = (state) => {
 	};
 };
 
-function mapDispatchToProps(dispatch) {
-	return {
-		dispatch,
-		...bindActionCreators({ goToPage, goBack, setFormData }, dispatch)
-	}
+const mapDispatchToProps = {
+	goToPage,
+	goBack,
+	setFormData
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(EventCreate);

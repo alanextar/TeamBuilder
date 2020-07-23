@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using TeamBuilder.Models;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -93,6 +94,11 @@ namespace TeamBuilder.Controllers
 
 			if (!accessChecker.IsConfirm(out var profileId))
 				return Forbid();
+			
+			var teamsNames = await context.Teams.Select(t => t.Name).ToListAsync();
+
+			if (teamsNames.Contains(createTeamViewModel.Name))
+				return BadRequest("Команда с таким именем уже существует");
 
 			var @event = await context.Events.FirstOrDefaultAsync(e => e.Id == createTeamViewModel.EventId);
 
@@ -128,7 +134,7 @@ namespace TeamBuilder.Controllers
 			var teamId = editTeamViewModel.Id;
 			if (!await accessChecker.CanManageTeam(teamId))
 				return Forbid();
-
+			
 			var team = await context.Teams.FirstOrDefaultAsync(t => t.Id == teamId);
 			if (team == null)
 				return NotFound($"Team '{teamId}' not found");
@@ -173,8 +179,9 @@ namespace TeamBuilder.Controllers
 
 			if (!await accessChecker.CanManageTeamOrSelfInTeam(model.TeamId, model.UserId))
 				return Forbid();
-
+			
 			var team = await context.Teams
+				.Include(t => t.Image)
 				.Include(u => u.UserTeams)
 				.ThenInclude(ut => ut.User)
 				.FirstOrDefaultAsync(u => u.Id == model.TeamId);
@@ -199,16 +206,14 @@ namespace TeamBuilder.Controllers
 			return Json(team);
 		}
 
-		//Отозвать приглашение которое выслали пользователю
+		//Отозвать приглашение которое выслали пользователю / пользователь отозвал заявку в команду
 		[HttpPost]
 		public async Task<IActionResult> CancelRequestUser([FromBody] ManageUserTeamViewModel model)
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(model)}");
-
-			if (!await accessChecker.CanManageTeam(model.TeamId))
-				return Forbid();
-
+			
 			var team = await context.Teams
+				.Include(t => t.Image)
 				.Include(u => u.UserTeams)
 				.ThenInclude(ut => ut.User)
 				.FirstOrDefaultAsync(u => u.Id == model.TeamId);
@@ -217,9 +222,16 @@ namespace TeamBuilder.Controllers
 			if (userTeam == null)
 				return NotFound($"Not found User {model.UserId} or user {model.UserId} inside Team {model.TeamId}");
 
-			if (userTeam.UserAction != UserActionEnum.ConsideringOffer)
+			switch (userTeam.UserAction)
+			{
+				case UserActionEnum.ConsideringOffer when !await accessChecker.CanManageTeam(model.TeamId):
+				case UserActionEnum.SentRequest when !await accessChecker.CanManageTeamOrSelfInTeam(model.TeamId, model.UserId):
+					return Forbid();
+			}
+
+			if (userTeam.UserAction != UserActionEnum.ConsideringOffer && userTeam.UserAction != UserActionEnum.SentRequest)
 				throw new Exception($"User '{model.UserId}' have invalid userAction '{userTeam.UserAction}' for team '{model.TeamId}'. " +
-									$"Available value: {UserActionEnum.ConsideringOffer}");
+									$"Available value: {UserActionEnum.ConsideringOffer}, {UserActionEnum.SentRequest}");
 
 
 			context.Remove(userTeam);
@@ -228,31 +240,36 @@ namespace TeamBuilder.Controllers
 			return Json(team);
 		}
 
-		//Добавить пользователя в команду
+		//Добавить пользователя в команду / пользователь принимает приглашение
 		[HttpPost]
 		public async Task<IActionResult> JoinTeam([FromBody] ManageUserTeamViewModel model)
 		{
-			logger.LogInformation($"GET Request {HttpContext.Request.Headers[":path"]}");
-
-			if (!await accessChecker.CanManageTeam(model.TeamId))
-				return Forbid();
+			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(model)}");
 
 			var user = await context.Users
 				.Include(x => x.UserTeams)
 				.FirstOrDefaultAsync(u => u.Id == model.UserId);
 
-			var userTeamToJoin = user.UserTeams.First(x => x.TeamId == model.TeamId);
+			var userTeam = user.UserTeams.First(x => x.TeamId == model.TeamId);
 
-			if (userTeamToJoin.UserAction != UserActionEnum.SentRequest)
-				throw new Exception($"User '{model.UserId}' have invalid userAction '{userTeamToJoin.UserAction}' for team '{model.TeamId}'. " +
-									$"Available value: {UserActionEnum.SentRequest}");
+			switch (userTeam.UserAction)
+			{
+				case UserActionEnum.ConsideringOffer when !await accessChecker.CanManageTeamOrSelfInTeam(model.TeamId, model.UserId):
+				case UserActionEnum.SentRequest when !await accessChecker.CanManageTeam(model.TeamId):
+					return Forbid();
+			}
 
-			userTeamToJoin.UserAction = UserActionEnum.JoinedTeam;
+			if (userTeam.UserAction != UserActionEnum.ConsideringOffer && userTeam.UserAction != UserActionEnum.SentRequest)
+				throw new Exception($"User '{model.UserId}' have invalid userAction '{userTeam.UserAction}' for team '{model.TeamId}'. " +
+				                    $"Available value: {UserActionEnum.ConsideringOffer}, {UserActionEnum.SentRequest}");
+
+			userTeam.UserAction = UserActionEnum.JoinedTeam;
 
 			context.Update(user);
 			await context.SaveChangesAsync();
 
 			var updTeam = context.Teams
+				.Include(t => t.Image)
 				.Include(x => x.UserTeams)
 				.ThenInclude(y => y.User).FirstOrDefault(x => x.Id == model.TeamId);
 

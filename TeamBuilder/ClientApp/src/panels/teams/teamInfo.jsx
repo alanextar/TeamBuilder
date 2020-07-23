@@ -2,36 +2,35 @@
 import { Api } from '../../infrastructure/api';
 
 import { connect } from 'react-redux';
-import { goBack, openPopout, closePopout, goToPage } from "../../store/router/actions";
-import { setProfileUser, addTeamToProfile } from "../../store/user/actions";
+import { goBack, goToPage } from "../../store/router/actions";
 import { setActiveTab } from "../../store/vk/actions";
 
 import {
-	Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, Cell, InfoRow,
-	SimpleCell, Avatar, Div, PullToRefresh, PanelHeaderContent, PanelHeaderContext,
-	List, Alert, Separator
+	Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, InfoRow,
+	SimpleCell, Avatar, PullToRefresh, PanelHeaderContent, Separator,
+	withPlatform, ANDROID
 } from '@vkontakte/vkui';
 
-import Icon28MessageOutline from '@vkontakte/icons/dist/28/message_outline';
+import TeamMenu from './teamMenu';
+import TeamManagment from './teamManagment';
+
+import Icon24Chevron from '@vkontakte/icons/dist/24/chevron';
 import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
-import { countConfirmed } from "../../infrastructure/utils";
+
 import { getActivePanel } from "../../services/_functions";
+import { countConfirmed } from "../../infrastructure/utils";
 
 class TeamInfo extends React.Component {
 	constructor(props) {
 		super(props);
 
 		let itemIdInitial = getActivePanel(props.activeView).itemId;
-		this.bindingId = `teamInfo_${itemIdInitial}`;
+		this.bindingId = `${props.id}_${itemIdInitial}`;
 
 		this.state = {
 			itemId: itemIdInitial,
 			team: {},
-			activeTab: props.activeTab[this.bindingId] || "teamDescription",
-			edit: true,
-			contextOpened: false,
-			vkProfile: props.profile,
-			profileUser: props.profileUser,
+			contextOpened: false
 		};
 
 		this.onRefresh = async () => {
@@ -44,312 +43,73 @@ class TeamInfo extends React.Component {
 		};
 
 		this.toggleContext = this.toggleContext.bind(this);
+		this.updateTeam = this.updateTeam.bind(this);
 	}
 
 	componentDidMount() {
 		this.populateTeamData();
 	}
 
-	componentWillUnmount() {
-		const { setActiveTab } = this.props;
-		setActiveTab(this.bindingId, this.state.activeTab);
-	}
-
 	async populateTeamData() {
-		Api.Teams.get(this.state.itemId)
-			.then(result => this.setState({ team: result }));
+		let team = await Api.Teams.get(this.state.itemId);
+		this.setState({ team: team });
 	}
 
 	toggleContext() {
 		this.setState({ contextOpened: !this.state.contextOpened });
 	};
-	//TODO рефакторинг обновления профиля после выполнения действий по команде
-	//Подать заявку в команду
-	async sendRequest() {
-		const { setProfileUser } = this.props;
 
-		let id = this.state.vkProfile.id;
-		let teamId = this.state.team.id
-		let isTeamOffer = false;
-
-		let newUserTeam = {
-			isOwner: false,
-			team: this.state.team,
-			teamId: teamId,
-			userAction: 1,
-			userId: this.props.profileUser.id
-		};
-
-		await Api.Users.setTeam(id, teamId, isTeamOffer)
-			.then(team => {
-				this.setState({ team: team });
-				this.props.addTeamToProfile(newUserTeam);
-			})
-	};
-
-	//Принять приглашение
-	async joinTeam() {
-		let profile = this.props.profileUser;
-		let teamId = this.state.team.id;
-		var userId = this.state.profileUser.id;
-
-		await Api.Users.joinTeam(teamId);
-		let userTeams = this.state.team.userTeams;
-
-		userTeams.map((userTeam, i) => {
-			(userTeam.userId === userId) && (userTeam.userAction = 2);
-		})
-
-		this.setState({
-			team: {
-				...this.state.team,
-				userTeams: userTeams
-			}
-		})
-
-		let userTeamToUpd = profile.userTeams.find(x => x.teamId == teamId);
-		userTeamToUpd.userAction = 2;
-		this.props.setProfileUser(profile);
-	};
-
-	//Выйти из команды / отклонить приглашение
-	async dropUser() {
-		let userId = this.state.profileUser.id;
-		let teamId = this.state.team.id;
-
-		await Api.Teams.rejectedOrRemoveUser({ teamId: teamId, userId: userId })
-			.then(json => {
-				this.setState({ team: json });
-				let profile = this.props.profileUser;
-				let userTeamToUpd = profile.userTeams.find(x => x.teamId == teamId);
-
-				switch (userTeamToUpd.userAction) {
-					case 2:
-						userTeamToUpd.userAction = 4;
-					case 5:
-						userTeamToUpd.userAction = 3;
-				}
-
-				this.props.setProfileUser(profile);
-			})
-	};
-
-	//Удалить команду
-	async deleteTeam() {
-		let id = this.state.team.id
-		await Api.Teams.delete(id);
-
-		let profile = this.props.profileUser;
-		let teamsToRemove = profile.userTeams.find(x => x.teamId == id);
-		const index = profile.userTeams.indexOf(teamsToRemove);
-		if (index > -1) {
-			profile.userTeams.splice(index, 1);
-		}
-		this.props.setProfileUser(profile);
-
-		this.props.goBack();
-	};
-
-	//Отменить поданную в команду заявку
-	async cancelUser(e, userTeam) {
-		let teamId = userTeam.teamId;
-		await Api.Users.cancelRequestTeam(teamId)
-		let updateTeam = []
-		this.state.team.userTeams.map((userTeam, i) => {
-			(userTeam.userId != this.state.profileUser.id) && updateTeam.push(userTeam)
-		})
-
-		this.setState({
-			team: {
-				...this.state.team,
-				userTeams: updateTeam
-			}
-		})
-
-		let profile = this.props.profileUser;
-		let teamsToRemove = profile.userTeams.find(x => x.teamId == teamId);
-		const index = profile.userTeams.indexOf(teamsToRemove);
-		if (index > -1) {
-			profile.userTeams.splice(index, 1);
-		}
-		this.props.setProfileUser(profile);
-	};
-
-	openPopoutExit = () => {
-		this.props.openPopout(
-			<Alert
-				actionsLayout="vertical"
-				actions={[{
-					title: 'Выйти из команды',
-					autoclose: true,
-					mode: 'destructive',
-					action: () => this.dropUser(),
-				}, {
-					title: 'Отмена',
-					autoclose: true,
-					mode: 'cancel'
-				}]}
-				onClose={() => this.props.closePopout()}
-			>
-				<h2>Подтвердите действие</h2>
-				<p>Вы уверены, что хотите выйти из команды?</p>
-			</Alert>
-		);
-	};
-
-	openPopoutDecline = (e, userInActiveTeam) => {
-		this.props.openPopout(
-			<Alert
-				actionsLayout="vertical"
-				actions={[{
-					title: 'Отклонить приглашение',
-					autoclose: true,
-					mode: 'destructive',
-					action: () => this.dropUser(e, userInActiveTeam),
-				}, {
-					title: 'Отмена',
-					autoclose: true,
-					mode: 'cancel'
-				}]}
-				onClose={() => this.props.closePopout()}
-			>
-				<h2>Подтвердите действие</h2>
-				<p>Вы уверены, что хотите отклонить приглашение?</p>
-			</Alert>
-		);
-	};
-
-	openPopoutDeleteTeam = () => {
-		this.props.openPopout(
-			<Alert
-				actionsLayout="vertical"
-				actions={[{
-					title: 'Удалить команду',
-					autoclose: true,
-					mode: 'destructive',
-					action: () => { this.deleteTeam() },
-				}, {
-					title: 'Отмена',
-					autoclose: true,
-					mode: 'cancel'
-				}]}
-				onClose={() => this.props.closePopout()}
-			>
-				<h2>Подтвердите действие</h2>
-				<p>Вы уверены, что хотите удалить команду?</p>
-			</Alert>
-		);
-	};
-
-	getPanelHeaderContext = () => {
-		const { goToPage } = this.props;
-
-		let userInActiveTeam = this.state.vkProfile &&
-			this.state.team.userTeams?.
-				find(user => user.userId === this.state.vkProfile.id);
-
-		let isUserInActiveTeam = userInActiveTeam != null;
-		let isOwner = isUserInActiveTeam && userInActiveTeam?.isOwner;
-		let isModerator = this.state.profileUser?.isModerator;
-		let userAction = userInActiveTeam?.userAction;
-		let confirmedUser = countConfirmed(this.state.team.userTeams);
-
-		return (
-			this.state.team && <PanelHeaderContext opened={this.state.contextOpened} onClose={this.toggleContext}>
-				{(isOwner || isModerator) &&
-					<List>
-						<Cell onClick={() => goToPage('teamEdit', this.state.itemId)}>
-							Редактировать команду
-                         </Cell>
-						<Cell onClick={() => { this.openPopoutDeleteTeam() }}>
-							Удалить команду
-                         </Cell>
-					</List>
-					|| userAction === 1 &&
-					<List>
-						<Cell>
-							Заявка на рассмотрении
-                                </Cell>
-						<Cell onClick={(e) => this.cancelUser(e, userInActiveTeam)}>
-							Отменить заявку
-                                </Cell>
-					</List>
-					|| userAction === 2 &&
-					<List>
-						<Cell onClick={() => this.openPopoutExit()}>
-							Выйти из команды
-                                </Cell>
-					</List>
-					|| userAction === 5 &&
-					<List>
-						<Cell onClick={() => this.joinTeam()}>
-							Принять приглашение
-                                </Cell>
-						<Cell
-							onClick={(e) => this.openPopoutDecline(e, userInActiveTeam)}>
-							Отклонить приглашение
-                                </Cell>
-					</List>
-					|| (!isUserInActiveTeam || userAction == 3 || userAction == 4) &&
-					confirmedUser < this.state.team.numberRequiredMembers &&
-					<List>
-						<Cell onClick={() => this.sendRequest()}>
-							Подать заявку в команду
-                                </Cell>
-					</List>
-					|| confirmedUser > this.state.team.numberRequiredMembers &&
-					<List>
-						<Cell>
-							В команде нет мест
-                                </Cell>
-					</List>
-				}
-			</PanelHeaderContext>
-		)
+	updateTeam(newTeam) {
+		this.setState({ team: newTeam })
 	}
 
 	render() {
-		const { goBack, goToPage } = this.props;
-
+		const { goBack, goToPage, setActiveTab, platform } = this.props;
 		let teamCap = this.state.team.userTeams?.find(x => x.isOwner)?.user;
+
+		const userInActiveTeam =
+			this.state.team.userTeams?.find((user) => user.userId === this.props.profile?.id);
+
+		const isUserInActiveTeam = userInActiveTeam != null;
+		const isOwner = isUserInActiveTeam && userInActiveTeam?.isOwner;
+		const isModerator = this.props.profileUser?.isModerator;
+		const canEdit = isOwner || isModerator;
 
 		return (
 			<Panel id={this.props.id}>
 				<PanelHeader separator={false} left={<PanelHeaderBack onClick={() => goBack()} />}>
-					{this.state.profileUser ?
+					{this.props.profileUser ?
 						<PanelHeaderContent
 							status={`${countConfirmed(this.state.team.userTeams)} участников`}
 							before={<Avatar size={36} src={this.state.team.image?.dataURL} />}
 							aside={<Icon16Dropdown style={{ transform: `rotate(${this.state.contextOpened ? '180deg' : '0'})` }} />}
-							onClick={() => { this.toggleContext(); }}>
+							onClick={() => this.toggleContext()}>
 							{this.state.team.name}
 						</PanelHeaderContent> :
 						`Команда`}
 				</PanelHeader>
-				{this.getPanelHeaderContext()}
+				<TeamMenu
+					team={this.state.team}
+					updateTeam={this.updateTeam}
+					opened={this.state.contextOpened}
+					onClose={this.toggleContext} />
 				<Tabs>
 					<TabsItem
-						onClick={() => {
-							this.setState({ activeTab: 'teamDescription' })
-						}}
-						selected={this.state.activeTab === 'teamDescription'}
-					>
+						onClick={() => setActiveTab(this.bindingId, null)}
+						selected={!this.props.activeTab[this.bindingId]}>
 						Описание
                     </TabsItem>
 					<TabsItem
-						onClick={() => {
-							this.setState({ activeTab: 'teamUsers' })
-						}}
-						selected={this.state.activeTab === 'teamUsers'}
-					>
+						onClick={() => setActiveTab(this.bindingId, 'teamUsers')}
+						selected={this.props.activeTab[this.bindingId] === 'teamUsers'}>
 						Участники
                     </TabsItem>
 				</Tabs>
 				<PullToRefresh onRefresh={this.onRefresh} isFetching={this.state.fetching}>
 					<Group>
 						{this.state.team && (
-							this.state.activeTab === 'teamDescription' ?
-								<Cell>
+							this.props.activeTab[this.bindingId] !== 'teamUsers' ?
+								<Group>
 									<SimpleCell multiline>
 										<InfoRow header="Название">
 											{this.state.team.name}
@@ -360,14 +120,14 @@ class TeamInfo extends React.Component {
 											{this.state.team.description}
 										</InfoRow>
 									</SimpleCell>
-									<SimpleCell expandable onClick={() => goToPage('eventInfo', this.state.team.event?.id)}>
+									<SimpleCell
+										expandable
+										after={platform === ANDROID && <Icon24Chevron />}
+										onClick={() => goToPage('eventInfo', this.state.team.event?.id)}>
 										<InfoRow header='Участвуем в '>
 											{this.state.team.event?.name}
 										</InfoRow>
 									</SimpleCell>
-								</Cell>
-								:
-								<Cell>
 									<SimpleCell>
 										<InfoRow header="Мы ищем">
 											{this.state.team.numberRequiredMembers} участников
@@ -378,34 +138,40 @@ class TeamInfo extends React.Component {
 											{this.state.team.descriptionRequiredMembers}
 										</InfoRow>
 									</SimpleCell>
-									<Div>
-										<InfoRow header='Участники'>
-											{teamCap && <SimpleCell key={teamCap.id}
+								</Group>
+								:
+								(!canEdit ?
+									<Group>
+										{teamCap &&
+											<SimpleCell key={teamCap.id}
 												onClick={() => goToPage('user', teamCap.id)}
 												before={<Avatar size={48} src={teamCap.photo100} />}
-												after={<Icon28MessageOutline />}
-												expandable>
+												description="Капитан"
+												expandable
+												after={platform === ANDROID && <Icon24Chevron />}>
 												{teamCap.fullName}
 											</SimpleCell>}
-											<Separator style={{ margin: '12px 0' }} />
-											{this.state.team.userTeams?.map(userTeam => {
-												console.log('userTeam out', userTeam);
-												return (
-													userTeam.userAction === 2 &&
-													<SimpleCell key={userTeam.userId}
-														onClick={() => goToPage('user', userTeam.userId)}
-														before={<Avatar size={48} src={userTeam.user && userTeam.user.photo100} />}
-														after={<Icon28MessageOutline />}
-														expandable>
-														{userTeam.user && userTeam.user.fullName}
-													</SimpleCell>
-
-												)
-											}
-											)}
-										</InfoRow>
-									</Div>
-								</Cell>)}
+										<Separator style={{ margin: '12px 0' }} />
+										{this.state.team.userTeams?.map(userTeam => {
+											return (
+												userTeam.userAction === 2 &&
+												<SimpleCell key={userTeam.userId}
+													onClick={() => goToPage('user', userTeam.userId)}
+													before={<Avatar size={48} src={userTeam.user?.photo100} />}
+													description={null}
+													expandable
+													after={platform === ANDROID && <Icon24Chevron />}>
+													{userTeam.user?.fullName}
+												</SimpleCell>
+											)
+										}
+										)}
+									</Group>
+									:
+									<TeamManagment
+										userTeams={this.state.team.userTeams}
+										updateTeam={this.updateTeam} />)
+						)}
 					</Group>
 				</PullToRefresh>
 			</Panel>
@@ -413,6 +179,8 @@ class TeamInfo extends React.Component {
 	}
 
 };
+
+withPlatform(TeamInfo);
 
 const mapStateToProps = (state) => {
 	return {
@@ -426,11 +194,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
 	goToPage,
 	goBack,
-	setActiveTab,
-	setProfileUser,
-	openPopout,
-	closePopout,
-	addTeamToProfile
+	setActiveTab
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(TeamInfo);

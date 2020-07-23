@@ -1,22 +1,25 @@
 ﻿import React, { useState, useEffect } from 'react';
 
 import { connect } from 'react-redux';
-import { bindActionCreators } from "redux";
-import { goBack, goToPage, openPopout, closePopout } from "../../store/router/actions";
+import { goBack, goToPage } from "../../store/router/actions";
 
 import {
-	Panel, PanelHeader, Group, SimpleCell, InfoRow, Header, Avatar, Alert,
+	Panel, PanelHeader, Group, SimpleCell, InfoRow, Header, Avatar, PullToRefresh,
 	PanelHeaderBack, Cell, List, PanelHeaderContent, PanelHeaderContext
 } from '@vkontakte/vkui';
 import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
+
+import * as Alerts from "../components/Alerts.js";
+
 import { countConfirmed } from "../../infrastructure/utils";
-import { getActivePanel } from "../../services/_functions";
+import { getActivePanel, longOperationWrapper } from "../../services/_functions";
 import { Api } from '../../infrastructure/api';
 
 const EventInfo = props => {
 	const { goBack, goToPage } = props;
 
 	const [itemId] = useState(getActivePanel(props.activeView).itemId);
+	const [fetching, setFetching] = useState(false);
 	const [event, setEvent] = useState(null);
 	const [contextOpened, setContextOpened] = useState(false);
 
@@ -24,13 +27,19 @@ const EventInfo = props => {
 		populateEventData();
 	}, [])
 
+	const onRefresh = async () => {
+		setFetching(true);
+		await populateEventData();
+		setFetching(false);
+	};
+
 	const toggleContext = () => {
 		setContextOpened(!contextOpened);
 	};
 
-	const populateEventData = () => {
-		Api.Events.get(itemId)
-			.then(result => setEvent(result));
+	const populateEventData = async () => {
+		let event = await Api.Events.get(itemId);
+		setEvent(event);
 	}
 
 	const canEdit = () => {
@@ -40,30 +49,11 @@ const EventInfo = props => {
 	};
 
 	const deleteEvent = () => {
-		Api.Events.delete(event.id);
-		goBack();
-	};
+		let action = async () => await Api.Events.delete(event.id);
+		let postAction = () => goBack();
+		let handler = () => longOperationWrapper({action, postAction});
 
-	const openPopoutDeleteEvent = () => {
-		props.openPopout(
-			<Alert
-				actionsLayout="vertical"
-				actions={[{
-					title: 'Удалить событие',
-					autoclose: true,
-					mode: 'destructive',
-					action: () => deleteEvent(),
-				}, {
-					title: 'Отмена',
-					autoclose: true,
-					mode: 'cancel'
-				}]}
-				onClose={() => props.closePopout()}
-			>
-				<h2>Подтвердите действие</h2>
-				<p>Вы уверены, что хотите удалить событие?</p>
-			</Alert>
-		);
+		Alerts.DeleteEventPopout(event.name, handler);
 	};
 
 	return (
@@ -87,49 +77,51 @@ const EventInfo = props => {
 						Редактировать событие
                         </Cell>
 					<Cell
-						onClick={() => openPopoutDeleteEvent()}>
+						onClick={() => deleteEvent()}>
 						Удалить событие
                         </Cell>
 				</List>
 			</PanelHeaderContext>
-			<Group>
-				<SimpleCell multiline>
-					<InfoRow header="Название">
-						{event?.name}
-					</InfoRow>
-				</SimpleCell>
-				<SimpleCell>
-					<InfoRow header="Ссылка">
-						<a href={event?.link}>{event?.link}</a>
-					</InfoRow>
-				</SimpleCell>
-				<SimpleCell multiline>
-					<InfoRow header="Описание">
-						{event?.description}
-					</InfoRow>
-				</SimpleCell>
-				<SimpleCell>
-					<InfoRow header="Время проведения">
-						{event?.startDate} - {event?.finishDate}
-					</InfoRow>
-				</SimpleCell>
-			</Group>
-			<Group>
-				<Header mode="secondary">Участвующие команды</Header>
-				{event?.teams?.map(team => {
-					return (
-						<Cell
-							key={team.id}
-							expandable
-							indicator={countConfirmed(team.userTeams) + '/' + team.numberRequiredMembers}
-							onClick={() => goToPage('teamInfo', team.id)}
-							before={<Avatar size={48} src={team.image?.dataURL} />}>
-							{team.name}
-						</Cell>
-					)
-				}
-				)}
-			</Group>
+			<PullToRefresh onRefresh={onRefresh} isFetching={fetching}>
+				<Group>
+					<SimpleCell multiline>
+						<InfoRow header="Название">
+							{event?.name}
+						</InfoRow>
+					</SimpleCell>
+					<SimpleCell>
+						<InfoRow header="Ссылка">
+							<a style={{ color: 'rgb(0, 125, 255)' }} href={event?.link}>{event?.link}</a>
+						</InfoRow>
+					</SimpleCell>
+					<SimpleCell multiline>
+						<InfoRow header="Описание">
+							{event?.description}
+						</InfoRow>
+					</SimpleCell>
+					<SimpleCell>
+						<InfoRow header="Время проведения">
+							{event?.startDate} - {event?.finishDate}
+						</InfoRow>
+					</SimpleCell>
+				</Group>
+				<Group>
+					<Header mode="secondary">Участвующие команды</Header>
+					{event?.teams?.map(team => {
+						return (
+							<Cell
+								key={team.id}
+								expandable
+								indicator={countConfirmed(team.userTeams) + '/' + team.numberRequiredMembers}
+								onClick={() => goToPage('teamInfo', team.id)}
+								before={<Avatar size={48} src={team.image?.dataURL} />}>
+								{team.name}
+							</Cell>
+						)
+					}
+					)}
+				</Group>
+			</PullToRefresh>
 		</Panel>
 	);
 }
@@ -142,12 +134,9 @@ const mapStateToProps = (state) => {
 	};
 };
 
-
-function mapDispatchToProps(dispatch) {
-	return {
-		dispatch,
-		...bindActionCreators({ goToPage, goBack, openPopout, closePopout }, dispatch)
-	}
+const mapDispatchToProps = {
+	goToPage,
+	goBack
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(EventInfo);
