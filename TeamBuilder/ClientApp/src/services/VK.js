@@ -3,7 +3,6 @@ import bridge from '@vkontakte/vk-bridge';
 import { store } from "../index";
 import { setColorScheme } from "../store/vk/actions";
 import { setProfile, setProfileUser } from "../store/user/actions";
-import { setStory } from "../store/router/actions";
 
 import { Api } from '../infrastructure/api';
 
@@ -14,8 +13,8 @@ export const initApp = () => (dispatch) => {
 	const VKConnectCallback = (e) => {
 		if (e.detail.type === 'VKWebAppUpdateConfig') {
 			bridge.unsubscribe(VKConnectCallback);
-
 			dispatch(setColorScheme(e.detail.data.scheme));
+			// dispatch(setColorScheme('space_gray'));
 		}
 	};
 
