@@ -1,5 +1,5 @@
 export function countConfirmed(userTeams) {
-	var count = userTeams ? userTeams.filter(x => x.userAction === 2 || x.isOwner).length : 0;
+	let count = userTeams ? userTeams.filter(x => x.userAction === 2 || x.isOwner).length : 0;
 	return count;
 };
 
@@ -23,29 +23,58 @@ export function convertSkills(skills) {
 	})
 }
 
-export function countActiveUserTeams(userTeams) {
-	var count = !userTeams
+export function countMyActiveTeams(userTeams) {
+	return countActiveUserTeams(userTeams, [1, 2, 5]);
+};
+
+export function countForeignActiveTeams(userTeams) {
+	return countActiveUserTeams(userTeams, [2]);
+};
+
+export function countActiveUserTeams(userTeams, activeActions) {
+	let count = !userTeams
 		? 0
 		: userTeams
 			.filter(x =>
-				x.userAction === 1 ||
-				x.userAction === 2 ||
-				x.userAction === 5 ||
+				activeActions.indexOf(x.userAction) !== -1 ||
 				x.isOwner)
 			.length;
 	return count;
 };
 
-export function GetRandomPic() {
+export function renderEventDate(event) {
+	const startDate = event.startDate;
+	const finishDate = event.finishDate;
+
+	if (startDate && finishDate) {
+		return `${startDate} - ${finishDate}`
+	}
+	if (startDate && !finishDate) {
+		return `c ${startDate}`
+	}
+	if (!startDate && finishDate) {
+		return `по ${finishDate}`
+	}
+}
+
+export function convertDateToWebType(date) {
+	let splitted = date.split('.');
+	if (splitted.length === 3) {
+		return `${splitted[2]}-${splitted[1]}-${splitted[0]}`;
+	}
+	return date;
+}
+
+export async function GetRandomPicUrl() {
 	let url = ``;
 
 	let count = 0
 	while (count < 10) {
-		url = `https://picsum.photos/id/${getRandomInt()}/100`;
-		if (UrlExists(url)) {
-			return url;
+		url = `https://picsum.photos/seed/${getRandomInt()}/100`;
+		const response = await fetch(url);
+		if (response.ok) {
+			return await readBlobAsDataURL(await response.blob());
 		}
-		console.log(`count: ${count}`);
 		count++;
 	}
 	return url;
@@ -57,10 +86,18 @@ function getRandomInt() {
 	return Math.floor(Math.random() * (+max - +min)) + +min;
 }
 
-function UrlExists(url) {
-	var http = new XMLHttpRequest();
-	http.open('GET', url);
-	http.responseType = 'blob';
-	http.send();
-	return http.status != 404
-}
+function readBlobAsDataURL(blob) {
+	const temporaryFileReader = new FileReader();
+
+	return new Promise((resolve, reject) => {
+		temporaryFileReader.onerror = () => {
+			temporaryFileReader.abort();
+			reject(new DOMException("Problem parsing input file."));
+		};
+
+		temporaryFileReader.onload = () => {
+			resolve(temporaryFileReader.result);
+		};
+		temporaryFileReader.readAsDataURL(blob);
+	});
+};

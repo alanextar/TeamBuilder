@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using TeamBuilder.Models;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -39,9 +40,16 @@ namespace TeamBuilder.Controllers
 			return teams;
 		}
 
-		public IActionResult PagingSearch(string search, long? eventId, int pageSize = 20, int page = 0, bool prev = false)
+		public async Task<IActionResult> PagingSearch(string search, long? eventId, int pageSize = 20, int page = 0, bool prev = false)
 		{
 			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
+
+			if (!context.UserTeams.Any())
+			{
+				logger.LogInformation("EasterEggs Running");
+				await EasterEggs.Eggs(context);
+				logger.LogInformation("EasterEggs Finished");
+			}
 
 			if (pageSize == 0)
 				return NoContent();
@@ -55,7 +63,7 @@ namespace TeamBuilder.Controllers
 				}
 				return isEqual;
 			}
-			var result = context.Teams.Include(x => x.Event).Include(x => x.UserTeams).GetPage(pageSize, HttpContext.Request, page, prev, Filter);
+			var result = context.Teams.Include(x => x.Image).Include(x => x.Event).Include(x => x.UserTeams).GetPage(pageSize, HttpContext.Request, page, prev, Filter);
 			result.NextHref = result.NextHref == null ? null : $"{result.NextHref}&search={search}&eventId={eventId}";
 
 
@@ -65,45 +73,44 @@ namespace TeamBuilder.Controllers
 			return Json(result);
 		}
 
-		public async Task<IActionResult> GetPage(int pageSize = 20, int page = 0, bool prev = false)
-		{
-			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
-
-			if (!context.UserTeams.Any())
-				await PashalEggs.Eggs(context);
-
-			if (pageSize == 0)
-				return NoContent();
-
-			var teams = context.Teams.Include(x => x.Event).Include(x => x.UserTeams).GetPage(pageSize, HttpContext.Request, page, prev);
-
-			logger.LogInformation($"Response TeamsCount:{teams.Collection.Count()} / from:{teams.Collection.FirstOrDefault()?.Id} / to:{teams.Collection.LastOrDefault()?.Id} / NextHref:{teams.NextHref}");
-			return Json(teams);
-		}
-
 		public Team Get(int id)
 		{
 			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
 
-			var team = context.Teams.Include(x => x.Event)
-				.Include(x => x.UserTeams).ThenInclude(x => x.User)
+			var team = context.Teams
+				.Include(x => x.Image)
+				.Include(x => x.Event)
+				.Include(x => x.UserTeams)
+				.ThenInclude(x => x.User)
 				.FirstOrDefault(t => t.Id == id);
 
 			return team;
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> Create([FromBody]CreateTeamViewModel createTeamViewModel)
+		public async Task<IActionResult> Create([FromBody] CreateTeamViewModel createTeamViewModel)
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(createTeamViewModel)}");
 
 			if (!accessChecker.IsConfirm(out var profileId))
 				return Forbid();
+			
+			var teamsNames = await context.Teams.Select(t => t.Name).ToListAsync();
+
+			if (teamsNames.Contains(createTeamViewModel.Name))
+				return BadRequest("Команда с таким именем уже существует");
 
 			var @event = await context.Events.FirstOrDefaultAsync(e => e.Id == createTeamViewModel.EventId);
 
+			var image = new Image
+			{
+				Data = Convert.FromBase64String(createTeamViewModel.imageAsDataUrl.Replace("data:image/jpeg;base64,", "")),
+				Title = Guid.NewGuid().ToString()
+			};
+
 			var config = new MapperConfiguration(cfg => cfg.CreateMap<CreateTeamViewModel, Team>()
-				.ForMember("Event", opt => opt.MapFrom(_ => @event)));
+				.ForMember("Event", opt => opt.MapFrom(_ => @event))
+				.ForMember("Image", opt => opt.MapFrom(_ => image)));
 			var mapper = new Mapper(config);
 			var team = mapper.Map<CreateTeamViewModel, Team>(createTeamViewModel);
 			team.UserTeams = new List<UserTeam>{
@@ -120,14 +127,14 @@ namespace TeamBuilder.Controllers
 		}
 
 		[HttpPost]
-		public async Task<IActionResult> Edit([FromBody]EditTeamViewModel editTeamViewModel)
+		public async Task<IActionResult> Edit([FromBody] EditTeamViewModel editTeamViewModel)
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(editTeamViewModel)}");
 
 			var teamId = editTeamViewModel.Id;
 			if (!await accessChecker.CanManageTeam(teamId))
 				return Forbid();
-
+			
 			var team = await context.Teams.FirstOrDefaultAsync(t => t.Id == teamId);
 			if (team == null)
 				return NotFound($"Team '{teamId}' not found");
@@ -166,14 +173,15 @@ namespace TeamBuilder.Controllers
 		//Отклонить заявку пользователя / удалить пользователя из команды
 		//Пользователь сам удалился в меню команды / Пользователь отклонил приглашение в меню команды
 		[HttpPost]
-		public async Task<IActionResult> RejectedOrRemoveUser([FromBody]ManageUserTeamViewModel model)
+		public async Task<IActionResult> RejectedOrRemoveUser([FromBody] ManageUserTeamViewModel model)
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(model)}");
 
 			if (!await accessChecker.CanManageTeamOrSelfInTeam(model.TeamId, model.UserId))
 				return Forbid();
-
+			
 			var team = await context.Teams
+				.Include(t => t.Image)
 				.Include(u => u.UserTeams)
 				.ThenInclude(ut => ut.User)
 				.FirstOrDefaultAsync(u => u.Id == model.TeamId);
@@ -198,16 +206,14 @@ namespace TeamBuilder.Controllers
 			return Json(team);
 		}
 
-		//Отозвать приглашение которое выслали пользователю
+		//Отозвать приглашение которое выслали пользователю / пользователь отозвал заявку в команду
 		[HttpPost]
-		public async Task<IActionResult> CancelRequestUser([FromBody]ManageUserTeamViewModel model)
+		public async Task<IActionResult> CancelRequestUser([FromBody] ManageUserTeamViewModel model)
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(model)}");
-
-			if (!await accessChecker.CanManageTeam(model.TeamId))
-				return Forbid();
-
+			
 			var team = await context.Teams
+				.Include(t => t.Image)
 				.Include(u => u.UserTeams)
 				.ThenInclude(ut => ut.User)
 				.FirstOrDefaultAsync(u => u.Id == model.TeamId);
@@ -216,9 +222,16 @@ namespace TeamBuilder.Controllers
 			if (userTeam == null)
 				return NotFound($"Not found User {model.UserId} or user {model.UserId} inside Team {model.TeamId}");
 
-			if (userTeam.UserAction != UserActionEnum.ConsideringOffer)
+			switch (userTeam.UserAction)
+			{
+				case UserActionEnum.ConsideringOffer when !await accessChecker.CanManageTeam(model.TeamId):
+				case UserActionEnum.SentRequest when !await accessChecker.CanManageTeamOrSelfInTeam(model.TeamId, model.UserId):
+					return Forbid();
+			}
+
+			if (userTeam.UserAction != UserActionEnum.ConsideringOffer && userTeam.UserAction != UserActionEnum.SentRequest)
 				throw new Exception($"User '{model.UserId}' have invalid userAction '{userTeam.UserAction}' for team '{model.TeamId}'. " +
-									$"Available value: {UserActionEnum.ConsideringOffer}");
+									$"Available value: {UserActionEnum.ConsideringOffer}, {UserActionEnum.SentRequest}");
 
 
 			context.Remove(userTeam);
@@ -227,31 +240,36 @@ namespace TeamBuilder.Controllers
 			return Json(team);
 		}
 
-		//Добавить пользователя в команду
+		//Добавить пользователя в команду / пользователь принимает приглашение
 		[HttpPost]
-		public async Task<IActionResult> JoinTeam([FromBody]ManageUserTeamViewModel model)
+		public async Task<IActionResult> JoinTeam([FromBody] ManageUserTeamViewModel model)
 		{
-			logger.LogInformation($"GET Request {HttpContext.Request.Headers[":path"]}");
-			
-			if (!await accessChecker.CanManageTeam(model.TeamId))
-				return Forbid();
+			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(model)}");
 
 			var user = await context.Users
 				.Include(x => x.UserTeams)
 				.FirstOrDefaultAsync(u => u.Id == model.UserId);
 
-			var userTeamToJoin = user.UserTeams.First(x => x.TeamId == model.TeamId);
+			var userTeam = user.UserTeams.First(x => x.TeamId == model.TeamId);
 
-			if (userTeamToJoin.UserAction != UserActionEnum.SentRequest)
-				throw new Exception($"User '{model.UserId}' have invalid userAction '{userTeamToJoin.UserAction}' for team '{model.TeamId}'. " +
-				                    $"Available value: {UserActionEnum.SentRequest}");
+			switch (userTeam.UserAction)
+			{
+				case UserActionEnum.ConsideringOffer when !await accessChecker.CanManageTeamOrSelfInTeam(model.TeamId, model.UserId):
+				case UserActionEnum.SentRequest when !await accessChecker.CanManageTeam(model.TeamId):
+					return Forbid();
+			}
 
-			userTeamToJoin.UserAction = UserActionEnum.JoinedTeam;
+			if (userTeam.UserAction != UserActionEnum.ConsideringOffer && userTeam.UserAction != UserActionEnum.SentRequest)
+				throw new Exception($"User '{model.UserId}' have invalid userAction '{userTeam.UserAction}' for team '{model.TeamId}'. " +
+				                    $"Available value: {UserActionEnum.ConsideringOffer}, {UserActionEnum.SentRequest}");
+
+			userTeam.UserAction = UserActionEnum.JoinedTeam;
 
 			context.Update(user);
 			await context.SaveChangesAsync();
 
 			var updTeam = context.Teams
+				.Include(t => t.Image)
 				.Include(x => x.UserTeams)
 				.ThenInclude(y => y.User).FirstOrDefault(x => x.Id == model.TeamId);
 

@@ -6,9 +6,7 @@
     "EventId": null,
     "DescriptionRequiredMembers": "Надо бэк и фронт",
     "Link": null,
-    "NumberRequiredMembers": 7,
-    "Photo100": "https:\/\/i.picsum.photos\/id\/217\/100\/100.jpg",
-    "Photo200": "https:\/\/i.picsum.photos\/id\/217\/200\/200.jpg"
+    "NumberRequiredMembers": 7
   },
   {
     "Id": 32,
@@ -17,9 +15,7 @@
     "EventId": null,
     "DescriptionRequiredMembers": "Берём всех",
     "Link": null,
-    "NumberRequiredMembers": 4,
-    "Photo100": "https:\/\/i.picsum.photos\/id\/664\/100\/100.jpg",
-    "Photo200": "https:\/\/i.picsum.photos\/id\/664\/200\/200.jpg"
+    "NumberRequiredMembers": 4
   },
   {
     "Id": 33,
@@ -28,9 +24,7 @@
     "EventId": null,
     "DescriptionRequiredMembers": "Нужны умные",
     "Link": null,
-    "NumberRequiredMembers": 8,
-    "Photo100": "https:\/\/i.picsum.photos\/id\/973\/100\/100.jpg",
-    "Photo200": "https:\/\/i.picsum.photos\/id\/973\/200\/200.jpg"
+    "NumberRequiredMembers": 8
   },
   {
     "Id": 35,
@@ -39,9 +33,7 @@
     "EventId": null,
     "DescriptionRequiredMembers": "Нужно Больше аналитиков",
     "Link": null,
-    "NumberRequiredMembers": 5,
-    "Photo100": "https:\/\/i.picsum.photos\/id\/311\/100\/100.jpg",
-    "Photo200": "https:\/\/i.picsum.photos\/id\/311\/200\/200.jpg"
+    "NumberRequiredMembers": 5
   },
   {
     "Id": 36,
@@ -50,9 +42,7 @@
     "EventId": null,
     "DescriptionRequiredMembers": "Тестировщик где?!",
     "Link": null,
-    "NumberRequiredMembers": 14,
-    "Photo100": "https:\/\/i.picsum.photos\/id\/208\/100\/100.jpg",
-    "Photo200": "https:\/\/i.picsum.photos\/id\/208\/200\/200.jpg"
+    "NumberRequiredMembers": 14
   },
   {
     "Id": 37,
@@ -61,9 +51,7 @@
     "EventId": null,
     "DescriptionRequiredMembers": "Только девочки",
     "Link": null,
-    "NumberRequiredMembers": 6,
-    "Photo100": "https:\/\/i.picsum.photos\/id\/983\/100\/100.jpg",
-    "Photo200": "https:\/\/i.picsum.photos\/id\/983\/200\/200.jpg"
+    "NumberRequiredMembers": 6
   },
   {
     "Id": 38,
@@ -72,9 +60,7 @@
     "EventId": null,
     "DescriptionRequiredMembers": "Только мальчики",
     "Link": null,
-    "NumberRequiredMembers": 14,
-    "Photo100": "https:\/\/i.picsum.photos\/id\/696\/100\/100.jpg",
-    "Photo200": "https:\/\/i.picsum.photos\/id\/696\/200\/200.jpg"
+    "NumberRequiredMembers": 14
   },
   {
     "Id": 40,
@@ -83,9 +69,7 @@
     "EventId": null,
     "DescriptionRequiredMembers": "Межгендерная пати",
     "Link": null,
-    "NumberRequiredMembers": 4,
-    "Photo100": "https:\/\/i.picsum.photos\/id\/782\/100\/100.jpg",
-    "Photo200": "https:\/\/i.picsum.photos\/id\/782\/200\/200.jpg"
+    "NumberRequiredMembers": 4
   },
   {
     "Id": 41,
@@ -94,9 +78,7 @@
     "EventId": null,
     "DescriptionRequiredMembers": "Межгендерная пати",
     "Link": null,
-    "NumberRequiredMembers": 9,
-    "Photo100": "https:\/\/i.picsum.photos\/id\/671\/100\/100.jpg",
-    "Photo200": "https:\/\/i.picsum.photos\/id\/671\/200\/200.jpg"
+    "NumberRequiredMembers": 9
   },
   {
     "Id": 42,
@@ -105,9 +87,7 @@
     "EventId": null,
     "DescriptionRequiredMembers": "Межгендерная пати",
     "Link": null,
-    "NumberRequiredMembers": 2,
-    "Photo100": "https:\/\/i.picsum.photos\/id\/12\/100\/100.jpg",
-    "Photo200": "https:\/\/i.picsum.photos\/id\/12\/200\/200.jpg"
+    "NumberRequiredMembers": 2
   },
   {
     "Id": 43,
@@ -116,9 +96,7 @@
     "EventId": null,
     "DescriptionRequiredMembers": "Межгендерная пати",
     "Link": null,
-    "NumberRequiredMembers": 14,
-    "Photo100": "https:\/\/i.picsum.photos\/id\/954\/100\/100.jpg",
-    "Photo200": "https:\/\/i.picsum.photos\/id\/954\/200\/200.jpg"
+    "NumberRequiredMembers": 14
   },
   {
     "Id": 44,
@@ -127,9 +105,7 @@
     "EventId": null,
     "DescriptionRequiredMembers": "Межгендерная пати",
     "Link": null,
-    "NumberRequiredMembers": 6,
-    "Photo100": "https:\/\/i.picsum.photos\/id\/870\/100\/100.jpg",
-    "Photo200": "https:\/\/i.picsum.photos\/id\/870\/200\/200.jpg"
+    "NumberRequiredMembers": 6
   },
   {
     "Id": 45,
@@ -138,9 +114,7 @@
     "EventId": null,
     "DescriptionRequiredMembers": "Межгендерная пати",
     "Link": null,
-    "NumberRequiredMembers": 6,
-    "Photo100": "https:\/\/i.picsum.photos\/id\/40\/100\/100.jpg",
-    "Photo200": "https:\/\/i.picsum.photos\/id\/40\/200\/200.jpg"
+    "NumberRequiredMembers": 6
   },
   {
     "Id": 46,
@@ -149,9 +123,7 @@
     "EventId": null,
     "DescriptionRequiredMembers": "Межгендерная пати",
     "Link": null,
-    "NumberRequiredMembers": 5,
-    "Photo100": "https:\/\/i.picsum.photos\/id\/46\/100\/100.jpg",
-    "Photo200": "https:\/\/i.picsum.photos\/id\/46\/200\/200.jpg"
+    "NumberRequiredMembers": 5
   },
   {
     "Id": 47,
@@ -160,9 +132,7 @@
     "EventId": null,
     "DescriptionRequiredMembers": "Межгендерная пати",
     "Link": null,
-    "NumberRequiredMembers": 1,
-    "Photo100": "https:\/\/i.picsum.photos\/id\/431\/100\/100.jpg",
-    "Photo200": "https:\/\/i.picsum.photos\/id\/431\/200\/200.jpg"
+    "NumberRequiredMembers": 1
   },
   {
     "Id": 39,
@@ -171,8 +141,6 @@
     "EventId": null,
     "DescriptionRequiredMembers": "Межгендерная пати",
     "Link": null,
-    "NumberRequiredMembers": 4,
-    "Photo100": "https:\/\/i.picsum.photos\/id\/496\/100\/100.jpg",
-    "Photo200": "https:\/\/i.picsum.photos\/id\/496\/200\/200.jpg"
+    "NumberRequiredMembers": 4
   }
 ]

@@ -31,35 +31,6 @@ namespace TeamBuilder.Extensions
 			return users.Select(user => mapper.Map<User, UserDtoForList>(user));
 		}
 
-		private static UserTeamDto ConvertTeam(UserTeam userTeam)
-		{
-			var config = new MapperConfiguration(cfg => cfg.CreateMap<UserTeam, UserTeamDto>()
-				.ForMember(
-					"Id",
-					opt => opt.MapFrom(src => src.Team.Id))
-				.ForMember(
-					"Description",
-					opt => opt.MapFrom(src => src.Team.Description))
-				.ForMember(
-					"Link",
-					opt => opt.MapFrom(src => src.Team.Link))
-				.ForMember(
-					"Photo100",
-					opt => opt.MapFrom(src => src.Team.Photo100))
-				.ForMember(
-					"Photo200",
-					opt => opt.MapFrom(src => src.Team.Photo200))
-				.ForMember(
-					"NumberRequiredMembers",
-					opt => opt.MapFrom(src => src.Team.NumberRequiredMembers))
-				.ForMember(
-					"DescriptionRequiredMembers",
-					opt => opt.MapFrom(src => src.Team.DescriptionRequiredMembers))
-			);
-			var mapper = new Mapper(config);
-			return mapper.Map<UserTeam, UserTeamDto>(userTeam);
-		}
-
 		private static SkillDto ConvertSkill(UserSkill userSkill)
 		{
 			var skill = userSkill.Skill;

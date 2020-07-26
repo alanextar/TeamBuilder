@@ -1,206 +1,151 @@
 ﻿import Icon28CheckCircleOutline from '@vkontakte/icons/dist/28/check_circle_outline';
 import Icon28InfoOutline from '@vkontakte/icons/dist/28/info_outline';
-import { Alert, Button, Card, CardGrid, Group, List, Placeholder, RichCell, PanelSpinner } from '@vkontakte/vkui';
+import { Button, Card, CardGrid, Group, List, Placeholder, RichCell, PanelSpinner } from '@vkontakte/vkui';
+import * as Alerts from "../components/Alerts.js";
 import '@vkontakte/vkui/dist/vkui.css';
 import React from 'react';
 import { connect } from 'react-redux';
 import { Api } from '../../infrastructure/api';
-import { countActiveUserTeams } from '../../infrastructure/utils';
-import { closePopout, openPopout, setPage } from '../../store/router/actions';
-import { setTeam, setUserTeam } from '../../store/teams/actions';
-import { setProfileUser, setUser } from '../../store/user/actions';
+import { countMyActiveTeams, countForeignActiveTeams } from '../../infrastructure/utils';
+import { longOperationWrapper } from "../../services/_functions";
+import { goToPage } from '../../store/router/actions';
 
 class UserTeams extends React.Component {
 	constructor(props) {
 		super(props);
 
 		this.state = {
-			userTeams: props.userTeams,
-			fetching: false,
+			userTeams: props.userTeams
 		}
 	}
 
-	componentDidMount() {
-
+	componentDidUpdate(prevProps) {
+		if (this.props.userTeams !== prevProps.userTeams) {
+			this.setState({ userTeams: this.props.userTeams })
+		}
 	}
 
 	async handleJoin(e, teamId) {
-		e.stopPropagation();
-		Api.Users.joinTeam(teamId)
-			.then(data => this.updateUserTeams(data));
+		e.preventDefault();
+
+		let action = async () => {
+			let updatedUserTeams = await Api.Users.joinTeam(teamId);
+			this.setState({ userTeams: updatedUserTeams });
+		}
+
+		await longOperationWrapper({ action });
 	}
 
-	async handleQuitOrDecline(e, teamId) {
-		e.stopPropagation();
-		Api.Users.quitOrDeclineTeam(teamId)
-			.then(data => this.updateUserTeams(data));
+	async handleQuitOrDecline(e, teamId, teamName, alert) {
+		e.preventDefault();
+
+		let action = async () => {
+			let updatedUserTeams = await Api.Users.quitOrDeclineTeam(teamId);
+			this.setState({ userTeams: updatedUserTeams });
+		}
+		let handler = () => longOperationWrapper({ action });
+
+		alert(teamName, handler)
 	}
 
-	async handleCancelRequestTeam(e, teamId) {
-		e.stopPropagation();
-		Api.Users.cancelRequestTeam(teamId)
-			.then(data => this.updateUserTeams(data));
+	async handleCancelRequestToTeam(e, teamId, teamName) {
+		e.preventDefault();
+
+		let action = async () => {
+			let updatedUserTeams = await Api.Users.cancelRequestTeam(teamId);
+			this.setState({ userTeams: updatedUserTeams });
+		}
+		let handler = () => longOperationWrapper({ action });
+
+		Alerts.CanselRequestToTeamPopout(teamName, handler);
 	}
 
-	updateUserTeams = (userTeams) => {
-		this.props.setProfileUser({
-			...this.props.profileUser,
-			userTeams: userTeams
-		});
-		this.setState({ userTeams: userTeams });
-		this.props.setUser(this.props.profileUser)
-	};
+	goToTeam = (e, teamId) => {
+		if (e.defaultPrevented) return;
+		this.props.goToPage('teamInfo', teamId);
+	}
 
-	openPopoutExit = (e, teamId) => {
-		e.stopPropagation();
-		this.props.openPopout(
-			<Alert
-				actionsLayout="vertical"
-				actions={[{
-					title: 'Выйти из команды',
-					autoclose: true,
-					mode: 'destructive',
-					action: () => this.handleQuitOrDecline(e, teamId),
-				}, {
-					title: 'Отмена',
-					autoclose: true,
-					mode: 'cancel'
-				}]}
-				onClose={() => this.props.closePopout()}
-			>
-				<h2>Подтвердите действие</h2>
-				<p>Вы уверены, что хотите выйти из команды?</p>
-			</Alert>
-		);
-	};
+	buildTeamAction = (userTeam) => {
+		if (this.props.readOnlyMode) {
+			return;
+		}
 
-	openPopoutDecline = (e, teamId) => {
-		e.stopPropagation();
-		this.props.openPopout(
-			<Alert
-				actionsLayout="vertical"
-				actions={[{
-					title: 'Отклонить приглашение',
-					autoclose: true,
-					mode: 'destructive',
-					action: () => this.handleQuitOrDecline(e, teamId),
-				}, {
-					title: 'Отмена',
-					autoclose: true,
-					mode: 'cancel'
-				}]}
-				onClose={() => this.props.closePopout()}
-			>
-				<h2>Подтвердите действие</h2>
-				<p>Вы уверены, что хотите отклонить приглашение?</p>
-			</Alert>
-		);
-	};
+		if (userTeam.userAction === 5) {
+			return (
+				<>
+					<Button onClick={(e) => this.handleJoin(e, userTeam.teamId)}>Принять</Button>
+					<Button onClick={(e) => this.handleQuitOrDecline(e, userTeam.teamId, userTeam.team.name, Alerts.DeclineTeamInvitePopout)}
+						mode="secondary">
+						Отклонить
+						</Button>
+				</>
+			);
+		}
 
-	openPopoutAbort = (e, teamId) => {
-		e.stopPropagation();
-		this.props.openPopout(
-			<Alert
-				actionsLayout="vertical"
-				actions={[{
-					title: 'Отменить заявку',
-					autoclose: true,
-					mode: 'destructive',
-					action: () => this.handleCancelRequestTeam(e, teamId),
-				}, {
-					title: 'Отмена',
-					autoclose: true,
-					mode: 'cancel'
-				}]}
-				onClose={() => this.props.closePopout()}
-			>
-				<h2>Подтвердите действие</h2>
-				<p>Вы уверены, что хотите отменить заявку?</p>
-			</Alert>
-		);
-	};
+		if (userTeam.userAction === 1 && !userTeam.isOwner) {
+			return (
+				<Button onClick={(e) => this.handleCancelRequestToTeam(e, userTeam.teamId, userTeam.team.name)} mode="secondary">
+					Отозвать заявку
+				</Button>
+			);
+		}
+
+		if (userTeam.userAction === 2 && !userTeam.isOwner) {
+			return (
+				<Button onClick={(e) => this.handleQuitOrDecline(e, userTeam.teamId, userTeam.team.name, Alerts.LeaveTeamPopout)} mode="secondary">
+					Выйти
+				</Button>
+			);
+		}
+	}
 
 	render() {
-		const { setPage, setTeam, activeView, setUserTeam } = this.props;
-		let isTeamsExists = countActiveUserTeams(this.props.userTeams);
+		let isTeamsExistsForProfile = countMyActiveTeams(this.state.userTeams) !== 0;
+		let isTeamsExistsForUser = countForeignActiveTeams(this.state.userTeams) !== 0;
 		const loader = <PanelSpinner key={0} size="large" />
 
 		return (
 			this.props.loading ? loader :
-			<Group>
-				{!isTeamsExists && !this.props.readOnlyMode &&
-					<Placeholder header="Вступайте в команду">
-						Или создайте свою и пригласите других участников. Здесь можно будет принять
-						приглашение от команд или отозвать заявку.
-                </Placeholder>}
-				{!isTeamsExists && this.props.readOnlyMode &&
-					<Placeholder header="Нет команд">
-						Пользователь пока не состоит ни в одной из команд. Вы можете отправить ему приглашение, чтобы он присоединился к вам.
-                </Placeholder>}
-				<List>
-					<CardGrid>
-						{
-							this.props.userTeams &&
-							this.props.userTeams.map(userTeam => {
+				<Group>
+					{!isTeamsExistsForProfile && !this.props.readOnlyMode &&
+						<Placeholder header="Вступайте в команду">
+							Или создайте свою и пригласите других участников. Здесь можно будет принять
+							приглашение от команд или отозвать заявку.
+							</Placeholder>}
+					{!isTeamsExistsForUser && this.props.readOnlyMode &&
+						<Placeholder header="Нет команд">
+							Пользователь пока не состоит ни в одной из команд. Вы можете отправить ему приглашение, чтобы он присоединился к вам.
+							</Placeholder>}
+					<List>
+						<CardGrid style={{ marginTop: 10, marginBottom: 10 }}>
+							{this.state.userTeams?.map(userTeam => {
+								if (this.props.readOnlyMode && userTeam.userAction !== 2 && !userTeam.isOwner)
+									return;
 								return (
 									<Card key={userTeam.teamId} size="l" mode="shadow">
 										<RichCell key={userTeam.teamId}
 											text={userTeam?.team?.description}
-											caption={"Событие: " + (userTeam?.team?.event ? userTeam.team.event.name : '')}
+											caption={userTeam.team.event?.name}
 											after={userTeam.userAction === 2 ? < Icon28CheckCircleOutline /> :
 												(userTeam.userAction === 1 && <Icon28InfoOutline />)}
-											onClick={() => { setTeam(userTeam.team); setUserTeam(userTeam.team); setPage(activeView, 'teaminfo') }}
-											actions={!this.props.readOnlyMode && (userTeam.userAction === 5 ?
-												<React.Fragment>
-													<Button onClick={(e) => this.handleJoin(e, userTeam.teamId)}>Принять</Button>
-													<Button onClick={(e) => this.openPopoutDecline(e, userTeam.teamId)}
-														mode="secondary">Отклонить</Button>
-												</React.Fragment> :
-												((userTeam.userAction === 2 || userTeam.userAction === 1 && !userTeam.isOwner) && <React.Fragment>
-													{
-														userTeam.userAction === 2
-															?
-															<Button onClick={(e) => this.openPopoutExit(e, userTeam.teamId)} mode="secondary">
-																Выйти
-                                                        </Button>
-															:
-															(userTeam.userAction === 1 ?
-																<Button onClick={(e) => this.openPopoutAbort(e, userTeam.teamId)} mode="secondary">
-																	Отозвать заявку
-                                                    </Button> : '')
-													}
-												</React.Fragment>
-												))}>
+											onClick={(e) => this.goToTeam(e, userTeam.teamId)}
+											actions={this.buildTeamAction(userTeam)}>
 											{userTeam.team.name}
 										</RichCell>
 									</Card>
 								)
 							})
-						}
-					</CardGrid>
-				</List>
-			</Group>
+							}
+						</CardGrid>
+					</List>
+				</Group>
 		)
 	}
 
 }
 
-const mapStateToProps = (state) => {
-
-	return {
-		activeView: state.router.activeView,
-		profileUser: state.user.profileUser
-	};
-};
-
 const mapDispatchToProps = {
-	setPage,
-	setTeam,
-	setUserTeam,
-	openPopout,
-	closePopout,
-	setProfileUser,
-	setUser
+	goToPage
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(UserTeams);
+export default connect(null, mapDispatchToProps)(UserTeams);

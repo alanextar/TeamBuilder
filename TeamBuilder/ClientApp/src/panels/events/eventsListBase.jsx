@@ -1,35 +1,20 @@
 ﻿import React from 'react';
 import { connect } from 'react-redux';
 
-import { goToPage } from '../../store/router/actions';
+import { goBack } from '../../store/router/actions';
+import { setTeamsEventFilter } from "../../store/events/actions";
 
 import {
 	Panel, PanelHeader, RichCell,
-	PanelHeaderButton, CardGrid, Card
+	PanelHeaderBack, CardGrid, Card
 } from '@vkontakte/vkui';
+
+import SearchWithInfiniteScroll from '../components/SearchWithInfiniteScroll';
 
 import { Api, Urls } from '../../infrastructure/api';
 import { renderEventDate } from "../../infrastructure/utils";
 
-import SearchWithInfiniteScroll from '../components/SearchWithInfiniteScroll';
-
-const Events = props => {
-	const { goToPage } = props;
-
-	const renderHeader = (
-		props.profileUser
-			?
-			<PanelHeader
-				separator={false}
-				left={<PanelHeaderButton onClick={() => goToPage('eventCreate')}>Создать</PanelHeaderButton>}>
-				События
-					</PanelHeader>
-			:
-			<PanelHeader separator={false}>
-				События
-					</PanelHeader>
-	)
-
+const EventsListBase = props => {
 	const renderItems = items => {
 		return (
 			<CardGrid style={{ marginTop: 10, marginBottom: 10 }}>
@@ -38,13 +23,13 @@ const Events = props => {
 						<RichCell
 							bottom={`Участвуют ${event.teams?.length} команд`}
 							caption={renderEventDate(event)}
-							onClick={() => goToPage('eventInfo', event.id)}>
+							onClick={() => props.itemClickHandler(event)}>
 							{event.name}
 						</RichCell>
 					</Card>
 				))}
 			</CardGrid>
-		)
+		);
 	}
 
 	return (
@@ -53,21 +38,19 @@ const Events = props => {
 				id={props.id}
 				pagingSearchHandler={Api.Events.pagingSearch}
 				getPageUrl={Urls.Events.PagingSearch}
-				header={renderHeader}>
+				header=
+				{<PanelHeader separator={false} left={<PanelHeaderBack onClick={() => props.backClickHandler()} />} >
+					Выберите мероприятие
+                </PanelHeader>}>
 				{renderItems}
 			</SearchWithInfiniteScroll>
 		</Panel>
 	);
 };
 
-const mapStateToProps = (state) => {
-	return {
-		profileUser: state.user.profileUser
-	}
-};
-
 const mapDispatchToProps = {
-	goToPage
-};
+	setTeamsEventFilter,
+	goBack
+}
 
-export default connect(mapStateToProps, mapDispatchToProps)(Events);
+export default connect(null, mapDispatchToProps)(EventsListBase);

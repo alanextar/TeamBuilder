@@ -12,25 +12,24 @@ import { Api, Urls } from '../../infrastructure/api';
 
 import SearchWithInfiniteScroll from '../components/SearchWithInfiniteScroll';
 
-import { setUser, setParticipantUser } from "../../store/user/actions";
-import { setPage } from '../../store/router/actions';
+import { goToPage } from '../../store/router/actions';
 
 const Users = props => {
-	const { setParticipantUser, setUser, setPage } = props;
+	const { goToPage } = props;
 	
 	const renderItems = items => {
 		return (
-			<CardGrid style={{ marginBottom: 10 }}>
-				{items && items.map(user => (
+			<CardGrid style={{ marginTop: 10, marginBottom: 10 }}>
+				{items?.map(user => (
 					<Card size="l" mode="shadow" key={user.id}>
 						{user.isSearchable &&
 							<RichCell
 								before={<Avatar size={48} src={user.photo100} />}
-								after={user.isTeamMember && <Icon24Work />}
+								after={user.isTeamMember && <Icon24Work  />}
 								caption={user.city && user.city}
 								bottom={stringfySkills(user.skills)}
 								text={user.about && user.about}
-								onClick={() => handleSelectItem(user)}
+								onClick={() => goToPage('user', user.id)}
 							>
 								{user.firstName} {user.lastName}
 							</RichCell>}
@@ -47,18 +46,12 @@ const Users = props => {
 		return result;
 	}
 
-	const handleSelectItem = user => {
-		setUser(user);
-		setParticipantUser(user);
-		setPage('users', 'user');
-	}
-
 	return (
 		<Panel id={props.id}>
 			<SearchWithInfiniteScroll
-				getPageHandler={Api.Users.getPage}
+				id={props.id}
 				pagingSearchHandler={Api.Users.pagingSearch}
-				getPageUrl={Urls.Users.GetPage}
+				getPageUrl={Urls.Users.PagingSearch}
 				header={<PanelHeader separator={false}>Участники</PanelHeader>}>
 				{renderItems}
 			</SearchWithInfiniteScroll>
@@ -66,17 +59,11 @@ const Users = props => {
 	);
 };
 
-const mapStateToProps = (state) => {
-	return {
-		profileUser: state.user.profileUser
-	}
-};
-
 function mapDispatchToProps(dispatch) {
 	return {
 		dispatch,
-		...bindActionCreators({ setPage, setUser, setParticipantUser }, dispatch)
+		...bindActionCreators({ goToPage }, dispatch)
 	}
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Users);
+export default connect(null, mapDispatchToProps)(Users);

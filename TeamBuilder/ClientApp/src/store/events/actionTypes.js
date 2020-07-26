@@ -1,3 +1,1 @@
-export const SET_EVENT = 'SET_EVENT';
 export const SET_TEAMS_EVENT_FILTER = 'SET_TEAMS_EVENT_FILTER';
-export const CREATE_EVENT = 'CREATE_EVENT';

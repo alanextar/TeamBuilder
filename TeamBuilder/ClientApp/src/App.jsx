@@ -1,17 +1,11 @@
 ﻿import React, { useState, useEffect } from 'react';
 import {
-	View, Epic, Tabbar, TabbarItem, ConfigProvider, Root
+	Epic, Tabbar, TabbarItem, ConfigProvider, Root
 } from '@vkontakte/vkui';
 import { connect } from 'react-redux';
 import '@vkontakte/vkui/dist/vkui.css';
 import { bindActionCreators } from 'redux'
-import { goBack, closeModal, setStory, setPage } from "./store/router/actions";
-import { setTeam, setTeamsTeam, setEventsTeam, setUserTeam, setUsersTeam } from "./store/teams/actions";
-import {
-	setUser, setProfile, setProfileUser, setTeamUser,
-	setEventUser, setParticipantUser
-} from "./store/user/actions";
-import { setEvent } from "./store/events/actions"
+import { goBack, closeModal, setStory } from "./store/router/actions";
 import { getActivePanel } from "./services/_functions";
 
 import Icon24Done from '@vkontakte/icons/dist/24/done';
@@ -22,31 +16,18 @@ import Icon28FavoriteOutline from '@vkontakte/icons/dist/28/favorite_outline';
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 
 import Events from './panels/events/events'
-import EventCreate from './panels/events/eventCreate'
-import EventInfo from './panels/events/eventInfo'
-import EventEdit from './panels/events/eventEdit'
-
 import Teams from './panels/teams/teams'
-import TeamInfo from './panels/teams/teamInfo'
-import TeamCreate from './panels/teams/teamCreate'
-import TeamEdit from './panels/teams/teamEdit'
-import EventsFilter from './panels/teams/eventsFilter'
 import TeamsFilters from './panels/teams/teamsFilters'
-
 import Users from './panels/users/users'
-import User from './panels/users/user'
-import UserEdit from './panels/users/userEdit'
-import SetUserTeam from './panels/users/setUserTeam'
+
+import CommonView from './CommonView'
 
 const App = (props) => {
 	const [lastAndroidBackAction, setLastAndroidBackButton] = useState(0);
 	const [history, setHistory] = useState(null);
 	const [popout, setPopout] = useState(null);
 
-	const { setStory, activeView, activeStory, setUser,
-		profileUser, teamUser, eventUser, participantUser, teamsTeam,
-		eventsTeam, userTeam, usersTeam, setTeam, colorScheme
-	} = props;
+	const { setStory, activeView, activeStory, profileUser, colorScheme } = props;
 
 	const [activeModal, setActiveModal] = useState(null);
 
@@ -81,104 +62,54 @@ const App = (props) => {
 			<Epic activeStory={activeStory} tabbar={
 				<Tabbar>
 					<TabbarItem
-						onClick={() => {
-							setStory('teams', 'teams');
-							teamUser && setUser(teamUser);
-							teamsTeam && setTeam(teamsTeam);
-						}}
+						onClick={() => setStory('teams', 'teams')}
 						selected={activeStory === 'teams'}
 						text="Команды"
 					><Icon28Users3Outline /></TabbarItem>
 					<TabbarItem
-						onClick={() => {
-							setStory('users', 'users');
-							participantUser && setUser(participantUser);
-							usersTeam && setTeam(usersTeam);
-						}}
+						onClick={() => setStory('users', 'users')}
 						selected={activeStory === 'users'}
 						text="Участники"
 					><Icon28Users /></TabbarItem>
 					<TabbarItem
-						onClick={() => {
-							setStory('events', 'events');
-							eventUser && setUser(eventUser);
-							eventsTeam && setTeam(eventsTeam);
-						}}
+						onClick={() => setStory('events', 'events')}
 						selected={activeStory === 'events'}
 						text="События"
 					><Icon28FavoriteOutline /></TabbarItem>
-					<TabbarItem style={{ color: props.profileUser === null ? "red" : "" }}
-						onClick={() => {
-							setStory('user', 'user');
-							setUser(profileUser);
-							userTeam && setTeam(userTeam)
-						}}
-						selected={activeStory === 'user'}
+					<TabbarItem
+						onClick={() => setStory('profile', 'user')}
+						selected={activeStory === 'profile'}
 						text="Профиль"
+						style={{ color: profileUser === null ? "red" : "" }}
 					><Icon28Profile /></TabbarItem>
 				</Tabbar>
 			}>
 				<Root id="teams" activeView={activeView} popout={popout}>
-					<View id='teams' activePanel={getActivePanel("teams")}
+					<CommonView id='teams' activePanel={getActivePanel('teams').panel}
 						history={history}
-						onSwipeBack={() => goBack()}
-						modal={<TeamsFilters activeModal={activeModal} setActiveModal={setActiveModal} />}>
-						<Teams id='teams' activeStory={activeStory} onFiltersClick={() => setActiveModal('filters') } />
-						<TeamInfo id='teaminfo' />
-						<TeamCreate id='teamCreate' />
-						<TeamEdit id='teamEdit' />
-						<User id='user' />
-						<SetUserTeam id='setUserTeam' />
-						<EventCreate id='eventCreate' />
-						<EventInfo id='eventInfo' />
-						<EventsFilter id='eventsFilter' openFilter={() => setActiveModal('filters')} />
-						<EventEdit id='eventEdit' owner={props.profile} />
-					</View>
+						modal={<TeamsFilters activeModal={activeModal} setActiveModal={setActiveModal} />}
+						setActiveModal={setActiveModal}>
+						<Teams id='teams' onFiltersClick={() => setActiveModal('filters')} />
+					</CommonView>
 				</Root>
 				<Root id="users" activeView={activeView} popout={popout}>
-					<View id="users" activePanel={getActivePanel("users")}
+					<CommonView id='users' activePanel={getActivePanel('users').panel}
 						history={history}
-						onSwipeBack={() => goBack()}
-					>
+						setActiveModal={setActiveModal}>
 						<Users id="users" />
-						<User id="user" />
-						<SetUserTeam id="setUserTeam" />
-						<TeamInfo id="teaminfo" />
-						<TeamEdit id="teamEdit" />
-						<EventCreate id='eventCreate' owner={props.profile} />
-						<EventInfo id='eventInfo' />
-						<EventEdit id='eventEdit' owner={props.profile} />
-					</View>
+					</CommonView>
 				</Root>
 				<Root id="events" activeView={activeView} popout={popout}>
-					<View id='events' activePanel={getActivePanel("events")}
+					<CommonView id='events' activePanel={getActivePanel('events').panel}
 						history={history}
-						onSwipeBack={() => goBack()}
-					>
+						setActiveModal={setActiveModal}>
 						<Events id='events' />
-						<EventCreate id='eventCreate' owner={props.profile} />
-						<EventInfo id='eventInfo' />
-						<EventEdit id='eventEdit' owner={props.profile} />
-						<TeamInfo id='teaminfo' />
-						<TeamEdit id='teamEdit' />
-						<User id='user' />
-						<SetUserTeam id='setUserTeam' />
-					</View>
+					</CommonView>
 				</Root>
-				<Root id="user" activeView={activeView} popout={popout}>
-					<View id='user' activePanel={getActivePanel("user")}
-						history={history}
-						onSwipeBack={() => goBack()}
-					>
-						<User id='user' />
-						<UserEdit id='userEdit' />
-						<TeamInfo id='teaminfo' />
-						<SetUserTeam id='setUserTeam' />
-						<TeamEdit id='teamEdit' />
-						<EventCreate id='eventCreate' owner={props.profile} />
-						<EventInfo id='eventInfo' />
-						<EventEdit id='eventEdit' owner={props.profile} />
-					</View>
+				<Root id="profile" activeView={activeView} popout={popout}>
+					<CommonView id='profile' activePanel={getActivePanel('profile').panel}
+						history={history} 
+						setActiveModal={setActiveModal}/>
 				</Root>
 			</Epic>
 		</ConfigProvider>
@@ -193,18 +124,8 @@ const mapStateToProps = (state) => {
 		popouts: state.router.popouts,
 		activeModals: state.router.activeModals,
 		colorScheme: state.vkui.colorScheme,
-		scrollPosition: state.router.scrollPosition,
 		profile: state.user.profile,
-		user: state.user.user,
-		profileUser: state.user.profileUser,
-		eventUser: state.user.eventUser,
-		teamUser: state.user.teamUser,
-		participantUser: state.user.participantUser,
-		teamsTeam: state.team.teamsTeam,
-		userTeam: state.team.userTeam,
-		usersTeam: state.team.usersTeam,
-		eventsTeam: state.team.eventsTeam,
-		event: state.event.event,
+		profileUser: state.user.profileUser
 	};
 };
 
@@ -213,9 +134,7 @@ function mapDispatchToProps(dispatch) {
 	return {
 		dispatch,
 		...bindActionCreators({
-			setStory, goBack, closeModal, setProfile, setUser, setProfileUser, setPage, setEvent,
-			setEventUser, setTeamUser, setParticipantUser, setTeam, setTeamsTeam,
-			setEventsTeam, setUsersTeam, setUserTeam,
+			setStory, goBack, closeModal
 		}, dispatch)
 	}
 }
