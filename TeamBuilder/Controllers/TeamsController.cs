@@ -6,10 +6,12 @@ using AutoMapper;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.SignalR;
 using TeamBuilder.Models;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using TeamBuilder.Extensions;
+using TeamBuilder.Hubs;
 using TeamBuilder.Models.Enums;
 using TeamBuilder.Services;
 using TeamBuilder.ViewModels;
@@ -19,12 +21,18 @@ namespace TeamBuilder.Controllers
 	public class TeamsController : Controller
 	{
 		private readonly ApplicationContext context;
+		private readonly IHubContext<NotificationHub> hubContext;
 		private readonly UserAccessChecker accessChecker;
 		private readonly ILogger<TeamsController> logger;
 
-		public TeamsController(ApplicationContext context, UserAccessChecker accessChecker, ILogger<TeamsController> logger)
+		public TeamsController(
+			ApplicationContext context,
+			IHubContext<NotificationHub> hubContext,
+			UserAccessChecker accessChecker,
+			ILogger<TeamsController> logger)
 		{
 			this.context = context;
+			this.hubContext = hubContext;
 			this.accessChecker = accessChecker;
 			this.logger = logger;
 		}
@@ -179,7 +187,9 @@ namespace TeamBuilder.Controllers
 
 			if (!await accessChecker.CanManageTeamOrSelfInTeam(model.TeamId, model.UserId))
 				return Forbid();
-			
+
+			var userId = HttpContext.User.Identity.Name;
+
 			var team = await context.Teams
 				.Include(t => t.Image)
 				.Include(u => u.UserTeams)

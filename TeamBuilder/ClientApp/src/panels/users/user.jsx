@@ -1,7 +1,7 @@
 ﻿import React from 'react';
 import { connect } from 'react-redux';
 import {
-	Panel, PanelHeader, Group, Cell, Avatar, Button, Div, PanelHeaderBack,
+	Panel, PanelHeader, Group, Cell, Avatar, Button, Div, PanelHeaderBack, Counter,
 	Tabs, TabsItem, Separator, PullToRefresh, InfoRow, Header, Link, PanelSpinner
 } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
@@ -14,7 +14,8 @@ import Icon24Send from '@vkontakte/icons/dist/24/send';
 import Icon28ViewOutline from '@vkontakte/icons/dist/28/view_outline';
 import Icon28HideOutline from '@vkontakte/icons/dist/28/hide_outline';
 
-import UserTeams from './userTeams'
+import UserTeams from './userTeams';
+import UserNotifications from './userNotifications';
 import { Api } from '../../infrastructure/api';
 import * as Utils from '../../infrastructure/utils';
 import { getActivePanel } from "../../services/_functions";
@@ -132,8 +133,8 @@ class User extends React.Component {
 		return (
 			<Panel id={this.props.id}>
 				{user === undefined && this.props.profileUser === undefined
-				? <PanelSpinner key={0} size="large" />
-				:
+					? <PanelSpinner key={0} size="large" />
+					:
 					<>
 						<PanelHeader separator={false}
 							left={hasBack &&
@@ -141,7 +142,7 @@ class User extends React.Component {
 						</PanelHeader>
 						<PullToRefresh onRefresh={this.onRefresh} isFetching={this.state.fetching}>
 							{this.state.readOnlyMode
-								? user && 
+								? user &&
 								<Group title="VK Connect">
 									<Link href={"https://m.vk.com/id" + user.id} target="_blank">
 										<Cell description={user.city || ''}
@@ -184,24 +185,27 @@ class User extends React.Component {
 								<TabsItem
 									onClick={() => setActiveTab(this.bindingId, null)}
 									selected={!this.props.activeTab[this.bindingId]}>
-									Основное
-						</TabsItem>
+									Основное</TabsItem>
 								<TabsItem
 									onClick={() => setActiveTab(this.bindingId, 'teams')}
 									selected={this.props.activeTab[this.bindingId] === 'teams'}>
-									Команды
-						</TabsItem>
+									Команды</TabsItem>
+								<TabsItem
+									onClick={() => setActiveTab(this.bindingId, 'notifications')}
+									selected={this.props.activeTab[this.bindingId] === 'notifications'}
+									after={<Counter size="s">4</Counter>}>
+									Уведомления</TabsItem>
 							</Tabs>
 							{
-								this.props.activeTab[this.bindingId] !== 'teams' ?
+								!this.props.activeTab[this.bindingId]
+									?
 									<Group header={
 										<Header
 											mode="secondary"
 											aside={!this.state.readOnlyMode &&
 												<Icon24Write style={{ color: "#3f8ae0" }} onClick={() => goToPage('userEdit')} />
 											}>
-											Информация
-                                </Header>}>
+											Информация</Header>}>
 										{user?.mobile &&
 											<Cell before={<Icon24Phone style={{ paddingTop: 0, paddingBottom: 0 }} />}>
 												<Link href={"tel:" + user.mobile}>{user.mobile}</Link>
@@ -224,10 +228,17 @@ class User extends React.Component {
 													<SkillTokens selectedSkills={Utils.convertUserSkills(user?.userSkills)} />
 												</InfoRow>
 											</Cell>}
-									</Group> :
-									<Group>
-										<UserTeams loading={this.state.loading} userTeams={user?.userTeams} readOnlyMode={this.state.readOnlyMode} />
 									</Group>
+									:
+									this.props.activeTab[this.bindingId] === 'teams'
+										?
+										<Group>
+											<UserTeams loading={this.state.loading} userTeams={user?.userTeams} readOnlyMode={this.state.readOnlyMode} />
+										</Group>
+										:
+										<Group>
+											<UserNotifications />
+										</Group>
 							}
 						</PullToRefresh>
 					</>

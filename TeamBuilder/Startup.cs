@@ -1,19 +1,22 @@
 using System;
-using System.Diagnostics;
-using System.Globalization;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using Npgsql;
 using React.AspNet;
-using Newtonsoft.Json;
+using TeamBuilder.Hubs;
 using TeamBuilder.Services;
 
 namespace TeamBuilder
@@ -32,6 +35,11 @@ namespace TeamBuilder
 		{
 			services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(GetConnectionString()));
 
+			services.AddAuthentication("Vk")
+				.AddScheme<VkAuthenticationOptions, VkAuthenticationHandler>("Vk", null);
+
+			services.AddSignalR();
+
 			services.AddHttpContextAccessor();
 			services.AddTransient<UserAccessChecker>();
 			services.AddReact();
@@ -39,7 +47,7 @@ namespace TeamBuilder
 			services.AddControllersWithViews()
 				.AddNewtonsoftJson(options =>
 				{
-					options.SerializerSettings.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.Utc;
+					options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
 					options.SerializerSettings.DateFormatString = "dd'.'MM'.'yyyy";
 					options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
 				}
@@ -51,6 +59,9 @@ namespace TeamBuilder
 			{
 				configuration.RootPath = "ClientApp/build";
 			});
+
+
+			services.AddSingleton<IUserIdProvider, UserIdProvider>();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -70,6 +81,15 @@ namespace TeamBuilder
 			app.UseHttpsRedirection();
 			app.UseStaticFiles();
 			app.UseSpaStaticFiles();
+			app.UseAuthentication();
+
+			app.MapWhen(
+				context => context.Request.Path.StartsWithSegments("/hub"),
+				appBuilder =>
+				{
+					appBuilder.UseRouting();
+					appBuilder.UseEndpoints(endpoints => endpoints.MapHub<NotificationHub>("/hub/notifications"));
+				});
 
 			app.MapWhen(
 				context => context.Request.Path.StartsWithSegments("/api"),
@@ -77,13 +97,17 @@ namespace TeamBuilder
 				{
 					appBuilder.UseRouting();
 					appBuilder.UserSignCheck();
+
 					appBuilder.UseEndpoints(endpoints =>
 					{
 						endpoints.MapControllerRoute(
 							name: "api",
 							pattern: "/api/{controller}/{action=Index}/{id?}");
+						endpoints.MapHub<NotificationHub>("/api/notifications");
 					});
 				});
+
+
 
 			app.UseSpa(spa =>
 			{
