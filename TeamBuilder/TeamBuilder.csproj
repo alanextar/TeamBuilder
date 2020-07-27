@@ -40,6 +40,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20200727123905_notify.cs" />
+    <Compile Remove="Migrations\20200727123905_notify.Designer.cs" />
+    <Compile Remove="Migrations\20200727131702_notification.cs" />
+    <Compile Remove="Migrations\20200727131702_notification.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="DemoDataSets\skills.json" />
     <Content Remove="DemoDataSets\teams.json" />
     <Content Remove="DemoDataSets\users.json" />
