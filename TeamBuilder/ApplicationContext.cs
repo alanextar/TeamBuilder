@@ -1,4 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using TeamBuilder.Models;
 
 namespace TeamBuilder
@@ -31,5 +36,14 @@ namespace TeamBuilder
                 .HasKey(t => new { t.UserId, t.SkillId });
 
         }
-    }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
+        {
+			//TODO по хорошему надо отдельного демона
+	        var noticesForRemoved = Notifications.Where(n => n.Ttl >= DateTime.Now);
+			base.RemoveRange(noticesForRemoved);
+
+	        return base.SaveChangesAsync(cancellationToken);
+        }
+	}
 }

@@ -12,10 +12,10 @@ import { goToPage } from '../../store/router/actions';
 import * as SignalR from '@aspnet/signalr'
 
 const mockNotification = [
-	{ id: 1, title: "Вас добавили туда" },
-	{ id: 2, title: "Вас исключили отсюда" },
-	{ id: 3, title: "В вашу команду поступил запрос" },
-	{ id: 4, title: "Из вашей команды вышел юзер" }
+	{ id: -1, message: "Вас добавили туда" },
+	{ id: -2, message: "Вас исключили отсюда" },
+	{ id: -3, message: "В вашу команду поступил запрос" },
+	{ id: -4, message: "Из вашей команды вышел юзер" }
 ]
 
 class UserNotifications extends React.Component {
@@ -40,11 +40,15 @@ class UserNotifications extends React.Component {
 				.then(() => console.log('Connection started!'))
 				.catch(error => console.log(`Error while establishing connection :(. Details: ${error}`));
 
-			this.state.hubConnection.on("sendNotify", notify => {
+			this.state.hubConnection.on("notify", notice => {
 				console.log('А вот и я')
-				let nots = this.state.nots || [];
-				nots.push(notify);
-				this.setState({ nots })
+				let noticesTemp = this.state.nots || [];
+
+				noticesTemp.push(notice)
+				this.setState({ nots: noticesTemp })
+				this.state.hubConnection
+					.invoke('NotificationsReceived', notice.id)
+					.catch(error => console.log(`Error while invoke hub method "NotificationsReceived". Details: ${error}`))
 			})
 		});
 	}
@@ -61,8 +65,8 @@ class UserNotifications extends React.Component {
 				<Button key={0} onClick={() => this.clickHandler()}>ОТПРАВИТЬ!</Button>
 				{this.state.nots.map(item => (
 					<React.Fragment key={item.id}>
-						<Cell description={'вчера в 16:53'}>
-							{item.title}
+						<Cell description={item.dateTimeNotify || null}>
+							{item.message}
 						</Cell>
 						<Separator style={{ margin: '5px 0' }} />
 					</React.Fragment>

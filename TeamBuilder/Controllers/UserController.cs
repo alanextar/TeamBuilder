@@ -11,6 +11,8 @@ using TeamBuilder.Models.Enums;
 using TeamBuilder.ViewModels;
 using System;
 using AutoMapper;
+using Microsoft.AspNetCore.SignalR;
+using TeamBuilder.Hubs;
 using TeamBuilder.Services;
 
 namespace TeamBuilder.Controllers
@@ -18,12 +20,18 @@ namespace TeamBuilder.Controllers
 	public class UserController : Controller
 	{
 		private readonly ApplicationContext context;
+		private readonly IHubContext<NotificationHub> hubContext;
 		private readonly UserAccessChecker accessChecker;
 		private readonly ILogger<UserController> logger;
 
-		public UserController(ApplicationContext context, UserAccessChecker accessChecker, ILogger<UserController> logger)
+		public UserController(
+			ApplicationContext context,
+			IHubContext<NotificationHub> hubContext,
+			UserAccessChecker accessChecker,
+			ILogger<UserController> logger)
 		{
 			this.context = context;
+			this.hubContext = hubContext;
 			this.accessChecker = accessChecker;
 			this.logger = logger;
 		}
@@ -69,7 +77,8 @@ namespace TeamBuilder.Controllers
 
 			return Json(user);
 		}
-
+		
+		//TODO не используется
 		[HttpGet]
 		public IActionResult CheckConfirmation(long id)
 		{
@@ -141,7 +150,7 @@ namespace TeamBuilder.Controllers
 				.Include(x => x.UserTeams)
 				.ThenInclude(y => y.Team)
 				.FirstOrDefaultAsync(u => u.Id == id);
-			
+
 			if (user.IsSearchable)
 			{
 				var profile = await context.Users
@@ -290,7 +299,6 @@ namespace TeamBuilder.Controllers
 			return Json(activeUserTeams);
 		}
 
-		//TODO Не понял что тут происходит :) 
 		//Пользователь отправляет запрос в команду из меню команды / Пользователя приглашает команда по кнопке завербовать
 		[HttpGet]
 		public async Task<IActionResult> SetTeam(long id, long teamId, bool isTeamOffer = true)
@@ -308,8 +316,9 @@ namespace TeamBuilder.Controllers
 			if (dbTeam == null)
 				return NotFound();
 
-			var userActionToSet = isTeamOffer ?
-					UserActionEnum.ConsideringOffer : UserActionEnum.SentRequest;
+			var userActionToSet = isTeamOffer
+				? UserActionEnum.ConsideringOffer
+				: UserActionEnum.SentRequest;
 
 			if (dbTeam.UserTeams.All(x => x.UserId != id))
 			{
@@ -323,6 +332,16 @@ namespace TeamBuilder.Controllers
 
 			context.Update(dbTeam);
 			await context.SaveChangesAsync();
+
+			var itemsForNotification = new Dictionary<string, string>
+			{
+				["TeamId"] = teamId.ToString()
+			};
+			var notification = new Notification(id, DateTime.Now, "Вас пригласили в команду #team",
+				NotifyType.Regular, itemsForNotification);
+
+			await hubContext.Clients.User(id.ToString())
+				.SendCoreAsync("notify", new object[] { notification, notification });
 
 			return Json(dbTeam);
 		}

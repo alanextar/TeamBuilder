@@ -106,6 +106,9 @@ namespace TeamBuilder.Migrations
                     b.Property<int>("NotifyType")
                         .HasColumnType("integer");
 
+                    b.Property<DateTime>("Ttl")
+                        .HasColumnType("timestamp without time zone");
+
                     b.Property<long>("UserId")
                         .HasColumnType("bigint");
 
