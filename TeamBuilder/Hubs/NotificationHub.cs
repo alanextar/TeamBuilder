@@ -22,8 +22,12 @@ namespace TeamBuilder.Hubs
 		//Test
 		public async Task SendNotify()
 		{
-			logger.LogInformation($"Hub request {Context.GetHttpContext().Request.Headers[":path"]}");
-			await Clients.User("252814031").SendAsync("sendNotify", new { Id = Guid.NewGuid(), Title = "Приветочка с сервера" });
+			logger.LogInformation($"Hub request {Context.GetHttpContext().Request.Path}");
+			await Clients.User("252814030").SendAsync("notify", new object[]
+			{
+				new { Id = Guid.NewGuid(), Message = "Ещё одна", DateTime = DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss") },
+				new { Id = Guid.NewGuid(), Message = "Приветочка с сервера", DateTime = DateTime.Now.ToString("dd.MM.yyyy HH:mm:ss") }
+			});
 		}
 
 		public async Task NotificationsReceived(long[] ids)
@@ -57,10 +61,10 @@ namespace TeamBuilder.Hubs
 			var notifications = await context.Notifications.Where(n => n.UserId == id).ToListAsync();
 			if (notifications.Any())
 			{
-				await Clients.User(Context.UserIdentifier).SendCoreAsync("notify", new object[] {notifications});
+				await Clients.User(Context.UserIdentifier).SendCoreAsync("notify", new object[] { notifications });
 			}
 		}
-		
+
 		private async Task SetConnectStatusForUser(long id, ConnectStatus status)
 		{
 			var connection = await context.Connections.FirstOrDefaultAsync(c => c.UserId == id);
@@ -77,6 +81,6 @@ namespace TeamBuilder.Hubs
 				}
 			}
 		}
-		
+
 	}
 }

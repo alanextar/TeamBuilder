@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.SignalR;
 using TeamBuilder.Models;
 using Microsoft.EntityFrameworkCore;
@@ -48,11 +48,12 @@ namespace TeamBuilder.Controllers
 			return teams;
 		}
 
+		[Authorize]
 		public async Task<IActionResult> PagingSearch(string search, long? eventId, int pageSize = 20, int page = 0, bool prev = false)
 		{
 			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
 
-			if (!context.UserTeams.Any())
+			if (!await context.UserTeams.AnyAsync())
 			{
 				logger.LogInformation("EasterEggs Running");
 				await EasterEggs.Eggs(context);

@@ -42,6 +42,7 @@ namespace TeamBuilder
 
 			services.AddHttpContextAccessor();
 			services.AddTransient<UserAccessChecker>();
+			services.AddSingleton<IVkSignChecker, VkSignChecker>();
 			services.AddReact();
 
 			services.AddControllersWithViews()
@@ -81,13 +82,14 @@ namespace TeamBuilder
 			app.UseHttpsRedirection();
 			app.UseStaticFiles();
 			app.UseSpaStaticFiles();
-			app.UseAuthentication();
 
 			app.MapWhen(
 				context => context.Request.Path.StartsWithSegments("/hub"),
 				appBuilder =>
 				{
 					appBuilder.UseRouting();
+					appBuilder.UseAuthentication();
+					appBuilder.UseAuthorization();
 					appBuilder.UseEndpoints(endpoints => endpoints.MapHub<NotificationHub>("/hub/notifications"));
 				});
 
@@ -96,8 +98,8 @@ namespace TeamBuilder
 				appBuilder =>
 				{
 					appBuilder.UseRouting();
-					appBuilder.UserSignCheck();
-
+					appBuilder.UseAuthentication();
+					appBuilder.UseAuthorization();
 					appBuilder.UseEndpoints(endpoints =>
 					{
 						endpoints.MapControllerRoute(
@@ -106,8 +108,6 @@ namespace TeamBuilder
 						endpoints.MapHub<NotificationHub>("/api/notifications");
 					});
 				});
-
-
 
 			app.UseSpa(spa =>
 			{

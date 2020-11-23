@@ -30,6 +30,7 @@ namespace TeamBuilder.Models
 		public NotifyType NotifyType { get; set; }
 		public string Items { get; set; }
 
+		public bool IsNew { get; set; }
 		public DateTime Ttl { get; set; }
 	}
 

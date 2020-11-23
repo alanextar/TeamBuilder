@@ -7,6 +7,7 @@ import '@vkontakte/vkui/dist/vkui.css';
 import { bindActionCreators } from 'redux'
 import { goBack, closeModal, setStory } from "./store/router/actions";
 import { getActivePanel } from "./services/_functions";
+import { initHubConnection } from "./services/notificationHub";
 
 import Icon24Done from '@vkontakte/icons/dist/24/done';
 import Icon28Users from '@vkontakte/icons/dist/28/users';
@@ -20,7 +21,7 @@ import Teams from './panels/teams/teams'
 import TeamsFilters from './panels/teams/teamsFilters'
 import Users from './panels/users/users'
 
-import CommonView from './CommonView'
+import CommonView from './CommonView';
 
 const App = (props) => {
 	const [lastAndroidBackAction, setLastAndroidBackButton] = useState(0);
@@ -44,7 +45,15 @@ const App = (props) => {
 				window.history.pushState(null, null);
 			}
 		};
+
 	}, []);
+
+	useEffect(() => {
+		if (profileUser?.id) {
+			initHubConnection();
+		}
+
+	}, [profileUser?.id]);
 
 	useEffect(() => {
 		const { activeView, panelsHistory, activeModals, popouts } = props;
@@ -108,8 +117,8 @@ const App = (props) => {
 				</Root>
 				<Root id="profile" activeView={activeView} popout={popout}>
 					<CommonView id='profile' activePanel={getActivePanel('profile').panel}
-						history={history} 
-						setActiveModal={setActiveModal}/>
+						history={history}
+						setActiveModal={setActiveModal} />
 				</Root>
 			</Epic>
 		</ConfigProvider>
