@@ -150,7 +150,7 @@ class TeamCreate extends React.Component {
 							{
 								<div>
 									<p style={{ float: 'left', margin: 0 }}>
-										<Link style={{ color: '#99334b' }} onClick={this.clearEvent}>Отчистить</Link>
+										<Link style={{ color: '#99334b' }} onClick={this.clearEvent}>Очистить</Link>
 									</p>
 									<p style={{ float: 'right', margin: 0 }}>
 										<Link style={{ color: 'rebeccapurple' }} onClick={() => goToPage('eventCreate')}>Создать событие</Link>

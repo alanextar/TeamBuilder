@@ -193,7 +193,7 @@ class User extends React.Component {
 								<TabsItem
 									onClick={() => setActiveTab(this.bindingId, 'notifications')}
 									selected={this.props.activeTab[this.bindingId] === 'notifications'}
-									after={<Counter size="s">4</Counter>}>
+									after={this.props.notifications?.length !== 0 && <Counter size="s">{this.props.notifications.length}</Counter>}>
 									Уведомления</TabsItem>
 							</Tabs>
 							{
@@ -255,7 +255,8 @@ const mapStateToProps = (state) => {
 		profile: state.user.profile,
 		activeView: state.router.activeView,
 		activeTab: state.vkui.activeTab,
-		panelsHistory: state.router.panelsHistory
+		panelsHistory: state.router.panelsHistory,
+		notifications: state.notice.notifications
 	};
 };
 

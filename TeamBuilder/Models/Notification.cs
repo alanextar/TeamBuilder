@@ -6,7 +6,7 @@ namespace TeamBuilder.Models
 {
 	public class Notification
 	{
-		public Notification(long userId, DateTime dateTimeNotify, string message, NotifyType notifyType, Dictionary<string, string> items)
+		public Notification(long userId, DateTime dateTimeNotify, string message, NotifyType notifyType, IEnumerable<NotificationItem> items)
 		: this(userId, dateTimeNotify, message, notifyType, JsonConvert.SerializeObject(items))
 		{ }
 
@@ -17,6 +17,7 @@ namespace TeamBuilder.Models
 			Message = message;
 			NotifyType = notifyType;
 			Items = items;
+			IsNew = true;
 
 			Ttl = DateTime.Now.AddDays(7);
 		}
@@ -32,6 +33,20 @@ namespace TeamBuilder.Models
 
 		public bool IsNew { get; set; }
 		public DateTime Ttl { get; set; }
+	}
+
+	public class NotificationItem
+	{
+		public NotificationItem(string placement, string id, string text)
+		{
+			Placement = placement;
+			Id = id;
+			Text = text;
+		}
+
+		public string Placement { get; set; }
+		public string Id { get; set; }
+		public string Text { get; set; }
 	}
 
 	public enum NotifyType

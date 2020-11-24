@@ -39,9 +39,12 @@ namespace TeamBuilder
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
         {
-			//TODO по хорошему надо отдельного демона
-	        var noticesForRemoved = Notifications.Where(n => n.Ttl >= DateTime.Now);
-			base.RemoveRange(noticesForRemoved);
+	        //TODO по хорошему надо отдельного демона
+	        if (DateTime.Now.DayOfWeek == DayOfWeek.Sunday)
+	        {
+		        var noticesForRemoved = Notifications.Where(n => DateTime.Now >= n.Ttl);
+		        base.RemoveRange(noticesForRemoved);
+	        }
 
 	        return base.SaveChangesAsync(cancellationToken);
         }

@@ -42,6 +42,7 @@ namespace TeamBuilder
 
 			services.AddHttpContextAccessor();
 			services.AddTransient<UserAccessChecker>();
+			services.AddTransient<NotificationSender>();
 			services.AddSingleton<IVkSignChecker, VkSignChecker>();
 			services.AddReact();
 

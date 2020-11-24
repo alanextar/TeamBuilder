@@ -33,10 +33,10 @@ class UserNotifications extends React.Component {
 		return (
 			<List>
 				<Button key={0} onClick={() => this.clickHandler()}>ОТПРАВИТЬ!</Button>
-				{notifications.map(item => (
-					<React.Fragment key={item.id}>
-						<Cell description={item.dateTime || null}>
-							{item.message}
+				{notifications.map(notification => (
+					<React.Fragment key={notification.id}>
+						<Cell description={notification.dateTimeNotify || null}>
+							{notification.renderedMessage}
 						</Cell>
 						<Separator style={{ margin: '5px 0' }} />
 					</React.Fragment>

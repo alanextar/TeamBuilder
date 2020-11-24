@@ -1,4 +1,4 @@
-import { SET_NOTIFICATIONS, SET_CONNECTION } from './actionTypes';
+import { SET_NOTIFICATIONS, SET_CONNECTION, SET_ERRORMESSAGE } from './actionTypes';
 
 export const setNotifications = (notifications) => {
 	return {
@@ -14,6 +14,15 @@ export const setConnection = (hubConnection) => {
 		type: SET_CONNECTION,
 		payload: {
 			hubConnection
+		}
+	}
+};
+
+export const setErrorMessage = (errorMessage) => {
+	return {
+		type: SET_ERRORMESSAGE,
+		payload: {
+			errorMessage
 		}
 	}
 };

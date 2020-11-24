@@ -22,17 +22,20 @@ namespace TeamBuilder.Controllers
 		private readonly ApplicationContext context;
 		private readonly IHubContext<NotificationHub> hubContext;
 		private readonly UserAccessChecker accessChecker;
+		private readonly NotificationSender notificationSender;
 		private readonly ILogger<UserController> logger;
 
 		public UserController(
 			ApplicationContext context,
 			IHubContext<NotificationHub> hubContext,
 			UserAccessChecker accessChecker,
+			NotificationSender notificationSender,
 			ILogger<UserController> logger)
 		{
 			this.context = context;
 			this.hubContext = hubContext;
 			this.accessChecker = accessChecker;
+			this.notificationSender = notificationSender;
 			this.logger = logger;
 		}
 
@@ -77,7 +80,7 @@ namespace TeamBuilder.Controllers
 
 			return Json(user);
 		}
-		
+
 		//TODO не используется
 		[HttpGet]
 		public IActionResult CheckConfirmation(long id)
@@ -299,7 +302,7 @@ namespace TeamBuilder.Controllers
 			return Json(activeUserTeams);
 		}
 
-		//Пользователь отправляет запрос в команду из меню команды / Пользователя приглашает команда по кнопке завербовать
+		//Пользователь отправляет запрос в команду из меню команды / Пользователя приглашает команда по кнопке "Завербовать"
 		[HttpGet]
 		public async Task<IActionResult> SetTeam(long id, long teamId, bool isTeamOffer = true)
 		{
@@ -333,15 +336,10 @@ namespace TeamBuilder.Controllers
 			context.Update(dbTeam);
 			await context.SaveChangesAsync();
 
-			var itemsForNotification = new Dictionary<string, string>
+			await notificationSender.Send(id, "Вас пригласили в команду #[team]", new List<NotificationItem>
 			{
-				["TeamId"] = teamId.ToString()
-			};
-			var notification = new Notification(id, DateTime.Now, "Вас пригласили в команду #team",
-				NotifyType.Regular, itemsForNotification);
-
-			await hubContext.Clients.User(id.ToString())
-				.SendCoreAsync("notify", new object[] { notification, notification });
+				new NotificationItem("team", dbTeam.Id.ToString(), dbTeam.Name)
+			});
 
 			return Json(dbTeam);
 		}
