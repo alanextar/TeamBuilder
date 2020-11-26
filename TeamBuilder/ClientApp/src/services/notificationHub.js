@@ -15,7 +15,7 @@ export const initHubConnection = () => {
 		.then(() => console.log('Connection started!'))
 		.catch(error => console.log(`Error while establishing connection :(. Details: ${error}`));
 
-	hubConnection.on("notify", notices => {
+	hubConnection.on("Notify", notices => {
 		store.dispatch(setNotifications(notices));
 		hubConnection.invoke('NotificationsReceived', notices.map(n => n.id))
 			.catch(error => console.log(`Error while invoke hub method "NotificationsReceived". Details: ${error}`))

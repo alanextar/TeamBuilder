@@ -1,10 +1,19 @@
-import { SET_NOTIFICATIONS, SET_CONNECTION, SET_ERRORMESSAGE } from './actionTypes';
+import { SET_NOTIFICATIONS, SET_AS_READ, SET_CONNECTION, SET_ERRORMESSAGE } from './actionTypes';
 
 export const setNotifications = (notifications) => {
 	return {
 		type: SET_NOTIFICATIONS,
 		payload: {
 			notifications
+		}
+	}
+};
+
+export const setAsRead = (notificationIds) => {
+	return {
+		type: SET_AS_READ,
+		payload: {
+			notificationIds
 		}
 	}
 };

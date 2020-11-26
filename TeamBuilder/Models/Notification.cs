@@ -19,7 +19,7 @@ namespace TeamBuilder.Models
 			Items = items;
 			IsNew = true;
 
-			Ttl = DateTime.Now.AddDays(7);
+			Ttl = DateTime.Today.AddDays(21);
 		}
 
 		public long Id { get; set; }

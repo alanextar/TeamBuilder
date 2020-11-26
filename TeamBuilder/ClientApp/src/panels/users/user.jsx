@@ -2,7 +2,7 @@
 import { connect } from 'react-redux';
 import {
 	Panel, PanelHeader, Group, Cell, Avatar, Button, Div, PanelHeaderBack, Counter,
-	Tabs, TabsItem, Separator, PullToRefresh, InfoRow, Header, Link, PanelSpinner
+	Tabs, TabsItem, Separator, PullToRefresh, InfoRow, Header, Link, PanelSpinner, HorizontalScroll
 } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import Icon24Phone from '@vkontakte/icons/dist/24/phone';
@@ -125,6 +125,11 @@ class User extends React.Component {
 			});
 	}
 
+	renderNoticeCount() {
+		let countNew = this.props.notifications.filter(n => n.isNew === true).length;
+		return countNew !== 0 && <Counter size="s">{countNew}</Counter>;
+	}
+
 	render() {
 		const { goBack, goToPage, setActiveTab } = this.props;
 		let user = this.state.user;
@@ -182,19 +187,24 @@ class User extends React.Component {
 							}
 							<Separator />
 							<Tabs>
-								<TabsItem
-									onClick={() => setActiveTab(this.bindingId, null)}
-									selected={!this.props.activeTab[this.bindingId]}>
-									Основное</TabsItem>
-								<TabsItem
-									onClick={() => setActiveTab(this.bindingId, 'teams')}
-									selected={this.props.activeTab[this.bindingId] === 'teams'}>
-									Команды</TabsItem>
-								<TabsItem
-									onClick={() => setActiveTab(this.bindingId, 'notifications')}
-									selected={this.props.activeTab[this.bindingId] === 'notifications'}
-									after={this.props.notifications?.length !== 0 && <Counter size="s">{this.props.notifications.length}</Counter>}>
-									Уведомления</TabsItem>
+								<HorizontalScroll>
+									<TabsItem
+										onClick={() => setActiveTab(this.bindingId, null)}
+										selected={!this.props.activeTab[this.bindingId]}>
+										Основное
+									</TabsItem>
+									<TabsItem
+										onClick={() => setActiveTab(this.bindingId, 'teams')}
+										selected={this.props.activeTab[this.bindingId] === 'teams'}>
+										Команды
+									</TabsItem>
+									<TabsItem
+										onClick={() => setActiveTab(this.bindingId, 'notifications')}
+										selected={this.props.activeTab[this.bindingId] === 'notifications'}
+										after={this.renderNoticeCount()}>
+										Уведомления
+									</TabsItem>
+								</HorizontalScroll>
 							</Tabs>
 							{
 								!this.props.activeTab[this.bindingId]

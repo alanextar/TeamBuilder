@@ -35,12 +35,9 @@ namespace TeamBuilder.Services
 			await context.Notifications.AddAsync(notification);
 			await context.SaveChangesAsync();
 
-			var user = await context.Connections.FirstOrDefaultAsync(u => u.UserId == userId);
-			if (user?.ConnectStatus == ConnectStatus.Online)
-				await hubContext.Clients
-					.User(userId.ToString())
-					.SendAsync("notify", new object[] { notification });
-
+			await hubContext.Clients
+				.User(userId.ToString())
+				.SendAsync("Notify", new object[] { notification });
 		}
 	}
 }

@@ -1,5 +1,5 @@
 import {
-	SET_NOTIFICATIONS, SET_CONNECTION, SET_ERRORMESSAGE
+	SET_NOTIFICATIONS, SET_AS_READ, SET_CONNECTION, SET_ERRORMESSAGE
 } from './actionTypes';
 
 import { renderNotification } from "../../services/renderers";
@@ -30,17 +30,32 @@ export const noticeReducer = (state = initialState, action) => {
 
 	switch (action.type) {
 		case SET_NOTIFICATIONS: {
-			
+
 			let nots = action.payload.notifications.map(n => {
 				return {
 					...n,
 					renderedMessage: renderNotification(n)
-				}
+				};
 			});
 
 			return {
 				...state,
 				notifications: [...state.notifications, ...nots]
+			};
+		}
+
+		case SET_AS_READ: {
+			let ids = action.payload.notificationIds;
+			let updated = state.notifications.map(n => {
+				if (!ids.includes(n.id)) {
+					return n;
+				}
+				return { ...n, isNew: false };
+			});
+
+			return {
+				...state,
+				notifications: updated
 			};
 		}
 

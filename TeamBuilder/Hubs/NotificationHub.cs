@@ -31,57 +31,28 @@ namespace TeamBuilder.Hubs
 			});
 		}
 
-		public async Task NotificationsReceived(long[] ids)
+		public async Task NoticesWasRead(long[] ids)
 		{
 			var notices = await context.Notifications.Where(n => ids.Contains(n.Id)).ToListAsync();
-			context.RemoveRange(notices);
+			notices.ForEach(n => n.IsNew = false);
 			await context.SaveChangesAsync();
 		}
 
 		public override async Task OnConnectedAsync()
 		{
-			var id = long.TryParse(Context.UserIdentifier, out var parsedId) ? parsedId : -1;
+			if (!long.TryParse(Context.UserIdentifier, out var userId))
+				return;
 
-			await SetConnectStatusForUser(id, ConnectStatus.Online);
-			await SendNotify(id);
-
-			await context.SaveChangesAsync();
+			await SendNotify(userId);
 		}
 
-		public override async Task OnDisconnectedAsync(Exception _)
+		private async Task SendNotify(long userId)
 		{
-			var id = long.TryParse(Context.UserIdentifier, out var parsedId) ? parsedId : -1;
-
-			await SetConnectStatusForUser(id, ConnectStatus.Offline);
-
-			await context.SaveChangesAsync();
-		}
-
-		private async Task SendNotify(long id)
-		{
-			var notifications = await context.Notifications.Where(n => n.UserId == id).ToListAsync();
+			var notifications = await context.Notifications.Where(n => n.UserId == userId).ToListAsync();
 			if (notifications.Any())
 			{
 				await Clients.User(Context.UserIdentifier).SendAsync("notify", notifications);
 			}
 		}
-
-		private async Task SetConnectStatusForUser(long id, ConnectStatus status)
-		{
-			var connection = await context.Connections.FirstOrDefaultAsync(c => c.UserId == id);
-			if (connection == null)
-			{
-				await context.AddAsync(new Connection(id, status));
-			}
-			else
-			{
-				if (connection.ConnectStatus != status)
-				{
-					connection.ConnectStatus = status;
-					context.Update(connection);
-				}
-			}
-		}
-
 	}
 }

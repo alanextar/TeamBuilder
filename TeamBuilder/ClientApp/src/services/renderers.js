@@ -44,11 +44,11 @@ const formatMentionText = (text, items, regex) => {
 
 				return prev.concat(
 					item ?
-						<Link key={i + current}
-							style={{ color: '#99334b' }}
+						<b><Link key={i + current}
+							style={{ color: '#468dd6' }}
 							onClick={() => store.dispatch(goToPage('teamInfo', item.Id))}>
 							{item.Text}
-						</Link>
+						</Link></b>
 						: current
 				);
 			}, [])}
