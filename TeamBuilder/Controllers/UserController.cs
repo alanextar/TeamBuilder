@@ -273,18 +273,17 @@ namespace TeamBuilder.Controllers
 			var items = new List<NoticeItem>
 			{
 				NoticeItem.User(user.Id, user.FullName),
-				NoticeItem.Team(userTeam.Team.Id, userTeam.Team.Name),
-				NoticeItem.Image(user.Photo100)
+				NoticeItem.Team(userTeam.Team.Id, userTeam.Team.Name)
 			};
 			switch (userTeam.UserAction)
 			{
 				case UserActionEnum.RejectedTeamRequest:
 					await notificationSender.Send(userTeam.Team.Owner.Id, NotifyType.Destructive, 
-						"Пользователь {0} отказался от приглашения в команду {1}", items);
+						"Пользователь {0} отказался от приглашения в команду {1}", user.Photo100, items);
 					break;
 				case UserActionEnum.QuitTeam:
 					await notificationSender.Send(userTeam.Team.Owner.Id, NotifyType.Destructive, 
-						"Пользователь {0} вышел из команды {1}", items);
+						"Пользователь {0} вышел из команды {1}", user.Photo100, items);
 					break;
 			}
 
@@ -357,9 +356,10 @@ namespace TeamBuilder.Controllers
 			await context.SaveChangesAsync();
 
 			if (userActionToSet == UserActionEnum.ConsideringOffer)
-				await notificationSender.Send(id, NotifyType.Add, "Вас пригласили в команду {0}",
-					NoticeItem.Team(dbTeam.Id, dbTeam.Name),
-					NoticeItem.Image(dbTeam.Image.DataURL));
+				await notificationSender.Send(id, NotifyType.Add,
+					"Вас пригласили в команду {0}", 
+					dbTeam.Image.DataURL,
+					NoticeItem.Team(dbTeam.Id, dbTeam.Name));
 
 			return Json(dbTeam);
 		}

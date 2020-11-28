@@ -6,15 +6,16 @@ namespace TeamBuilder.Models
 {
 	public class Notification
 	{
-		public Notification(long userId, string message, NotifyType notifyType, IEnumerable<NoticeItem> items)
-		: this(userId, DateTime.Now, message, notifyType, JsonConvert.SerializeObject(items))
+		public Notification(long userId, string message, string imageUrl, NotifyType notifyType, IEnumerable<NoticeItem> items)
+		: this(userId, DateTime.Now, message, imageUrl, notifyType, JsonConvert.SerializeObject(items))
 		{ }
 
-		public Notification(long userId, DateTime dateTimeNotify, string message, NotifyType notifyType, string items)
+		public Notification(long userId, DateTime dateTimeNotify, string message, string imageUrl, NotifyType notifyType, string items)
 		{
 			UserId = userId;
 			DateTimeNotify = dateTimeNotify;
 			Message = message;
+			ImageUrl = imageUrl;
 			NotifyType = notifyType;
 			Items = items;
 			IsNew = true;
@@ -28,6 +29,7 @@ namespace TeamBuilder.Models
 
 		public DateTime DateTimeNotify { get; set; }
 		public string Message { get; set; }
+		public string ImageUrl { get; set; }
 		public NotifyType NotifyType { get; set; }
 		public string Items { get; set; }
 
@@ -55,7 +57,6 @@ namespace TeamBuilder.Models
 		public static NoticeItem Team(long id, string name) => new NoticeItem(NoticePlaceholder.Team, id.ToString(), name);
 		public static NoticeItem User(long id, string name) => new NoticeItem(NoticePlaceholder.User, id.ToString(), name);
 		public static NoticeItem Event(long id, string name) => new NoticeItem(NoticePlaceholder.Event, id.ToString(), name);
-		public static NoticeItem Image(string dataUrl) => new NoticeItem(NoticePlaceholder.Image, dataUrl, null);
 
 		public string Placement { get; set; }
 		public string Id { get; set; }
@@ -66,7 +67,6 @@ namespace TeamBuilder.Models
 	{
 		Team,
 		User,
-		Event,
-		Image
+		Event
 	}
 }

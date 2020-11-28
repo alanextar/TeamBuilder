@@ -1,4 +1,4 @@
-﻿import { Separator, SimpleCell , Cell, List, Placeholder, RichCell, Avatar } from '@vkontakte/vkui';
+﻿import { Separator, SimpleCell, Cell, List, Placeholder, RichCell, Avatar } from '@vkontakte/vkui';
 import Icon16Add from '@vkontakte/icons/dist/16/add';
 import '@vkontakte/vkui/dist/vkui.css';
 import React from 'react';
@@ -36,8 +36,8 @@ class UserNotifications extends React.Component {
 			<List>
 				{this.props.notifications?.map(notice => (
 					<React.Fragment key={notice.id}>
-						<SimpleCell 
-							before={<Avatar style={{ background: 'var(--accent)' }} size={28} shadow={false}><Icon16Add fill="var(--white)" /></Avatar>}
+						<SimpleCell
+							before={<Avatar style={{ background: 'var(--accent)' }} size={28} shadow={false} src={notice.imageUrl} />}
 							description={notice.dateTimeNotify}
 							multiline>
 							{notice.renderedMessage}

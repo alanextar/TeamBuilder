@@ -97,6 +97,9 @@ namespace TeamBuilder.Migrations
                     b.Property<DateTime>("DateTimeNotify")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("text");
+
                     b.Property<bool>("IsNew")
                         .HasColumnType("boolean");
 

@@ -55,9 +55,10 @@ const formatMentionText = (text, items, regex) => {
 	</div>);
 };
 
-const findIt = (items, placement) => {
+const findIt = (items, placeholder) => {
 	for (var i = 0; i < items.length; i++) {
-		if (items[i].Placement === placement) {
+		if (placeholder.startWith(items[i].Placement) &&
+			placeholder.endsWith(items[i].Id)) {
 			return items[i];
 		}
 	}

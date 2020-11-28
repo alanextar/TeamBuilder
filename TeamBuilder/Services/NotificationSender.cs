@@ -27,28 +27,30 @@ namespace TeamBuilder.Services
 		}
 
 		public async Task Send(
-			long userId,
+			long recipientId,
 			NotifyType notifyType,
 			string message,
+			string imageUrl,
 			IEnumerable<NoticeItem> items)
 		{
-			await Send(userId, notifyType, message, items.ToArray());
+			await Send(recipientId, notifyType, message, imageUrl, items.ToArray());
 		}
 
 		public async Task Send(
-			long userId,
+			long recipientId,
 			NotifyType notifyType,
 			string message,
+			string imageUrl,
 			params NoticeItem[] items)
 		{
 			message = PlaceholderBuilder.Build(message, items);
-			var notification = new Notification(userId, message, notifyType, items);
+			var notification = new Notification(recipientId, message, imageUrl, notifyType, items);
 
 			await context.Notifications.AddAsync(notification);
 			await context.SaveChangesAsync();
 
 			await hubContext.Clients
-				.User(userId.ToString())
+				.User(recipientId.ToString())
 				.SendAsync("Notify", new object[] { notification });
 		}
 	}
