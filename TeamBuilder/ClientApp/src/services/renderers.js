@@ -46,7 +46,7 @@ const formatMentionText = (text, items, regex) => {
 					item ?
 						<b><Link key={i + current}
 							style={{ color: '#468dd6' }}
-							onClick={() => store.dispatch(goToPage('teamInfo', item.Id))}>
+							onClick={() => store.dispatch(goToPage(choosePanel(item), item.Id))}>
 							{item.Text}
 						</Link></b>
 						: current
@@ -63,3 +63,11 @@ const findIt = (items, placeholder) => {
 		}
 	}
 };
+
+const choosePanel = (item) => {
+	switch (item.Placement) {
+		case 'Team': return 'teamInfo';
+		case 'User': return 'UserInfo';
+		case 'Event': return 'eventInfo';
+	  }
+}
