@@ -13,6 +13,8 @@ using TeamBuilder.Extensions;
 using TeamBuilder.Models.Enums;
 using TeamBuilder.Services;
 using TeamBuilder.ViewModels;
+using System.Net;
+using TeamBuilder.Helpers;
 
 namespace TeamBuilder.Controllers
 {
@@ -120,8 +122,16 @@ namespace TeamBuilder.Controllers
 					UserId = profileId
 				}};
 
-			await context.Teams.AddAsync(team);
-			await context.SaveChangesAsync();
+			try
+			{
+				await context.Teams.AddAsync(team);
+				await context.SaveChangesAsync();
+			}
+			catch (Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
+			}
+			
 
 			return Ok(team);
 		}
@@ -230,8 +240,9 @@ namespace TeamBuilder.Controllers
 			}
 
 			if (userTeam.UserAction != UserActionEnum.ConsideringOffer && userTeam.UserAction != UserActionEnum.SentRequest)
-				throw new Exception($"User '{model.UserId}' have invalid userAction '{userTeam.UserAction}' for team '{model.TeamId}'. " +
-									$"Available value: {UserActionEnum.ConsideringOffer}, {UserActionEnum.SentRequest}");
+				throw new HttpStatusException(HttpStatusCode.BadRequest,
+					TeamErrorMessages.QuitDeclineTeam,
+					TeamErrorMessages.InvalidUserAction(model.UserId, userTeam, model.TeamId, UserActionEnum.ConsideringOffer, UserActionEnum.SentRequest));
 
 
 			context.Remove(userTeam);
@@ -259,9 +270,15 @@ namespace TeamBuilder.Controllers
 					return Forbid();
 			}
 
-			if (userTeam.UserAction != UserActionEnum.ConsideringOffer && userTeam.UserAction != UserActionEnum.SentRequest)
-				throw new Exception($"User '{model.UserId}' have invalid userAction '{userTeam.UserAction}' for team '{model.TeamId}'. " +
-				                    $"Available value: {UserActionEnum.ConsideringOffer}, {UserActionEnum.SentRequest}");
+			var userIsNotAllowedToJoinTeam = userTeam.UserAction != UserActionEnum.ConsideringOffer && 
+				userTeam.UserAction != UserActionEnum.SentRequest;
+
+			if (userIsNotAllowedToJoinTeam)
+			{
+				var debugMsg = TeamErrorMessages.InvalidUserAction(model.UserId, userTeam, model.TeamId, UserActionEnum.SentRequest);
+
+				throw new HttpStatusException(HttpStatusCode.BadRequest, UserErrorMessages.AppendToTeam, debugMsg);
+			}
 
 			userTeam.UserAction = UserActionEnum.JoinedTeam;
 

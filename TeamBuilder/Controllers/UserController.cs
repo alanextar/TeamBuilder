@@ -12,6 +12,8 @@ using TeamBuilder.ViewModels;
 using System;
 using AutoMapper;
 using TeamBuilder.Services;
+using TeamBuilder.Helpers;
+using System.Net;
 
 namespace TeamBuilder.Controllers
 {
@@ -121,7 +123,7 @@ namespace TeamBuilder.Controllers
 				.FirstOrDefault(u => u.Id == id);
 
 			if (user == null)
-				return NotFound("Не нашли пользователя");
+				return NotFound(UserErrorMessages.NotFound);
 
 			if (user?.UserTeams != null)
 			{
@@ -141,7 +143,7 @@ namespace TeamBuilder.Controllers
 				.Include(x => x.UserTeams)
 				.ThenInclude(y => y.Team)
 				.FirstOrDefaultAsync(u => u.Id == id);
-			
+
 			if (user.IsSearchable)
 			{
 				var profile = await context.Users
@@ -156,10 +158,11 @@ namespace TeamBuilder.Controllers
 
 				//команды оунера в которых не состоит юзер
 				user.TeamsToRecruit = profileTeams.Except(user.GetActiveUserTeams().Select(x => x.Team).ToList()).ToList();
-				return Json(user.TeamsToRecruit);
 			}
+			else
+				throw new HttpStatusException(HttpStatusCode.BadRequest, UserErrorMessages.IsNotSearchable);
 
-			return BadRequest("Пользователь не ищет команду");
+			return Json(user.TeamsToRecruit);
 
 		}
 
@@ -215,8 +218,11 @@ namespace TeamBuilder.Controllers
 			var userTeamToJoin = user?.UserTeams.First(x => x.TeamId == teamId);
 
 			if (userTeamToJoin?.UserAction != UserActionEnum.ConsideringOffer)
-				throw new Exception($"User '{user?.Id}' have invalid userAction '{userTeamToJoin?.UserAction}' for team '{teamId}'. " +
-									$"Available value: {UserActionEnum.ConsideringOffer}");
+			{
+				var debugMsg = $"User '{user?.Id}' have invalid userAction '{userTeamToJoin?.UserAction}' for team '{teamId}'. " +
+									$"Available value: {UserActionEnum.ConsideringOffer}";
+				throw new HttpStatusException(HttpStatusCode.BadRequest, UserErrorMessages.AppendToTeam, debugMsg);
+			}
 
 			userTeamToJoin.UserAction = UserActionEnum.JoinedTeam;
 
@@ -249,12 +255,22 @@ namespace TeamBuilder.Controllers
 			{
 				UserActionEnum.ConsideringOffer => UserActionEnum.RejectedTeamRequest,
 				UserActionEnum.JoinedTeam => UserActionEnum.QuitTeam,
-				_ => throw new Exception($"User '{profileId}' have invalid userAction '{userTeam.UserAction}' for team '{teamId}'. " +
-										 $"Available value: {UserActionEnum.ConsideringOffer}, {UserActionEnum.JoinedTeam}")
+				_ => throw new HttpStatusException(HttpStatusCode.BadRequest, 
+					TeamErrorMessages.QuitDeclineTeam, 
+					TeamErrorMessages.DebugQuitDeclineTeam(profileId, teamId, userTeam)
+				)
 			};
 
-			context.Update(user);
-			await context.SaveChangesAsync();
+			try
+			{
+				context.Update(user);
+				await context.SaveChangesAsync();
+			}
+			catch (Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.NotFound, UserErrorMessages.NotFound);
+			}
+			
 
 			var activeUserTeams = user.GetActiveUserTeams();
 
@@ -277,14 +293,28 @@ namespace TeamBuilder.Controllers
 			var userTeam = user?.UserTeams.FirstOrDefault(ut => ut.TeamId == teamId);
 
 			if (userTeam == null)
-				return NotFound($"Not found User {profileId} or user {profileId} inside Team {teamId}");
+			{
+				throw new HttpStatusException(HttpStatusCode.NotFound, UserErrorMessages.NotFound, UserErrorMessages.NotFoundUserTeam(profileId, teamId));
+			}
+				
 
 			if (userTeam.UserAction != UserActionEnum.SentRequest)
-				throw new Exception($"User '{profileId}' have invalid userAction '{userTeam.UserAction}' for team '{teamId}'. " +
-									$"Available value: {UserActionEnum.SentRequest}");
+			{
+				var debugMsg = TeamErrorMessages.InvalidUserAction(profileId, userTeam, teamId, UserActionEnum.SentRequest);
 
-			context.Remove(userTeam);
-			await context.SaveChangesAsync();
+				throw new HttpStatusException(HttpStatusCode.NotFound, UserErrorMessages.NotFound, debugMsg);
+			}
+
+			try
+			{
+				context.Remove(userTeam);
+				await context.SaveChangesAsync();
+			}
+			catch (Exception)
+			{
+				throw new HttpStatusException(System.Net.HttpStatusCode.NotFound, CommonErrorMessages.SaveChanges);
+			}
+			
 
 			var activeUserTeams = user.GetActiveUserTeams();
 			return Json(activeUserTeams);
@@ -318,16 +348,28 @@ namespace TeamBuilder.Controllers
 			else
 			{
 				var user = dbTeam.UserTeams.FirstOrDefault(x => x.UserId == id);
+				if (user == null)
+				{
+					throw new HttpStatusException(HttpStatusCode.NotFound, UserErrorMessages.NotFound);
+				}
+
 				user.UserAction = userActionToSet;
 			}
 
-			context.Update(dbTeam);
-			await context.SaveChangesAsync();
+			try
+			{
+				context.Update(dbTeam);
+				await context.SaveChangesAsync();
+			}
+			catch (Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.NotFound, CommonErrorMessages.SaveChanges);
+			}
 
 			return Json(dbTeam);
 		}
 
-		#region List
+#region List
 
 		public IActionResult GetAll()
 		{
@@ -363,6 +405,6 @@ namespace TeamBuilder.Controllers
 			return Json(result);
 		}
 
-		#endregion
+#endregion
 	}
 }
