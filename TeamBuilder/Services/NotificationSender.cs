@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -27,10 +28,21 @@ namespace TeamBuilder.Services
 
 		public async Task Send(
 			long userId,
+			NotifyType notifyType,
 			string message,
-			List<NotificationItem> items)
+			IEnumerable<NoticeItem> items)
 		{
-			var notification = new Notification(userId, DateTime.Now, message, NotifyType.Regular, items);
+			await Send(userId, notifyType, message, items.ToArray());
+		}
+
+		public async Task Send(
+			long userId,
+			NotifyType notifyType,
+			string message,
+			params NoticeItem[] items)
+		{
+			message = PlaceholderBuilder.Build(message, items);
+			var notification = new Notification(userId, message, notifyType, items);
 
 			await context.Notifications.AddAsync(notification);
 			await context.SaveChangesAsync();

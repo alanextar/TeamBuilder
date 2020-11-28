@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using TeamBuilder.Models;
 
 namespace TeamBuilder.Hubs
 {
@@ -51,7 +49,7 @@ namespace TeamBuilder.Hubs
 			var notifications = await context.Notifications.Where(n => n.UserId == userId).ToListAsync();
 			if (notifications.Any())
 			{
-				await Clients.User(Context.UserIdentifier).SendAsync("notify", notifications);
+				await Clients.User(Context.UserIdentifier).SendAsync("Notify", notifications);
 			}
 		}
 	}

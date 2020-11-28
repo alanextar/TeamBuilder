@@ -268,9 +268,29 @@ namespace TeamBuilder.Controllers
 			context.Update(user);
 			await context.SaveChangesAsync();
 
-			var activeUserTeams = user.GetActiveUserTeams();
+			#region notice
 
-			return Json(activeUserTeams);
+			var items = new List<NoticeItem>
+			{
+				NoticeItem.User(user.Id, user.FullName),
+				NoticeItem.Team(userTeam.Team.Id, userTeam.Team.Name),
+				NoticeItem.Image(user.Photo100)
+			};
+			switch (userTeam.UserAction)
+			{
+				case UserActionEnum.RejectedTeamRequest:
+					await notificationSender.Send(userTeam.Team.Owner.Id, NotifyType.Destructive, 
+						"Пользователь {0} отказался от приглашения в команду {1}", items);
+					break;
+				case UserActionEnum.QuitTeam:
+					await notificationSender.Send(userTeam.Team.Owner.Id, NotifyType.Destructive, 
+						"Пользователь {0} вышел из команды {1}", items);
+					break;
+			}
+
+			#endregion
+
+			return Json(user.GetActiveUserTeams());
 		}
 
 		//Пользователь сам отменяет заявку в команду (из профиля)
@@ -336,10 +356,10 @@ namespace TeamBuilder.Controllers
 			context.Update(dbTeam);
 			await context.SaveChangesAsync();
 
-			await notificationSender.Send(id, "Вас пригласили в команду #[team]", new List<NotificationItem>
-			{
-				new NotificationItem("team", dbTeam.Id.ToString(), dbTeam.Name)
-			});
+			if (userActionToSet == UserActionEnum.ConsideringOffer)
+				await notificationSender.Send(id, NotifyType.Add, "Вас пригласили в команду {0}",
+					NoticeItem.Team(dbTeam.Id, dbTeam.Name),
+					NoticeItem.Image(dbTeam.Image.DataURL));
 
 			return Json(dbTeam);
 		}

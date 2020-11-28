@@ -6,8 +6,8 @@ namespace TeamBuilder.Models
 {
 	public class Notification
 	{
-		public Notification(long userId, DateTime dateTimeNotify, string message, NotifyType notifyType, IEnumerable<NotificationItem> items)
-		: this(userId, dateTimeNotify, message, notifyType, JsonConvert.SerializeObject(items))
+		public Notification(long userId, string message, NotifyType notifyType, IEnumerable<NoticeItem> items)
+		: this(userId, DateTime.Now, message, notifyType, JsonConvert.SerializeObject(items))
 		{ }
 
 		public Notification(long userId, DateTime dateTimeNotify, string message, NotifyType notifyType, string items)
@@ -35,26 +35,38 @@ namespace TeamBuilder.Models
 		public DateTime Ttl { get; set; }
 	}
 
-	public class NotificationItem
+	public enum NotifyType
 	{
-		public NotificationItem(string placement, string id, string text)
+		Info,
+		Add,
+		Destructive,
+		Service
+	}
+
+	public class NoticeItem
+	{
+		public NoticeItem(NoticePlaceholder placement, string id, string text)
 		{
-			Placement = placement;
+			Placement = placement.ToString("G");
 			Id = id;
 			Text = text;
 		}
+
+		public static NoticeItem Team(long id, string name) => new NoticeItem(NoticePlaceholder.Team, id.ToString(), name);
+		public static NoticeItem User(long id, string name) => new NoticeItem(NoticePlaceholder.User, id.ToString(), name);
+		public static NoticeItem Event(long id, string name) => new NoticeItem(NoticePlaceholder.Event, id.ToString(), name);
+		public static NoticeItem Image(string dataUrl) => new NoticeItem(NoticePlaceholder.Image, dataUrl, null);
 
 		public string Placement { get; set; }
 		public string Id { get; set; }
 		public string Text { get; set; }
 	}
 
-	public enum NotifyType
+	public enum NoticePlaceholder
 	{
-		None,
-		Regular,
-		Destructive,
-		Important,
-		Service
+		Team,
+		User,
+		Event,
+		Image
 	}
 }
