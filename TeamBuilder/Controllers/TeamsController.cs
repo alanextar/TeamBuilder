@@ -156,8 +156,15 @@ namespace TeamBuilder.Controllers
 			var mapper = new Mapper(config);
 			mapper.Map(editTeamViewModel, team);
 
-			context.Update(team);
-			await context.SaveChangesAsync();
+			try
+			{
+				context.Update(team);
+				await context.SaveChangesAsync();
+			}
+			catch (Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
+			}
 
 			return Ok(team);
 		}
@@ -174,8 +181,15 @@ namespace TeamBuilder.Controllers
 			if (team == null)
 				return NotFound($"Team '{id}' not found");
 
-			context.Remove(team);
-			await context.SaveChangesAsync();
+			try
+			{
+				context.Remove(team);
+				await context.SaveChangesAsync();
+			}
+			catch (Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
+			}
 
 			return Json("Deleted");
 		}
@@ -198,20 +212,28 @@ namespace TeamBuilder.Controllers
 			var userTeam = team?.UserTeams.FirstOrDefault(ut => ut.UserId == model.UserId);
 
 			if (userTeam == null)
-				return NotFound($"Not found User {model.UserId} or user {model.UserId} inside Team {model.TeamId}");
+				return NotFound(UserErrorMessages.NotFoundUserTeam(model.UserId, model.TeamId));
 
 			userTeam.UserAction = userTeam.UserAction switch
 			{
 				UserActionEnum.SentRequest => UserActionEnum.RejectedTeamRequest,
 				UserActionEnum.JoinedTeam => UserActionEnum.QuitTeam,
 				UserActionEnum.ConsideringOffer => UserActionEnum.RejectedTeamRequest,
-				_ => throw new Exception(
-					$"User '{model.UserId}' have invalid userAction '{userTeam.UserAction}' for team '{model.TeamId}'. " +
-					$"Available value: {UserActionEnum.SentRequest}, {UserActionEnum.JoinedTeam}, {UserActionEnum.ConsideringOffer}")
+				_ => throw new HttpStatusException(HttpStatusCode.BadRequest, 
+					TeamErrorMessages.QuitDeclineTeam, 
+					TeamErrorMessages.InvalidUserAction(model.UserId, userTeam, team.Id, 
+					UserActionEnum.SentRequest, UserActionEnum.JoinedTeam, UserActionEnum.ConsideringOffer ))
 			};
 
-			context.Update(userTeam);
-			await context.SaveChangesAsync();
+			try
+			{
+				context.Update(userTeam);
+				await context.SaveChangesAsync();
+			}
+			catch (Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
+			}
 
 			return Json(team);
 		}
@@ -242,11 +264,18 @@ namespace TeamBuilder.Controllers
 			if (userTeam.UserAction != UserActionEnum.ConsideringOffer && userTeam.UserAction != UserActionEnum.SentRequest)
 				throw new HttpStatusException(HttpStatusCode.BadRequest,
 					TeamErrorMessages.QuitDeclineTeam,
-					TeamErrorMessages.InvalidUserAction(model.UserId, userTeam, model.TeamId, UserActionEnum.ConsideringOffer, UserActionEnum.SentRequest));
+					TeamErrorMessages.InvalidUserAction(model.UserId, userTeam, model.TeamId, 
+					UserActionEnum.ConsideringOffer, UserActionEnum.SentRequest));
 
-
-			context.Remove(userTeam);
-			await context.SaveChangesAsync();
+			try
+			{
+				context.Remove(userTeam);
+				await context.SaveChangesAsync();
+			}
+			catch (Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
+			}
 
 			return Json(team);
 		}
@@ -282,8 +311,15 @@ namespace TeamBuilder.Controllers
 
 			userTeam.UserAction = UserActionEnum.JoinedTeam;
 
-			context.Update(user);
-			await context.SaveChangesAsync();
+			try
+			{
+				context.Update(user);
+				await context.SaveChangesAsync();
+			}
+			catch (Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
+			}
 
 			var updTeam = context.Teams
 				.Include(t => t.Image)

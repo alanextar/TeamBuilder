@@ -16,9 +16,9 @@ namespace TeamBuilder.Helpers
 		public static string NotFound { get; set; } = "Пользователь не найден";
 		public static string AppendToTeam { get; set; } = "Ошибка при добавлении пользователя в команду";
 		public static string IsNotSearchable { get; set; } = "Пользователь не ищет команду";
-		internal static string NotFoundUserTeam(long profileId, long teamId)
+		internal static string NotFoundUserTeam(long userId, long teamId)
 		{
-			var debugMsg = $"Not found User {profileId} or user {profileId} inside Team {teamId}";
+			var debugMsg = $"Not found User {userId} or user {userId} inside Team {teamId}";
 			return debugMsg;
 		}
 	}
@@ -30,6 +30,7 @@ namespace TeamBuilder.Helpers
 
 	public static class TeamErrorMessages
 	{
+		public static string NotFound { get; set; } = "Команда не найдена";
 		public static string QuitDeclineTeam { get; set; } = "Что-то пошло не так при выходе из команды";
 		public static string DebugQuitDeclineTeam(long profileId, long teamId, UserTeam userTeam)
 		{
@@ -40,7 +41,7 @@ namespace TeamBuilder.Helpers
 		internal static string InvalidUserAction(long userId, UserTeam userTeam, long teamId, params UserActionEnum[] allowedUserActions) 
 		{
 			//TODO Join enum values by comma
-			var actionsStr = "Join enum values by comma";
+			var actionsStr = String.Join(", ", allowedUserActions.Select(x => x.ToString()));
 			var debugMsg = $"User '{userId}' have invalid userAction '{userTeam.UserAction}' for team '{teamId}'. " +
 									$"Available values: {actionsStr}";
 			return debugMsg;

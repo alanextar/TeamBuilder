@@ -67,7 +67,15 @@ namespace TeamBuilder.Controllers
 
 			user.IsSearchable = profileViewModel.IsSearchable;
 
-			await context.SaveChangesAsync();
+			try
+			{
+				await context.SaveChangesAsync();
+			}
+			catch (Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
+			}
+			
 
 			return Json(user);
 		}
@@ -219,15 +227,21 @@ namespace TeamBuilder.Controllers
 
 			if (userTeamToJoin?.UserAction != UserActionEnum.ConsideringOffer)
 			{
-				var debugMsg = $"User '{user?.Id}' have invalid userAction '{userTeamToJoin?.UserAction}' for team '{teamId}'. " +
-									$"Available value: {UserActionEnum.ConsideringOffer}";
-				throw new HttpStatusException(HttpStatusCode.BadRequest, UserErrorMessages.AppendToTeam, debugMsg);
+				throw new HttpStatusException(HttpStatusCode.BadRequest, UserErrorMessages.AppendToTeam, 
+					TeamErrorMessages.InvalidUserAction(user.Id, userTeamToJoin, teamId, UserActionEnum.ConsideringOffer));
 			}
 
 			userTeamToJoin.UserAction = UserActionEnum.JoinedTeam;
 
-			context.Update(user);
-			await context.SaveChangesAsync();
+			try
+			{
+				context.Update(user);
+				await context.SaveChangesAsync();
+			}
+			catch (Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
+			}
 
 			var activeUserTeams = user.GetActiveUserTeams();
 
@@ -257,7 +271,8 @@ namespace TeamBuilder.Controllers
 				UserActionEnum.JoinedTeam => UserActionEnum.QuitTeam,
 				_ => throw new HttpStatusException(HttpStatusCode.BadRequest, 
 					TeamErrorMessages.QuitDeclineTeam, 
-					TeamErrorMessages.DebugQuitDeclineTeam(profileId, teamId, userTeam)
+					TeamErrorMessages.InvalidUserAction(profileId, userTeam, teamId,
+					UserActionEnum.ConsideringOffer, UserActionEnum.JoinedTeam)
 				)
 			};
 
@@ -312,7 +327,7 @@ namespace TeamBuilder.Controllers
 			}
 			catch (Exception)
 			{
-				throw new HttpStatusException(System.Net.HttpStatusCode.NotFound, CommonErrorMessages.SaveChanges);
+				throw new HttpStatusException(HttpStatusCode.NotFound, CommonErrorMessages.SaveChanges);
 			}
 			
 
