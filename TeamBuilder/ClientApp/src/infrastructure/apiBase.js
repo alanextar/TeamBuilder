@@ -48,8 +48,7 @@ export async function get(url, params = {}) {
 	}
 	catch (error) {
 		console.log(`Error for get request '${url}'. Details: ${error.message}`);
-		store.dispatch(setErrorMsg(error.message));
-		store.dispatch(goToPage('error'));
+		ShowErrorPage(error);
 	}
 	
 }
@@ -68,8 +67,7 @@ export async function post(url, data = {}) {
 	}
 	catch (error) {
 		console.log(`Error for post request '${url}' with body ${JSON.stringify(data)}.  Details: ${error}`);
-		store.dispatch(setErrorMsg(error.message));
-		store.dispatch(goToPage('error'));
+		ShowErrorPage(error);
 	}
 }
 
@@ -89,7 +87,11 @@ export async function Delete(url, params = {}) {
 		})
 		.catch(error => {
 			console.log(`Error for delete request '${url}'. Details: ${error}`);
-			store.dispatch(setErrorMsg(error.message));
-			store.dispatch(goToPage('error'));
+			ShowErrorPage(error);
 		});
+}
+
+function ShowErrorPage(error) {
+	store.dispatch(setErrorMsg(error.message));
+	store.dispatch(goToPage('error'));
 }

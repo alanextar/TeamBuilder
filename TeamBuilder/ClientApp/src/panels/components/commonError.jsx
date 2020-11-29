@@ -1,17 +1,19 @@
 ﻿import React from 'react'
 import { connect } from "react-redux";
 import { goToPage, goBack } from "../../store/router/actions";
-import { Panel, Div, PanelHeader, PanelHeaderBack } from "@vkontakte/vkui";
+import { Panel, Div, PanelHeader, PanelHeaderBack, SimpleCell } from "@vkontakte/vkui";
+import Icon20CancelCircleFillRed from '@vkontakte/icons/dist/20/cancel_circle_fill_red';
 
 export const CommonError = props => {
+
 	return (
 		<Panel id={props.id}>
 			<PanelHeader left={<PanelHeaderBack onClick={() => props.goBack()} />}>
 				Ошибка
 			</PanelHeader>
-			<Div>
-				<p>{props.error != null ? props.error : "Не сцыте мы работаем над вашей проблемой!"}</p>
-			</Div>
+			<SimpleCell expandable before={<Icon20CancelCircleFillRed />}>
+				{props.error != null ? props.error : "Не сцыте мы работаем над вашей проблемой!"}
+			</SimpleCell>
 		</Panel>
 	)
 }
