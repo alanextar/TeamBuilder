@@ -57,7 +57,7 @@ const formatMentionText = (text, items, regex) => {
 
 const findIt = (items, placeholder) => {
 	for (var i = 0; i < items.length; i++) {
-		if (placeholder.startWith(items[i].Placement) &&
+		if (placeholder.startsWith(items[i].Placement) &&
 			placeholder.endsWith(items[i].Id)) {
 			return items[i];
 		}
@@ -67,7 +67,7 @@ const findIt = (items, placeholder) => {
 const choosePanel = (item) => {
 	switch (item.Placement) {
 		case 'Team': return 'teamInfo';
-		case 'User': return 'UserInfo';
+		case 'User': return 'user';
 		case 'Event': return 'eventInfo';
-	  }
+	}
 }

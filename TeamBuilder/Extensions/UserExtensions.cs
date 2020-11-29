@@ -15,5 +15,12 @@ namespace TeamBuilder.Extensions
 				x.UserAction == UserActionEnum.SentRequest || 
 				x.IsOwner);
 		}
+
+		public static long? GetOwnerId(this Team team)
+		{
+			return team.UserTeams?
+				.FirstOrDefault(t => t.IsOwner)?
+				.UserId;
+		}
 	}
 }

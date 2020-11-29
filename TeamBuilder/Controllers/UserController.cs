@@ -275,14 +275,18 @@ namespace TeamBuilder.Controllers
 				NoticeItem.User(user.Id, user.FullName),
 				NoticeItem.Team(userTeam.Team.Id, userTeam.Team.Name)
 			};
+			var ownerId = (await context.Teams
+				.Include(t => t.UserTeams)
+				.FirstOrDefaultAsync(t => t.Id == teamId))
+				.GetOwnerId() ?? throw new NullReferenceException("ownerId");
 			switch (userTeam.UserAction)
 			{
 				case UserActionEnum.RejectedTeamRequest:
-					await notificationSender.Send(userTeam.Team.Owner.Id, NotifyType.Destructive, 
+					await notificationSender.Send(ownerId, NotifyType.Destructive, 
 						"Пользователь {0} отказался от приглашения в команду {1}", user.Photo100, items);
 					break;
 				case UserActionEnum.QuitTeam:
-					await notificationSender.Send(userTeam.Team.Owner.Id, NotifyType.Destructive, 
+					await notificationSender.Send(ownerId, NotifyType.Destructive, 
 						"Пользователь {0} вышел из команды {1}", user.Photo100, items);
 					break;
 			}

@@ -23,8 +23,6 @@ namespace TeamBuilder.Models
 		public Event Event { get; set; }
 		public long? EventId { get; set; }
 		public List<UserTeam> UserTeams { get; set; }
-
-		public User Owner => UserTeams.FirstOrDefault(ut => ut.IsOwner)?.User;
 	}
 
 	public class UserTeamDto : IDbItem
