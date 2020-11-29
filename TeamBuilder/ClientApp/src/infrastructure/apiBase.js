@@ -1,4 +1,7 @@
 ﻿// import * as secrets from './secret.js';
+import { store } from "../index";
+import { goToPage } from "../store/router/actions";
+import { setErrorMsg } from "../store/formData/actions";
 
 const initGet = {
 	method: 'GET',
@@ -30,22 +33,25 @@ const initDelete = {
 
 //TODO Сделать нормальную обработку ошибок!!! 
 export async function get(url, params = {}) {
-	var searchParams = new URLSearchParams(params).toString();
-	url = searchParams ? `${url}?${searchParams}` : url;
-	console.log(`get request: ${url}`);
-	const resp = await fetch(url, initGet);
-	const json = await resp.json();
+	try {
+		var searchParams = new URLSearchParams(params).toString();
+		url = searchParams ? `${url}?${searchParams}` : url;
+		console.log(`get request: ${url}`);
+		const resp = await fetch(url, initGet);
+		const json = await resp.json();
 
-	if (resp.ok) {
-		return json;
+		if (resp.ok)
+			return json;
+		else
+			throw json;
+
 	}
-	else {
-		throw json;
+	catch (error) {
+		console.log(`Error for get request '${url}'. Details: ${error.message}`);
+		store.dispatch(setErrorMsg(error.message));
+		store.dispatch(goToPage('error'));
 	}
-	//catch (error) {
-	//	console.log(`Error for get request '${url}'. Details: ${error}`);
-	//	// return {};
-	//}
+	
 }
 
 export async function post(url, data = {}) {
@@ -55,11 +61,15 @@ export async function post(url, data = {}) {
 		console.log(`post request: ${url}`);
 		const resp = await fetch(url, init);
 		const json = await resp.json();
-		return json;
+		if (resp.ok)
+			return json;
+		else
+			throw json;
 	}
 	catch (error) {
 		console.log(`Error for post request '${url}' with body ${JSON.stringify(data)}.  Details: ${error}`);
-		return {};
+		store.dispatch(setErrorMsg(error.message));
+		store.dispatch(goToPage('error'));
 	}
 }
 
@@ -70,10 +80,16 @@ export async function Delete(url, params = {}) {
 	}
 	console.log(`delete request: ${url}`);
 	return fetch(url, initDelete)
-		.then(resp => resp.json())
-		.then(json => json)
+		.then(resp => {
+			const json = resp.json();
+			if (resp.ok)
+				return json;
+			else
+				throw json;
+		})
 		.catch(error => {
 			console.log(`Error for delete request '${url}'. Details: ${error}`);
-			return {};
+			store.dispatch(setErrorMsg(error.message));
+			store.dispatch(goToPage('error'));
 		});
 }
