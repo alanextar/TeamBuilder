@@ -13,7 +13,7 @@ namespace TeamBuilder.Controllers
 	//https://stackoverflow.com/a/38935583/9744434
 	public class ErrorsController : Controller
 	{
-		[Route("error")]
+		[Route("api/error")]
 		public ErrorResponseViewModel Error()
 		{
 			var context = HttpContext.Features.Get<IExceptionHandlerFeature>();

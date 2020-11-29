@@ -17,6 +17,7 @@ import TeamEdit from './panels/teams/teamEdit'
 import User from './panels/users/user'
 import UserEdit from './panels/users/userEdit'
 import SetUserTeam from './panels/users/setUserTeam'
+import CommonError from './panels/components/commonError'
 
 const CommonView = props => {
 	const h = React.createElement;
@@ -32,7 +33,8 @@ const CommonView = props => {
 		h(EventCreate, { id: 'eventCreate', key: 'eventCreate' }),
 		h(EventEdit, { id: 'eventEdit', key: 'eventEdit' }),
 		h(EventsListToFilter, { id: 'eventsListToFilter', key: 'eventsListToFilter', openFilter:  () => props.setActiveModal('filters')}),
-		h(EventsListToTeam, { id: 'eventsListToTeam', key: 'eventsListToTeam'})
+		h(EventsListToTeam, { id: 'eventsListToTeam', key: 'eventsListToTeam' }),
+		h(CommonError, { id: 'error', key: 'error' })
 	]
 
 	return (
