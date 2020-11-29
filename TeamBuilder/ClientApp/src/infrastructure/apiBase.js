@@ -32,23 +32,20 @@ const initDelete = {
 export async function get(url, params = {}) {
 	var searchParams = new URLSearchParams(params).toString();
 	url = searchParams ? `${url}?${searchParams}` : url;
-	try {
-		console.log(`get request: ${url}`);
-		const resp = await fetch(url, initGet);
-		if (resp.ok) {
-			const json = await resp.json();
-			return json;
-		}
-		else {
-			// const text = await resp.text();
-			// return text;
-			return null;
-		}
+	console.log(`get request: ${url}`);
+	const resp = await fetch(url, initGet);
+	const json = await resp.json();
+
+	if (resp.ok) {
+		return json;
 	}
-	catch (error) {
-		console.log(`Error for get request '${url}'. Details: ${error}`);
-		// return {};
+	else {
+		throw json;
 	}
+	//catch (error) {
+	//	console.log(`Error for get request '${url}'. Details: ${error}`);
+	//	// return {};
+	//}
 }
 
 export async function post(url, data = {}) {

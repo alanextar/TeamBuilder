@@ -18,7 +18,7 @@ export const CommonError = props => {
 
 const mapStateToProps = (state) => {
 	return {
-		error: state.error
+		error: state.formData.error
 	};
 };
 

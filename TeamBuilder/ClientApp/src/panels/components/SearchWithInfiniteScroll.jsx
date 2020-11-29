@@ -1,7 +1,7 @@
 ﻿import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { setFormData } from "../../store/formData/actions";
+import { setFormData, setErrorMsg } from "../../store/formData/actions";
 import InfiniteScroll from 'react-infinite-scroller';
 
 import {
@@ -13,6 +13,7 @@ import IconIndicator from './IconIndicator';
 
 import { Api } from '../../infrastructure/api';
 import useDebounce from '../../infrastructure/use-debounce';
+import { goToPage } from '../../store/router/actions';
 
 const SearchWithInfiniteScroll =
 	({ id, pagingSearchHandler, getPageUrl, onFiltersClickHandler, filterValue, header, ...props }) => {
@@ -29,6 +30,8 @@ const SearchWithInfiniteScroll =
 		const [searchTerm, setSearchTerm] = useState(props.inputData[bindingId] || '');
 		const searchTermRef = useRef();
 		const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+		const { goToPage, setErrorMsg } = props;
 
 		useEffect(() => {
 			searchTermRef.current = debouncedSearchTerm;
@@ -49,8 +52,14 @@ const SearchWithInfiniteScroll =
 			dataWaiter(true);
 			pagingSearchHandler(debouncedSearchTerm, getNotEmptyAttr() || {})
 				.then(result => {
+					console.log('===============',result);
 					updateItems(result);
 					dataWaiter(false);
+				})
+				.catch((error) => {
+					console.log('!!!!!!!!!!!!!!', error);
+					setErrorMsg(error.message);
+					goToPage('error');
 				});
 		}
 
@@ -152,7 +161,9 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = {
-	setFormData
+	goToPage,
+	setFormData,
+	setErrorMsg,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(SearchWithInfiniteScroll);
