@@ -1,4 +1,4 @@
-import {SET_FORM_DATA} from './actionTypes';
+import { SET_FORM_DATA, SET_ERROR_MSG} from './actionTypes';
 
 export const setFormData = (formName, inputData) => (
     {
@@ -6,6 +6,15 @@ export const setFormData = (formName, inputData) => (
         payload: {
             form: formName,
             data: inputData,
+        }
+    }
+);
+
+export const setErrorMsg = (msg) => (
+    {
+		type: SET_ERROR_MSG,
+        payload: {
+            error: msg
         }
     }
 );

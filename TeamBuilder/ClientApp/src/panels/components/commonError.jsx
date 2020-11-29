@@ -1,16 +1,16 @@
 ﻿import React from 'react'
 import { connect } from "react-redux";
 import { goToPage, goBack } from "../../store/router/actions";
-import { Panel, Div, PanelHeader } from "@vkontakte/vkui";
+import { Panel, Div, PanelHeader, PanelHeaderBack } from "@vkontakte/vkui";
 
 export const CommonError = props => {
 	return (
 		<Panel id={props.id}>
-			<PanelHeader>
+			<PanelHeader left={<PanelHeaderBack onClick={() => props.goBack()} />}>
 				Ошибка
 			</PanelHeader>
 			<Div>
-				<p>Не сцыте мы работаем над вашей проблемой!</p>
+				<p>{props.error != null ? props.error : "Не сцыте мы работаем над вашей проблемой!"}</p>
 			</Div>
 		</Panel>
 	)
@@ -18,7 +18,7 @@ export const CommonError = props => {
 
 const mapStateToProps = (state) => {
 	return {
-		errorMessage: state.errorMessage
+		error: state.error
 	};
 };
 
