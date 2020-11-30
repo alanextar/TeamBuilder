@@ -174,6 +174,7 @@ class TeamInfo extends React.Component {
 						)}
 					</Group>
 				</PullToRefresh>
+				{props.snackbar}
 			</Panel>
 		);
 	}

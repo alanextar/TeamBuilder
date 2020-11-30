@@ -96,6 +96,7 @@ const EventEdit = props => {
 					Сохранить
                 </Button>
 			</FormLayout>
+			{props.snackbar}
 		</Panel>
 	);
 }
@@ -103,6 +104,7 @@ const EventEdit = props => {
 const mapStateToProps = (state) => {
 	return {
 		inputData: state.formData.forms,
+		snackbar: state.formData.snackbar
 	};
 };
 

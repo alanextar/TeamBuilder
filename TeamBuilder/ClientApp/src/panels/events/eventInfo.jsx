@@ -122,6 +122,7 @@ const EventInfo = props => {
 					)}
 				</Group>
 			</PullToRefresh>
+			{props.snackbar}
 		</Panel>
 	);
 }
@@ -130,7 +131,8 @@ const mapStateToProps = (state) => {
 	return {
 		profile: state.user.profile,
 		profileUser: state.user.profileUser,
-		activeView: state.router.activeView
+		activeView: state.router.activeView,
+		snackbar: state.formData.snackbar
 	};
 };
 

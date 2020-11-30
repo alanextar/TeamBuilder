@@ -63,14 +63,9 @@ namespace TeamBuilder.Helpers
 
 	public static class EventErrorMessages
 	{
-		public static string NotFound { get; set; } = "Событие не найдена";
+		public static string NotFound { get; set; } = "Событие не найдено";
 		public static string AlreadyExists { get; set; } = "Событие с таким именем уже существует";
 		public static string QuitDeclineEvent { get; set; } = "Что-то пошло не так при выходе из события";
-		public static string DebugQuitDeclineEvent(long profileId, long teamId, UserTeam userTeam)
-		{
-			return $"User '{profileId}' have invalid userAction '{userTeam.UserAction}' for team '{teamId}'. " +
-					$"Available value: {UserActionEnum.ConsideringOffer}, {UserActionEnum.JoinedTeam}";
-		}
 		public static string DebugNotFound(long id)
 		{
 			return $"Event '{id}' not found";

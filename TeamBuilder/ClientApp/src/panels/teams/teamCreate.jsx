@@ -178,6 +178,7 @@ class TeamCreate extends React.Component {
 						</Button>
 					</Div>
 				</Group>
+				{props.snackbar}
 			</Panel>
 		);
 	}
@@ -188,7 +189,8 @@ class TeamCreate extends React.Component {
 const mapStateToProps = (state) => {
 	return {
 		inputData: state.formData.forms,
-		profileUser: state.user.profileUser
+		profileUser: state.user.profileUser,
+		snackbar: state.formData.snackbar
 	};
 };
 

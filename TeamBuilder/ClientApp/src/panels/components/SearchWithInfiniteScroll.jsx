@@ -12,7 +12,6 @@ import Icon24Filter from '@vkontakte/icons/dist/24/filter';
 import IconIndicator from './IconIndicator';
 
 import { Api } from '../../infrastructure/api';
-import { ShowError } from '../../infrastructure/apiBase';
 import useDebounce from '../../infrastructure/use-debounce';
 
 const SearchWithInfiniteScroll =

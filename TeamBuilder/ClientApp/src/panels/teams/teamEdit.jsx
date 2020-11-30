@@ -159,6 +159,7 @@ class TeamEdit extends React.Component {
                         </Button>
 					</Div>
 				</Group>
+				{props.snackbar}
 			</Panel>
 		);
 	}
@@ -168,7 +169,8 @@ class TeamEdit extends React.Component {
 const mapStateToProps = (state) => {
 	return {
 		activeView: state.router.activeView,
-		inputData: state.formData.forms
+		inputData: state.formData.forms,
+		snackbar: state.formData.snackbar
 	};
 };
 
