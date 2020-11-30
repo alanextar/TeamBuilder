@@ -5,7 +5,7 @@ import { goBack, goToPage } from "../../store/router/actions";
 
 import {
 	Panel, PanelHeader, Group, SimpleCell, InfoRow, Header, Avatar, PullToRefresh,
-	PanelHeaderBack, Cell, List, PanelHeaderContent, PanelHeaderContext
+	PanelHeaderBack, Cell, List, PanelHeaderContent, PanelHeaderContext, Placeholder
 } from '@vkontakte/vkui';
 import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
 
@@ -14,6 +14,8 @@ import * as Alerts from "../components/Alerts.js";
 import { countConfirmed } from "../../infrastructure/utils";
 import { getActivePanel, longOperationWrapper } from "../../services/_functions";
 import { Api } from '../../infrastructure/api';
+import Icon56UsersOutline from '@vkontakte/icons/dist/56/users_outline';
+import { isNoContentResponse } from "../../infrastructure/utils";
 
 const EventInfo = props => {
 	const { goBack, goToPage } = props;
@@ -107,7 +109,7 @@ const EventInfo = props => {
 				</Group>
 				<Group>
 					<Header mode="secondary">Участвующие команды</Header>
-					{event?.teams?.map(team => {
+					{event && event.teams ? event?.teams?.map(team => {
 						return (
 							<Cell
 								key={team.id}
@@ -119,7 +121,11 @@ const EventInfo = props => {
 							</Cell>
 						)
 					}
-					)}
+					) :
+						<Placeholder icon={<Icon56UsersOutline />} header="Создайте мероприятие">
+							И пригласите туда любого из участников в активном поиске, кто подходит вам по интересам
+						</Placeholder>
+					}
 				</Group>
 			</PullToRefresh>
 			{props.snackbar}
@@ -132,7 +138,8 @@ const mapStateToProps = (state) => {
 		profile: state.user.profile,
 		profileUser: state.user.profileUser,
 		activeView: state.router.activeView,
-		snackbar: state.formData.snackbar
+		snackbar: state.formData.snackbar,
+		error: state.formData.error
 	};
 };
 

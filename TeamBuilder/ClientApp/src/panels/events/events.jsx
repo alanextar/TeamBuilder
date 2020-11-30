@@ -58,13 +58,6 @@ const Events = props => {
 				header={renderHeader}>
 				{renderItems}
 			</SearchWithInfiniteScroll>
-			{
-				isNoContentResponse(props.error) &&
-				<Placeholder icon={<Icon56UsersOutline />} header="Создайте мероприятие">
-					И пригласите туда любого из участников в активном поиске, кто подходит вам по интересам
-				</Placeholder>
-			}
-			
 		</Panel>
 	);
 };

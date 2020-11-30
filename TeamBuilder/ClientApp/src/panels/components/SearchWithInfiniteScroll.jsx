@@ -5,14 +5,16 @@ import { setFormData } from "../../store/formData/actions";
 import InfiniteScroll from 'react-infinite-scroller';
 
 import {
-	PanelSpinner, Search, PullToRefresh, FixedLayout, Div
+	PanelSpinner, Search, PullToRefresh, FixedLayout, Div, Placeholder
 } from '@vkontakte/vkui';
 import Icon24Filter from '@vkontakte/icons/dist/24/filter';
+import Icon56UsersOutline from '@vkontakte/icons/dist/56/users_outline';
 
 import IconIndicator from './IconIndicator';
 
 import { Api } from '../../infrastructure/api';
 import useDebounce from '../../infrastructure/use-debounce';
+import { isNoContentResponse } from "../../infrastructure/utils";
 
 const SearchWithInfiniteScroll =
 	({ id, pagingSearchHandler, getPageUrl, onFiltersClickHandler, filterValue, header, ...props }) => {
@@ -132,6 +134,13 @@ const SearchWithInfiniteScroll =
 					}
 				</PullToRefresh>
 				{props.snackbar}
+				{
+					isNoContentResponse(props.error) &&
+					<Placeholder icon={<Icon56UsersOutline />} header="Создайте команду">
+						Создавайте команду. Вступайте в существующие мероприятия
+						или создайте своё и пригласите туда участников.
+				</Placeholder>
+				}
 				</React.Fragment>
 		);
 	};
@@ -150,7 +159,8 @@ const mapStateToProps = (state) => {
 	return {
 		activeView: state.router.activeView,
 		inputData: state.formData.forms,
-		snackbar: state.formData.snackbar
+		snackbar: state.formData.snackbar,
+		error: state.formData.error
 	}
 };
 

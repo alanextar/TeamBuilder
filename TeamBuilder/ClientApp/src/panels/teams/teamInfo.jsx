@@ -8,7 +8,7 @@ import { setActiveTab } from "../../store/vk/actions";
 import {
 	Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, InfoRow,
 	SimpleCell, Avatar, PullToRefresh, PanelHeaderContent, Separator,
-	withPlatform, ANDROID
+	withPlatform, ANDROID, Placeholder
 } from '@vkontakte/vkui';
 
 import TeamMenu from './teamMenu';
@@ -16,9 +16,10 @@ import TeamManagment from './teamManagment';
 
 import Icon24Chevron from '@vkontakte/icons/dist/24/chevron';
 import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
+import Icon56UsersOutline from '@vkontakte/icons/dist/56/users_outline';
 
 import { getActivePanel } from "../../services/_functions";
-import { countConfirmed } from "../../infrastructure/utils";
+import { countConfirmed, isNoContentResponse } from "../../infrastructure/utils";
 
 class TeamInfo extends React.Component {
 	constructor(props) {
@@ -175,6 +176,12 @@ class TeamInfo extends React.Component {
 					</Group>
 				</PullToRefresh>
 				{this.props.snackbar}
+				{
+					isNoContentResponse(this.props.error) &&
+					<Placeholder icon={<Icon56UsersOutline />} header="Создайте мероприятие">
+						И пригласите туда любого из участников в активном поиске, кто подходит вам по интересам
+					</Placeholder>
+				}
 			</Panel>
 		);
 	}
