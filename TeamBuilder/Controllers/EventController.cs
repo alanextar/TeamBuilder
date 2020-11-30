@@ -9,6 +9,8 @@ using TeamBuilder.Extensions;
 using TeamBuilder.Models;
 using TeamBuilder.Services;
 using TeamBuilder.ViewModels;
+using System.Net;
+using TeamBuilder.Helpers;
 
 namespace TeamBuilder.Controllers
 {
@@ -46,10 +48,11 @@ namespace TeamBuilder.Controllers
 
 		public IActionResult PagingSearch(string search, int pageSize = 20, int page = 0, bool prev = false)
 		{
+			throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
 			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
 
 			if (pageSize == 0)
-				return NoContent();
+				throw new HttpStatusException(HttpStatusCode.NoContent, "");
 
 			bool Filter(Event @event) => @event.Name.ToLowerInvariant().Contains(search?.ToLowerInvariant() ?? string.Empty);
 			var result = context.Events.Include(e => e.Teams).GetPage(pageSize, HttpContext.Request, page, prev, Filter);
@@ -66,7 +69,7 @@ namespace TeamBuilder.Controllers
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(createEventViewModel)}"); ;
 
 			if (!accessChecker.IsConfirm(out var profileId))
-				return Forbid();
+				throw new HttpStatusException(HttpStatusCode.Forbidden, CommonErrorMessages.Forbidden);
 
 			var config = new MapperConfiguration(cfg => cfg.CreateMap<CreateEventViewModel, Event>()
 				.ForMember("Teams", opt => opt.Ignore())
@@ -88,7 +91,7 @@ namespace TeamBuilder.Controllers
 
 			var eventId = editEventViewModel.Id;
 			if (!await accessChecker.CanManageEvent(eventId))
-				return Forbid();
+				throw new HttpStatusException(HttpStatusCode.Forbidden, CommonErrorMessages.Forbidden);
 
 			var @event = await context.Events.Include(e => e.Owner).FirstOrDefaultAsync(e => e.Id == eventId);
 
@@ -111,11 +114,12 @@ namespace TeamBuilder.Controllers
 
 			var eventId = id;
 			if (!await accessChecker.CanManageEvent(eventId))
-				return Forbid();
+				throw new HttpStatusException(HttpStatusCode.Forbidden, CommonErrorMessages.Forbidden);
 
 			var @event = await context.Events.FirstOrDefaultAsync(e => e.Id == id);
 			if (@event == null)
-				return NotFound($"Event '{id}' not found");
+				throw new HttpStatusException(HttpStatusCode.BadRequest, "Событие не найдено",
+					$"Event '{id}' not found");
 
 			context.Remove(@event);
 			await context.SaveChangesAsync();

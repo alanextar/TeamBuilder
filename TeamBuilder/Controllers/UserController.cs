@@ -121,6 +121,7 @@ namespace TeamBuilder.Controllers
 		[HttpGet]
 		public IActionResult Get(long id)
 		{
+			return NotFound(UserErrorMessages.NotFound);
 			logger.LogInformation($"GET Request {HttpContext.Request.Headers[":path"]}");
 
 			var user = context.Users.Include(x => x.UserTeams)
@@ -131,7 +132,7 @@ namespace TeamBuilder.Controllers
 				.FirstOrDefault(u => u.Id == id);
 
 			if (user == null)
-				return NotFound(UserErrorMessages.NotFound);
+				throw new HttpStatusException(HttpStatusCode.NotFound, UserErrorMessages.NotFound);
 
 			if (user?.UserTeams != null)
 			{
@@ -180,7 +181,7 @@ namespace TeamBuilder.Controllers
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");
 
 			if (!await accessChecker.CanManageUser(editUserModel.Id))
-				return Forbid();
+				throw new HttpStatusException(HttpStatusCode.Forbidden, CommonErrorMessages.Forbidden);
 
 			var user = await context.Users
 				.Include(x => x.UserSkills)
@@ -215,7 +216,7 @@ namespace TeamBuilder.Controllers
 			logger.LogInformation($"GET Request {HttpContext.Request.Headers[":path"]}");
 
 			if (!accessChecker.IsConfirm(out var profileId))
-				return Forbid();
+				throw new HttpStatusException(HttpStatusCode.Forbidden, CommonErrorMessages.Forbidden);
 
 			var user = await context.Users
 				.Include(x => x.UserTeams)
@@ -254,7 +255,7 @@ namespace TeamBuilder.Controllers
 			logger.LogInformation($"GET Request {HttpContext.Request.Headers[":path"]}");
 
 			if (!accessChecker.IsConfirm(out var profileId))
-				return Forbid();
+				throw new HttpStatusException(HttpStatusCode.Forbidden, CommonErrorMessages.Forbidden);
 
 			var user = await context.Users
 				.Include(x => x.UserTeams)
@@ -298,7 +299,7 @@ namespace TeamBuilder.Controllers
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");
 
 			if (!accessChecker.IsConfirm(out var profileId))
-				return Forbid();
+				throw new HttpStatusException(HttpStatusCode.Forbidden, CommonErrorMessages.Forbidden);
 
 			var user = context.Users
 				.Include(x => x.UserTeams)
@@ -351,7 +352,7 @@ namespace TeamBuilder.Controllers
 				.ThenInclude(x => x.Event)
 				.FirstOrDefaultAsync(x => x.Id == teamId);
 			if (dbTeam == null)
-				return NotFound();
+				throw new HttpStatusException(HttpStatusCode.NotFound, "Команда не найдена");
 
 			var userActionToSet = isTeamOffer ?
 					UserActionEnum.ConsideringOffer : UserActionEnum.SentRequest;
@@ -402,7 +403,7 @@ namespace TeamBuilder.Controllers
 			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
 
 			if (pageSize == 0)
-				return NoContent();
+				throw new HttpStatusException(HttpStatusCode.NoContent, "");
 
 			bool Filter(User user) => user.FullName.ToLowerInvariant().Contains(search?.ToLowerInvariant() ?? string.Empty);
 			var result = context.Users

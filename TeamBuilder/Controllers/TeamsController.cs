@@ -54,7 +54,7 @@ namespace TeamBuilder.Controllers
 			}
 
 			if (pageSize == 0)
-				return NoContent();
+				throw new HttpStatusException(HttpStatusCode.NoContent, "");
 
 			bool Filter(Team team)
 			{
@@ -95,12 +95,12 @@ namespace TeamBuilder.Controllers
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(createTeamViewModel)}");
 
 			if (!accessChecker.IsConfirm(out var profileId))
-				return Forbid();
-			
+				throw new HttpStatusException(HttpStatusCode.Forbidden, CommonErrorMessages.Forbidden);
+
 			var teamsNames = await context.Teams.Select(t => t.Name).ToListAsync();
 
 			if (teamsNames.Contains(createTeamViewModel.Name))
-				return BadRequest("Команда с таким именем уже существует");
+				throw new HttpStatusException(HttpStatusCode.BadRequest, TeamErrorMessages.AlreadyExists);
 
 			var @event = await context.Events.FirstOrDefaultAsync(e => e.Id == createTeamViewModel.EventId);
 
@@ -143,11 +143,11 @@ namespace TeamBuilder.Controllers
 
 			var teamId = editTeamViewModel.Id;
 			if (!await accessChecker.CanManageTeam(teamId))
-				return Forbid();
-			
+				throw new HttpStatusException(HttpStatusCode.Forbidden, CommonErrorMessages.Forbidden);
+
 			var team = await context.Teams.FirstOrDefaultAsync(t => t.Id == teamId);
 			if (team == null)
-				return NotFound($"Team '{teamId}' not found");
+				throw new HttpStatusException(HttpStatusCode.BadRequest, TeamErrorMessages.NotFound, TeamErrorMessages.DebugNotFound(teamId));
 
 			var @event = await context.Events.FirstOrDefaultAsync(e => e.Id == editTeamViewModel.EventId);
 
@@ -175,11 +175,11 @@ namespace TeamBuilder.Controllers
 			logger.LogInformation($"DELETE Request {HttpContext.Request.Headers[":path"]}.");
 
 			if (!await accessChecker.CanManageTeam(id))
-				return Forbid();
+				throw new HttpStatusException(HttpStatusCode.Forbidden, CommonErrorMessages.Forbidden);
 
 			var team = await context.Teams.FirstOrDefaultAsync(t => t.Id == id);
 			if (team == null)
-				return NotFound($"Team '{id}' not found");
+				throw new HttpStatusException(HttpStatusCode.BadRequest, TeamErrorMessages.NotFound, TeamErrorMessages.DebugNotFound(id));
 
 			try
 			{
@@ -202,8 +202,8 @@ namespace TeamBuilder.Controllers
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(model)}");
 
 			if (!await accessChecker.CanManageTeamOrSelfInTeam(model.TeamId, model.UserId))
-				return Forbid();
-			
+				throw new HttpStatusException(HttpStatusCode.Forbidden, CommonErrorMessages.Forbidden);
+
 			var team = await context.Teams
 				.Include(t => t.Image)
 				.Include(u => u.UserTeams)
@@ -212,7 +212,8 @@ namespace TeamBuilder.Controllers
 			var userTeam = team?.UserTeams.FirstOrDefault(ut => ut.UserId == model.UserId);
 
 			if (userTeam == null)
-				return NotFound(UserErrorMessages.NotFoundUserTeam(model.UserId, model.TeamId));
+				throw new HttpStatusException(HttpStatusCode.NotFound, UserErrorMessages.NotFound, 
+					UserErrorMessages.NotFoundUserTeam(model.UserId, model.TeamId));
 
 			userTeam.UserAction = userTeam.UserAction switch
 			{
@@ -252,13 +253,14 @@ namespace TeamBuilder.Controllers
 			var userTeam = team?.UserTeams.FirstOrDefault(ut => ut.UserId == model.UserId);
 
 			if (userTeam == null)
-				return NotFound($"Not found User {model.UserId} or user {model.UserId} inside Team {model.TeamId}");
+				throw new HttpStatusException(HttpStatusCode.BadRequest, TeamErrorMessages.NotFound, 
+					$"Not found User {model.UserId} or user {model.UserId} inside Team {model.TeamId}");
 
 			switch (userTeam.UserAction)
 			{
 				case UserActionEnum.ConsideringOffer when !await accessChecker.CanManageTeam(model.TeamId):
 				case UserActionEnum.SentRequest when !await accessChecker.CanManageTeamOrSelfInTeam(model.TeamId, model.UserId):
-					return Forbid();
+					throw new HttpStatusException(HttpStatusCode.Forbidden, CommonErrorMessages.Forbidden);
 			}
 
 			if (userTeam.UserAction != UserActionEnum.ConsideringOffer && userTeam.UserAction != UserActionEnum.SentRequest)
@@ -296,7 +298,7 @@ namespace TeamBuilder.Controllers
 			{
 				case UserActionEnum.ConsideringOffer when !await accessChecker.CanManageTeamOrSelfInTeam(model.TeamId, model.UserId):
 				case UserActionEnum.SentRequest when !await accessChecker.CanManageTeam(model.TeamId):
-					return Forbid();
+					throw new HttpStatusException(HttpStatusCode.Forbidden, CommonErrorMessages.Forbidden);
 			}
 
 			var userIsNotAllowedToJoinTeam = userTeam.UserAction != UserActionEnum.ConsideringOffer && 

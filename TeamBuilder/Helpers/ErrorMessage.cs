@@ -26,16 +26,23 @@ namespace TeamBuilder.Helpers
 	public static class CommonErrorMessages
 	{
 		public static string SaveChanges { get; set; } = "Ошибка при сохранении";
+		public static string Forbidden { get; set; } = "Ты сюда не ходи - туда ходи";
+
 	}
 
 	public static class TeamErrorMessages
 	{
 		public static string NotFound { get; set; } = "Команда не найдена";
+		public static string AlreadyExists { get; set; } = "Команда с таким именем уже существует";
 		public static string QuitDeclineTeam { get; set; } = "Что-то пошло не так при выходе из команды";
 		public static string DebugQuitDeclineTeam(long profileId, long teamId, UserTeam userTeam)
 		{
 			return $"User '{profileId}' have invalid userAction '{userTeam.UserAction}' for team '{teamId}'. " +
 					$"Available value: {UserActionEnum.ConsideringOffer}, {UserActionEnum.JoinedTeam}";
+		}
+		public static string DebugNotFound(long teamId)
+		{
+			return $"Team '{teamId}' not found";
 		}
 
 		internal static string InvalidUserAction(long userId, UserTeam userTeam, long teamId, params UserActionEnum[] allowedUserActions) 

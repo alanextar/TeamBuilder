@@ -52,10 +52,6 @@ const SearchWithInfiniteScroll =
 				.then(result => {
 					updateItems(result);
 					dataWaiter(false);
-				})
-				.catch(error => {
-					setIsSearching(false);
-					ShowError(error);
 				});
 		}
 
