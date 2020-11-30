@@ -4,16 +4,17 @@ import { bindActionCreators } from "redux";
 
 import {
 	Panel, PanelHeader, Avatar, RichCell,
-	CardGrid, Card
+	CardGrid, Card, Placeholder
 } from '@vkontakte/vkui';
 import Icon24Work from '@vkontakte/icons/dist/24/work';
+import Icon56UsersOutline from '@vkontakte/icons/dist/56/users_outline';
 
 import { Api, Urls } from '../../infrastructure/api';
 
 import SearchWithInfiniteScroll from '../components/SearchWithInfiniteScroll';
 
 import { goToPage } from '../../store/router/actions';
-import { isNotContentResponse } from "../../infrastructure/utils";
+import { isNoContentResponse } from "../../infrastructure/utils";
 
 const Users = props => {
 	const { goToPage } = props;
@@ -57,8 +58,8 @@ const Users = props => {
 				{renderItems}
 			</SearchWithInfiniteScroll>
 			{
-				isNotContentResponse(props.error) &&
-				<Placeholder header="Список участников пока пуст">
+				isNoContentResponse(props.error) &&
+				<Placeholder icon={<Icon56UsersOutline />} header="Список участников пока пуст">
 					Но мы развиваемся и, надеемся, что пользователи к нам подтянутся :)
 				</Placeholder>
 			}

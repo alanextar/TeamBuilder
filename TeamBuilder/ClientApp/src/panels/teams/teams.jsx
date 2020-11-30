@@ -6,10 +6,11 @@ import {
 	PanelHeaderButton, CardGrid, Card, Placeholder
 } from '@vkontakte/vkui';
 
+import Icon56UsersOutline from '@vkontakte/icons/dist/56/users_outline';
 import SearchWithInfiniteScroll from '../components/SearchWithInfiniteScroll';
 
 import { Api, Urls } from '../../infrastructure/api';
-import { countConfirmed, isNotContentResponse } from "../../infrastructure/utils";
+import { countConfirmed, isNoContentResponse } from "../../infrastructure/utils";
 
 const Teams = props => {
 	const { goToPage } = props;
@@ -69,9 +70,10 @@ const Teams = props => {
 				{renderItems}
 			</SearchWithInfiniteScroll>
 			{
-				isNotContentResponse(props.error) &&
-				<Placeholder header="Создайте команду">
-					Создавайте команду. Вступайте в существующие мероприятия или создайте своё и пригласите туда участников.
+				isNoContentResponse(props.error) &&
+				<Placeholder icon={<Icon56UsersOutline />} header="Создайте команду">
+					Создавайте команду. Вступайте в существующие мероприятия 
+					или создайте своё и пригласите туда участников.
 				</Placeholder>
 			}
 		</Panel>

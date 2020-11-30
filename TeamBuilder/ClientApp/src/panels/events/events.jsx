@@ -8,8 +8,10 @@ import {
 	PanelHeaderButton, CardGrid, Card
 } from '@vkontakte/vkui';
 
+import Icon56UsersOutline from '@vkontakte/icons/dist/56/users_outline';
+
 import { Api, Urls } from '../../infrastructure/api';
-import { renderEventDate, isNotContentResponse } from "../../infrastructure/utils";
+import { renderEventDate, isNoContentResponse } from "../../infrastructure/utils";
 
 import SearchWithInfiniteScroll from '../components/SearchWithInfiniteScroll';
 
@@ -57,8 +59,8 @@ const Events = props => {
 				{renderItems}
 			</SearchWithInfiniteScroll>
 			{
-				isNotContentResponse(props.error) &&
-				<Placeholder header="Создайте мероприятие">
+				isNoContentResponse(props.error) &&
+				<Placeholder icon={<Icon56UsersOutline />} header="Создайте мероприятие">
 					И пригласите туда любого из участников в активном поиске, кто подходит вам по интересам
 				</Placeholder>
 			}

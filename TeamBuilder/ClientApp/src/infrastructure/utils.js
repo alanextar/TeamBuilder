@@ -1,4 +1,4 @@
-export function isNotContentResponse(response) {
+export function isNoContentResponse(response) {
 	return response && response.code == 204;
 };
 
