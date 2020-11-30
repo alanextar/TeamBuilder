@@ -57,6 +57,12 @@ const Users = props => {
 				header={<PanelHeader separator={false}>Участники</PanelHeader>}>
 				{renderItems}
 			</SearchWithInfiniteScroll>
+			{
+				isNoContentResponse(props.error) &&
+				<Placeholder icon={<Icon56UsersOutline />} header="Список участников пока пуст">
+					Но мы развиваемся и, надеемся, что пользователи к нам подтянутся :)
+				</Placeholder>
+			}
 		</Panel>
 	);
 };

@@ -69,6 +69,13 @@ const Teams = props => {
 				header={renderHeader}>
 				{renderItems}
 			</SearchWithInfiniteScroll>
+			{
+				isNoContentResponse(props.error) &&
+				<Placeholder icon={<Icon56UsersOutline />} header="Список команд пуст">
+					Создавайте команду. Вступайте в существующие мероприятия <br />
+					или создайте своё и пригласите туда участников.
+				</Placeholder>
+			}
 		</Panel>
 	);
 };

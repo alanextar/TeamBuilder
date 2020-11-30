@@ -109,21 +109,21 @@ const EventInfo = props => {
 				</Group>
 				<Group>
 					<Header mode="secondary">Участвующие команды</Header>
-					{event && event.teams ? event?.teams?.map(team => {
-						return (
-							<Cell
-								key={team.id}
-								expandable
-								indicator={countConfirmed(team.userTeams) + '/' + team.numberRequiredMembers}
-								onClick={() => goToPage('teamInfo', team.id)}
-								before={<Avatar size={48} src={team.image?.dataURL} />}>
-								{team.name}
-							</Cell>
-						)
-					}
-					) :
-						<Placeholder icon={<Icon56UsersOutline />} header="Создайте мероприятие">
-							И пригласите туда любого из участников в активном поиске, кто подходит вам по интересам
+					{event && event.teams && event.teams.length ? event.teams.map(team => {
+							return (
+								<Cell
+									key={team.id}
+									expandable
+									indicator={countConfirmed(team.userTeams) + '/' + team.numberRequiredMembers}
+									onClick={() => goToPage('teamInfo', team.id)}
+									before={<Avatar size={48} src={team.image?.dataURL} />}>
+									{team.name}
+								</Cell>
+							)
+						})
+					:
+						<Placeholder icon={<Icon56UsersOutline />} header="Нет заявок от команд">
+							Мероприятие создано, но ни одна из команд пока не вступила в него
 						</Placeholder>
 					}
 				</Group>

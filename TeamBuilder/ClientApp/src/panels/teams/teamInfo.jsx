@@ -70,7 +70,7 @@ class TeamInfo extends React.Component {
 
 		const userInActiveTeam =
 			this.state.team.userTeams?.find((user) => user.userId === this.props.profile?.id);
-		const activeTeamMembers = this.state.team.userTeams?.filter(x => x.userAction === 2);
+		const activeTeamMembers = this.state.team && this.state.team.userTeams?.filter(x => x.userAction === 2);
 
 		const isUserInActiveTeam = userInActiveTeam != null;
 		const isOwner = isUserInActiveTeam && userInActiveTeam?.isOwner;
@@ -143,8 +143,10 @@ class TeamInfo extends React.Component {
 								</Group>
 								:
 								(!activeTeamMembers.length ?
-									<Placeholder icon={<Icon56UsersOutline />} header="Создайте мероприятие">
-										И пригласите туда любого из участников в активном поиске, кто подходит вам по интересам
+									<Placeholder icon={<Icon56UsersOutline />} header="Нет участников">
+										Список участников пуст<br/> 
+										Вы можете подать заявку и<br />
+										капитан команды рассмотрит её
 									</Placeholder>
 									:
 									!canEdit ?

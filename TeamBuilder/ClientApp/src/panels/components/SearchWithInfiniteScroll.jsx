@@ -134,14 +134,7 @@ const SearchWithInfiniteScroll =
 					}
 				</PullToRefresh>
 				{props.snackbar}
-				{
-					isNoContentResponse(props.error) &&
-					<Placeholder icon={<Icon56UsersOutline />} header="Создайте команду">
-						Создавайте команду. Вступайте в существующие мероприятия
-						или создайте своё и пригласите туда участников.
-				</Placeholder>
-				}
-				</React.Fragment>
+			</React.Fragment>
 		);
 	};
 
