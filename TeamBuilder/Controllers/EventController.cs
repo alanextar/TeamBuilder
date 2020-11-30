@@ -48,7 +48,6 @@ namespace TeamBuilder.Controllers
 
 		public IActionResult PagingSearch(string search, int pageSize = 20, int page = 0, bool prev = false)
 		{
-			throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
 			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
 
 			if (pageSize == 0)

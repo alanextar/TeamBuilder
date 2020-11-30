@@ -174,7 +174,7 @@ class TeamInfo extends React.Component {
 						)}
 					</Group>
 				</PullToRefresh>
-				{props.snackbar}
+				{this.props.snackbar}
 			</Panel>
 		);
 	}
@@ -188,7 +188,8 @@ const mapStateToProps = (state) => {
 		activeView: state.router.activeView,
 		profile: state.user.profile,
 		profileUser: state.user.profileUser,
-		activeTab: state.vkui.activeTab
+		activeTab: state.vkui.activeTab,
+		snackbar: state.formData.snackbar
 	};
 };
 

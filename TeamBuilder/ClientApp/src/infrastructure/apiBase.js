@@ -33,7 +33,6 @@ const initDelete = {
 	cache: 'default'
 };
 
-//TODO Сделать нормальную обработку ошибок!!! 
 export async function get(url, params = {}) {
 	try {
 		var searchParams = new URLSearchParams(params).toString();

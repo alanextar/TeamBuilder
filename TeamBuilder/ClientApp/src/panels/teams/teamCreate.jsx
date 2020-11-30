@@ -178,7 +178,7 @@ class TeamCreate extends React.Component {
 						</Button>
 					</Div>
 				</Group>
-				{props.snackbar}
+				{this.props.snackbar}
 			</Panel>
 		);
 	}
