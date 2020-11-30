@@ -44,7 +44,7 @@ export async function get(url, params = {}) {
 		if (resp.ok)
 			return json;
 		else {
-			throw { code: resp.status, ...json };
+			throw json;
 		}
 
 	}
@@ -66,7 +66,7 @@ export async function post(url, data = {}) {
 		if (resp.ok)
 			return json;
 		else {
-			throw { code: resp.status, ...json };
+			throw json;
 		}
 			
 	}
@@ -89,7 +89,7 @@ export async function Delete(url, params = {}) {
 			if (resp.ok)
 				return json;
 			else {
-				throw { code: resp.status, ...json };
+				throw json;
 			}
 				
 		})

@@ -19,7 +19,9 @@ namespace TeamBuilder.Controllers
 			var context = HttpContext.Features.Get<IExceptionHandlerFeature>();
 			var exception = context?.Error;
 			var responseException = new ErrorResponseViewModel(exception);
-			Response.StatusCode = (int)responseException.Code;
+
+			//TODO Костыль. Код 204 не возвращает json => мы будем валиться на попытке получить тело ответа. Переделать по умному)
+			Response.StatusCode = responseException.IsNoContent ? 403 : (int)responseException.Code;
 
 			return responseException;
 		}
