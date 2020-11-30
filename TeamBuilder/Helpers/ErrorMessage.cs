@@ -17,7 +17,7 @@ namespace TeamBuilder.Helpers
 		public static string NotFoundUserTeam { get; set; } = "Не найдена команда или пользователь в ней";
 		public static string AppendToTeam { get; set; } = "Ошибка при добавлении пользователя в команду";
 		public static string IsNotSearchable { get; set; } = "Пользователь не ищет команду";
-		public static string InvalidAction { get; set; } = "Невалидное действие";
+		public static string InvalidAction { get; set; } = "Действие не может быть выполнено";
 		internal static string DebugNotFoundUserTeam(long userId, long teamId)
 		{
 			var debugMsg = $"Not found User {userId} or user {userId} inside Team {teamId}";
