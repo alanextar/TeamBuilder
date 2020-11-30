@@ -14,7 +14,6 @@ import IconIndicator from './IconIndicator';
 import { Api } from '../../infrastructure/api';
 import { ShowError } from '../../infrastructure/apiBase';
 import useDebounce from '../../infrastructure/use-debounce';
-import { CommonError } from './commonError';
 
 const SearchWithInfiniteScroll =
 	({ id, pagingSearchHandler, getPageUrl, onFiltersClickHandler, filterValue, header, ...props }) => {
@@ -55,6 +54,7 @@ const SearchWithInfiniteScroll =
 					dataWaiter(false);
 				})
 				.catch(error => {
+					setIsSearching(false);
 					ShowError(error);
 				});
 		}
@@ -108,7 +108,6 @@ const SearchWithInfiniteScroll =
 		const loader = <PanelSpinner key={0} size="large" />
 
 		return (
-			props.error == null ?
 			<React.Fragment>
 				{header}
 				<FixedLayout vertical="top">
@@ -136,8 +135,8 @@ const SearchWithInfiniteScroll =
 						</InfiniteScroll>
 					}
 				</PullToRefresh>
-				</React.Fragment> :
-				<CommonError />
+				{props.snackbar}
+				</React.Fragment>
 		);
 	};
 
@@ -155,7 +154,7 @@ const mapStateToProps = (state) => {
 	return {
 		activeView: state.router.activeView,
 		inputData: state.formData.forms,
-		error: state.formData.error
+		snackbar: state.formData.snackbar
 	}
 };
 

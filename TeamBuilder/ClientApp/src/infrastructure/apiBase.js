@@ -1,7 +1,9 @@
 ﻿// import * as secrets from './secret.js';
+import React from 'react';
 import { store } from "../index";
-import { goToPage } from "../store/router/actions";
-import { setError } from "../store/formData/actions";
+import { setSnackbar } from "../store/formData/actions";
+import { Snackbar, Avatar } from "@vkontakte/vkui";
+import Icon20CancelCircleFillRed from '@vkontakte/icons/dist/20/cancel_circle_fill_red';
 
 const initGet = {
 	method: 'GET',
@@ -70,7 +72,6 @@ export async function post(url, data = {}) {
 			
 	}
 	catch (error) {
-		
 		console.log(`Error for post request '${url}' with body ${JSON.stringify(data)}.  Details: ${error}`);
 		ShowError(error);
 	}
@@ -98,6 +99,14 @@ export async function Delete(url, params = {}) {
 		});
 }
 
- export function ShowError(error) {
-	store.dispatch(setError(error));
+export function ShowError(error) {
+	let snackbar = <Snackbar
+		layout="vertical"
+		onClose={() => store.dispatch(setSnackbar(null))}
+			before={<Avatar size={24}><Icon20CancelCircleFillRed /></Avatar>}
+		>
+			<p>Код ошибки: {error.code != null ? error.code : 500}</p>
+			<p>{error.message != null ? error.message : "Ничего страшного, бывает и хуже.Скоро устраним ;)"}</p>
+	</Snackbar>
+	store.dispatch(setSnackbar(snackbar));
 }
