@@ -1,4 +1,4 @@
-import {SET_FORM_DATA, SET_ERROR_MSG} from './actionTypes';
+import {SET_FORM_DATA, SET_ERROR} from './actionTypes';
 
 const initialState = {
     forms: []
@@ -17,7 +17,7 @@ export const formDataReducer = (state = initialState, action) => {
                 }
             };
         }
-		case SET_ERROR_MSG: {
+		case SET_ERROR: {
             return {
                 ...state,
 				error: action.payload.error

@@ -12,7 +12,9 @@ import Icon24Filter from '@vkontakte/icons/dist/24/filter';
 import IconIndicator from './IconIndicator';
 
 import { Api } from '../../infrastructure/api';
+import { ShowError } from '../../infrastructure/apiBase';
 import useDebounce from '../../infrastructure/use-debounce';
+import { CommonError } from './commonError';
 
 const SearchWithInfiniteScroll =
 	({ id, pagingSearchHandler, getPageUrl, onFiltersClickHandler, filterValue, header, ...props }) => {
@@ -51,6 +53,9 @@ const SearchWithInfiniteScroll =
 				.then(result => {
 					updateItems(result);
 					dataWaiter(false);
+				})
+				.catch(error => {
+					ShowError(error);
 				});
 		}
 
@@ -103,6 +108,7 @@ const SearchWithInfiniteScroll =
 		const loader = <PanelSpinner key={0} size="large" />
 
 		return (
+			props.error == null ?
 			<React.Fragment>
 				{header}
 				<FixedLayout vertical="top">
@@ -130,7 +136,8 @@ const SearchWithInfiniteScroll =
 						</InfiniteScroll>
 					}
 				</PullToRefresh>
-			</React.Fragment>
+				</React.Fragment> :
+				<CommonError />
 		);
 	};
 
@@ -147,7 +154,8 @@ SearchWithInfiniteScroll.propTypes = {
 const mapStateToProps = (state) => {
 	return {
 		activeView: state.router.activeView,
-		inputData: state.formData.forms
+		inputData: state.formData.forms,
+		error: state.formData.error
 	}
 };
 

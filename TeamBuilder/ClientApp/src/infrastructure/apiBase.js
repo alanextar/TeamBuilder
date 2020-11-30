@@ -1,7 +1,7 @@
 ﻿// import * as secrets from './secret.js';
 import { store } from "../index";
 import { goToPage } from "../store/router/actions";
-import { setErrorMsg } from "../store/formData/actions";
+import { setError } from "../store/formData/actions";
 
 const initGet = {
 	method: 'GET',
@@ -42,13 +42,15 @@ export async function get(url, params = {}) {
 
 		if (resp.ok)
 			return json;
-		else
-			throw json;
+		else {
+			throw { code: resp.status, ...json };
+		}
 
 	}
 	catch (error) {
-		console.log(`Error for get request '${url}'. Details: ${error.message}`);
-		ShowErrorPage(error);
+		console.log(`Error for get request '${url}'. Details: ${error}`);
+		ShowError(error);
+		throw error;
 	}
 	
 }
@@ -62,12 +64,15 @@ export async function post(url, data = {}) {
 		const json = await resp.json();
 		if (resp.ok)
 			return json;
-		else
-			throw json;
+		else {
+			throw { code: resp.status, ...json };
+		}
+			
 	}
 	catch (error) {
+		
 		console.log(`Error for post request '${url}' with body ${JSON.stringify(data)}.  Details: ${error}`);
-		ShowErrorPage(error);
+		ShowError(error);
 	}
 }
 
@@ -82,16 +87,17 @@ export async function Delete(url, params = {}) {
 			const json = resp.json();
 			if (resp.ok)
 				return json;
-			else
-				throw json;
+			else {
+				throw { code: resp.status, ...json };
+			}
+				
 		})
 		.catch(error => {
 			console.log(`Error for delete request '${url}'. Details: ${error}`);
-			ShowErrorPage(error);
+			ShowError(error);
 		});
 }
 
-function ShowErrorPage(error) {
-	store.dispatch(setErrorMsg(error.message));
-	store.dispatch(goToPage('error'));
+ export function ShowError(error) {
+	store.dispatch(setError(error));
 }

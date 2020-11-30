@@ -12,6 +12,7 @@ import { Api, Urls } from '../../infrastructure/api';
 import { renderEventDate } from "../../infrastructure/utils";
 
 import SearchWithInfiniteScroll from '../components/SearchWithInfiniteScroll';
+import { CommonError } from '../components/commonError';
 
 const Events = props => {
 	const { goToPage } = props;
@@ -62,7 +63,8 @@ const Events = props => {
 
 const mapStateToProps = (state) => {
 	return {
-		profileUser: state.user.profileUser
+		profileUser: state.user.profileUser,
+		error: state.formData.error
 	}
 };
 
