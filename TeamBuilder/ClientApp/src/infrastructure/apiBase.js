@@ -1,7 +1,7 @@
 ﻿// import * as secrets from './secret.js';
 import React from 'react';
 import { store } from "../index";
-import { setSnackbar } from "../store/formData/actions";
+import { setError, setSnackbar } from "../store/formData/actions";
 import { Snackbar, Avatar } from "@vkontakte/vkui";
 import Icon20CancelCircleFillRed from '@vkontakte/icons/dist/20/cancel_circle_fill_red';
 
@@ -101,13 +101,17 @@ export async function Delete(url, params = {}) {
 }
 
 export function ShowError(error) {
-	let snackbar = <Snackbar
-		layout="vertical"
-		onClose={() => store.dispatch(setSnackbar(null))}
+	if (error.code != 204) {
+		let snackbar = <Snackbar
+			layout="vertical"
+			onClose={() => store.dispatch(setSnackbar(null))}
 			before={<Avatar size={24}><Icon20CancelCircleFillRed /></Avatar>}
 		>
 			<p>Код ошибки: {error.code != null ? error.code : 500}</p>
 			<p>{error.message != null ? error.message : "Ничего страшного, бывает и хуже.Скоро устраним ;)"}</p>
-	</Snackbar>
-	store.dispatch(setSnackbar(snackbar));
+		</Snackbar>
+		store.dispatch(setSnackbar(snackbar));
+	}
+
+	store.dispatch(setError(error));
 }

@@ -1,3 +1,7 @@
+export function isNotContentResponse(response) {
+	return response && response.code == 204;
+};
+
 export function countConfirmed(userTeams) {
 	let count = userTeams ? userTeams.filter(x => x.userAction === 2 || x.isOwner).length : 0;
 	return count;

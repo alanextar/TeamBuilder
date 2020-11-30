@@ -13,6 +13,7 @@ import { Api, Urls } from '../../infrastructure/api';
 import SearchWithInfiniteScroll from '../components/SearchWithInfiniteScroll';
 
 import { goToPage } from '../../store/router/actions';
+import { isNotContentResponse } from "../../infrastructure/utils";
 
 const Users = props => {
 	const { goToPage } = props;
@@ -55,8 +56,21 @@ const Users = props => {
 				header={<PanelHeader separator={false}>Участники</PanelHeader>}>
 				{renderItems}
 			</SearchWithInfiniteScroll>
+			{
+				isNotContentResponse(props.error) &&
+				<Placeholder header="Список участников пока пуст">
+					Но мы развиваемся и, надеемся, что пользователи к нам подтянутся :)
+				</Placeholder>
+			}
 		</Panel>
 	);
+};
+
+
+const mapStateToProps = (state) => {
+	return {
+		error: state.formData.error
+	}
 };
 
 function mapDispatchToProps(dispatch) {
@@ -66,4 +80,4 @@ function mapDispatchToProps(dispatch) {
 	}
 }
 
-export default connect(null, mapDispatchToProps)(Users);
+export default connect(mapStateToProps, mapDispatchToProps)(Users);

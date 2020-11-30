@@ -17,17 +17,11 @@ namespace TeamBuilder.Controllers
 		public ErrorResponseViewModel Error()
 		{
 			var context = HttpContext.Features.Get<IExceptionHandlerFeature>();
-			var exception = context?.Error; // Your exception
-			var code = 500; // Internal Server Error by default
+			var exception = context?.Error;
+			var responseException = new ErrorResponseViewModel(exception);
+			Response.StatusCode = (int)responseException.Code;
 
-			if (exception is HttpStatusException httpException)
-			{
-				code = (int)httpException.Status;
-			}
-
-			Response.StatusCode = code; // You can use HttpStatusCode enum instead
-
-			return new ErrorResponseViewModel(exception); // Your error model
+			return responseException;
 		}
 	}
 }

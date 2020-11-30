@@ -4,15 +4,14 @@ import { connect } from 'react-redux';
 import { goToPage } from '../../store/router/actions';
 
 import {
-	Panel, PanelHeader, RichCell,
+	Panel, PanelHeader, RichCell, Placeholder,
 	PanelHeaderButton, CardGrid, Card
 } from '@vkontakte/vkui';
 
 import { Api, Urls } from '../../infrastructure/api';
-import { renderEventDate } from "../../infrastructure/utils";
+import { renderEventDate, isNotContentResponse } from "../../infrastructure/utils";
 
 import SearchWithInfiniteScroll from '../components/SearchWithInfiniteScroll';
-import { CommonError } from '../components/commonError';
 
 const Events = props => {
 	const { goToPage } = props;
@@ -57,6 +56,13 @@ const Events = props => {
 				header={renderHeader}>
 				{renderItems}
 			</SearchWithInfiniteScroll>
+			{
+				isNotContentResponse(props.error) &&
+				<Placeholder header="Создайте мероприятие">
+					И пригласите туда любого из участников в активном поиске, кто подходит вам по интересам
+				</Placeholder>
+			}
+			
 		</Panel>
 	);
 };
