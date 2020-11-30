@@ -142,7 +142,7 @@ class TeamInfo extends React.Component {
 									</SimpleCell>
 								</Group>
 								:
-								(!activeTeamMembers.length ?
+								(!activeTeamMembers?.length ?
 									<Placeholder icon={<Icon56UsersOutline />} header="Нет участников">
 										Список участников пуст<br/> 
 										Вы можете подать заявку и<br />
