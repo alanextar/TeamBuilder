@@ -4,6 +4,7 @@ import { store } from "../index";
 import { setError, setSnackbar } from "../store/formData/actions";
 import { Snackbar, Avatar } from "@vkontakte/vkui";
 import Icon20CancelCircleFillRed from '@vkontakte/icons/dist/20/cancel_circle_fill_red';
+import * as Alerts from "../panels/components/Alerts.js";
 
 const initGet = {
 	method: 'GET',
@@ -34,6 +35,9 @@ const initDelete = {
 };
 
 export async function get(url, params = {}) {
+	//reset error before each request
+	store.dispatch(setError(null));
+
 	try {
 		var searchParams = new URLSearchParams(params).toString();
 		url = searchParams ? `${url}?${searchParams}` : url;
@@ -57,6 +61,8 @@ export async function get(url, params = {}) {
 }
 
 export async function post(url, data = {}) {
+	store.dispatch(setError(null));
+
 	var init = initPost;
 	init.body = JSON.stringify(data);
 	try {
@@ -78,26 +84,30 @@ export async function post(url, data = {}) {
 }
 
 export async function Delete(url, params = {}) {
-	var searchParams = new URLSearchParams(params).toString();
-	if (searchParams) {
-		url = `${url}?${searchParams}`;
+	store.dispatch(setError(null));
+
+	try {
+		var searchParams = new URLSearchParams(params).toString();
+		if (searchParams) {
+			url = `${url}?${searchParams}`;
+		}
+		console.log(`delete request: ${url}`);
+		const resp = await fetch(url, initDelete);
+		const json = await resp.json();
+
+		if (resp.ok)
+			return json;
+		else {
+			throw json;
+		}
+
 	}
-	console.log(`delete request: ${url}`);
-	return fetch(url, initDelete)
-		.then(resp => {
-			const json = resp.json();
-			if (resp.ok)
-				return json;
-			else {
-				throw json;
-			}
-				
-		})
-		.catch(error => {
-			console.log(`Error for delete request '${url}'. Details: ${error}`);
-			ShowError(error);
-			throw error;
-		});
+	catch (error) {
+		console.log(`Error for delete request '${url}'. Details: ${error}`);
+		ShowError(error);
+		Alerts.UnblockScreen();
+		throw error;
+	}
 }
 
 export function ShowError(error) {
