@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using TeamBuilder.Extensions;
+using TeamBuilder.ViewModels;
 
 namespace TeamBuilder
 {
@@ -44,8 +46,8 @@ namespace TeamBuilder
 
 			if (!Check(parsed))
 			{
-				context.Response.StatusCode = 403;
-				await context.Response.WriteAsync("Launch params is invalid");
+				throw new HttpStatusException(HttpStatusCode.Forbidden, 
+					"Не удалось идентифицировать пользователя", "Launch params is invalid");
 			}
 			else
 			{

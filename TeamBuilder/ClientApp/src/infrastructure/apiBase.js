@@ -1,4 +1,10 @@
 ﻿// import * as secrets from './secret.js';
+import React from 'react';
+import { store } from "../index";
+import { setError, setSnackbar } from "../store/formData/actions";
+import { Snackbar, Avatar } from "@vkontakte/vkui";
+import Icon20CancelCircleFillRed from '@vkontakte/icons/dist/20/cancel_circle_fill_red';
+import * as Alerts from "../panels/components/Alerts.js";
 
 const initGet = {
 	method: 'GET',
@@ -28,55 +34,94 @@ const initDelete = {
 	cache: 'default'
 };
 
-//TODO Сделать нормальную обработку ошибок!!! 
 export async function get(url, params = {}) {
-	var searchParams = new URLSearchParams(params).toString();
-	url = searchParams ? `${url}?${searchParams}` : url;
+	//reset error before each request
+	store.dispatch(setError(null));
+
 	try {
+		var searchParams = new URLSearchParams(params).toString();
+		url = searchParams ? `${url}?${searchParams}` : url;
 		console.log(`get request: ${url}`);
 		const resp = await fetch(url, initGet);
-		if (resp.ok) {
-			const json = await resp.json();
+		const json = await resp.json();
+
+		if (resp.ok)
 			return json;
-		}
 		else {
-			// const text = await resp.text();
-			// return text;
-			return null;
+			throw json;
 		}
+
 	}
 	catch (error) {
 		console.log(`Error for get request '${url}'. Details: ${error}`);
-		// return {};
+		ShowError(error);
+		throw error;
 	}
+	
 }
 
 export async function post(url, data = {}) {
+	store.dispatch(setError(null));
+
 	var init = initPost;
 	init.body = JSON.stringify(data);
 	try {
 		console.log(`post request: ${url}`);
 		const resp = await fetch(url, init);
 		const json = await resp.json();
-		return json;
+		if (resp.ok)
+			return json;
+		else {
+			throw json;
+		}
+			
 	}
 	catch (error) {
 		console.log(`Error for post request '${url}' with body ${JSON.stringify(data)}.  Details: ${error}`);
-		return {};
+		ShowError(error);
+		throw error;
 	}
 }
 
 export async function Delete(url, params = {}) {
-	var searchParams = new URLSearchParams(params).toString();
-	if (searchParams) {
-		url = `${url}?${searchParams}`;
+	store.dispatch(setError(null));
+
+	try {
+		var searchParams = new URLSearchParams(params).toString();
+		if (searchParams) {
+			url = `${url}?${searchParams}`;
+		}
+		console.log(`delete request: ${url}`);
+		const resp = await fetch(url, initDelete);
+		const json = await resp.json();
+
+		if (resp.ok)
+			return json;
+		else {
+			throw json;
+		}
+
 	}
-	console.log(`delete request: ${url}`);
-	return fetch(url, initDelete)
-		.then(resp => resp.json())
-		.then(json => json)
-		.catch(error => {
-			console.log(`Error for delete request '${url}'. Details: ${error}`);
-			return {};
-		});
+	catch (error) {
+		console.log(`Error for delete request '${url}'. Details: ${error}`);
+		ShowError(error);
+		Alerts.UnblockScreen();
+		throw error;
+	}
+}
+
+export function ShowError(error) {
+	if (error.code != 204) {
+		let snackbar = <Snackbar
+			layout="vertical"
+			onClose={() => store.dispatch(setSnackbar(null))}
+			before={<Avatar size={24}><Icon20CancelCircleFillRed /></Avatar>}
+		>
+			<p>Код ошибки: {error.code != null ? error.code : 500}</p>
+			<p>{error.message != null ? error.message : "Ничего страшного, бывает и хуже.Скоро устраним ;)"}</p>
+		</Snackbar>
+		store.dispatch(setSnackbar(snackbar));
+	}
+
+	store.dispatch(setError(error));
 }

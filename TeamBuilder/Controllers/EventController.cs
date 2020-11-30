@@ -9,6 +9,8 @@ using TeamBuilder.Extensions;
 using TeamBuilder.Models;
 using TeamBuilder.Services;
 using TeamBuilder.ViewModels;
+using System.Net;
+using TeamBuilder.Helpers;
 
 namespace TeamBuilder.Controllers
 {
@@ -49,7 +51,7 @@ namespace TeamBuilder.Controllers
 			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
 
 			if (pageSize == 0)
-				return NoContent();
+				throw new HttpStatusException(HttpStatusCode.NoContent, "");
 
 			bool Filter(Event @event) => @event.Name.ToLowerInvariant().Contains(search?.ToLowerInvariant() ?? string.Empty);
 			var result = context.Events.Include(e => e.Teams).GetPage(pageSize, HttpContext.Request, page, prev, Filter);
@@ -66,7 +68,7 @@ namespace TeamBuilder.Controllers
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(createEventViewModel)}"); ;
 
 			if (!accessChecker.IsConfirm(out var profileId))
-				return Forbid();
+				throw new HttpStatusException(HttpStatusCode.Forbidden, CommonErrorMessages.Forbidden);
 
 			var config = new MapperConfiguration(cfg => cfg.CreateMap<CreateEventViewModel, Event>()
 				.ForMember("Teams", opt => opt.Ignore())
@@ -75,8 +77,15 @@ namespace TeamBuilder.Controllers
 			var mapper = new Mapper(config);
 			var @event = mapper.Map<CreateEventViewModel, Event>(createEventViewModel);
 
-			await context.Events.AddAsync(@event);
-			await context.SaveChangesAsync();
+			try
+			{
+				await context.Events.AddAsync(@event);
+				await context.SaveChangesAsync();
+			}
+			catch (System.Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
+			}
 
 			return Json(@event);
 		}
@@ -88,7 +97,7 @@ namespace TeamBuilder.Controllers
 
 			var eventId = editEventViewModel.Id;
 			if (!await accessChecker.CanManageEvent(eventId))
-				return Forbid();
+				throw new HttpStatusException(HttpStatusCode.Forbidden, CommonErrorMessages.Forbidden);
 
 			var @event = await context.Events.Include(e => e.Owner).FirstOrDefaultAsync(e => e.Id == eventId);
 
@@ -98,8 +107,15 @@ namespace TeamBuilder.Controllers
 			var mapper = new Mapper(config);
 			mapper.Map(editEventViewModel, @event);
 
-			context.Update(@event);
-			await context.SaveChangesAsync();
+			try
+			{
+				context.Update(@event);
+				await context.SaveChangesAsync();
+			}
+			catch (System.Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
+			}
 
 			return Json(@event);
 		}
@@ -111,14 +127,22 @@ namespace TeamBuilder.Controllers
 
 			var eventId = id;
 			if (!await accessChecker.CanManageEvent(eventId))
-				return Forbid();
+				throw new HttpStatusException(HttpStatusCode.Forbidden, CommonErrorMessages.Forbidden);
 
 			var @event = await context.Events.FirstOrDefaultAsync(e => e.Id == id);
 			if (@event == null)
-				return NotFound($"Event '{id}' not found");
+				throw new HttpStatusException(HttpStatusCode.BadRequest, EventErrorMessages.NotFound,
+					EventErrorMessages.DebugNotFound(id));
 
-			context.Remove(@event);
-			await context.SaveChangesAsync();
+			try
+			{
+				context.Remove(@event);
+				await context.SaveChangesAsync();
+			}
+			catch (System.Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
+			}
 
 			return Json("Deleted");
 		}

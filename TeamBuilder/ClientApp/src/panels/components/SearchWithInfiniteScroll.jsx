@@ -5,14 +5,16 @@ import { setFormData } from "../../store/formData/actions";
 import InfiniteScroll from 'react-infinite-scroller';
 
 import {
-	PanelSpinner, Search, PullToRefresh, FixedLayout, Div
+	PanelSpinner, Search, PullToRefresh, FixedLayout, Div, Placeholder
 } from '@vkontakte/vkui';
 import Icon24Filter from '@vkontakte/icons/dist/24/filter';
+import Icon56UsersOutline from '@vkontakte/icons/dist/56/users_outline';
 
 import IconIndicator from './IconIndicator';
 
 import { Api } from '../../infrastructure/api';
 import useDebounce from '../../infrastructure/use-debounce';
+import { isNoContentResponse } from "../../infrastructure/utils";
 
 const SearchWithInfiniteScroll =
 	({ id, pagingSearchHandler, getPageUrl, onFiltersClickHandler, filterValue, header, ...props }) => {
@@ -51,7 +53,8 @@ const SearchWithInfiniteScroll =
 				.then(result => {
 					updateItems(result);
 					dataWaiter(false);
-				});
+				})
+				.catch((error) => { dataWaiter(false); setHasMoreItems(false); })
 		}
 
 		const updateItems = (result) => {
@@ -130,6 +133,7 @@ const SearchWithInfiniteScroll =
 						</InfiniteScroll>
 					}
 				</PullToRefresh>
+				{props.snackbar}
 			</React.Fragment>
 		);
 	};
@@ -147,7 +151,9 @@ SearchWithInfiniteScroll.propTypes = {
 const mapStateToProps = (state) => {
 	return {
 		activeView: state.router.activeView,
-		inputData: state.formData.forms
+		inputData: state.formData.forms,
+		snackbar: state.formData.snackbar,
+		error: state.formData.error
 	}
 };
 

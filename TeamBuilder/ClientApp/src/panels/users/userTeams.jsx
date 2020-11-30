@@ -9,6 +9,8 @@ import { Api } from '../../infrastructure/api';
 import { countMyActiveTeams, countForeignActiveTeams } from '../../infrastructure/utils';
 import { longOperationWrapper } from "../../services/_functions";
 import { goToPage } from '../../store/router/actions';
+import Icon56UsersOutline from '@vkontakte/icons/dist/56/users_outline';
+import { isNoContentResponse } from "../../infrastructure/utils";
 
 class UserTeams extends React.Component {
 	constructor(props) {
@@ -118,7 +120,7 @@ class UserTeams extends React.Component {
 							</Placeholder>}
 					<List>
 						<CardGrid style={{ marginTop: 10, marginBottom: 10 }}>
-							{this.state.userTeams?.map(userTeam => {
+							{this.state.userTeams ? this.state.userTeams?.map(userTeam => {
 								if (this.props.readOnlyMode && userTeam.userAction !== 2 && !userTeam.isOwner)
 									return;
 								return (
@@ -134,7 +136,10 @@ class UserTeams extends React.Component {
 										</RichCell>
 									</Card>
 								)
-							})
+							}) :
+								<Placeholder icon={<Icon56UsersOutline />} header="Создайте мероприятие">
+									И пригласите туда любого из участников в активном поиске, кто подходит вам по интересам
+								</Placeholder>
 							}
 						</CardGrid>
 					</List>
@@ -144,8 +149,17 @@ class UserTeams extends React.Component {
 
 }
 
+const mapStateToProps = (state) => {
+	return {
+		activeView: state.router.activeView,
+		inputData: state.formData.forms,
+		snackbar: state.formData.snackbar,
+		error: state.formData.error
+	}
+};
+
 const mapDispatchToProps = {
 	goToPage
 }
 
-export default connect(null, mapDispatchToProps)(UserTeams);
+export default connect(mapStateToProps, mapDispatchToProps)(UserTeams);

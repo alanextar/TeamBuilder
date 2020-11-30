@@ -1,6 +1,9 @@
 ﻿using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
+using TeamBuilder.ViewModels;
+using System.Net;
+using TeamBuilder.Extensions;
 
 namespace TeamBuilder.Controllers
 {
@@ -19,6 +22,9 @@ namespace TeamBuilder.Controllers
 		{
 			logger.LogInformation("Request GETALL");
 			var allSkills = context.Skills.ToList();
+
+			if (allSkills.IsNullOrEmpty())
+				throw new HttpStatusException(HttpStatusCode.NoContent, "");
 
 			return Json(allSkills);
 		}

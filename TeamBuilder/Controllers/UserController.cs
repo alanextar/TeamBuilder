@@ -12,6 +12,8 @@ using TeamBuilder.ViewModels;
 using System;
 using AutoMapper;
 using TeamBuilder.Services;
+using TeamBuilder.Helpers;
+using System.Net;
 
 namespace TeamBuilder.Controllers
 {
@@ -65,7 +67,14 @@ namespace TeamBuilder.Controllers
 
 			user.IsSearchable = profileViewModel.IsSearchable;
 
-			await context.SaveChangesAsync();
+			try
+			{
+				await context.SaveChangesAsync();
+			}
+			catch (Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
+			}
 
 			return Json(user);
 		}
@@ -121,9 +130,9 @@ namespace TeamBuilder.Controllers
 				.FirstOrDefault(u => u.Id == id);
 
 			if (user == null)
-				return NotFound("Не нашли пользователя");
+				throw new HttpStatusException(HttpStatusCode.NotFound, UserErrorMessages.NotFound, UserErrorMessages.DebugNotFound(id));
 
-			if (user?.UserTeams != null)
+			if (!user.UserTeams.IsNullOrEmpty())
 			{
 				user.UserTeams = user.GetActiveUserTeams().ToList();
 				user.AnyTeamOwner = user.UserTeams.Any(x => x.IsOwner);
@@ -141,7 +150,10 @@ namespace TeamBuilder.Controllers
 				.Include(x => x.UserTeams)
 				.ThenInclude(y => y.Team)
 				.FirstOrDefaultAsync(u => u.Id == id);
-			
+
+			if (user == null)
+				throw new HttpStatusException(HttpStatusCode.NotFound, UserErrorMessages.NotFound, UserErrorMessages.DebugNotFound(id));
+
 			if (user.IsSearchable)
 			{
 				var profile = await context.Users
@@ -156,10 +168,11 @@ namespace TeamBuilder.Controllers
 
 				//команды оунера в которых не состоит юзер
 				user.TeamsToRecruit = profileTeams.Except(user.GetActiveUserTeams().Select(x => x.Team).ToList()).ToList();
-				return Json(user.TeamsToRecruit);
 			}
+			else
+				throw new HttpStatusException(HttpStatusCode.BadRequest, UserErrorMessages.IsNotSearchable);
 
-			return BadRequest("Пользователь не ищет команду");
+			return Json(user.TeamsToRecruit);
 
 		}
 
@@ -169,7 +182,7 @@ namespace TeamBuilder.Controllers
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");
 
 			if (!await accessChecker.CanManageUser(editUserModel.Id))
-				return Forbid();
+				throw new HttpStatusException(HttpStatusCode.Forbidden, CommonErrorMessages.Forbidden);
 
 			var user = await context.Users
 				.Include(x => x.UserSkills)
@@ -181,10 +194,17 @@ namespace TeamBuilder.Controllers
 
 			var existUserSkills = user.UserSkills;
 			var newUserSkills = editUserModel.SkillsIds.Select(s => new UserSkill { UserId = user.Id, SkillId = s }).ToList();
-			context.TryUpdateManyToMany(existUserSkills, newUserSkills, x => new { x.SkillId });
 
-			context.Update(user);
-			await context.SaveChangesAsync();
+			try
+			{
+				context.TryUpdateManyToMany(existUserSkills, newUserSkills, x => new { x.SkillId });
+				context.Update(user);
+				await context.SaveChangesAsync();
+			}
+			catch (Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
+			}
 
 			//TODO ПОЧЕМУ ПРИХОДИТСЯ ЗАНОВО ДОСТАВАТЬ????
 			var updUser = await context.Users
@@ -204,7 +224,7 @@ namespace TeamBuilder.Controllers
 			logger.LogInformation($"GET Request {HttpContext.Request.Headers[":path"]}");
 
 			if (!accessChecker.IsConfirm(out var profileId))
-				return Forbid();
+				throw new HttpStatusException(HttpStatusCode.Forbidden, CommonErrorMessages.Forbidden);
 
 			var user = await context.Users
 				.Include(x => x.UserTeams)
@@ -215,13 +235,22 @@ namespace TeamBuilder.Controllers
 			var userTeamToJoin = user?.UserTeams.First(x => x.TeamId == teamId);
 
 			if (userTeamToJoin?.UserAction != UserActionEnum.ConsideringOffer)
-				throw new Exception($"User '{user?.Id}' have invalid userAction '{userTeamToJoin?.UserAction}' for team '{teamId}'. " +
-									$"Available value: {UserActionEnum.ConsideringOffer}");
+			{
+				throw new HttpStatusException(HttpStatusCode.BadRequest, UserErrorMessages.AppendToTeam, 
+					TeamErrorMessages.InvalidUserAction(user.Id, userTeamToJoin, teamId, UserActionEnum.ConsideringOffer));
+			}
 
 			userTeamToJoin.UserAction = UserActionEnum.JoinedTeam;
 
-			context.Update(user);
-			await context.SaveChangesAsync();
+			try
+			{
+				context.Update(user);
+				await context.SaveChangesAsync();
+			}
+			catch (Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
+			}
 
 			var activeUserTeams = user.GetActiveUserTeams();
 
@@ -234,7 +263,7 @@ namespace TeamBuilder.Controllers
 			logger.LogInformation($"GET Request {HttpContext.Request.Headers[":path"]}");
 
 			if (!accessChecker.IsConfirm(out var profileId))
-				return Forbid();
+				throw new HttpStatusException(HttpStatusCode.Forbidden, CommonErrorMessages.Forbidden);
 
 			var user = await context.Users
 				.Include(x => x.UserTeams)
@@ -249,12 +278,22 @@ namespace TeamBuilder.Controllers
 			{
 				UserActionEnum.ConsideringOffer => UserActionEnum.RejectedTeamRequest,
 				UserActionEnum.JoinedTeam => UserActionEnum.QuitTeam,
-				_ => throw new Exception($"User '{profileId}' have invalid userAction '{userTeam.UserAction}' for team '{teamId}'. " +
-										 $"Available value: {UserActionEnum.ConsideringOffer}, {UserActionEnum.JoinedTeam}")
+				_ => throw new HttpStatusException(HttpStatusCode.BadRequest, 
+					TeamErrorMessages.QuitDeclineTeam, 
+					TeamErrorMessages.InvalidUserAction(profileId, userTeam, teamId,
+					UserActionEnum.ConsideringOffer, UserActionEnum.JoinedTeam)
+				)
 			};
 
-			context.Update(user);
-			await context.SaveChangesAsync();
+			try
+			{
+				context.Update(user);
+				await context.SaveChangesAsync();
+			}
+			catch (Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.NotFound, UserErrorMessages.NotFound);
+			}
 
 			var activeUserTeams = user.GetActiveUserTeams();
 
@@ -267,7 +306,7 @@ namespace TeamBuilder.Controllers
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");
 
 			if (!accessChecker.IsConfirm(out var profileId))
-				return Forbid();
+				throw new HttpStatusException(HttpStatusCode.Forbidden, CommonErrorMessages.Forbidden);
 
 			var user = context.Users
 				.Include(x => x.UserTeams)
@@ -277,16 +316,32 @@ namespace TeamBuilder.Controllers
 			var userTeam = user?.UserTeams.FirstOrDefault(ut => ut.TeamId == teamId);
 
 			if (userTeam == null)
-				return NotFound($"Not found User {profileId} or user {profileId} inside Team {teamId}");
+			{
+				throw new HttpStatusException(HttpStatusCode.NotFound, UserErrorMessages.NotFound, UserErrorMessages.DebugNotFoundUserTeam(profileId, teamId));
+			}
 
 			if (userTeam.UserAction != UserActionEnum.SentRequest)
-				throw new Exception($"User '{profileId}' have invalid userAction '{userTeam.UserAction}' for team '{teamId}'. " +
-									$"Available value: {UserActionEnum.SentRequest}");
+			{
+				var debugMsg = TeamErrorMessages.InvalidUserAction(profileId, userTeam, teamId, UserActionEnum.SentRequest);
 
-			context.Remove(userTeam);
-			await context.SaveChangesAsync();
+				throw new HttpStatusException(HttpStatusCode.NotFound, UserErrorMessages.NotFound, debugMsg);
+			}
 
+			try
+			{
+				context.Remove(userTeam);
+				await context.SaveChangesAsync();
+			}
+			catch (Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.NotFound, CommonErrorMessages.SaveChanges);
+			}
+			
 			var activeUserTeams = user.GetActiveUserTeams();
+
+			if (activeUserTeams.IsNullOrEmpty())
+				throw new HttpStatusException(HttpStatusCode.NoContent, "");
+
 			return Json(activeUserTeams);
 		}
 
@@ -306,7 +361,7 @@ namespace TeamBuilder.Controllers
 				.ThenInclude(x => x.Event)
 				.FirstOrDefaultAsync(x => x.Id == teamId);
 			if (dbTeam == null)
-				return NotFound();
+				throw new HttpStatusException(HttpStatusCode.NotFound, TeamErrorMessages.NotFound, TeamErrorMessages.DebugNotFound(teamId));
 
 			var userActionToSet = isTeamOffer ?
 					UserActionEnum.ConsideringOffer : UserActionEnum.SentRequest;
@@ -318,16 +373,26 @@ namespace TeamBuilder.Controllers
 			else
 			{
 				var user = dbTeam.UserTeams.FirstOrDefault(x => x.UserId == id);
+				if (user == null)
+					throw new HttpStatusException(HttpStatusCode.NotFound, UserErrorMessages.NotFound, UserErrorMessages.DebugNotFound(id));
+
 				user.UserAction = userActionToSet;
 			}
 
-			context.Update(dbTeam);
-			await context.SaveChangesAsync();
+			try
+			{
+				context.Update(dbTeam);
+				await context.SaveChangesAsync();
+			}
+			catch (Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
+			}
 
 			return Json(dbTeam);
 		}
 
-		#region List
+#region List
 
 		public IActionResult GetAll()
 		{
@@ -345,7 +410,7 @@ namespace TeamBuilder.Controllers
 			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
 
 			if (pageSize == 0)
-				return NoContent();
+				throw new HttpStatusException(HttpStatusCode.NoContent, "");
 
 			bool Filter(User user) => user.FullName.ToLowerInvariant().Contains(search?.ToLowerInvariant() ?? string.Empty);
 			var result = context.Users
@@ -363,6 +428,6 @@ namespace TeamBuilder.Controllers
 			return Json(result);
 		}
 
-		#endregion
+#endregion
 	}
 }
