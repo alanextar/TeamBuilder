@@ -39,12 +39,17 @@ export async function get(url, params = {}) {
 		url = searchParams ? `${url}?${searchParams}` : url;
 		console.log(`get request: ${url}`);
 		const resp = await fetch(url, initGet);
-		const json = await resp.json();
+		if (resp.body) {
+			const json = await resp.json();
 
-		if (resp.ok)
-			return json;
+			if (resp.ok)
+				return json;
+			else {
+				throw json;
+			}
+		}
 		else {
-			throw json;
+			store.dispatch(setError({ code: resp.status, message: "" }));
 		}
 
 	}
@@ -62,11 +67,17 @@ export async function post(url, data = {}) {
 	try {
 		console.log(`post request: ${url}`);
 		const resp = await fetch(url, init);
-		const json = await resp.json();
-		if (resp.ok)
-			return json;
+		if (resp.body) {
+			const json = await resp.json();
+
+			if (resp.ok)
+				return json;
+			else {
+				throw json;
+			}
+		}
 		else {
-			throw json;
+			store.dispatch(setError({ code: resp.status, message: "" }));
 		}
 			
 	}
@@ -101,17 +112,15 @@ export async function Delete(url, params = {}) {
 }
 
 export function ShowError(error) {
-	if (error.code != 204) {
-		let snackbar = <Snackbar
-			layout="vertical"
-			onClose={() => store.dispatch(setSnackbar(null))}
-			before={<Avatar size={24}><Icon20CancelCircleFillRed /></Avatar>}
-		>
-			<p>Код ошибки: {error.code != null ? error.code : 500}</p>
-			<p>{error.message != null ? error.message : "Ничего страшного, бывает и хуже.Скоро устраним ;)"}</p>
-		</Snackbar>
-		store.dispatch(setSnackbar(snackbar));
-	}
+	let snackbar = <Snackbar
+		layout="vertical"
+		onClose={() => store.dispatch(setSnackbar(null))}
+		before={<Avatar size={24}><Icon20CancelCircleFillRed /></Avatar>}
+	>
+		<p>Код ошибки: {error.code != null ? error.code : 500}</p>
+		<p>{error.message != null ? error.message : "Ничего страшного, бывает и хуже.Скоро устраним ;)"}</p>
+	</Snackbar>
 
 	store.dispatch(setError(error));
+	store.dispatch(setSnackbar(snackbar));
 }
