@@ -78,8 +78,15 @@ namespace TeamBuilder.Controllers
 			var mapper = new Mapper(config);
 			var @event = mapper.Map<CreateEventViewModel, Event>(createEventViewModel);
 
-			await context.Events.AddAsync(@event);
-			await context.SaveChangesAsync();
+			try
+			{
+				await context.Events.AddAsync(@event);
+				await context.SaveChangesAsync();
+			}
+			catch (System.Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
+			}
 
 			return Json(@event);
 		}
@@ -101,8 +108,15 @@ namespace TeamBuilder.Controllers
 			var mapper = new Mapper(config);
 			mapper.Map(editEventViewModel, @event);
 
-			context.Update(@event);
-			await context.SaveChangesAsync();
+			try
+			{
+				context.Update(@event);
+				await context.SaveChangesAsync();
+			}
+			catch (System.Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
+			}
 
 			return Json(@event);
 		}
@@ -118,11 +132,18 @@ namespace TeamBuilder.Controllers
 
 			var @event = await context.Events.FirstOrDefaultAsync(e => e.Id == id);
 			if (@event == null)
-				throw new HttpStatusException(HttpStatusCode.BadRequest, "Событие не найдено",
-					$"Event '{id}' not found");
+				throw new HttpStatusException(HttpStatusCode.BadRequest, EventErrorMessages.NotFound,
+					EventErrorMessages.DebugNotFound(id));
 
-			context.Remove(@event);
-			await context.SaveChangesAsync();
+			try
+			{
+				context.Remove(@event);
+				await context.SaveChangesAsync();
+			}
+			catch (System.Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
+			}
 
 			return Json("Deleted");
 		}

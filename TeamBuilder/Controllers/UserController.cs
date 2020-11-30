@@ -75,7 +75,6 @@ namespace TeamBuilder.Controllers
 			{
 				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
 			}
-			
 
 			return Json(user);
 		}
@@ -121,7 +120,6 @@ namespace TeamBuilder.Controllers
 		[HttpGet]
 		public IActionResult Get(long id)
 		{
-			return NotFound(UserErrorMessages.NotFound);
 			logger.LogInformation($"GET Request {HttpContext.Request.Headers[":path"]}");
 
 			var user = context.Users.Include(x => x.UserTeams)
@@ -132,9 +130,9 @@ namespace TeamBuilder.Controllers
 				.FirstOrDefault(u => u.Id == id);
 
 			if (user == null)
-				throw new HttpStatusException(HttpStatusCode.NotFound, UserErrorMessages.NotFound);
+				throw new HttpStatusException(HttpStatusCode.NotFound, UserErrorMessages.NotFound, UserErrorMessages.DebugNotFound(id));
 
-			if (user?.UserTeams != null)
+			if (!user.UserTeams.IsNullOrEmpty())
 			{
 				user.UserTeams = user.GetActiveUserTeams().ToList();
 				user.AnyTeamOwner = user.UserTeams.Any(x => x.IsOwner);
@@ -152,6 +150,9 @@ namespace TeamBuilder.Controllers
 				.Include(x => x.UserTeams)
 				.ThenInclude(y => y.Team)
 				.FirstOrDefaultAsync(u => u.Id == id);
+
+			if (user == null)
+				throw new HttpStatusException(HttpStatusCode.NotFound, UserErrorMessages.NotFound, UserErrorMessages.DebugNotFound(id));
 
 			if (user.IsSearchable)
 			{
@@ -193,10 +194,17 @@ namespace TeamBuilder.Controllers
 
 			var existUserSkills = user.UserSkills;
 			var newUserSkills = editUserModel.SkillsIds.Select(s => new UserSkill { UserId = user.Id, SkillId = s }).ToList();
-			context.TryUpdateManyToMany(existUserSkills, newUserSkills, x => new { x.SkillId });
 
-			context.Update(user);
-			await context.SaveChangesAsync();
+			try
+			{
+				context.TryUpdateManyToMany(existUserSkills, newUserSkills, x => new { x.SkillId });
+				context.Update(user);
+				await context.SaveChangesAsync();
+			}
+			catch (Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
+			}
 
 			//TODO ПОЧЕМУ ПРИХОДИТСЯ ЗАНОВО ДОСТАВАТЬ????
 			var updUser = await context.Users
@@ -286,7 +294,6 @@ namespace TeamBuilder.Controllers
 			{
 				throw new HttpStatusException(HttpStatusCode.NotFound, UserErrorMessages.NotFound);
 			}
-			
 
 			var activeUserTeams = user.GetActiveUserTeams();
 
@@ -310,9 +317,8 @@ namespace TeamBuilder.Controllers
 
 			if (userTeam == null)
 			{
-				throw new HttpStatusException(HttpStatusCode.NotFound, UserErrorMessages.NotFound, UserErrorMessages.NotFoundUserTeam(profileId, teamId));
+				throw new HttpStatusException(HttpStatusCode.NotFound, UserErrorMessages.NotFound, UserErrorMessages.DebugNotFoundUserTeam(profileId, teamId));
 			}
-				
 
 			if (userTeam.UserAction != UserActionEnum.SentRequest)
 			{
@@ -331,8 +337,11 @@ namespace TeamBuilder.Controllers
 				throw new HttpStatusException(HttpStatusCode.NotFound, CommonErrorMessages.SaveChanges);
 			}
 			
-
 			var activeUserTeams = user.GetActiveUserTeams();
+
+			if (activeUserTeams.IsNullOrEmpty())
+				throw new HttpStatusException(HttpStatusCode.NoContent, "");
+
 			return Json(activeUserTeams);
 		}
 
@@ -352,7 +361,7 @@ namespace TeamBuilder.Controllers
 				.ThenInclude(x => x.Event)
 				.FirstOrDefaultAsync(x => x.Id == teamId);
 			if (dbTeam == null)
-				throw new HttpStatusException(HttpStatusCode.NotFound, "Команда не найдена");
+				throw new HttpStatusException(HttpStatusCode.NotFound, TeamErrorMessages.NotFound, TeamErrorMessages.DebugNotFound(teamId));
 
 			var userActionToSet = isTeamOffer ?
 					UserActionEnum.ConsideringOffer : UserActionEnum.SentRequest;
@@ -365,9 +374,7 @@ namespace TeamBuilder.Controllers
 			{
 				var user = dbTeam.UserTeams.FirstOrDefault(x => x.UserId == id);
 				if (user == null)
-				{
-					throw new HttpStatusException(HttpStatusCode.NotFound, UserErrorMessages.NotFound);
-				}
+					throw new HttpStatusException(HttpStatusCode.NotFound, UserErrorMessages.NotFound, UserErrorMessages.DebugNotFound(id));
 
 				user.UserAction = userActionToSet;
 			}
@@ -379,7 +386,7 @@ namespace TeamBuilder.Controllers
 			}
 			catch (Exception)
 			{
-				throw new HttpStatusException(HttpStatusCode.NotFound, CommonErrorMessages.SaveChanges);
+				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
 			}
 
 			return Json(dbTeam);

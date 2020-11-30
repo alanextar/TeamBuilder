@@ -14,12 +14,18 @@ namespace TeamBuilder.Helpers
 	public static class UserErrorMessages
 	{
 		public static string NotFound { get; set; } = "Пользователь не найден";
+		public static string NotFoundUserTeam { get; set; } = "Не найдена команда или пользователь в ней";
 		public static string AppendToTeam { get; set; } = "Ошибка при добавлении пользователя в команду";
 		public static string IsNotSearchable { get; set; } = "Пользователь не ищет команду";
-		internal static string NotFoundUserTeam(long userId, long teamId)
+		public static string InvalidAction { get; set; } = "Невалидное действие";
+		internal static string DebugNotFoundUserTeam(long userId, long teamId)
 		{
 			var debugMsg = $"Not found User {userId} or user {userId} inside Team {teamId}";
 			return debugMsg;
+		}
+		public static string DebugNotFound(long userId)
+		{
+			return $"User '{userId}' not found";
 		}
 	}
 
@@ -46,6 +52,31 @@ namespace TeamBuilder.Helpers
 		}
 
 		internal static string InvalidUserAction(long userId, UserTeam userTeam, long teamId, params UserActionEnum[] allowedUserActions) 
+		{
+			//TODO Join enum values by comma
+			var actionsStr = String.Join(", ", allowedUserActions.Select(x => x.ToString()));
+			var debugMsg = $"User '{userId}' have invalid userAction '{userTeam.UserAction}' for team '{teamId}'. " +
+									$"Available values: {actionsStr}";
+			return debugMsg;
+		}
+	}
+
+	public static class EventErrorMessages
+	{
+		public static string NotFound { get; set; } = "Событие не найдена";
+		public static string AlreadyExists { get; set; } = "Событие с таким именем уже существует";
+		public static string QuitDeclineEvent { get; set; } = "Что-то пошло не так при выходе из события";
+		public static string DebugQuitDeclineEvent(long profileId, long teamId, UserTeam userTeam)
+		{
+			return $"User '{profileId}' have invalid userAction '{userTeam.UserAction}' for team '{teamId}'. " +
+					$"Available value: {UserActionEnum.ConsideringOffer}, {UserActionEnum.JoinedTeam}";
+		}
+		public static string DebugNotFound(long id)
+		{
+			return $"Event '{id}' not found";
+		}
+
+		internal static string InvalidUserAction(long userId, UserTeam userTeam, long teamId, params UserActionEnum[] allowedUserActions)
 		{
 			//TODO Join enum values by comma
 			var actionsStr = String.Join(", ", allowedUserActions.Select(x => x.ToString()));

@@ -46,7 +46,7 @@ namespace TeamBuilder.Controllers
 		{
 			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
 
-			if (!context.UserTeams.Any())
+			if (context.UserTeams.IsNullOrEmpty())
 			{
 				logger.LogInformation("EasterEggs Running");
 				await EasterEggs.Eggs(context);
@@ -213,7 +213,7 @@ namespace TeamBuilder.Controllers
 
 			if (userTeam == null)
 				throw new HttpStatusException(HttpStatusCode.NotFound, UserErrorMessages.NotFound, 
-					UserErrorMessages.NotFoundUserTeam(model.UserId, model.TeamId));
+					UserErrorMessages.DebugNotFoundUserTeam(model.UserId, model.TeamId));
 
 			userTeam.UserAction = userTeam.UserAction switch
 			{
@@ -253,8 +253,8 @@ namespace TeamBuilder.Controllers
 			var userTeam = team?.UserTeams.FirstOrDefault(ut => ut.UserId == model.UserId);
 
 			if (userTeam == null)
-				throw new HttpStatusException(HttpStatusCode.BadRequest, TeamErrorMessages.NotFound, 
-					$"Not found User {model.UserId} or user {model.UserId} inside Team {model.TeamId}");
+				throw new HttpStatusException(HttpStatusCode.BadRequest, UserErrorMessages.NotFoundUserTeam, 
+					UserErrorMessages.DebugNotFoundUserTeam(model.UserId, model.TeamId));
 
 			switch (userTeam.UserAction)
 			{
