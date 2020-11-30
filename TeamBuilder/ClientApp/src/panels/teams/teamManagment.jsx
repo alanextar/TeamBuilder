@@ -53,12 +53,17 @@ const TeamManagment = (props) => {
 		if (e.defaultPrevented) return;
 		props.goToPage("user", userId);
 	}
+	
+	const canManage = (userAction) => {
+		const actionsAllowed = [1, 2, 5];
+		return actionsAllowed.includes(userAction);
+	}
 
 	return (
 		<Group>
-			{props.userTeams?.map(userTeam => {
+			{ props.userTeams?.map(userTeam => {
 				return (
-					(userTeam.userAction === 1 || userTeam.userAction === 2 || userTeam.userAction === 5) &&
+					canManage(userTeam.userAction) &&
 					<RichCell
 						key={userTeam.userId}
 						before={<Avatar size={48} src={userTeam.user.photo100} />}

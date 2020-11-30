@@ -70,6 +70,7 @@ class TeamInfo extends React.Component {
 
 		const userInActiveTeam =
 			this.state.team.userTeams?.find((user) => user.userId === this.props.profile?.id);
+		const activeTeamMembers = this.state.team.userTeams?.filter(x => x.userAction === 2);
 
 		const isUserInActiveTeam = userInActiveTeam != null;
 		const isOwner = isUserInActiveTeam && userInActiveTeam?.isOwner;
@@ -141,7 +142,12 @@ class TeamInfo extends React.Component {
 									</SimpleCell>
 								</Group>
 								:
-								(!canEdit ?
+								(!activeTeamMembers.length ?
+									<Placeholder icon={<Icon56UsersOutline />} header="Создайте мероприятие">
+										И пригласите туда любого из участников в активном поиске, кто подходит вам по интересам
+									</Placeholder>
+									:
+									!canEdit ?
 									<Group>
 										{teamCap &&
 											<SimpleCell key={teamCap.id}
@@ -153,7 +159,7 @@ class TeamInfo extends React.Component {
 												{teamCap.fullName}
 											</SimpleCell>}
 										<Separator style={{ margin: '12px 0' }} />
-										{this.state.team.userTeams?.map(userTeam => {
+										{activeTeamMembers && activeTeamMembers.map(userTeam => {
 											return (
 												userTeam.userAction === 2 &&
 												<SimpleCell key={userTeam.userId}
@@ -165,23 +171,15 @@ class TeamInfo extends React.Component {
 													{userTeam.user?.fullName}
 												</SimpleCell>
 											)
-										}
-										)}
+										})}
 									</Group>
 									:
-									<TeamManagment
-										userTeams={this.state.team.userTeams}
-										updateTeam={this.updateTeam} />)
+									<TeamManagment userTeams={this.state.team.userTeams} updateTeam={this.updateTeam} />
+								)
 						)}
 					</Group>
 				</PullToRefresh>
 				{this.props.snackbar}
-				{
-					isNoContentResponse(this.props.error) &&
-					<Placeholder icon={<Icon56UsersOutline />} header="Создайте мероприятие">
-						И пригласите туда любого из участников в активном поиске, кто подходит вам по интересам
-					</Placeholder>
-				}
 			</Panel>
 		);
 	}
