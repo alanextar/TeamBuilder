@@ -1,7 +1,7 @@
 ﻿import React from 'react';
 import { connect } from 'react-redux';
 import {
-	Panel, PanelHeader, Group, Cell, Avatar, Button, Div, PanelHeaderBack,
+	Panel, PanelHeader, Group, Cell, Avatar, Button, Div, PanelHeaderBack, Placeholder,
 	Tabs, TabsItem, Separator, PullToRefresh, InfoRow, Header, Link, PanelSpinner
 } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
@@ -13,6 +13,7 @@ import Icon24Send from '@vkontakte/icons/dist/24/send';
 
 import Icon28ViewOutline from '@vkontakte/icons/dist/28/view_outline';
 import Icon28HideOutline from '@vkontakte/icons/dist/28/hide_outline';
+import Icon56UsersOutline from '@vkontakte/icons/dist/56/users_outline';
 
 import UserTeams from './userTeams'
 import { Api } from '../../infrastructure/api';
@@ -224,6 +225,11 @@ class User extends React.Component {
 													<SkillTokens selectedSkills={Utils.convertUserSkills(user?.userSkills)} />
 												</InfoRow>
 											</Cell>}
+										{user && (!user.mobile && !user.telegram && !user.email && !user.about) &&
+											<Placeholder icon={<Icon56UsersOutline />} header="Нет информации">
+											Здесь вы можете просмотреть контактные данные участника<br />
+											Но, вероятно, пользователь пока не заполнил информацию о себе
+											</Placeholder>}
 									</Group> :
 									<Group>
 										<UserTeams loading={this.state.loading} userTeams={user?.userTeams} readOnlyMode={this.state.readOnlyMode} />
