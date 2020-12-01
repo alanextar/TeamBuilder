@@ -111,13 +111,14 @@ class UserTeams extends React.Component {
 				<Group>
 					{!isTeamsExistsForProfile && !this.props.readOnlyMode &&
 						<Placeholder header="Вступайте в команду">
-							Или создайте свою и пригласите других участников. Здесь можно будет принять
-							приглашение от команд или отозвать заявку.
-							</Placeholder>}
+							Или создайте свою и пригласите других участников. <br />
+							Здесь можно будет принять приглашение или отозвать заявку
+						</Placeholder>}
 					{!isTeamsExistsForUser && this.props.readOnlyMode &&
 						<Placeholder header="Нет команд">
-							Пользователь пока не состоит ни в одной из команд. Вы можете отправить ему приглашение, чтобы он присоединился к вам.
-							</Placeholder>}
+							Пользователь пока не состоит ни в одной из команд. <br />
+							Если у вас есть своя команда, Вы можете отправить ему приглашение
+						</Placeholder>}
 					<List>
 						<CardGrid style={{ marginTop: 10, marginBottom: 10 }}>
 							{this.state.userTeams ? this.state.userTeams?.map(userTeam => {

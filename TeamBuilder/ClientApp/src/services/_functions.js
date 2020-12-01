@@ -55,9 +55,14 @@ export const longOperationWrapper = async (longOperation) => {
 	longOperation.preAction && await longOperation.preAction();
 
 	Alerts.BlockScreen();
-	longOperation.action && await longOperation.action();
-	Alerts.UnblockScreen();
+	try {
+		longOperation.action && await longOperation.action();
+		Alerts.UnblockScreen();
 
-	longOperation.postAction && await longOperation.postAction();
+		longOperation.postAction && await longOperation.postAction();
+	} catch (e) {
+		Alerts.UnblockScreen();
+	}
+	
 }
 
