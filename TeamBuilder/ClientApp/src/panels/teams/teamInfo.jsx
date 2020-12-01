@@ -76,8 +76,7 @@ class TeamInfo extends React.Component {
 		const isOwner = isUserInActiveTeam && userInActiveTeam?.isOwner;
 		const isModerator = this.props.profileUser?.isModerator;
 		const canEdit = isOwner || isModerator;
-		let managerPlaceholder = activeTeamMembers?.length < 2; 
-		let observerPlaceholder = !canEdit && activeTeamMembers?.filter(x => x.userAction === 2)?.length; 
+		let isEmptyTeam = !canEdit && activeTeamMembers?.filter(x => x.userAction === 2); 
 
 		return (
 			<Panel id={this.props.id}>
@@ -144,41 +143,44 @@ class TeamInfo extends React.Component {
 									</SimpleCell>
 								</Group>
 								:
-								(observerPlaceholder || managerPlaceholder ?
-									<Placeholder icon={<Icon56UsersOutline />} header="Нет участников">
-										Список участников пуст<br/> 
-										Вы можете подать заявку и<br />
-										капитан команды рассмотрит её
-									</Placeholder>
-									:
-									!canEdit ?
-									<Group>
-										{teamCap &&
-											<SimpleCell key={teamCap.id}
-												onClick={() => goToPage('user', teamCap.id)}
-												before={<Avatar size={48} src={teamCap.photo100} />}
-												description="Капитан"
-												expandable
-												after={platform === ANDROID && <Icon24Chevron />}>
-												{teamCap.fullName}
-											</SimpleCell>}
-										<Separator style={{ margin: '12px 0' }} />
-											{activeTeamMembers && activeTeamMembers.map(userTeam => {
-											return (
-												userTeam.userAction === 2 &&
-												<SimpleCell key={userTeam.userId}
-													onClick={() => goToPage('user', userTeam.userId)}
-													before={<Avatar size={48} src={userTeam.user?.photo100} />}
-													description={null}
-													expandable
-													after={platform === ANDROID && <Icon24Chevron />}>
-													{userTeam.user?.fullName}
-												</SimpleCell>
-											)
-										})}
+								(<Group>
+									{teamCap && !isModerator &&
+										<SimpleCell key={teamCap.id}
+											onClick={() => goToPage('user', teamCap.id)}
+											before={<Avatar size={48} src={teamCap.photo100} />}
+											description="Капитан"
+											expandable
+											after={platform === ANDROID && <Icon24Chevron />}>
+											{teamCap.fullName}
+										</SimpleCell>
+									}
+									{isEmptyTeam &&
+										<Placeholder icon={<Icon56UsersOutline />} header="Нет участников">
+											Список участников пуст<br />
+											Вы можете подать заявку и<br />
+											капитан команды рассмотрит её
+										</Placeholder>}
+									{
+										!canEdit ?
+											<Group>
+												<Separator style={{ margin: '12px 0' }} />
+												{activeTeamMembers && activeTeamMembers.map(userTeam => {
+													return (
+														userTeam.userAction === 2 &&
+														<SimpleCell key={userTeam.userId}
+															onClick={() => goToPage('user', userTeam.userId)}
+															before={<Avatar size={48} src={userTeam.user?.photo100} />}
+															description={null}
+															expandable
+															after={platform === ANDROID && <Icon24Chevron />}>
+															{userTeam.user?.fullName}
+														</SimpleCell>
+													)
+												})}
+											</Group> :
+											<TeamManagment isModerator={isModerator} userTeams={this.state.team.userTeams} updateTeam={this.updateTeam} />
+									}
 									</Group>
-									:
-									<TeamManagment userTeams={this.state.team.userTeams} updateTeam={this.updateTeam} />
 								)
 						)}
 					</Group>

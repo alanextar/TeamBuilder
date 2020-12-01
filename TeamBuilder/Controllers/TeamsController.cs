@@ -86,6 +86,9 @@ namespace TeamBuilder.Controllers
 				.ThenInclude(x => x.User)
 				.FirstOrDefault(t => t.Id == id);
 
+			//показывать капитана первым
+			team.UserTeams = team.UserTeams.OrderByDescending(x => x.IsOwner).ToList();
+
 			return team;
 		}
 
@@ -119,7 +122,7 @@ namespace TeamBuilder.Controllers
 				new UserTeam
 				{
 					IsOwner = true,
-					UserId = profileId
+					UserId = profileId,
 					UserAction = UserActionEnum.JoinedTeam
 				}};
 
@@ -226,6 +229,9 @@ namespace TeamBuilder.Controllers
 					TeamErrorMessages.InvalidUserAction(model.UserId, userTeam, team.Id, 
 					UserActionEnum.SentRequest, UserActionEnum.JoinedTeam, UserActionEnum.ConsideringOffer ))
 			};
+
+			//По этому свойству отображается капитан в команде. А так как капитан может самоустраниться, то нужно менять свойство
+			userTeam.IsOwner = false;
 
 			try
 			{

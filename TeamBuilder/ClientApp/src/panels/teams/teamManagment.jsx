@@ -2,7 +2,7 @@
 import { connect } from "react-redux";
 import { goToPage } from "../../store/router/actions";
 
-import { RichCell, Group, Button, Avatar } from "@vkontakte/vkui";
+import { RichCell, Group, Button, Avatar, SimpleCell } from "@vkontakte/vkui";
 
 import Icon24Dismiss from '@vkontakte/icons/dist/24/dismiss';
 import * as Alerts from "../components/Alerts.js";
@@ -54,7 +54,7 @@ const TeamManagment = (props) => {
 		props.goToPage("user", userId);
 	}
 	
-	const canManage = (userAction) => {
+	const isAnyActionAllowed = (userAction) => {
 		const actionsAllowed = [1, 2, 5];
 		return actionsAllowed.includes(userAction);
 	}
@@ -63,32 +63,51 @@ const TeamManagment = (props) => {
 		<Group>
 			{ props.userTeams?.map(userTeam => {
 				return (
-					canManage(userTeam.userAction) &&
-					<RichCell
-						key={userTeam.userId}
-						before={<Avatar size={48} src={userTeam.user.photo100} />}
-						after={
-							userTeam.userAction === 2 &&
-							<Icon24Dismiss onClick={e => dropUser(e, userTeam, Alerts.RemoveUserFromTeamPopout)} />
+					<React.Fragment>
+						{
+							userTeam.isOwner &&
+							<RichCell
+								key={userTeam.id}
+								before={<Avatar size={48} src={userTeam.user.photo100} />}
+								onClick={(e) => goToUser(e, userTeam.userId)}
+								caption="Капитан"
+								expandable
+								after={
+									<Icon24Dismiss onClick={e => dropUser(e, userTeam, Alerts.RemoveUserFromTeamPopout)} />
+								}
+							>
+								{userTeam.user.fullName}
+							</RichCell>
 						}
-						onClick={(e) => goToUser(e, userTeam.userId)}
-						actions={
-							userTeam.userAction === 1 &&
-							<React.Fragment>
-								<Button
-									onClick={e => handleJoin(e, userTeam)}>Принять</Button>
-								<Button mode="secondary" style={{ marginLeft: 2 }}
-									onClick={e => dropUser(e, userTeam, Alerts.RejectUserRequestPopout)}>Отклонить</Button>
-							</React.Fragment> ||
-							userTeam.userAction === 5 &&
-							<React.Fragment>
-								<Button mode="secondary"
-									onClick={e => cancelUser(e, userTeam)}>Отозвать предложение</Button>
-							</React.Fragment>
+						{
+							isAnyActionAllowed(userTeam.userAction) && !userTeam.isOwner &&
+							<RichCell
+								key={userTeam.userId}
+								before={<Avatar size={48} src={userTeam.user.photo100} />}
+								after={
+									userTeam.userAction === 2 || props.isModerator &&
+									<Icon24Dismiss onClick={e => dropUser(e, userTeam, Alerts.RemoveUserFromTeamPopout)} />
+								}
+								onClick={(e) => goToUser(e, userTeam.userId)}
+								actions={
+									userTeam.userAction === 1 || props.isModerator &&
+									<React.Fragment>
+										<Button
+											onClick={e => handleJoin(e, userTeam)}>Принять</Button>
+										<Button mode="secondary" style={{ marginLeft: 2 }}
+											onClick={e => dropUser(e, userTeam, Alerts.RejectUserRequestPopout)}>Отклонить</Button>
+									</React.Fragment> ||
+									userTeam.userAction === 5 || props.isModerator &&
+									<React.Fragment>
+										<Button mode="secondary"
+											onClick={e => cancelUser(e, userTeam)}>Отозвать предложение</Button>
+									</React.Fragment>
+								}
+							>
+								{userTeam.user.fullName}
+							</RichCell>
 						}
-					>
-						{userTeam.user.fullName}
-					</RichCell>
+					</React.Fragment>
 				)
 			}
 			)}
