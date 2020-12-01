@@ -144,7 +144,7 @@ class TeamInfo extends React.Component {
 								</Group>
 								:
 								(<Group>
-									{teamCap && !isModerator &&
+									{teamCap && !canEdit &&
 										<SimpleCell key={teamCap.id}
 											onClick={() => goToPage('user', teamCap.id)}
 											before={<Avatar size={48} src={teamCap.photo100} />}
