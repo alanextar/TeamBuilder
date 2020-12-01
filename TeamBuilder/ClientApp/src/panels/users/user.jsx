@@ -157,7 +157,7 @@ class User extends React.Component {
 										<Div>
 											<Button mode="primary" size='xl'
 												onClick={() => goToPage('setUserTeam', this.state.itemId)}>
-												Завербовать
+												Пригласить
 												</Button>
 										</Div>}
 								</Group>

@@ -120,6 +120,7 @@ namespace TeamBuilder.Controllers
 				{
 					IsOwner = true,
 					UserId = profileId
+					UserAction = UserActionEnum.JoinedTeam
 				}};
 
 			try
