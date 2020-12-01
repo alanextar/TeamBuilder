@@ -70,12 +70,14 @@ class TeamInfo extends React.Component {
 
 		const userInActiveTeam =
 			this.state.team.userTeams?.find((user) => user.userId === this.props.profile?.id);
-		const activeTeamMembers = this.state.team && this.state.team.userTeams?.filter(x => x.userAction === 2);
+		const activeTeamMembers = this.state.team && this.state.team.userTeams;
 
 		const isUserInActiveTeam = userInActiveTeam != null;
 		const isOwner = isUserInActiveTeam && userInActiveTeam?.isOwner;
 		const isModerator = this.props.profileUser?.isModerator;
 		const canEdit = isOwner || isModerator;
+		let managerPlaceholder = activeTeamMembers?.length < 2; 
+		let observerPlaceholder = !canEdit && activeTeamMembers?.filter(x => x.userAction === 2)?.length; 
 
 		return (
 			<Panel id={this.props.id}>
@@ -142,7 +144,7 @@ class TeamInfo extends React.Component {
 									</SimpleCell>
 								</Group>
 								:
-								(!activeTeamMembers.length ?
+								(observerPlaceholder || managerPlaceholder ?
 									<Placeholder icon={<Icon56UsersOutline />} header="Нет участников">
 										Список участников пуст<br/> 
 										Вы можете подать заявку и<br />
@@ -161,7 +163,7 @@ class TeamInfo extends React.Component {
 												{teamCap.fullName}
 											</SimpleCell>}
 										<Separator style={{ margin: '12px 0' }} />
-										{activeTeamMembers && activeTeamMembers.map(userTeam => {
+											{activeTeamMembers && activeTeamMembers.map(userTeam => {
 											return (
 												userTeam.userAction === 2 &&
 												<SimpleCell key={userTeam.userId}
