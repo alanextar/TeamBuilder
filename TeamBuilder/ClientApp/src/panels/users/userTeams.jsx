@@ -112,7 +112,7 @@ class UserTeams extends React.Component {
 					{!isTeamsExistsForProfile && !this.props.readOnlyMode &&
 						<Placeholder header="Вступайте в команду">
 							Или создайте свою и пригласите других участников. <br />
-							Здесь можно будет принятьприглашение от команд или отозвать заявку
+							Здесь можно будет принять приглашение или отозвать заявку
 						</Placeholder>}
 					{!isTeamsExistsForUser && this.props.readOnlyMode &&
 						<Placeholder header="Нет команд">

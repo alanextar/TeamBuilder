@@ -76,7 +76,7 @@ class TeamInfo extends React.Component {
 		const isOwner = isUserInActiveTeam && userInActiveTeam?.isOwner;
 		const isModerator = this.props.profileUser?.isModerator;
 		const canEdit = isOwner || isModerator;
-		let isEmptyTeam = !canEdit && activeTeamMembers?.filter(x => x.userAction === 2); 
+		let isEmptyTeam = !canEdit && activeTeamMembers?.filter(x => x.userAction === 2).length == 0; 
 
 		return (
 			<Panel id={this.props.id}>
