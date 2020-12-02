@@ -73,24 +73,10 @@ const TeamManagment = (props) => {
 				return (
 					<React.Fragment>
 						{
-							userTeam.isOwner &&
-							<RichCell
-								key={userTeam.id}
-								before={<Avatar size={48} src={userTeam.user.photo100} />}
-								onClick={(e) => goToUser(e, userTeam.userId)}
-								caption="Капитан"
-								expandable
-								after={
-									<Icon24Dismiss onClick={e => dropUser(e, userTeam, Alerts.RemoveUserFromTeamPopout)} />
-								}
-							>
-								{userTeam.user.fullName}
-							</RichCell>
-						}
-						{
 							isAnyActionAllowed(userTeam.userAction) && !userTeam.isOwner &&
 							<RichCell
 								key={userTeam.userId}
+								caption={userTeam.isOwner ? "Капитан" : null}
 								before={<Avatar size={48} src={userTeam.user.photo100} />}
 								after={
 									userTeam.userAction === 2 || props.isModerator &&
@@ -112,7 +98,7 @@ const TeamManagment = (props) => {
 									</React.Fragment>
 								}
 							>
-								{userTeam.user.fullName}
+								{userTeam.user?.fullName}
 							</RichCell>
 						}
 					</React.Fragment>
