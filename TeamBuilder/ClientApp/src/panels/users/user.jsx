@@ -129,6 +129,7 @@ class User extends React.Component {
 		const { goBack, goToPage, setActiveTab } = this.props;
 		let user = this.state.user;
 		let hasBack = this.props.panelsHistory[this.props.activeView].length > 1;
+		let isNoContent = !user || (!user.mobile && !user.telegram && !user.email && !user.about);
 
 		return (
 			<Panel id={this.props.id}>
@@ -201,8 +202,13 @@ class User extends React.Component {
 											aside={!this.state.readOnlyMode &&
 												<Icon24Write style={{ color: "#3f8ae0" }} onClick={() => goToPage('userEdit')} />
 											}>
-											Информация
+											{isNoContent ? "" : "Информация"}
                                 </Header>}>
+										{isNoContent &&
+											<Placeholder icon={<Icon56UsersOutline />} header="Нет информации">
+												Здесь вы можете просмотреть контактные данные участника<br />
+											Но, вероятно, пользователь пока не заполнил информацию о себе
+											</Placeholder>}
 										{user?.mobile &&
 											<Cell before={<Icon24Phone style={{ paddingTop: 0, paddingBottom: 0 }} />}>
 												<Link href={"tel:" + user.mobile}>{user.mobile}</Link>
@@ -225,11 +231,6 @@ class User extends React.Component {
 													<SkillTokens selectedSkills={Utils.convertUserSkills(user?.userSkills)} />
 												</InfoRow>
 											</Cell>}
-										{user && (!user.mobile && !user.telegram && !user.email && !user.about) &&
-											<Placeholder icon={<Icon56UsersOutline />} header="Нет информации">
-											Здесь вы можете просмотреть контактные данные участника<br />
-											Но, вероятно, пользователь пока не заполнил информацию о себе
-											</Placeholder>}
 									</Group> :
 									<Group>
 										<UserTeams loading={this.state.loading} userTeams={user?.userTeams} readOnlyMode={this.state.readOnlyMode} />
