@@ -129,7 +129,7 @@ class User extends React.Component {
 		const { goBack, goToPage, setActiveTab } = this.props;
 		let user = this.state.user;
 		let hasBack = this.props.panelsHistory[this.props.activeView].length > 1;
-		let isNoContent = user && (!user.mobile && !user.telegram && !user.email && !user.about);
+		let isNoContent = !user || (!user.mobile && !user.telegram && !user.email && !user.about);
 
 		return (
 			<Panel id={this.props.id}>
