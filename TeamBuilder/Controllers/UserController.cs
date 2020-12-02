@@ -164,7 +164,7 @@ namespace TeamBuilder.Controllers
 
 		//Пользователь отправляет запрос в команду из меню команды / Пользователя приглашает команда по кнопке "Завербовать"
 		[HttpGet]
-		public async Task<IActionResult> SetTeam(long userId, long teamId, bool isTeamOffer = true)
+		public async Task<IActionResult> SetTeam(long id, long teamId, bool isTeamOffer = true)
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");
 
@@ -184,20 +184,20 @@ namespace TeamBuilder.Controllers
 				? UserActionEnum.ConsideringOffer
 				: UserActionEnum.SentRequest;
 
-			if (dbTeam.UserTeams.All(x => x.UserId != userId))
+			if (dbTeam.UserTeams.All(x => x.UserId != id))
 			{
-				dbTeam.UserTeams.Add(new UserTeam { UserId = userId, UserAction = userActionToSet });
+				dbTeam.UserTeams.Add(new UserTeam { UserId = id, UserAction = userActionToSet });
 			}
 			else
 			{
-				var user = dbTeam.UserTeams.FirstOrDefault(x => x.UserId == userId);
+				var user = dbTeam.UserTeams.FirstOrDefault(x => x.UserId == id);
 				user.UserAction = userActionToSet;
 			}
 
 			context.Update(dbTeam);
 			await context.SaveChangesAsync();
 
-			await SetTeamNotify(userId, dbTeam, userActionToSet);
+			await SetTeamNotify(id, dbTeam, userActionToSet);
 
 			return Json(dbTeam);
 		}

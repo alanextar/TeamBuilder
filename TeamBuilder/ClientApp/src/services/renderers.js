@@ -44,7 +44,7 @@ const formatMentionText = (text, items, regex) => {
 
 				return prev.concat(
 					item ?
-						<b><Link key={i + current}
+						<b key={i + current}><Link key={i + current}
 							style={{ color: '#468dd6' }}
 							onClick={() => store.dispatch(goToPage(choosePanel(item), item.Id))}>
 							{item.Text}

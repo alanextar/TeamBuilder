@@ -34,18 +34,18 @@ class UserNotifications extends React.Component {
 	render() {
 		return (
 			<List>
-				{this.props.notifications?.map(notice => (
-					<React.Fragment key={notice.id}>
-						<SimpleCell
-							before={<Avatar style={{ background: 'var(--accent)' }} size={28} shadow={false} src={notice.imageUrl} />}
-							description={notice.dateTimeNotify}
-							multiline>
-							{notice.renderedMessage}
-							{/* Sed ut perspiciatis, unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam eaque ipsa, quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt, explicabo. */}
-						</SimpleCell>
-						{/* <Separator style={{ margin: '5px 0' }} /> */}
-					</React.Fragment>
-				))}
+				{this.props.notifications
+					?.sort((a, b) => new Date(b.dateTimeNotify) - new Date(a.dateTimeNotify))
+					.map(notice => (
+						<React.Fragment key={notice.id}>
+							<SimpleCell
+								before={<Avatar style={{ background: 'var(--accent)' }} size={28} shadow={false} src={notice.imageUrl} />}
+								description={new Date(notice.dateTimeNotify).toLocaleString()}
+								multiline>
+								{notice.renderedMessage}
+							</SimpleCell>
+						</React.Fragment>
+					))}
 			</List>
 		);
 	}
