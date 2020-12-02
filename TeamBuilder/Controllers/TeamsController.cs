@@ -12,6 +12,8 @@ using TeamBuilder.Extensions;
 using TeamBuilder.Models.Enums;
 using TeamBuilder.Services;
 using TeamBuilder.ViewModels;
+using System.Net;
+using TeamBuilder.Helpers;
 
 namespace TeamBuilder.Controllers
 {
@@ -39,7 +41,7 @@ namespace TeamBuilder.Controllers
 		{
 			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
 
-			if (!await context.UserTeams.AnyAsync())
+			if (context.UserTeams.IsNullOrEmpty())
 			{
 				logger.LogInformation("EasterEggs Running");
 				await EasterEggs.Eggs(context);
@@ -47,7 +49,7 @@ namespace TeamBuilder.Controllers
 			}
 
 			if (pageSize == 0)
-				return NoContent();
+				throw new HttpStatusException(HttpStatusCode.NoContent, "");
 
 			bool Filter(Team team)
 			{
@@ -68,6 +70,129 @@ namespace TeamBuilder.Controllers
 			return Json(result);
 		}
 
+		public Team Get(int id)
+		{
+			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
+
+			var team = context.Teams
+				.Include(x => x.Image)
+				.Include(x => x.Event)
+				.Include(x => x.UserTeams)
+				.ThenInclude(x => x.User)
+				.FirstOrDefault(t => t.Id == id);
+
+			//показывать капитана первым
+			team.UserTeams = team.UserTeams.OrderByDescending(x => x.IsOwner).ToList();
+
+			return team;
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> Create([FromBody] CreateTeamViewModel createTeamViewModel)
+		{
+			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(createTeamViewModel)}");
+
+			if (!accessChecker.IsConfirm(out var profileId))
+				throw new HttpStatusException(HttpStatusCode.Forbidden, CommonErrorMessages.Forbidden);
+
+			var teamsNames = await context.Teams.Select(t => t.Name).ToListAsync();
+
+			if (teamsNames.Contains(createTeamViewModel.Name))
+				throw new HttpStatusException(HttpStatusCode.BadRequest, TeamErrorMessages.AlreadyExists);
+
+			var @event = await context.Events.FirstOrDefaultAsync(e => e.Id == createTeamViewModel.EventId);
+
+			var image = new Image
+			{
+				Data = Convert.FromBase64String(createTeamViewModel.imageAsDataUrl.Replace("data:image/jpeg;base64,", "")),
+				Title = Guid.NewGuid().ToString()
+			};
+
+			var config = new MapperConfiguration(cfg => cfg.CreateMap<CreateTeamViewModel, Team>()
+				.ForMember("Event", opt => opt.MapFrom(_ => @event))
+				.ForMember("Image", opt => opt.MapFrom(_ => image)));
+			var mapper = new Mapper(config);
+			var team = mapper.Map<CreateTeamViewModel, Team>(createTeamViewModel);
+			team.UserTeams = new List<UserTeam>{
+				new UserTeam
+				{
+					IsOwner = true,
+					UserId = profileId,
+					UserAction = UserActionEnum.JoinedTeam
+				}};
+
+			try
+			{
+				await context.Teams.AddAsync(team);
+				await context.SaveChangesAsync();
+			}
+			catch (Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
+			}
+			
+
+			return Ok(team);
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> Edit([FromBody] EditTeamViewModel editTeamViewModel)
+		{
+			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(editTeamViewModel)}");
+
+			var teamId = editTeamViewModel.Id;
+			if (!await accessChecker.CanManageTeam(teamId))
+				throw new HttpStatusException(HttpStatusCode.Forbidden, CommonErrorMessages.Forbidden);
+
+			var team = await context.Teams.FirstOrDefaultAsync(t => t.Id == teamId);
+			if (team == null)
+				throw new HttpStatusException(HttpStatusCode.BadRequest, TeamErrorMessages.NotFound, TeamErrorMessages.DebugNotFound(teamId));
+
+			var @event = await context.Events.FirstOrDefaultAsync(e => e.Id == editTeamViewModel.EventId);
+
+			var config = new MapperConfiguration(cfg => cfg.CreateMap<EditTeamViewModel, Team>()
+				.ForMember("Event", opt => opt.MapFrom(_ => @event)));
+			var mapper = new Mapper(config);
+			mapper.Map(editTeamViewModel, team);
+
+			try
+			{
+				context.Update(team);
+				await context.SaveChangesAsync();
+			}
+			catch (Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
+			}
+
+			return Ok(team);
+		}
+
+		[HttpDelete]
+		public async Task<IActionResult> Delete(long id)
+		{
+			logger.LogInformation($"DELETE Request {HttpContext.Request.Headers[":path"]}.");
+
+			if (!await accessChecker.CanManageTeam(id))
+				throw new HttpStatusException(HttpStatusCode.Forbidden, CommonErrorMessages.Forbidden);
+
+			var team = await context.Teams.FirstOrDefaultAsync(t => t.Id == id);
+			if (team == null)
+				throw new HttpStatusException(HttpStatusCode.BadRequest, TeamErrorMessages.NotFound, TeamErrorMessages.DebugNotFound(id));
+
+			try
+			{
+				context.Remove(team);
+				await context.SaveChangesAsync();
+			}
+			catch (Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
+			}
+
+			return Json("Deleted");
+		}
+
 		//Отклонить заявку пользователя / удалить пользователя из команды
 		//Пользователь сам удалился в меню команды / Пользователь отклонил приглашение в меню команды
 		[HttpPost]
@@ -76,7 +201,7 @@ namespace TeamBuilder.Controllers
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(model)}");
 
 			if (!await accessChecker.CanManageTeamOrSelfInTeam(model.TeamId, model.UserId))
-				return Forbid();
+				throw new HttpStatusException(HttpStatusCode.Forbidden, CommonErrorMessages.Forbidden);
 
 			var team = await context.Teams
 				.Include(t => t.Image)
@@ -86,20 +211,32 @@ namespace TeamBuilder.Controllers
 			var userTeam = team?.UserTeams.FirstOrDefault(ut => ut.UserId == model.UserId);
 
 			if (userTeam == null)
-				return NotFound($"Not found User {model.UserId} or user {model.UserId} inside Team {model.TeamId}");
+				throw new HttpStatusException(HttpStatusCode.NotFound, UserErrorMessages.NotFound, 
+					UserErrorMessages.DebugNotFoundUserTeam(model.UserId, model.TeamId));
 
 			userTeam.UserAction = userTeam.UserAction switch
 			{
 				UserActionEnum.SentRequest => UserActionEnum.RejectedTeamRequest,
 				UserActionEnum.JoinedTeam => UserActionEnum.QuitTeam,
 				UserActionEnum.ConsideringOffer => UserActionEnum.RejectedTeamRequest,
-				_ => throw new Exception(
-					$"User '{model.UserId}' have invalid userAction '{userTeam.UserAction}' for team '{model.TeamId}'. " +
-					$"Available value: {UserActionEnum.SentRequest}, {UserActionEnum.JoinedTeam}, {UserActionEnum.ConsideringOffer}")
+				_ => throw new HttpStatusException(HttpStatusCode.BadRequest, 
+					TeamErrorMessages.QuitDeclineTeam, 
+					TeamErrorMessages.InvalidUserAction(model.UserId, userTeam, team.Id, 
+					UserActionEnum.SentRequest, UserActionEnum.JoinedTeam, UserActionEnum.ConsideringOffer ))
 			};
 
-			context.Update(userTeam);
-			await context.SaveChangesAsync();
+			//По этому свойству отображается капитан в команде. А так как капитан может самоустраниться, то нужно менять свойство
+			userTeam.IsOwner = false;
+
+			try
+			{
+				context.Update(userTeam);
+				await context.SaveChangesAsync();
+			}
+			catch (Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
+			}
 
 			await RejectedOrRemoveUserNotify(model.UserId, team, userTeam.UserAction);
 
@@ -120,22 +257,31 @@ namespace TeamBuilder.Controllers
 			var userTeam = team?.UserTeams.FirstOrDefault(ut => ut.UserId == model.UserId);
 
 			if (userTeam == null)
-				return NotFound($"Not found User {model.UserId} or user {model.UserId} inside Team {model.TeamId}");
+				throw new HttpStatusException(HttpStatusCode.BadRequest, UserErrorMessages.NotFoundUserTeam, 
+					UserErrorMessages.DebugNotFoundUserTeam(model.UserId, model.TeamId));
 
 			switch (userTeam.UserAction)
 			{
 				case UserActionEnum.ConsideringOffer when !await accessChecker.CanManageTeam(model.TeamId):
 				case UserActionEnum.SentRequest when !await accessChecker.CanManageTeamOrSelfInTeam(model.TeamId, model.UserId):
-					return Forbid();
+					throw new HttpStatusException(HttpStatusCode.Forbidden, CommonErrorMessages.Forbidden);
 			}
 
 			if (userTeam.UserAction != UserActionEnum.ConsideringOffer && userTeam.UserAction != UserActionEnum.SentRequest)
-				throw new Exception($"User '{model.UserId}' have invalid userAction '{userTeam.UserAction}' for team '{model.TeamId}'. " +
-									$"Available value: {UserActionEnum.ConsideringOffer}, {UserActionEnum.SentRequest}");
+				throw new HttpStatusException(HttpStatusCode.BadRequest,
+					TeamErrorMessages.QuitDeclineTeam,
+					TeamErrorMessages.InvalidUserAction(model.UserId, userTeam, model.TeamId, 
+					UserActionEnum.ConsideringOffer, UserActionEnum.SentRequest));
 
-
-			context.Remove(userTeam);
-			await context.SaveChangesAsync();
+			try
+			{
+				context.Remove(userTeam);
+				await context.SaveChangesAsync();
+			}
+			catch (Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
+			}
 
 			return Json(team);
 		}
@@ -156,18 +302,30 @@ namespace TeamBuilder.Controllers
 			{
 				case UserActionEnum.ConsideringOffer when !await accessChecker.CanManageTeamOrSelfInTeam(model.TeamId, model.UserId):
 				case UserActionEnum.SentRequest when !await accessChecker.CanManageTeam(model.TeamId):
-					return Forbid();
+					throw new HttpStatusException(HttpStatusCode.Forbidden, CommonErrorMessages.Forbidden);
 			}
 
-			if (userTeam.UserAction != UserActionEnum.ConsideringOffer && userTeam.UserAction != UserActionEnum.SentRequest)
-				throw new Exception($"User '{model.UserId}' have invalid userAction '{userTeam.UserAction}' for team '{model.TeamId}'. " +
-									$"Available value: {UserActionEnum.ConsideringOffer}, {UserActionEnum.SentRequest}");
+			var userIsNotAllowedToJoinTeam = userTeam.UserAction != UserActionEnum.ConsideringOffer && 
+				userTeam.UserAction != UserActionEnum.SentRequest;
 
-			var wasAction = userTeam.UserAction;
+			if (userIsNotAllowedToJoinTeam)
+			{
+				var debugMsg = TeamErrorMessages.InvalidUserAction(model.UserId, userTeam, model.TeamId, UserActionEnum.SentRequest);
+
+				throw new HttpStatusException(HttpStatusCode.BadRequest, UserErrorMessages.AppendToTeam, debugMsg);
+			}
+
 			userTeam.UserAction = UserActionEnum.JoinedTeam;
 
-			context.Update(user);
-			await context.SaveChangesAsync();
+			try
+			{
+				context.Update(user);
+				await context.SaveChangesAsync();
+			}
+			catch (Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
+			}
 
 			var team = await context.Teams
 				.Include(t => t.Image)

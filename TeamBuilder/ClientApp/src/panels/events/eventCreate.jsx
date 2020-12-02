@@ -85,6 +85,7 @@ const EventCreate = props => {
 					Создать событие
                 </Button>
 			</FormLayout>
+			{props.snackbar}
 		</Panel>
 	);
 }
@@ -92,7 +93,8 @@ const EventCreate = props => {
 const mapStateToProps = (state) => {
 	return {
 		activeView: state.router.activeView,
-		inputData: state.formData.forms
+		inputData: state.formData.forms,
+		snackbar: state.formData.snackbar
 	};
 };
 

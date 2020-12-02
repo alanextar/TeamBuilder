@@ -3,13 +3,14 @@ import { connect } from 'react-redux';
 import { goToPage, goBack } from '../../store/router/actions';
 import {
 	Panel, PanelHeader, Avatar, RichCell,
-	PanelHeaderButton, CardGrid, Card
+	PanelHeaderButton, CardGrid, Card, Placeholder
 } from '@vkontakte/vkui';
 
+import Icon56UsersOutline from '@vkontakte/icons/dist/56/users_outline';
 import SearchWithInfiniteScroll from '../components/SearchWithInfiniteScroll';
 
 import { Api, Urls } from '../../infrastructure/api';
-import { countConfirmed } from "../../infrastructure/utils";
+import { countConfirmed, isNoContentResponse } from "../../infrastructure/utils";
 
 const Teams = props => {
 	const { goToPage } = props;
@@ -68,6 +69,13 @@ const Teams = props => {
 				header={renderHeader}>
 				{renderItems}
 			</SearchWithInfiniteScroll>
+			{
+				isNoContentResponse(props.error) &&
+				<Placeholder icon={<Icon56UsersOutline />} header="Список команд пуст">
+					Создавайте команду. Вступайте в существующие мероприятия <br />
+					или создайте своё и пригласите туда участников
+				</Placeholder>
+			}
 		</Panel>
 	);
 };
@@ -75,7 +83,8 @@ const Teams = props => {
 const mapStateToProps = (state) => {
 	return {
 		teamsEventFilter: state.event.teamsEventFilter,
-		profileUser: state.user.profileUser
+		profileUser: state.user.profileUser,
+		error: state.formData.error
 	}
 };
 

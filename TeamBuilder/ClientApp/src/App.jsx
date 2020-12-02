@@ -22,6 +22,7 @@ import TeamsFilters from './panels/teams/teamsFilters';
 import Users from './panels/users/users';
 
 import IconIndicator from './panels/components/IconIndicator';
+import { CommonError } from './panels/components/commonError';
 
 import CommonView from './CommonView';
 

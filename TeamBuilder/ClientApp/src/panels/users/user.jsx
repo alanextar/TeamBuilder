@@ -1,7 +1,7 @@
 ﻿import React from 'react';
 import { connect } from 'react-redux';
 import {
-	Panel, PanelHeader, Group, Cell, Avatar, Button, Div, PanelHeaderBack, Counter,
+	Panel, PanelHeader, Group, Cell, Avatar, Button, Div, PanelHeaderBack, Counter, Placeholder,
 	Tabs, TabsItem, Separator, PullToRefresh, InfoRow, Header, Link, PanelSpinner, HorizontalScroll
 } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
@@ -13,6 +13,7 @@ import Icon24Send from '@vkontakte/icons/dist/24/send';
 
 import Icon28ViewOutline from '@vkontakte/icons/dist/28/view_outline';
 import Icon28HideOutline from '@vkontakte/icons/dist/28/hide_outline';
+import Icon56UsersOutline from '@vkontakte/icons/dist/56/users_outline';
 
 import UserTeams from './userTeams';
 import UserNotifications from './userNotifications';
@@ -134,9 +135,11 @@ class User extends React.Component {
 		const { goBack, goToPage, setActiveTab } = this.props;
 		let user = this.state.user;
 		let hasBack = this.props.panelsHistory[this.props.activeView].length > 1;
+		let isNoContent = !user || (!user.mobile && !user.telegram && !user.email && !user.about);
 
 		return (
 			<Panel id={this.props.id}>
+				{/*!!!Костыль. Пока не сделали запрос на юзера в базе он undefined. Затем становить null, в js это разные вещи*/}
 				{user === undefined && this.props.profileUser === undefined
 					? <PanelSpinner key={0} size="large" />
 					:
@@ -163,7 +166,7 @@ class User extends React.Component {
 										<Div>
 											<Button mode="primary" size='xl'
 												onClick={() => goToPage('setUserTeam', this.state.itemId)}>
-												Завербовать
+												Пригласить
 												</Button>
 										</Div>}
 								</Group>
@@ -212,10 +215,15 @@ class User extends React.Component {
 									<Group header={
 										<Header
 											mode="secondary"
-											aside={!this.state.readOnlyMode &&
+											aside={user && !this.state.readOnlyMode &&
 												<Icon24Write style={{ color: "#3f8ae0" }} onClick={() => goToPage('userEdit')} />
 											}>
-											Информация</Header>}>
+											{isNoContent ? "" : "Информация"}
+                                </Header>}>
+										{isNoContent &&
+											<Placeholder icon={<Icon56UsersOutline />} header="Нет информации">
+												Здесь вы можете просмотреть контактные данные участника
+											</Placeholder>}
 										{user?.mobile &&
 											<Cell before={<Icon24Phone style={{ paddingTop: 0, paddingBottom: 0 }} />}>
 												<Link href={"tel:" + user.mobile}>{user.mobile}</Link>

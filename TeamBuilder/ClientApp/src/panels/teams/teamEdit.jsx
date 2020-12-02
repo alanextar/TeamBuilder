@@ -7,10 +7,12 @@ import { setFormData } from "../../store/formData/actions";
 
 import {
 	Panel, PanelHeader, PanelHeaderBack, SelectMimicry, Group,
-	Div, Button, Textarea, FormLayout, Input, Link
+	Div, Button, Textarea, FormLayout, Input, Link, Placeholder
 } from '@vkontakte/vkui';
 
 import { getActivePanel, longOperationWrapper } from "../../services/_functions";
+import Icon56UsersOutline from '@vkontakte/icons/dist/56/users_outline';
+import { isNoContentResponse } from "../../infrastructure/utils";
 
 class TeamEdit extends React.Component {
 	constructor(props) {
@@ -159,6 +161,13 @@ class TeamEdit extends React.Component {
                         </Button>
 					</Div>
 				</Group>
+				{this.props.snackbar}
+				{
+					isNoContentResponse(this.props.error) &&
+					<Placeholder icon={<Icon56UsersOutline />} header="Создайте мероприятие">
+						И пригласите туда любого из участников в активном поиске, кто подходит вам по интересам
+					</Placeholder>
+				}
 			</Panel>
 		);
 	}
@@ -168,7 +177,9 @@ class TeamEdit extends React.Component {
 const mapStateToProps = (state) => {
 	return {
 		activeView: state.router.activeView,
-		inputData: state.formData.forms
+		inputData: state.formData.forms,
+		snackbar: state.formData.snackbar,
+		error: state.formData.error,
 	};
 };
 

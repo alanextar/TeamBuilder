@@ -6,12 +6,14 @@ import { setFormData } from "../../store/formData/actions";
 
 import {
 	Panel, PanelHeader, Button, Textarea,
-	PanelHeaderBack, Input, FormLayout
+	PanelHeaderBack, Input, FormLayout, Placeholder
 } from '@vkontakte/vkui';
 
 import { Api } from '../../infrastructure/api';
 import * as utils from '../../infrastructure/utils';
 import { getActivePanel, longOperationWrapper } from "../../services/_functions";
+import Icon56UsersOutline from '@vkontakte/icons/dist/56/users_outline';
+import { isNoContentResponse } from "../../infrastructure/utils";
 
 const EventEdit = props => {
 	const { goBack, setFormData } = props;
@@ -96,6 +98,13 @@ const EventEdit = props => {
 					Сохранить
                 </Button>
 			</FormLayout>
+			{props.snackbar}
+			{
+				isNoContentResponse(props.error) &&
+				<Placeholder icon={<Icon56UsersOutline />} header="Создайте мероприятие">
+					И пригласите туда любого из участников в активном поиске, кто подходит вам по интересам
+				</Placeholder>
+			}
 		</Panel>
 	);
 }
@@ -103,6 +112,8 @@ const EventEdit = props => {
 const mapStateToProps = (state) => {
 	return {
 		inputData: state.formData.forms,
+		error: state.formData.error,
+		snackbar: state.formData.snackbar
 	};
 };
 
