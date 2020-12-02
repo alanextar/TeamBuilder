@@ -79,7 +79,7 @@ const TeamManagment = (props) => {
 								caption={userTeam.isOwner ? "Капитан" : null}
 								before={<Avatar size={48} src={userTeam.user.photo100} />}
 								after={
-									userTeam.userAction === 2 || props.isModerator &&
+									(userTeam.userAction === 2 || props.isModerator) &&
 									<Icon24Dismiss onClick={e => dropUser(e, userTeam, Alerts.RemoveUserFromTeamPopout)} />
 								}
 								onClick={(e) => goToUser(e, userTeam.userId)}
