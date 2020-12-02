@@ -207,8 +207,7 @@ class User extends React.Component {
                                 </Header>}>
 										{isNoContent &&
 											<Placeholder icon={<Icon56UsersOutline />} header="Нет информации">
-												Здесь вы можете просмотреть контактные данные участника<br />
-											Но, вероятно, пользователь пока не заполнил информацию о себе
+												Здесь вы можете просмотреть контактные данные участника
 											</Placeholder>}
 										{user?.mobile &&
 											<Cell before={<Icon24Phone style={{ paddingTop: 0, paddingBottom: 0 }} />}>
