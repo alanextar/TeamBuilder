@@ -144,16 +144,6 @@ class TeamInfo extends React.Component {
 								</Group>
 								:
 								(<Group>
-									{teamCap && !canEdit &&
-										<SimpleCell key={teamCap.id}
-											onClick={() => goToPage('user', teamCap.id)}
-											before={<Avatar size={48} src={teamCap.photo100} />}
-											description="Капитан"
-											expandable
-											after={platform === ANDROID && <Icon24Chevron />}>
-											{teamCap.fullName}
-										</SimpleCell>
-									}
 									{isEmptyTeam &&
 										<Placeholder icon={<Icon56UsersOutline />} header="Нет участников">
 											Список участников пуст<br />
@@ -170,7 +160,7 @@ class TeamInfo extends React.Component {
 														<SimpleCell key={userTeam.userId}
 															onClick={() => goToPage('user', userTeam.userId)}
 															before={<Avatar size={48} src={userTeam.user?.photo100} />}
-															description={null}
+															description={userTeam.isOwner ? 'Капитан' : 'Состоит в команде'}
 															expandable
 															after={platform === ANDROID && <Icon24Chevron />}>
 															{userTeam.user?.fullName}

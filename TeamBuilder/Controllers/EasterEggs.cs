@@ -46,7 +46,7 @@ namespace TeamBuilder.Controllers
 				team.Image = await GetRandomImage(httpClient);
 				var id = random.Next(0, team.UserTeams.Count);
 				team.UserTeams[id].IsOwner = true;
-				team.UserTeams[id].UserAction = UserActionEnum.None;
+				team.UserTeams[id].UserAction = UserActionEnum.JoinedTeam;
 			}
 
 			foreach (var @event in events)
