@@ -130,7 +130,9 @@ namespace TeamBuilder.Controllers
 				.FirstOrDefault(u => u.Id == id);
 
 			if (user == null)
-				throw new HttpStatusException(HttpStatusCode.NotFound, UserErrorMessages.NotFound, UserErrorMessages.DebugNotFound(id));
+				return Json(null);
+			//TODO По идее это правильный эксепшен, но если неподтвержденный юзер, то нужно возвращать null чтобы не вываливался снекбар с exception
+				//throw new HttpStatusException(HttpStatusCode.NotFound, UserErrorMessages.NotFound, UserErrorMessages.DebugNotFound(id));
 
 			if (!user.UserTeams.IsNullOrEmpty())
 			{

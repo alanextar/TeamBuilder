@@ -110,37 +110,34 @@ class UserTeams extends React.Component {
 			this.props.loading ? loader :
 				<Group>
 					{!isTeamsExistsForProfile && !this.props.readOnlyMode &&
-						<Placeholder header="Вступайте в команду">
+						<Placeholder icon={<Icon56UsersOutline />} header="Вступайте в команду">
 							Или создайте свою и пригласите других участников. <br />
 							Здесь можно будет принять приглашение или отозвать заявку
 						</Placeholder>}
 					{!isTeamsExistsForUser && this.props.readOnlyMode &&
-						<Placeholder header="Нет команд">
+						<Placeholder icon={<Icon56UsersOutline />} header="Нет команд">
 							Пользователь пока не состоит ни в одной из команд. <br />
 							Если у вас есть своя команда, Вы можете отправить ему приглашение
 						</Placeholder>}
 					<List>
 						<CardGrid style={{ marginTop: 10, marginBottom: 10 }}>
-							{this.state.userTeams ? this.state.userTeams?.map(userTeam => {
+							{this.state.userTeams && this.state.userTeams?.map(userTeam => {
 								if (this.props.readOnlyMode && userTeam.userAction !== 2 && !userTeam.isOwner)
 									return;
 								return (
-									<Card key={userTeam.teamId} size="l" mode="shadow">
-										<RichCell key={userTeam.teamId}
-											text={userTeam?.team?.description}
-											caption={userTeam.team.event?.name}
-											after={userTeam.userAction === 2 ? < Icon28CheckCircleOutline /> :
-												(userTeam.userAction === 1 && <Icon28InfoOutline />)}
-											onClick={(e) => this.goToTeam(e, userTeam.teamId)}
-											actions={this.buildTeamAction(userTeam)}>
-											{userTeam.team.name}
-										</RichCell>
-									</Card>
-								)
-							}) :
-								<Placeholder icon={<Icon56UsersOutline />} header="Создайте мероприятие">
-									И пригласите туда любого из участников в активном поиске, кто подходит вам по интересам
-								</Placeholder>
+										<Card key={userTeam.teamId} size="l" mode="shadow">
+											<RichCell key={userTeam.teamId}
+												text={userTeam?.team?.description}
+												caption={userTeam.team.event?.name}
+												after={userTeam.userAction === 2 ? < Icon28CheckCircleOutline /> :
+													(userTeam.userAction === 1 && <Icon28InfoOutline />)}
+												onClick={(e) => this.goToTeam(e, userTeam.teamId)}
+												actions={this.buildTeamAction(userTeam)}>
+												{userTeam.team.name}
+											</RichCell>
+										</Card>
+									)
+								})
 							}
 						</CardGrid>
 					</List>
