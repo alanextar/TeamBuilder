@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using TeamBuilder.Helpers;
 using TeamBuilder.Models;
+using TeamBuilder.Models.Enums;
 using TeamBuilder.ViewModels;
 
 namespace TeamBuilder.Controllers
@@ -24,6 +27,9 @@ namespace TeamBuilder.Controllers
 				.Include(x => x.UserTeams)
 				.ThenInclude(x => x.User)
 				.FirstOrDefault(t => t.Id == id);
+
+			//показывать капитана первым
+			team.UserTeams = team.UserTeams.OrderByDescending(x => x.IsOwner).ToList();
 
 			return team;
 		}
@@ -42,16 +48,15 @@ namespace TeamBuilder.Controllers
 		[HttpPost]
 		public async Task<IActionResult> Create([FromBody] CreateTeamViewModel createTeamViewModel)
 		{
-			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. " +
-			                      $"Body: {JsonConvert.SerializeObject(createTeamViewModel)}");
+			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(createTeamViewModel)}");
 
 			if (!accessChecker.IsConfirm(out var profileId))
-				return Forbid();
+				throw new HttpStatusException(HttpStatusCode.Forbidden, CommonErrorMessages.Forbidden);
 
 			var teamsNames = await context.Teams.Select(t => t.Name).ToListAsync();
 
 			if (teamsNames.Contains(createTeamViewModel.Name))
-				return BadRequest("Команда с таким именем уже существует");
+				throw new HttpStatusException(HttpStatusCode.BadRequest, TeamErrorMessages.AlreadyExists);
 
 			var @event = await context.Events.FirstOrDefaultAsync(e => e.Id == createTeamViewModel.EventId);
 
@@ -70,11 +75,20 @@ namespace TeamBuilder.Controllers
 				new UserTeam
 				{
 					IsOwner = true,
-					UserId = profileId
+					UserId = profileId,
+					UserAction = UserActionEnum.JoinedTeam
 				}};
 
-			await context.Teams.AddAsync(team);
-			await context.SaveChangesAsync();
+			try
+			{
+				await context.Teams.AddAsync(team);
+				await context.SaveChangesAsync();
+			}
+			catch (Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
+			}
+			
 
 			return Ok(team);
 		}
@@ -82,16 +96,15 @@ namespace TeamBuilder.Controllers
 		[HttpPost]
 		public async Task<IActionResult> Edit([FromBody] EditTeamViewModel editTeamViewModel)
 		{
-			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. " +
-			                      $"Body: {JsonConvert.SerializeObject(editTeamViewModel)}");
+			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(editTeamViewModel)}");
 
 			var teamId = editTeamViewModel.Id;
 			if (!await accessChecker.CanManageTeam(teamId))
-				return Forbid();
+				throw new HttpStatusException(HttpStatusCode.Forbidden, CommonErrorMessages.Forbidden);
 
 			var team = await context.Teams.FirstOrDefaultAsync(t => t.Id == teamId);
 			if (team == null)
-				return NotFound($"Team '{teamId}' not found");
+				throw new HttpStatusException(HttpStatusCode.BadRequest, TeamErrorMessages.NotFound, TeamErrorMessages.DebugNotFound(teamId));
 
 			var @event = await context.Events.FirstOrDefaultAsync(e => e.Id == editTeamViewModel.EventId);
 
@@ -100,8 +113,15 @@ namespace TeamBuilder.Controllers
 			var mapper = new Mapper(config);
 			mapper.Map(editTeamViewModel, team);
 
-			context.Update(team);
-			await context.SaveChangesAsync();
+			try
+			{
+				context.Update(team);
+				await context.SaveChangesAsync();
+			}
+			catch (Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
+			}
 
 			return Ok(team);
 		}
@@ -112,14 +132,21 @@ namespace TeamBuilder.Controllers
 			logger.LogInformation($"DELETE Request {HttpContext.Request.Headers[":path"]}.");
 
 			if (!await accessChecker.CanManageTeam(id))
-				return Forbid();
+				throw new HttpStatusException(HttpStatusCode.Forbidden, CommonErrorMessages.Forbidden);
 
 			var team = await context.Teams.FirstOrDefaultAsync(t => t.Id == id);
 			if (team == null)
-				return NotFound($"Team '{id}' not found");
+				throw new HttpStatusException(HttpStatusCode.BadRequest, TeamErrorMessages.NotFound, TeamErrorMessages.DebugNotFound(id));
 
-			context.Remove(team);
-			await context.SaveChangesAsync();
+			try
+			{
+				context.Remove(team);
+				await context.SaveChangesAsync();
+			}
+			catch (Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
+			}
 
 			return Json("Deleted");
 		}

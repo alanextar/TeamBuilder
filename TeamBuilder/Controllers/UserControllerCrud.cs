@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -6,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using TeamBuilder.Extensions;
+using TeamBuilder.Helpers;
 using TeamBuilder.Models;
 using TeamBuilder.ViewModels;
 
@@ -16,8 +19,7 @@ namespace TeamBuilder.Controllers
 		[HttpPost]
 		public async Task<IActionResult> SaveOrConfirm([FromBody] ProfileViewModel profileViewModel)
 		{
-			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. " +
-			                      $"Body: {JsonConvert.SerializeObject(profileViewModel)}");
+			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(profileViewModel)}");
 
 			var user = context.Users.Include(x => x.UserSkills)
 				.ThenInclude(y => y.Skill).FirstOrDefault(u => u.Id == profileViewModel.Id);
@@ -51,10 +53,18 @@ namespace TeamBuilder.Controllers
 
 			user.IsSearchable = profileViewModel.IsSearchable;
 
-			await context.SaveChangesAsync();
+			try
+			{
+				await context.SaveChangesAsync();
+			}
+			catch (Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
+			}
 
 			return Json(user);
 		}
+
 		[HttpGet]
 		public IActionResult Get(long id)
 		{
@@ -68,9 +78,11 @@ namespace TeamBuilder.Controllers
 				.FirstOrDefault(u => u.Id == id);
 
 			if (user == null)
-				return NotFound("Не нашли пользователя");
+				return Json(null);
+			//TODO По идее это правильный эксепшен, но если неподтвержденный юзер, то нужно возвращать null чтобы не вываливался снекбар с exception
+			//throw new HttpStatusException(HttpStatusCode.NotFound, UserErrorMessages.NotFound, UserErrorMessages.DebugNotFound(id));
 
-			if (user?.UserTeams != null)
+			if (!user.UserTeams.IsNullOrEmpty())
 			{
 				user.UserTeams = user.GetActiveUserTeams().ToList();
 				user.AnyTeamOwner = user.UserTeams.Any(x => x.IsOwner);
@@ -85,7 +97,7 @@ namespace TeamBuilder.Controllers
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");
 
 			if (!await accessChecker.CanManageUser(editUserModel.Id))
-				return Forbid();
+				throw new HttpStatusException(HttpStatusCode.Forbidden, CommonErrorMessages.Forbidden);
 
 			var user = await context.Users
 				.Include(x => x.UserSkills)
@@ -97,10 +109,17 @@ namespace TeamBuilder.Controllers
 
 			var existUserSkills = user.UserSkills;
 			var newUserSkills = editUserModel.SkillsIds.Select(s => new UserSkill { UserId = user.Id, SkillId = s }).ToList();
-			context.TryUpdateManyToMany(existUserSkills, newUserSkills, x => new { x.SkillId });
 
-			context.Update(user);
-			await context.SaveChangesAsync();
+			try
+			{
+				context.TryUpdateManyToMany(existUserSkills, newUserSkills, x => new { x.SkillId });
+				context.Update(user);
+				await context.SaveChangesAsync();
+			}
+			catch (Exception)
+			{
+				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
+			}
 
 			//TODO ПОЧЕМУ ПРИХОДИТСЯ ЗАНОВО ДОСТАВАТЬ????
 			var updUser = await context.Users
