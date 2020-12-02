@@ -14,7 +14,7 @@ export default class IconIndicator extends React.Component {
 		return (
 			<div style={{ position: "relative" }}>
 				{this.showIndicator() &&
-					<div className="indicator">
+					<div className="indicator" style={this.props.style}>
 						{this.props.counter}
 					</div>}
 				{this.props.children}

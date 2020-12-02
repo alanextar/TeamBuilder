@@ -17,19 +17,7 @@ export const initHubConnection = () => {
 
 	hubConnection.on("Notify", notices => {
 		store.dispatch(setNotifications(notices));
-		hubConnection.invoke('NotificationsReceived', notices.map(n => n.id))
-			.catch(error => console.log(`Error while invoke hub method "NotificationsReceived". Details: ${error}`))
-	});
-
-	// hubConnection.onreconnecting(error => {
-	// 	console.log(`Connection lost due to error "${error}". Reconnecting.`)
-	// 	store.dispatch(setErrorMessage("Проблемы с соединением. Переподключаемся..."));
-	// });
-
-	// hubConnection.onreconnected(connectionId => {
-	// 	console.log(`Connection reestablished. Connected with connectionId "${connectionId}".`)
-	// 	store.dispatch(setErrorMessage(null));
-	// });
+	});	
 
 	hubConnection.onclose(error => {
 		console.log(`Connection closed due to error "${error}". Try refreshing this page to restart the connection.`)
