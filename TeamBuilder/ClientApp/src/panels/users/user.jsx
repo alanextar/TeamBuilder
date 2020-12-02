@@ -133,6 +133,7 @@ class User extends React.Component {
 
 		return (
 			<Panel id={this.props.id}>
+				{/*!!!Костыль. Пока не сделали запрос на юзера в базе он undefined. Затем становить null, в js это разные вещи*/}
 				{user === undefined && this.props.profileUser === undefined
 				? <PanelSpinner key={0} size="large" />
 				:
@@ -199,7 +200,7 @@ class User extends React.Component {
 									<Group header={
 										<Header
 											mode="secondary"
-											aside={!this.state.readOnlyMode &&
+											aside={user && !this.state.readOnlyMode &&
 												<Icon24Write style={{ color: "#3f8ae0" }} onClick={() => goToPage('userEdit')} />
 											}>
 											{isNoContent ? "" : "Информация"}
