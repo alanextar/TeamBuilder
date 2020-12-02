@@ -1,113 +1,33 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
 using TeamBuilder.Models;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using TeamBuilder.Extensions;
 using TeamBuilder.Models.Enums;
-using TeamBuilder.ViewModels;
 using System;
-using AutoMapper;
-using Microsoft.AspNetCore.SignalR;
-using TeamBuilder.Hubs;
 using TeamBuilder.Services;
 
 namespace TeamBuilder.Controllers
 {
-	public class UserController : Controller
+	public partial class UserController : Controller
 	{
 		private readonly ApplicationContext context;
-		private readonly IHubContext<NotificationHub> hubContext;
 		private readonly UserAccessChecker accessChecker;
 		private readonly NotificationSender notificationSender;
 		private readonly ILogger<UserController> logger;
 
 		public UserController(
 			ApplicationContext context,
-			IHubContext<NotificationHub> hubContext,
 			UserAccessChecker accessChecker,
 			NotificationSender notificationSender,
 			ILogger<UserController> logger)
 		{
 			this.context = context;
-			this.hubContext = hubContext;
 			this.accessChecker = accessChecker;
 			this.notificationSender = notificationSender;
 			this.logger = logger;
-		}
-
-		[HttpPost]
-		public async Task<IActionResult> SaveOrConfirm([FromBody] ProfileViewModel profileViewModel)
-		{
-			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(profileViewModel)}");
-
-			var user = context.Users.Include(x => x.UserSkills)
-				.ThenInclude(y => y.Skill).FirstOrDefault(u => u.Id == profileViewModel.Id);
-
-			if (user == null)
-			{
-				user = new User { Id = profileViewModel.Id };
-				if (profileViewModel.SkillsIds != null)
-				{
-					foreach (var skillId in profileViewModel.SkillsIds)
-					{
-						user.UserSkills.Add(new UserSkill() { SkillId = skillId });
-					}
-				}
-
-				await context.Users.AddAsync(user);
-			}
-			else
-			{
-				var dbUserSkills = user.UserSkills;
-				var userSkillsDto = profileViewModel.SkillsIds.Select(s => new UserSkill { UserId = user.Id, SkillId = s }).ToList();
-				context.TryUpdateManyToMany(dbUserSkills, userSkillsDto, x => new { x.SkillId });
-
-				context.Users.Update(user);
-			}
-
-			user.FirstName = profileViewModel.FirstName;
-			user.LastName = profileViewModel.LastName;
-			user.Photo100 = profileViewModel.Photo100;
-			user.Photo200 = profileViewModel.Photo200;
-
-			user.IsSearchable = profileViewModel.IsSearchable;
-
-			await context.SaveChangesAsync();
-
-			return Json(user);
-		}
-
-		//TODO не используется
-		[HttpGet]
-		public IActionResult CheckConfirmation(long id)
-		{
-			logger.LogInformation($"GET Request {HttpContext.Request.Headers[":path"]}");
-
-			var isConfirmed = context.Users.FirstOrDefault(x => x.Id == id) != null ? true : false;
-
-			return Json(isConfirmed);
-		}
-
-		//TODO не используется
-		public List<Skill> GetSkills(long id)
-		{
-			logger.LogInformation($"GET Request {HttpContext.Request.Headers[":path"]}");
-
-			var userSkills = context.Users.Include(x => x.UserSkills)
-				.ThenInclude(y => y.Skill)
-				.FirstOrDefault(x => x.Id == id)?
-				.UserSkills
-				.Select(x => x.Skill)
-				.ToList();
-
-			if (userSkills == null || !userSkills.Any())
-				return new List<Skill>();
-
-			return userSkills;
 		}
 
 		//Команды других могут просматривать все
@@ -118,30 +38,6 @@ namespace TeamBuilder.Controllers
 			var user = context.Users.Include(x => x.UserTeams).FirstOrDefault(x => x.Id == id);
 
 			return user;
-		}
-
-		[HttpGet]
-		public IActionResult Get(long id)
-		{
-			logger.LogInformation($"GET Request {HttpContext.Request.Headers[":path"]}");
-
-			var user = context.Users.Include(x => x.UserTeams)
-				.ThenInclude(y => y.Team)
-				.ThenInclude(y => y.Event)
-				.Include(x => x.UserSkills)
-				.ThenInclude(y => y.Skill)
-				.FirstOrDefault(u => u.Id == id);
-
-			if (user == null)
-				return NotFound("Не нашли пользователя");
-
-			if (user?.UserTeams != null)
-			{
-				user.UserTeams = user.GetActiveUserTeams().ToList();
-				user.AnyTeamOwner = user.UserTeams.Any(x => x.IsOwner);
-			}
-
-			return Json(user);
 		}
 
 		[HttpGet]
@@ -172,42 +68,6 @@ namespace TeamBuilder.Controllers
 			}
 
 			return BadRequest("Пользователь не ищет команду");
-
-		}
-
-		[HttpPost]
-		public async Task<IActionResult> Edit([FromBody] EditUserViewModel editUserModel)
-		{
-			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");
-
-			if (!await accessChecker.CanManageUser(editUserModel.Id))
-				return Forbid();
-
-			var user = await context.Users
-				.Include(x => x.UserSkills)
-				.FirstOrDefaultAsync(u => u.Id == editUserModel.Id);
-
-			var config = new MapperConfiguration(cfg => cfg.CreateMap<EditUserViewModel, User>());
-			var mapper = new Mapper(config);
-			mapper.Map(editUserModel, user);
-
-			var existUserSkills = user.UserSkills;
-			var newUserSkills = editUserModel.SkillsIds.Select(s => new UserSkill { UserId = user.Id, SkillId = s }).ToList();
-			context.TryUpdateManyToMany(existUserSkills, newUserSkills, x => new { x.SkillId });
-
-			context.Update(user);
-			await context.SaveChangesAsync();
-
-			//TODO ПОЧЕМУ ПРИХОДИТСЯ ЗАНОВО ДОСТАВАТЬ????
-			var updUser = await context.Users
-				.Include(x => x.UserTeams)
-				.ThenInclude(y => y.Team)
-				.ThenInclude(y => y.Event)
-				.Include(x => x.UserSkills)
-				.ThenInclude(y => y.Skill)
-				.FirstOrDefaultAsync(u => u.Id == editUserModel.Id);
-
-			return Json(updUser);
 		}
 
 		// Принимает приглашение (из профиля)
@@ -224,20 +84,20 @@ namespace TeamBuilder.Controllers
 				.ThenInclude(y => y.Event)
 				.FirstOrDefaultAsync(u => u.Id == profileId);
 
-			var userTeamToJoin = user?.UserTeams.First(x => x.TeamId == teamId);
+			var userTeam = user?.UserTeams.First(x => x.TeamId == teamId);
 
-			if (userTeamToJoin?.UserAction != UserActionEnum.ConsideringOffer)
-				throw new Exception($"User '{user?.Id}' have invalid userAction '{userTeamToJoin?.UserAction}' for team '{teamId}'. " +
+			if (userTeam?.UserAction != UserActionEnum.ConsideringOffer)
+				throw new Exception($"User '{user?.Id}' have invalid userAction '{userTeam?.UserAction}' for team '{teamId}'. " +
 									$"Available value: {UserActionEnum.ConsideringOffer}");
 
-			userTeamToJoin.UserAction = UserActionEnum.JoinedTeam;
+			userTeam.UserAction = UserActionEnum.JoinedTeam;
 
 			context.Update(user);
 			await context.SaveChangesAsync();
 
-			var activeUserTeams = user.GetActiveUserTeams();
+			await JoinTeamNotify(teamId, user, userTeam.Team);
 
-			return Json(activeUserTeams);
+			return Json(user.GetActiveUserTeams());
 		}
 
 		//Пользователь выходит из команды / отказывается от приглашения (из профиля)
@@ -268,30 +128,7 @@ namespace TeamBuilder.Controllers
 			context.Update(user);
 			await context.SaveChangesAsync();
 
-			#region notice
-
-			var items = new List<NoticeItem>
-			{
-				NoticeItem.User(user.Id, user.FullName),
-				NoticeItem.Team(userTeam.Team.Id, userTeam.Team.Name)
-			};
-			var ownerId = (await context.Teams
-				.Include(t => t.UserTeams)
-				.FirstOrDefaultAsync(t => t.Id == teamId))
-				.GetOwnerId() ?? throw new NullReferenceException("ownerId");
-			switch (userTeam.UserAction)
-			{
-				case UserActionEnum.RejectedTeamRequest:
-					await notificationSender.Send(ownerId, NotifyType.Destructive, 
-						"Пользователь {0} отказался от приглашения в команду {1}", user.Photo100, items);
-					break;
-				case UserActionEnum.QuitTeam:
-					await notificationSender.Send(ownerId, NotifyType.Destructive, 
-						"Пользователь {0} вышел из команды {1}", user.Photo100, items);
-					break;
-			}
-
-			#endregion
+			await QuitOrDeclineTeamNotify(teamId, user, userTeam);
 
 			return Json(user.GetActiveUserTeams());
 		}
@@ -327,9 +164,9 @@ namespace TeamBuilder.Controllers
 
 		//Пользователь отправляет запрос в команду из меню команды / Пользователя приглашает команда по кнопке "Завербовать"
 		[HttpGet]
-		public async Task<IActionResult> SetTeam(long id, long teamId, bool isTeamOffer = true)
+		public async Task<IActionResult> SetTeam(long userId, long teamId, bool isTeamOffer = true)
 		{
-			logger.LogInformation("Request SetTeam");
+			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");
 
 			var dbTeam = await context.Teams
 				.Include(x => x.Image)
@@ -339,6 +176,7 @@ namespace TeamBuilder.Controllers
 				.ThenInclude(x => x.Team)
 				.ThenInclude(x => x.Event)
 				.FirstOrDefaultAsync(x => x.Id == teamId);
+
 			if (dbTeam == null)
 				return NotFound();
 
@@ -346,24 +184,20 @@ namespace TeamBuilder.Controllers
 				? UserActionEnum.ConsideringOffer
 				: UserActionEnum.SentRequest;
 
-			if (dbTeam.UserTeams.All(x => x.UserId != id))
+			if (dbTeam.UserTeams.All(x => x.UserId != userId))
 			{
-				dbTeam.UserTeams.Add(new UserTeam { UserId = id, UserAction = userActionToSet });
+				dbTeam.UserTeams.Add(new UserTeam { UserId = userId, UserAction = userActionToSet });
 			}
 			else
 			{
-				var user = dbTeam.UserTeams.FirstOrDefault(x => x.UserId == id);
+				var user = dbTeam.UserTeams.FirstOrDefault(x => x.UserId == userId);
 				user.UserAction = userActionToSet;
 			}
 
 			context.Update(dbTeam);
 			await context.SaveChangesAsync();
 
-			if (userActionToSet == UserActionEnum.ConsideringOffer)
-				await notificationSender.Send(id, NotifyType.Add,
-					"Вас пригласили в команду {0}", 
-					dbTeam.Image.DataURL,
-					NoticeItem.Team(dbTeam.Id, dbTeam.Name));
+			await SetTeamNotify(userId, dbTeam, userActionToSet);
 
 			return Json(dbTeam);
 		}

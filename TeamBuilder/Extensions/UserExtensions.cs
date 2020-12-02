@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using TeamBuilder.Models;
 using TeamBuilder.Models.Enums;
 
@@ -16,11 +19,13 @@ namespace TeamBuilder.Extensions
 				x.IsOwner);
 		}
 
-		public static long? GetOwnerId(this Team team)
+		public static async Task<long> GetOwnerId(this DbSet<Team> teams, long teamId)
 		{
-			return team.UserTeams?
-				.FirstOrDefault(t => t.IsOwner)?
-				.UserId;
+			return (await teams.Include(t => t.UserTeams)
+					.FirstOrDefaultAsync(t => t.Id == teamId))
+					.UserTeams?
+					.FirstOrDefault(t => t.IsOwner)?
+					.UserId ?? throw new NullReferenceException("ownerId");
 		}
 	}
 }

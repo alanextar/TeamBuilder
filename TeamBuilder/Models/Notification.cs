@@ -47,16 +47,19 @@ namespace TeamBuilder.Models
 
 	public class NoticeItem
 	{
-		public NoticeItem(NoticePlaceholder placement, string id, string text)
+		public NoticeItem(NoticePlaceholder placement, long id, string text)
 		{
 			Placement = placement.ToString("G");
-			Id = id;
+			Id = id.ToString();
 			Text = text;
 		}
 
-		public static NoticeItem Team(long id, string name) => new NoticeItem(NoticePlaceholder.Team, id.ToString(), name);
-		public static NoticeItem User(long id, string name) => new NoticeItem(NoticePlaceholder.User, id.ToString(), name);
-		public static NoticeItem Event(long id, string name) => new NoticeItem(NoticePlaceholder.Event, id.ToString(), name);
+		public static NoticeItem Team(Team team) => Team(team.Id, team.Name);
+		public static NoticeItem Team(long id, string name) => new NoticeItem(NoticePlaceholder.Team, id, name);
+		public static NoticeItem User(User user) => User(user.Id, user.FullName);
+		public static NoticeItem User(long id, string name) => new NoticeItem(NoticePlaceholder.User, id, name);
+		public static NoticeItem Event(Event @event) => Event(@event.Id, @event.Name);
+		public static NoticeItem Event(long id, string name) => new NoticeItem(NoticePlaceholder.Event, id, name);
 
 		public string Placement { get; set; }
 		public string Id { get; set; }
