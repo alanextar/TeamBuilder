@@ -1,8 +1,8 @@
 ﻿import React from 'react';
 import { connect } from 'react-redux';
 import {
-	Panel, PanelHeader, Group, Cell, Avatar, Button, Div, PanelHeaderBack, Placeholder,
-	Tabs, TabsItem, Separator, PullToRefresh, InfoRow, Header, Link, PanelSpinner
+	Panel, PanelHeader, Group, Cell, Avatar, Button, Div, PanelHeaderBack, Counter, Placeholder,
+	Tabs, TabsItem, Separator, PullToRefresh, InfoRow, Header, Link, PanelSpinner, HorizontalScroll
 } from '@vkontakte/vkui';
 import '@vkontakte/vkui/dist/vkui.css';
 import Icon24Phone from '@vkontakte/icons/dist/24/phone';
@@ -15,7 +15,8 @@ import Icon28ViewOutline from '@vkontakte/icons/dist/28/view_outline';
 import Icon28HideOutline from '@vkontakte/icons/dist/28/hide_outline';
 import Icon56UsersOutline from '@vkontakte/icons/dist/56/users_outline';
 
-import UserTeams from './userTeams'
+import UserTeams from './userTeams';
+import UserNotifications from './userNotifications';
 import { Api } from '../../infrastructure/api';
 import * as Utils from '../../infrastructure/utils';
 import { getActivePanel } from "../../services/_functions";
@@ -125,6 +126,11 @@ class User extends React.Component {
 			});
 	}
 
+	renderNoticeCount() {
+		let countNew = this.props.notifications.filter(n => n.isNew === true).length;
+		return countNew !== 0 && <Counter size="s">{countNew}</Counter>;
+	}
+
 	render() {
 		const { goBack, goToPage, setActiveTab } = this.props;
 		let user = this.state.user;
@@ -135,8 +141,8 @@ class User extends React.Component {
 			<Panel id={this.props.id}>
 				{/*!!!Костыль. Пока не сделали запрос на юзера в базе он undefined. Затем становить null, в js это разные вещи*/}
 				{user === undefined && this.props.profileUser === undefined
-				? <PanelSpinner key={0} size="large" />
-				:
+					? <PanelSpinner key={0} size="large" />
+					:
 					<>
 						<PanelHeader separator={false}
 							left={hasBack &&
@@ -144,7 +150,7 @@ class User extends React.Component {
 						</PanelHeader>
 						<PullToRefresh onRefresh={this.onRefresh} isFetching={this.state.fetching}>
 							{this.state.readOnlyMode
-								? user && 
+								? user &&
 								<Group title="VK Connect">
 									<Link href={"https://m.vk.com/id" + user.id} target="_blank">
 										<Cell description={user.city || ''}
@@ -184,19 +190,28 @@ class User extends React.Component {
 							}
 							<Separator />
 							<Tabs>
-								<TabsItem
-									onClick={() => setActiveTab(this.bindingId, null)}
-									selected={!this.props.activeTab[this.bindingId]}>
-									Основное
-						</TabsItem>
-								<TabsItem
-									onClick={() => setActiveTab(this.bindingId, 'teams')}
-									selected={this.props.activeTab[this.bindingId] === 'teams'}>
-									Команды
-						</TabsItem>
+								<HorizontalScroll>
+									<TabsItem
+										onClick={() => setActiveTab(this.bindingId, null)}
+										selected={!this.props.activeTab[this.bindingId]}>
+										Основное
+									</TabsItem>
+									<TabsItem
+										onClick={() => setActiveTab(this.bindingId, 'teams')}
+										selected={this.props.activeTab[this.bindingId] === 'teams'}>
+										Команды
+									</TabsItem>
+									<TabsItem
+										onClick={() => setActiveTab(this.bindingId, 'notifications')}
+										selected={this.props.activeTab[this.bindingId] === 'notifications'}
+										after={this.renderNoticeCount()}>
+										Уведомления
+									</TabsItem>
+								</HorizontalScroll>
 							</Tabs>
 							{
-								this.props.activeTab[this.bindingId] !== 'teams' ?
+								!this.props.activeTab[this.bindingId]
+									?
 									<Group header={
 										<Header
 											mode="secondary"
@@ -231,10 +246,17 @@ class User extends React.Component {
 													<SkillTokens selectedSkills={Utils.convertUserSkills(user?.userSkills)} />
 												</InfoRow>
 											</Cell>}
-									</Group> :
-									<Group>
-										<UserTeams loading={this.state.loading} userTeams={user?.userTeams} readOnlyMode={this.state.readOnlyMode} />
 									</Group>
+									:
+									this.props.activeTab[this.bindingId] === 'teams'
+										?
+										<Group>
+											<UserTeams loading={this.state.loading} userTeams={user?.userTeams} readOnlyMode={this.state.readOnlyMode} />
+										</Group>
+										:
+										<Group>
+											<UserNotifications />
+										</Group>
 							}
 						</PullToRefresh>
 					</>
@@ -251,7 +273,8 @@ const mapStateToProps = (state) => {
 		profile: state.user.profile,
 		activeView: state.router.activeView,
 		activeTab: state.vkui.activeTab,
-		panelsHistory: state.router.panelsHistory
+		panelsHistory: state.router.panelsHistory,
+		notifications: state.notice.notifications
 	};
 };
 

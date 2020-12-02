@@ -1,110 +1,36 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Mvc;
 using TeamBuilder.Models;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using TeamBuilder.Extensions;
 using TeamBuilder.Models.Enums;
-using TeamBuilder.ViewModels;
 using System;
-using AutoMapper;
 using TeamBuilder.Services;
 using TeamBuilder.Helpers;
 using System.Net;
+using TeamBuilder.ViewModels;
 
 namespace TeamBuilder.Controllers
 {
-	public class UserController : Controller
+	public partial class UserController : Controller
 	{
 		private readonly ApplicationContext context;
 		private readonly UserAccessChecker accessChecker;
+		private readonly NotificationSender notificationSender;
 		private readonly ILogger<UserController> logger;
 
-		public UserController(ApplicationContext context, UserAccessChecker accessChecker, ILogger<UserController> logger)
+		public UserController(
+			ApplicationContext context,
+			UserAccessChecker accessChecker,
+			NotificationSender notificationSender,
+			ILogger<UserController> logger)
 		{
 			this.context = context;
 			this.accessChecker = accessChecker;
+			this.notificationSender = notificationSender;
 			this.logger = logger;
-		}
-
-		[HttpPost]
-		public async Task<IActionResult> SaveOrConfirm([FromBody] ProfileViewModel profileViewModel)
-		{
-			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}. Body: {JsonConvert.SerializeObject(profileViewModel)}");
-
-			var user = context.Users.Include(x => x.UserSkills)
-				.ThenInclude(y => y.Skill).FirstOrDefault(u => u.Id == profileViewModel.Id);
-
-			if (user == null)
-			{
-				user = new User { Id = profileViewModel.Id };
-				if (profileViewModel.SkillsIds != null)
-				{
-					foreach (var skillId in profileViewModel.SkillsIds)
-					{
-						user.UserSkills.Add(new UserSkill() { SkillId = skillId });
-					}
-				}
-
-				await context.Users.AddAsync(user);
-			}
-			else
-			{
-				var dbUserSkills = user.UserSkills;
-				var userSkillsDto = profileViewModel.SkillsIds.Select(s => new UserSkill { UserId = user.Id, SkillId = s }).ToList();
-				context.TryUpdateManyToMany(dbUserSkills, userSkillsDto, x => new { x.SkillId });
-
-				context.Users.Update(user);
-			}
-
-			user.FirstName = profileViewModel.FirstName;
-			user.LastName = profileViewModel.LastName;
-			user.Photo100 = profileViewModel.Photo100;
-			user.Photo200 = profileViewModel.Photo200;
-
-			user.IsSearchable = profileViewModel.IsSearchable;
-
-			try
-			{
-				await context.SaveChangesAsync();
-			}
-			catch (Exception)
-			{
-				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
-			}
-
-			return Json(user);
-		}
-
-		[HttpGet]
-		public IActionResult CheckConfirmation(long id)
-		{
-			logger.LogInformation($"GET Request {HttpContext.Request.Headers[":path"]}");
-
-			var isConfirmed = context.Users.FirstOrDefault(x => x.Id == id) != null ? true : false;
-
-			return Json(isConfirmed);
-		}
-
-		//TODO не используется
-		public List<Skill> GetSkills(long id)
-		{
-			logger.LogInformation($"GET Request {HttpContext.Request.Headers[":path"]}");
-
-			var userSkills = context.Users.Include(x => x.UserSkills)
-				.ThenInclude(y => y.Skill)
-				.FirstOrDefault(x => x.Id == id)?
-				.UserSkills
-				.Select(x => x.Skill)
-				.ToList();
-
-			if (userSkills == null || !userSkills.Any())
-				return new List<Skill>();
-
-			return userSkills;
 		}
 
 		//Команды других могут просматривать все
@@ -115,32 +41,6 @@ namespace TeamBuilder.Controllers
 			var user = context.Users.Include(x => x.UserTeams).FirstOrDefault(x => x.Id == id);
 
 			return user;
-		}
-
-		[HttpGet]
-		public IActionResult Get(long id)
-		{
-			logger.LogInformation($"GET Request {HttpContext.Request.Headers[":path"]}");
-
-			var user = context.Users.Include(x => x.UserTeams)
-				.ThenInclude(y => y.Team)
-				.ThenInclude(y => y.Event)
-				.Include(x => x.UserSkills)
-				.ThenInclude(y => y.Skill)
-				.FirstOrDefault(u => u.Id == id);
-
-			if (user == null)
-				return Json(null);
-			//TODO По идее это правильный эксепшен, но если неподтвержденный юзер, то нужно возвращать null чтобы не вываливался снекбар с exception
-				//throw new HttpStatusException(HttpStatusCode.NotFound, UserErrorMessages.NotFound, UserErrorMessages.DebugNotFound(id));
-
-			if (!user.UserTeams.IsNullOrEmpty())
-			{
-				user.UserTeams = user.GetActiveUserTeams().ToList();
-				user.AnyTeamOwner = user.UserTeams.Any(x => x.IsOwner);
-			}
-
-			return Json(user);
 		}
 
 		[HttpGet]
@@ -175,49 +75,6 @@ namespace TeamBuilder.Controllers
 				throw new HttpStatusException(HttpStatusCode.BadRequest, UserErrorMessages.IsNotSearchable);
 
 			return Json(user.TeamsToRecruit);
-
-		}
-
-		[HttpPost]
-		public async Task<IActionResult> Edit([FromBody] EditUserViewModel editUserModel)
-		{
-			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");
-
-			if (!await accessChecker.CanManageUser(editUserModel.Id))
-				throw new HttpStatusException(HttpStatusCode.Forbidden, CommonErrorMessages.Forbidden);
-
-			var user = await context.Users
-				.Include(x => x.UserSkills)
-				.FirstOrDefaultAsync(u => u.Id == editUserModel.Id);
-
-			var config = new MapperConfiguration(cfg => cfg.CreateMap<EditUserViewModel, User>());
-			var mapper = new Mapper(config);
-			mapper.Map(editUserModel, user);
-
-			var existUserSkills = user.UserSkills;
-			var newUserSkills = editUserModel.SkillsIds.Select(s => new UserSkill { UserId = user.Id, SkillId = s }).ToList();
-
-			try
-			{
-				context.TryUpdateManyToMany(existUserSkills, newUserSkills, x => new { x.SkillId });
-				context.Update(user);
-				await context.SaveChangesAsync();
-			}
-			catch (Exception)
-			{
-				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
-			}
-
-			//TODO ПОЧЕМУ ПРИХОДИТСЯ ЗАНОВО ДОСТАВАТЬ????
-			var updUser = await context.Users
-				.Include(x => x.UserTeams)
-				.ThenInclude(y => y.Team)
-				.ThenInclude(y => y.Event)
-				.Include(x => x.UserSkills)
-				.ThenInclude(y => y.Skill)
-				.FirstOrDefaultAsync(u => u.Id == editUserModel.Id);
-
-			return Json(updUser);
 		}
 
 		// Принимает приглашение (из профиля)
@@ -234,15 +91,15 @@ namespace TeamBuilder.Controllers
 				.ThenInclude(y => y.Event)
 				.FirstOrDefaultAsync(u => u.Id == profileId);
 
-			var userTeamToJoin = user?.UserTeams.First(x => x.TeamId == teamId);
+			var userTeam = user?.UserTeams.First(x => x.TeamId == teamId);
 
-			if (userTeamToJoin?.UserAction != UserActionEnum.ConsideringOffer)
+			if (userTeam?.UserAction != UserActionEnum.ConsideringOffer)
 			{
-				throw new HttpStatusException(HttpStatusCode.BadRequest, UserErrorMessages.AppendToTeam, 
-					TeamErrorMessages.InvalidUserAction(user.Id, userTeamToJoin, teamId, UserActionEnum.ConsideringOffer));
+				throw new HttpStatusException(HttpStatusCode.BadRequest, UserErrorMessages.AppendToTeam,
+					TeamErrorMessages.InvalidUserAction(user.Id, userTeam, teamId, UserActionEnum.ConsideringOffer));
 			}
 
-			userTeamToJoin.UserAction = UserActionEnum.JoinedTeam;
+			userTeam.UserAction = UserActionEnum.JoinedTeam;
 
 			try
 			{
@@ -254,9 +111,9 @@ namespace TeamBuilder.Controllers
 				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
 			}
 
-			var activeUserTeams = user.GetActiveUserTeams();
+			await JoinTeamNotify(teamId, user, userTeam.Team);
 
-			return Json(activeUserTeams);
+			return Json(user.GetActiveUserTeams());
 		}
 
 		//Пользователь выходит из команды / отказывается от приглашения (из профиля)
@@ -280,8 +137,8 @@ namespace TeamBuilder.Controllers
 			{
 				UserActionEnum.ConsideringOffer => UserActionEnum.RejectedTeamRequest,
 				UserActionEnum.JoinedTeam => UserActionEnum.QuitTeam,
-				_ => throw new HttpStatusException(HttpStatusCode.BadRequest, 
-					TeamErrorMessages.QuitDeclineTeam, 
+				_ => throw new HttpStatusException(HttpStatusCode.BadRequest,
+					TeamErrorMessages.QuitDeclineTeam,
 					TeamErrorMessages.InvalidUserAction(profileId, userTeam, teamId,
 					UserActionEnum.ConsideringOffer, UserActionEnum.JoinedTeam)
 				)
@@ -297,9 +154,9 @@ namespace TeamBuilder.Controllers
 				throw new HttpStatusException(HttpStatusCode.NotFound, UserErrorMessages.NotFound);
 			}
 
-			var activeUserTeams = user.GetActiveUserTeams();
+			await QuitOrDeclineTeamNotify(teamId, user, userTeam);
 
-			return Json(activeUserTeams);
+			return Json(user.GetActiveUserTeams());
 		}
 
 		//Пользователь сам отменяет заявку в команду (из профиля)
@@ -338,7 +195,7 @@ namespace TeamBuilder.Controllers
 			{
 				throw new HttpStatusException(HttpStatusCode.NotFound, CommonErrorMessages.SaveChanges);
 			}
-			
+
 			var activeUserTeams = user.GetActiveUserTeams();
 
 			if (activeUserTeams.IsNullOrEmpty())
@@ -347,12 +204,11 @@ namespace TeamBuilder.Controllers
 			return Json(activeUserTeams);
 		}
 
-		//TODO Не понял что тут происходит :) 
-		//Пользователь отправляет запрос в команду из меню команды / Пользователя приглашает команда по кнопке завербовать
+		//Пользователь отправляет запрос в команду из меню команды / Пользователя приглашает команда по кнопке "Завербовать"
 		[HttpGet]
 		public async Task<IActionResult> SetTeam(long id, long teamId, bool isTeamOffer = true)
 		{
-			logger.LogInformation("Request SetTeam");
+			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");
 
 			var dbTeam = await context.Teams
 				.Include(x => x.Image)
@@ -362,11 +218,13 @@ namespace TeamBuilder.Controllers
 				.ThenInclude(x => x.Team)
 				.ThenInclude(x => x.Event)
 				.FirstOrDefaultAsync(x => x.Id == teamId);
+
 			if (dbTeam == null)
 				throw new HttpStatusException(HttpStatusCode.NotFound, TeamErrorMessages.NotFound, TeamErrorMessages.DebugNotFound(teamId));
 
-			var userActionToSet = isTeamOffer ?
-					UserActionEnum.ConsideringOffer : UserActionEnum.SentRequest;
+			var userActionToSet = isTeamOffer
+				? UserActionEnum.ConsideringOffer
+				: UserActionEnum.SentRequest;
 
 			if (dbTeam.UserTeams.All(x => x.UserId != id))
 			{
@@ -391,10 +249,12 @@ namespace TeamBuilder.Controllers
 				throw new HttpStatusException(HttpStatusCode.InternalServerError, CommonErrorMessages.SaveChanges);
 			}
 
+			await SetTeamNotify(id, dbTeam, userActionToSet);
+
 			return Json(dbTeam);
 		}
 
-#region List
+		#region List
 
 		public IActionResult GetAll()
 		{
@@ -430,6 +290,6 @@ namespace TeamBuilder.Controllers
 			return Json(result);
 		}
 
-#endregion
+		#endregion
 	}
 }

@@ -17,10 +17,6 @@ const initialState = {
 	activeView: null,
 	activePanel: null,
 
-	activeUserId: null,
-	activeTeamId: null,
-	activeEventsId: null,
-
 	storiesHistory: [],
 	viewsHistory: [],
 	panelsHistory: [],

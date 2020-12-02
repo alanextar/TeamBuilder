@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using TeamBuilder.Controllers.Paging;
 using TeamBuilder.Models.Enums;
 

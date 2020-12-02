@@ -11,23 +11,27 @@ import { setStory } from "./store/router/actions";
 import { composeWithDevTools } from 'redux-devtools-extension';
 import { Provider } from 'react-redux';
 
-import bridge from '@vkontakte/vk-bridge';
-
 import './css/main.css';
 import App from './App'
 import * as VK from './services/VK';
 
 export const store = createStore(
-    rootReducer, composeWithDevTools(
-    applyMiddleware(thunk),
-    applyMiddleware(logger)
-));
+	rootReducer, composeWithDevTools(
+		applyMiddleware(thunk),
+		applyMiddleware(logger)
+	));
 
-store.dispatch(VK.initApp()); 
+store.dispatch(VK.initApp());
 store.dispatch(VK.initProfile());
 store.dispatch(setStory('profile', 'user'));
 
-ReactDOM.render(<Provider store={store}><App /></Provider>, document.getElementById('root'));
+ReactDOM.render(
+	<Provider store={store}>
+		<App />
+	</Provider>,
+	document.getElementById('root')
+);
+
 if (process.env.NODE_ENV === "development") {
-    import("eruda").then(({ default: eruda }) => { }); //runtime download
+	import("eruda").then(({ default: eruda }) => { }); //runtime download
 }
