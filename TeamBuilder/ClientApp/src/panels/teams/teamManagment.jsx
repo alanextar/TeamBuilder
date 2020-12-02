@@ -73,7 +73,7 @@ const TeamManagment = (props) => {
 				return (
 					<React.Fragment>
 						{
-							isAnyActionAllowed(userTeam.userAction) && !userTeam.isOwner &&
+							isAnyActionAllowed(userTeam.userAction) &&
 							<RichCell
 								key={userTeam.userId}
 								caption={userTeam.isOwner ? "Капитан" : null}
