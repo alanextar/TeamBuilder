@@ -60,6 +60,13 @@ const TeamManagment = (props) => {
 		return actionsAllowed.includes(userAction);
 	}
 
+	const canDelete = (userTeam) => {
+		let isAccepted = userTeam.userAction === 2;
+		let isSelf = userTeam.userId == props.profileUser.id
+
+		return isAccepted && !isSelf;
+	}
+
 	return (
 		<Group>
 			{props.userTeams?.filter(x => isAnyActionAllowed(x.userAction))?.length == 0 &&
@@ -79,7 +86,7 @@ const TeamManagment = (props) => {
 								caption={userTeam.isOwner ? "Капитан" : null}
 								before={<Avatar size={48} src={userTeam.user.photo100} />}
 								after={
-									(userTeam.userAction === 2 || props.isModerator) &&
+									canDelete(userTeam) &&
 									<Icon24Dismiss onClick={e => dropUser(e, userTeam, Alerts.RemoveUserFromTeamPopout)} />
 								}
 								onClick={(e) => goToUser(e, userTeam.userId)}

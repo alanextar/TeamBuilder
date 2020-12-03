@@ -91,6 +91,7 @@ class TeamInfo extends React.Component {
 						</PanelHeaderContent> :
 						`Команда`}
 				</PanelHeader>
+				<Separator style={{ margin: '12px 0' }} />
 				<TeamMenu
 					team={this.state.team}
 					updateTeam={this.updateTeam}
@@ -153,7 +154,6 @@ class TeamInfo extends React.Component {
 									{
 										!canEdit ?
 											<Group>
-												<Separator style={{ margin: '12px 0' }} />
 												{activeTeamMembers && activeTeamMembers.map(userTeam => {
 													return (
 														userTeam.userAction === 2 &&
