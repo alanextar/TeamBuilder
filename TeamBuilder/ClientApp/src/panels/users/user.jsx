@@ -201,12 +201,12 @@ class User extends React.Component {
 										selected={this.props.activeTab[this.bindingId] === 'teams'}>
 										Команды
 									</TabsItem>
-									<TabsItem
+									{user?.id == this.props.profileUser?.id && <TabsItem
 										onClick={() => setActiveTab(this.bindingId, 'notifications')}
 										selected={this.props.activeTab[this.bindingId] === 'notifications'}
 										after={this.renderNoticeCount()}>
 										Уведомления
-									</TabsItem>
+									</TabsItem>}
 								</HorizontalScroll>
 							</Tabs>
 							{
