@@ -62,7 +62,9 @@ class User extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
-		if (this.props.profile !== prevProps.profile) {
+		if (this.props.profile !== prevProps.profile || 
+			this.props.panelsHistory !== prevProps.panelsHistory) {
+			
 			let itemIdInitial = getActivePanel(this.props.activeView).itemId || this.props.profile?.id;
 			let isMyProfile = itemIdInitial == this.props.profile?.id;
 
@@ -222,7 +224,7 @@ class User extends React.Component {
 												<Icon24Write className="pointer" style={{ color: "#3f8ae0" }} onClick={() => goToPage('userEdit')} />
 											}>
 											{isNoContent ? "" : "Информация"}
-                                </Header>}>
+										</Header>}>
 										{isNoContent &&
 											<Placeholder icon={<Icon56UsersOutline />} header="Нет информации">
 												Здесь вы можете просмотреть контактные данные участника

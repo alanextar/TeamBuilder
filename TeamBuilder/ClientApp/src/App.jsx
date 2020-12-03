@@ -10,7 +10,7 @@ import { getActivePanel } from "./services/_functions";
 import { initHubConnection } from "./services/notificationHub";
 
 import Icon24Done from '@vkontakte/icons/dist/24/done';
-import Icon28Users from '@vkontakte/icons/dist/28/users';
+import Icon28UsersOutline from '@vkontakte/icons/dist/28/users_outline';
 import Icon28Profile from '@vkontakte/icons/dist/28/profile';
 import Icon28Users3Outline from '@vkontakte/icons/dist/28/users_3_outline';
 import Icon28FavoriteOutline from '@vkontakte/icons/dist/28/favorite_outline';
@@ -69,7 +69,7 @@ const App = (props) => {
 		setPopout(popout);
 	});
 
-	
+
 	const isNewNotice = () => {
 		return notifications.filter(n => n.isNew === true).length !== 0;
 	}
@@ -89,7 +89,7 @@ const App = (props) => {
 						onClick={() => setStory('users', 'users')}
 						selected={activeStory === 'users'}
 						text="Участники"
-					><Icon28Users /></TabbarItem>
+					><Icon28UsersOutline /></TabbarItem>
 					<TabbarItem
 						className="pointer"
 						onClick={() => setStory('events', 'events')}
