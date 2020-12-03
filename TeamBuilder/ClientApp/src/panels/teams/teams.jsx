@@ -28,7 +28,7 @@ const Teams = props => {
 	const renderHeader = (
 		props.profileUser ?
 			<PanelHeader separator={false}
-				left={<PanelHeaderButton onClick={() => goToPage('teamCreate')}>Создать</PanelHeaderButton>}>
+				left={<PanelHeaderButton className="pointer" onClick={() => goToPage('teamCreate')}>Создать</PanelHeaderButton>}>
 				Команды
 	            </PanelHeader> :
 			<PanelHeader separator={false}>

@@ -34,13 +34,13 @@ class TeamFilters extends React.Component {
 					onClose={() => this.hideModal()}
 					header={
 						<ModalPageHeader
-							left={<PanelHeaderButton onClick={() => this.reset()}>Сбросить</PanelHeaderButton>}
-							right={<PanelHeaderButton onClick={() => this.hideModal()}>Готово</PanelHeaderButton>}>
+							left={<PanelHeaderButton className="pointer" onClick={() => this.reset()}>Сбросить</PanelHeaderButton>}
+							right={<PanelHeaderButton className="pointer" onClick={() => this.hideModal()}>Готово</PanelHeaderButton>}>
 							Фильтры
 							</ModalPageHeader>
 					}>
 					<FormLayout>
-						<SelectMimicry top="События" placeholder="Не выбрано"
+						<SelectMimicry className="pointer" top="События" placeholder="Не выбрано"
 							onClick={() => this.chooseEvent()}>
 							{this.props.teamsEventFilter?.name}
 						</SelectMimicry>

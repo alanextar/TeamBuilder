@@ -192,16 +192,19 @@ class User extends React.Component {
 							<Tabs>
 								<HorizontalScroll>
 									<TabsItem
+										className="pointer"
 										onClick={() => setActiveTab(this.bindingId, null)}
 										selected={!this.props.activeTab[this.bindingId]}>
 										Основное
 									</TabsItem>
 									<TabsItem
+										className="pointer"
 										onClick={() => setActiveTab(this.bindingId, 'teams')}
 										selected={this.props.activeTab[this.bindingId] === 'teams'}>
 										Команды
 									</TabsItem>
 									{user?.id == this.props.profileUser?.id && <TabsItem
+										className="pointer"
 										onClick={() => setActiveTab(this.bindingId, 'notifications')}
 										selected={this.props.activeTab[this.bindingId] === 'notifications'}
 										after={this.renderNoticeCount()}>
@@ -216,7 +219,7 @@ class User extends React.Component {
 										<Header
 											mode="secondary"
 											aside={user && !this.state.readOnlyMode &&
-												<Icon24Write style={{ color: "#3f8ae0" }} onClick={() => goToPage('userEdit')} />
+												<Icon24Write className="pointer" style={{ color: "#3f8ae0" }} onClick={() => goToPage('userEdit')} />
 											}>
 											{isNoContent ? "" : "Информация"}
                                 </Header>}>

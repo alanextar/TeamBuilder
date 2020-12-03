@@ -23,7 +23,7 @@ const Events = props => {
 			?
 			<PanelHeader
 				separator={false}
-				left={<PanelHeaderButton onClick={() => goToPage('eventCreate')}>Создать</PanelHeaderButton>}>
+				left={<PanelHeaderButton className="pointer" onClick={() => goToPage('eventCreate')}>Создать</PanelHeaderButton>}>
 				События
 					</PanelHeader>
 			:
