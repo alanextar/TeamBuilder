@@ -98,7 +98,8 @@ class TeamCreate extends React.Component {
 
 	async getAllEvents() {
 		Api.Events.getAll()
-			.then(result => this.setState({ events: result }));
+			.then(result => this.setState({ events: result }))
+			.catch(error => { });
 	}
 
 	async postCreate() {

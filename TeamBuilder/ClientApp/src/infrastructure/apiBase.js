@@ -65,7 +65,7 @@ export async function get(url, params = {}) {
 	catch (error) {
 		console.log(`Error for get request '${url}'. Details: ${error}`);
 		ShowError(error);
-		return;
+		throw error;
 	}
 	
 }
@@ -90,7 +90,7 @@ export async function post(url, data = {}) {
 	catch (error) {
 		console.log(`Error for post request '${url}' with body ${JSON.stringify(data)}.  Details: ${error}`);
 		ShowError(error);
-		return;
+		throw error;
 	}
 }
 
@@ -117,7 +117,7 @@ export async function Delete(url, params = {}) {
 		console.log(`Error for delete request '${url}'. Details: ${error}`);
 		ShowError(error);
 		Alerts.UnblockScreen();
-		return;
+		throw error;
 	}
 }
 

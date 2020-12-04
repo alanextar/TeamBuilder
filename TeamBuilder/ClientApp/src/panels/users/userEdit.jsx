@@ -103,6 +103,7 @@ class UserEdit extends React.Component {
 					}
 				})
 			})
+			.catch(error => { });
 	}
 
 	populateSkills() {

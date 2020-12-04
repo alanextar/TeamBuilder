@@ -125,7 +125,8 @@ class User extends React.Component {
 			.then(user => {
 				this.setState({ user: user });
 				setProfileUser(user);
-			});
+			})
+			.catch(error => { });
 	}
 
 	renderNoticeCount() {
