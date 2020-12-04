@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using System.Threading.Tasks;
+using AspNetCoreRateLimit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -33,6 +34,24 @@ namespace TeamBuilder
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
+			#region Rate Limiting
+			// needed to load configuration from appsettings.json
+			services.AddOptions();
+
+			// needed to store rate limit counters and ip rules
+			services.AddMemoryCache();
+
+			//load general configuration from appsettings.json
+			services.Configure<IpRateLimitOptions>(Configuration.GetSection("IpRateLimiting"));
+
+			//load ip rules from appsettings.json
+			services.Configure<IpRateLimitPolicies>(Configuration.GetSection("IpRateLimitPolicies"));
+
+			// inject counter and rules stores
+			services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+			services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+			#endregion
+
 			services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(GetConnectionString()));
 
 			services.AddAuthentication("Vk")
@@ -56,6 +75,8 @@ namespace TeamBuilder
 
 			);
 
+			services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+
 			// In production, the React files will be served from this directory
 			services.AddSpaStaticFiles(configuration =>
 			{
@@ -69,6 +90,9 @@ namespace TeamBuilder
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{
+			//app.UseIpRateLimiting();
+			app.UseMiddleware<MyIpRateLimitMiddleware>();
+
 			app.UseHttpsRedirection();
 			app.UseStaticFiles();
 			app.UseSpaStaticFiles();
