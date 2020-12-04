@@ -15,7 +15,6 @@ import { countConfirmed } from "../../infrastructure/utils";
 import { getActivePanel, longOperationWrapper } from "../../services/_functions";
 import { Api } from '../../infrastructure/api';
 import Icon56UsersOutline from '@vkontakte/icons/dist/56/users_outline';
-import { isNoContentResponse } from "../../infrastructure/utils";
 
 const EventInfo = props => {
 	const { goBack, goToPage } = props;

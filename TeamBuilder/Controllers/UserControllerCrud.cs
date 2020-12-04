@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -39,9 +40,12 @@ namespace TeamBuilder.Controllers
 			}
 			else
 			{
-				var dbUserSkills = user.UserSkills;
-				var userSkillsDto = profileViewModel.SkillsIds.Select(s => new UserSkill { UserId = user.Id, SkillId = s }).ToList();
-				context.TryUpdateManyToMany(dbUserSkills, userSkillsDto, x => new { x.SkillId });
+				var dbUserSkills = user.UserSkills ?? new List<UserSkill> ();
+				var userSkillsDto = profileViewModel.SkillsIds
+					?.Select(s => new UserSkill { UserId = user.Id, SkillId = s })?.ToList();
+				userSkillsDto = userSkillsDto ?? new List<UserSkill>();
+
+				context.TryUpdateManyToMany(dbUserSkills, userSkillsDto, x => x.SkillId);
 
 				context.Users.Update(user);
 			}

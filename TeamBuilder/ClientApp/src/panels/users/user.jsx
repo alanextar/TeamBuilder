@@ -266,6 +266,7 @@ class User extends React.Component {
 						</PullToRefresh>
 					</>
 				}
+				{this.props.snackbar}
 			</Panel>
 		)
 	}
@@ -279,7 +280,8 @@ const mapStateToProps = (state) => {
 		activeView: state.router.activeView,
 		activeTab: state.vkui.activeTab,
 		panelsHistory: state.router.panelsHistory,
-		notifications: state.notice.notifications
+		notifications: state.notice.notifications,
+		snackbar: state.formData.snackbar
 	};
 };
 

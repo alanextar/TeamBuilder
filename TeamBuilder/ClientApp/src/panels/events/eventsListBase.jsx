@@ -44,8 +44,15 @@ const EventsListBase = props => {
                 </PanelHeader>}>
 				{renderItems}
 			</SearchWithInfiniteScroll>
+			{props.snackbar}
 		</Panel>
 	);
+};
+
+const mapStateToProps = (state) => {
+	return {
+		snackbar: state.formData.snackbar
+	};
 };
 
 const mapDispatchToProps = {
@@ -53,4 +60,4 @@ const mapDispatchToProps = {
 	goBack
 }
 
-export default connect(null, mapDispatchToProps)(EventsListBase);
+export default connect(mapStateToProps, mapDispatchToProps)(EventsListBase);

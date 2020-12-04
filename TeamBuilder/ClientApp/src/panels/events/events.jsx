@@ -65,7 +65,7 @@ const Events = props => {
 					добавить в него свою команду
 				</Placeholder>
 			}
-			
+			{props.snackbar}
 		</Panel>
 	);
 };
@@ -73,7 +73,8 @@ const Events = props => {
 const mapStateToProps = (state) => {
 	return {
 		profileUser: state.user.profileUser,
-		error: state.formData.error
+		error: state.formData.error,
+		snackbar: state.formData.snackbar
 	}
 };
 
