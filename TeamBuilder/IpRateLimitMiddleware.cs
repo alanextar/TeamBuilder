@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Net;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
@@ -35,9 +36,9 @@ namespace TeamBuilder
 
 			httpContext.Response.Headers["Retry-After"] = retryAfter;
 
-			httpContext.Response.StatusCode = 200;
+			httpContext.Response.StatusCode = (int)HttpStatusCode.TooManyRequests;
 			httpContext.Response.ContentType = "application/json";
-			var exception = new HttpStatusException(System.Net.HttpStatusCode.TooManyRequests, CommonErrorMessages.TooManyRequests);
+			var exception = new HttpStatusException(HttpStatusCode.TooManyRequests, CommonErrorMessages.TooManyRequests);
 
 			return httpContext.Response.WriteAsync(JsonConvert.SerializeObject(exception));
 		}
