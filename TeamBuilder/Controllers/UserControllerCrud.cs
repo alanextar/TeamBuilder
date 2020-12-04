@@ -46,8 +46,6 @@ namespace TeamBuilder.Controllers
 				userSkillsDto = userSkillsDto ?? new List<UserSkill>();
 
 				context.TryUpdateManyToMany(dbUserSkills, userSkillsDto, x => x.SkillId);
-
-				context.Users.Update(user);
 			}
 
 			user.FirstName = profileViewModel.FirstName;
