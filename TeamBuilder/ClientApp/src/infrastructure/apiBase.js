@@ -6,10 +6,20 @@ import { Snackbar, Avatar } from "@vkontakte/vkui";
 import Icon20CancelCircleFillRed from '@vkontakte/icons/dist/20/cancel_circle_fill_red';
 import * as Alerts from "../panels/components/Alerts.js";
 
+const getVkId = () => {
+	const params = new URLSearchParams(window.location.search)
+	return params.get("vk_user_id");
+}
+
+const commonHeaders = {
+	'Launch-Params': window.location.search,// === "" ? secrets.launchParams : window.location.search
+	'X-ClientId': getVkId()
+}
+
 const initGet = {
 	method: 'GET',
 	headers: {
-		'Launch-Params': window.location.search// === "" ? secrets.launchParams : window.location.search
+		...commonHeaders
 	},
 	mode: 'cors',
 	cache: 'default'
@@ -18,7 +28,7 @@ const initGet = {
 const initPost = {
 	method: 'POST',
 	headers: {
-		'Launch-Params': window.location.search,// === "" ? secrets.launchParams : window.location.search,
+		...commonHeaders,
 		'Content-Type': 'application/json'
 	},
 	mode: 'cors',
@@ -28,7 +38,7 @@ const initPost = {
 const initDelete = {
 	method: 'DELETE',
 	headers: {
-		'Launch-Params': window.location.search// === "" ? secrets.launchParams : window.location.search,
+		...commonHeaders
 	},
 	mode: 'cors',
 	cache: 'default'
@@ -48,7 +58,7 @@ export async function get(url, params = {}) {
 		if (resp.ok)
 			return json;
 		else {
-			throw json;
+			throw { ...json, code:resp.status };
 		}
 
 	}
@@ -72,7 +82,8 @@ export async function post(url, data = {}) {
 		if (resp.ok)
 			return json;
 		else {
-			throw json;
+			
+			throw {...json, code : resp.status};
 		}
 			
 	}
@@ -98,7 +109,7 @@ export async function Delete(url, params = {}) {
 		if (resp.ok)
 			return json;
 		else {
-			throw json;
+			throw { ...json, code: resp.status };
 		}
 
 	}
@@ -111,14 +122,19 @@ export async function Delete(url, params = {}) {
 }
 
 export function ShowError(error) {
+	let message = error?.message;
+	if (error.code == 429) {
+		message = "Упс. Кажется, Вы слишком часто повторяете какое-то действие, попробуйте позже"
+	}
+
 	if (error.code != 204) {
 		let snackbar = <Snackbar
 			layout="vertical"
 			onClose={() => store.dispatch(setSnackbar(null))}
 			before={<Avatar size={24}><Icon20CancelCircleFillRed /></Avatar>}
 		>
-			<p>Код ошибки: {error.code != null ? error.code : 500}</p>
-			<p>{error.message != null ? error.message : "Ничего страшного, бывает и хуже.Скоро устраним ;)"}</p>
+			<p>Код ошибки: {error.code ? error.code : 500}</p>
+			<p>{message ? message : "Ничего страшного, бывает и хуже.Скоро устраним ;)"}</p>
 		</Snackbar>
 		store.dispatch(setSnackbar(snackbar));
 	}

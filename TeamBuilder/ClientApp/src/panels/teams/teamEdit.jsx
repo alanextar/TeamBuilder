@@ -88,11 +88,13 @@ class TeamEdit extends React.Component {
 	fetchTeams() {
 		Api.Teams.get(this.state.itemId)
 			.then(user => this.setState({ inputData: user }))
+			.catch(error => { });
 	}
 
 	populateEventsData() {
 		Api.Events.getAll()
-			.then(events => this.setState({ events: events }));
+			.then(events => this.setState({ events: events }))
+			.catch(error => { });
 	}
 
 	async postEdit() {

@@ -31,7 +31,8 @@ const EventEdit = props => {
 
 	const fetchEvent = () => {
 		Api.Events.get(itemId)
-			.then(result => setInputData(result));
+			.then(result => setInputData(result))
+			.catch(error => { });
 	}
 
 	useEffect(() => {

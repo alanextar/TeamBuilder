@@ -31,9 +31,9 @@ namespace TeamBuilder.Helpers
 
 	public static class CommonErrorMessages
 	{
+		public static string TooManyRequests { get; set; } = "Количество запросов в интервал времени превышает предельно допустимое значение";
 		public static string SaveChanges { get; set; } = "Ошибка при сохранении";
 		public static string Forbidden { get; set; } = "Ты сюда не ходи - туда ходи";
-
 	}
 
 	public static class TeamErrorMessages

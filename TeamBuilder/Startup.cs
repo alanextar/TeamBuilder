@@ -1,9 +1,11 @@
 using System;
 using System.Text;
 using System.Threading.Tasks;
+using AspNetCoreRateLimit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.EntityFrameworkCore;
@@ -33,6 +35,23 @@ namespace TeamBuilder
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
+			//services.AddHttpContextAccessor();
+			#region Rate Limiting
+			// needed to load configuration from appsettings.json
+			services.AddOptions();
+
+			// needed to store rate limit counters and ip rules
+			services.AddMemoryCache();
+
+			// configure ip rate limiting middleware
+			services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+			services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+
+			// configure client rate limiting middleware
+			services.Configure<ClientRateLimitOptions>(Configuration.GetSection("ClientRateLimiting"));
+			services.AddSingleton<IClientPolicyStore, MemoryCacheClientPolicyStore>();
+			#endregion
+
 			services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(GetConnectionString()));
 
 			services.AddAuthentication("Vk")
@@ -40,7 +59,6 @@ namespace TeamBuilder
 
 			services.AddSignalR();
 
-			services.AddHttpContextAccessor();
 			services.AddTransient<UserAccessChecker>();
 			services.AddTransient<NotificationSender>();
 			services.AddSingleton<IVkSignChecker, VkSignChecker>();
@@ -56,6 +74,9 @@ namespace TeamBuilder
 
 			);
 
+			services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+			services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+
 			// In production, the React files will be served from this directory
 			services.AddSpaStaticFiles(configuration =>
 			{
@@ -69,6 +90,8 @@ namespace TeamBuilder
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{
+			app.UseMiddleware<MyClientRateLimitMiddleware>();
+
 			app.UseHttpsRedirection();
 			app.UseStaticFiles();
 			app.UseSpaStaticFiles();
