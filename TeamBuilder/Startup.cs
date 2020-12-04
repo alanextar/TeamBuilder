@@ -5,6 +5,7 @@ using AspNetCoreRateLimit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.EntityFrameworkCore;
@@ -34,6 +35,7 @@ namespace TeamBuilder
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
+			//services.AddHttpContextAccessor();
 			#region Rate Limiting
 			// needed to load configuration from appsettings.json
 			services.AddOptions();
@@ -41,15 +43,13 @@ namespace TeamBuilder
 			// needed to store rate limit counters and ip rules
 			services.AddMemoryCache();
 
-			//load general configuration from appsettings.json
-			services.Configure<IpRateLimitOptions>(Configuration.GetSection("IpRateLimiting"));
-
-			//load ip rules from appsettings.json
-			services.Configure<IpRateLimitPolicies>(Configuration.GetSection("IpRateLimitPolicies"));
-
-			// inject counter and rules stores
+			// configure ip rate limiting middleware
 			services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
 			services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+
+			// configure client rate limiting middleware
+			services.Configure<ClientRateLimitOptions>(Configuration.GetSection("ClientRateLimiting"));
+			services.AddSingleton<IClientPolicyStore, MemoryCacheClientPolicyStore>();
 			#endregion
 
 			services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(GetConnectionString()));
@@ -59,7 +59,6 @@ namespace TeamBuilder
 
 			services.AddSignalR();
 
-			services.AddHttpContextAccessor();
 			services.AddTransient<UserAccessChecker>();
 			services.AddTransient<NotificationSender>();
 			services.AddSingleton<IVkSignChecker, VkSignChecker>();
@@ -75,6 +74,7 @@ namespace TeamBuilder
 
 			);
 
+			services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 			services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 
 			// In production, the React files will be served from this directory
@@ -90,23 +90,25 @@ namespace TeamBuilder
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{
+			app.UseClientRateLimiting();
+			//app.UseMiddleware<MyClientRateLimitMiddleware>();
+			app.UseExceptionHandler("/api/error");
 			//app.UseIpRateLimiting();
-			app.UseMiddleware<MyIpRateLimitMiddleware>();
 
 			app.UseHttpsRedirection();
 			app.UseStaticFiles();
 			app.UseSpaStaticFiles();
 
-			if (env.IsDevelopment())
-			{
-				app.UseDeveloperExceptionPage();
-			}
-			else
-			{
-				app.UseExceptionHandler("/api/error");
-				// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-				app.UseHsts();
-			}
+			//if (env.IsDevelopment())
+			//{
+			//	app.UseDeveloperExceptionPage();
+			//}
+			//else
+			//{
+			//	app.UseExceptionHandler("/api/error");
+			//	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+			//	app.UseHsts();
+			//}
 
 			app.MapWhen(
 				context => context.Request.Path.StartsWithSegments("/hub"),

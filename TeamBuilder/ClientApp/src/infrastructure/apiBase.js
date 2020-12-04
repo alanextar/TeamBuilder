@@ -6,10 +6,20 @@ import { Snackbar, Avatar } from "@vkontakte/vkui";
 import Icon20CancelCircleFillRed from '@vkontakte/icons/dist/20/cancel_circle_fill_red';
 import * as Alerts from "../panels/components/Alerts.js";
 
+const getVkId = () => {
+	const params = new URLSearchParams(window.location.search)
+	return params.get("vk_user_id");
+}
+
+const commonHeaders = {
+	'Launch-Params': window.location.search,// === "" ? secrets.launchParams : window.location.search
+	'X-ClientId': getVkId()
+}
+
 const initGet = {
 	method: 'GET',
 	headers: {
-		'Launch-Params': window.location.search// === "" ? secrets.launchParams : window.location.search
+		...commonHeaders
 	},
 	mode: 'cors',
 	cache: 'default'
@@ -18,7 +28,7 @@ const initGet = {
 const initPost = {
 	method: 'POST',
 	headers: {
-		'Launch-Params': window.location.search,// === "" ? secrets.launchParams : window.location.search,
+		...commonHeaders,
 		'Content-Type': 'application/json'
 	},
 	mode: 'cors',
@@ -28,7 +38,7 @@ const initPost = {
 const initDelete = {
 	method: 'DELETE',
 	headers: {
-		'Launch-Params': window.location.search// === "" ? secrets.launchParams : window.location.search,
+		...commonHeaders
 	},
 	mode: 'cors',
 	cache: 'default'

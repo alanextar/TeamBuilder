@@ -17,16 +17,19 @@ using TeamBuilder.ViewModels;
 
 namespace TeamBuilder
 {
-	public class MyIpRateLimitMiddleware : IpRateLimitMiddleware
+	public class MyClientRateLimitMiddleware : ClientRateLimitMiddleware
 	{
-		public MyIpRateLimitMiddleware(RequestDelegate next
-			, IOptions<IpRateLimitOptions> options
-			, IRateLimitCounterStore counterStore
-			, IIpPolicyStore policyStore
-			, IRateLimitConfiguration config
-			, ILogger<IpRateLimitMiddleware> logger)
-				: base(next, options, counterStore, policyStore, config, logger)
+		private readonly ILogger<ClientRateLimitMiddleware> _logger;
+
+		public MyClientRateLimitMiddleware(RequestDelegate next,
+			IOptions<ClientRateLimitOptions> options,
+			IRateLimitCounterStore counterStore,
+			IClientPolicyStore policyStore,
+			IRateLimitConfiguration config,
+			ILogger<ClientRateLimitMiddleware> logger)
+		: base(next, options, counterStore, policyStore, config, logger)
 		{
+			_logger = logger;
 		}
 
 		public override Task ReturnQuotaExceededResponse(HttpContext httpContext, RateLimitRule rule, string retryAfter)
