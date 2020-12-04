@@ -91,23 +91,21 @@ namespace TeamBuilder
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{
 			app.UseMiddleware<MyClientRateLimitMiddleware>();
-			app.UseExceptionHandler("/api/error");
-			//app.UseIpRateLimiting();
 
 			app.UseHttpsRedirection();
 			app.UseStaticFiles();
 			app.UseSpaStaticFiles();
 
-			//if (env.IsDevelopment())
-			//{
-			//	app.UseDeveloperExceptionPage();
-			//}
-			//else
-			//{
-			//	app.UseExceptionHandler("/api/error");
-			//	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-			//	app.UseHsts();
-			//}
+			if (env.IsDevelopment())
+			{
+				app.UseDeveloperExceptionPage();
+			}
+			else
+			{
+				app.UseExceptionHandler("/api/error");
+				// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+				app.UseHsts();
+			}
 
 			app.MapWhen(
 				context => context.Request.Path.StartsWithSegments("/hub"),
