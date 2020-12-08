@@ -30,6 +30,8 @@ class UserEdit extends React.Component {
 
 		this.handleInput = (e) => {
 			let value = e.currentTarget.value;
+			if (500 - value.length < 0)
+				return;
 
 			if (e.currentTarget.type === 'checkbox') {
 				value = e.currentTarget.checked;
@@ -93,6 +95,10 @@ class UserEdit extends React.Component {
 		await longOperationWrapper({ action, postAction });
 	}
 
+	validateForm() {
+
+	}
+
 	fetchUser() {
 		Api.Users.get(this.props.profile.id)
 			.then(user => {
@@ -143,6 +149,9 @@ class UserEdit extends React.Component {
 						<Input name="telegram" value={this.getOrEmpty('telegram')} onChange={this.handleInput} type="text" placeholder="Telegram" />
 						<Input name="email" value={this.getOrEmpty('email')} onChange={this.handleInput} type="text" placeholder="Email" />
 						<Textarea name="about" value={this.getOrEmpty('about')} onChange={this.handleInput} placeholder="Дополнительно" />
+						<div style={{ margin: "12px", display: "flex", justifyContent: "end", fontSize: "11px", color: "var(--text_secondary)" }}>
+							<span weight="regular">осталось {500 - this.getOrEmpty('about').length} символов</span>
+						</div>
 						<Div>
 							<Title level="3" weight="regular" style={{ marginBottom: 16 }}>Скиллы:</Title>
 							<CreatableMulti

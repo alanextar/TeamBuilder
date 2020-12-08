@@ -184,7 +184,7 @@ class User extends React.Component {
 									</Link>
 									{this.props.profileUser === null &&
 										<Div>
-											<Button mode="destructive" size='xl'
+											<Button size='xl'
 												onClick={() => this.confirmUser()}>
 												Зарегистрироваться
 									</Button>
