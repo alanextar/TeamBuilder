@@ -276,9 +276,10 @@ namespace TeamBuilder.Controllers
 			if (pageSize == 0)
 				throw new HttpStatusException(HttpStatusCode.NoContent, "");
 
-
+			var searchLower = search?.ToLower();
 			bool Filter(IHasFullName user) 
-				=> string.IsNullOrEmpty(search) || EF.Functions.ILike(user.FullName, $"%{search}%");
+				=> string.IsNullOrEmpty(searchLower) || user.FullName.ToLower().Contains(searchLower);
+
 			var result = context.Users
 				.Select(u => new UserPagingSearchDto
 				{
