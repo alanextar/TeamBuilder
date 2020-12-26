@@ -1,6 +1,6 @@
 #See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
+FROM mcr.microsoft.com/dotnet/aspnet:5.0-buster AS build
 WORKDIR /app
 
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE=1
@@ -18,7 +18,7 @@ COPY TeamBuilder/. ./TeamBuilder/
 WORKDIR /app/TeamBuilder
 RUN dotnet publish -c Release -o out
 
-FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-buster-slim AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:5.0-buster-slim AS runtime
 WORKDIR /app
 COPY --from=build /app/TeamBuilder/out ./
 

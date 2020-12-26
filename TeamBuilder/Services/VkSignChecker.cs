@@ -30,7 +30,7 @@ namespace TeamBuilder.Services
 
 		public bool Verify(string query)
 		{
-			var parsed = !string.IsNullOrEmpty(query) 
+			var parsed = !string.IsNullOrEmpty(query)
 				? LaunchParams.Parse(query).ParsedQuery
 				: null;
 
@@ -45,15 +45,16 @@ namespace TeamBuilder.Services
 			if (!launchParams.ContainsKey("sign") || string.IsNullOrEmpty(launchParams["sign"]))
 				return false;
 
-			var secret = env.IsDevelopment() ? configuration["VK_SECURE_KEY"] : Environment.GetEnvironmentVariable("VK_SECURE_KEY");
+			var secret = env.IsDevelopment() 
+				? configuration["VK_SECURE_KEY"] 
+				: Environment.GetEnvironmentVariable("VK_SECURE_KEY");
 			if (string.IsNullOrEmpty(secret))
 				return false;
 
-			var checkedQuery = launchParams
+			var checkedQuery = string.Join("&", launchParams
 				.Where(q => q.Key.StartsWith("vk_"))
 				.OrderBy(q => q.Key)
-				.Select(q => $"{q.Key}={q.Value}")
-				.Join("&");
+				.Select(q => $"{q.Key}={q.Value}"));
 
 			var sign = GetSign(checkedQuery, secret);
 
