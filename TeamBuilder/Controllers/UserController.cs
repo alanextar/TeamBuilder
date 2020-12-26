@@ -7,9 +7,11 @@ using Microsoft.EntityFrameworkCore;
 using TeamBuilder.Extensions;
 using TeamBuilder.Models.Enums;
 using System;
+using System.Collections.Generic;
 using TeamBuilder.Services;
 using TeamBuilder.Helpers;
 using System.Net;
+using TeamBuilder.Controllers.Paging;
 using TeamBuilder.ViewModels;
 
 namespace TeamBuilder.Controllers
@@ -274,15 +276,24 @@ namespace TeamBuilder.Controllers
 			if (pageSize == 0)
 				throw new HttpStatusException(HttpStatusCode.NoContent, "");
 
-			bool Filter(User user) => user.FullName.ToLowerInvariant().Contains(search?.ToLowerInvariant() ?? string.Empty);
-			var result = context.Users
-				.Include(u => u.UserSkills)
-				.ThenInclude(us => us.Skill)
-				.Include(u => u.UserTeams)
-				.GetPage(pageSize, HttpContext.Request, page, prev, Filter)
-				.HackForReferenceLoop();
 
-			result.NextHref = result.NextHref == null ? null : $"{result.NextHref}&search={search}";
+			bool Filter(IHasFullName user) 
+				=> string.IsNullOrEmpty(search) || EF.Functions.ILike(user.FullName, $"%{search}%");
+			var result = context.Users
+				.Select(u => new UserPagingSearchDto
+				{
+					Id = u.Id,
+					IsSearchable = u.IsSearchable,
+					FirstName = u.FirstName,
+					LastName = u.LastName,
+					FullName = u.FullName,
+					Photo200 = u.Photo200,
+					City = u.City,
+					About = u.About,
+					Skills = u.UserSkills.Select(us => us.Skill.Name),
+					IsTeamMember = u.UserTeams.Count(ut => ut.UserAction == UserActionEnum.JoinedTeam) > 0
+				})
+				.GetPage(pageSize, HttpContext.Request.Headers[":path"], page, prev, Filter);
 
 			logger.LogInformation($"Response UsersCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
 								  $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
@@ -291,5 +302,19 @@ namespace TeamBuilder.Controllers
 		}
 
 		#endregion
+	}
+
+	public class UserPagingSearchDto : IHasId, IHasFullName
+	{
+		public long Id { get; set; }
+		public bool IsSearchable { get; set; }
+		public string FirstName { get; set; }
+		public string LastName { get; set; }
+		public string Photo200 { get; set; }
+		public IEnumerable<string> Skills { get; set; }
+		public bool IsTeamMember { get; set; }
+		public string City { get; set; }
+		public string About { get; set; }
+		public string FullName { get; set; }
 	}
 }

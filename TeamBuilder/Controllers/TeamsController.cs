@@ -59,8 +59,11 @@ namespace TeamBuilder.Controllers
 				}
 				return isEqual;
 			}
-			var result = context.Teams.Include(x => x.Image).Include(x => x.Event).Include(x => x.UserTeams).GetPage(pageSize, HttpContext.Request, page, prev, Filter);
-			result.NextHref = result.NextHref == null ? null : $"{result.NextHref}&search={search}&eventId={eventId}";
+			var result = context.Teams.Include(x => x.Image)
+				.Include(x => x.Event)
+				.Include(x => x.UserTeams)
+				.GetPage(pageSize, HttpContext.Request.Headers[":path"], page, prev, Filter);
+			//result.NextHref = result.NextHref == null ? null : $"{result.NextHref}&search={search}&eventId={eventId}";
 
 
 			logger.LogInformation($"Response TeamsCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +

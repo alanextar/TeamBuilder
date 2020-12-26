@@ -48,14 +48,14 @@ namespace TeamBuilder.Controllers
 
 		public IActionResult PagingSearch(string search, int pageSize = 20, int page = 0, bool prev = false)
 		{
-			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
+			var requestUrl = HttpContext.Request.Headers[":path"];
+			logger.LogInformation($"Request {requestUrl}");
 
 			if (pageSize == 0)
 				throw new HttpStatusException(HttpStatusCode.NoContent, "");
 
 			bool Filter(Event @event) => @event.Name.ToLowerInvariant().Contains(search?.ToLowerInvariant() ?? string.Empty);
-			var result = context.Events.Include(e => e.Teams).GetPage(pageSize, HttpContext.Request, page, prev, Filter);
-			result.NextHref = result.NextHref == null ? null : $"{result.NextHref}&search={search}";
+			var result = context.Events.Include(e => e.Teams).GetPage(pageSize, requestUrl, page, prev, Filter);
 			logger.LogInformation($"Response EventsCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
 			                      $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
 

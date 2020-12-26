@@ -55,8 +55,9 @@ export async function get(url, params = {}) {
 		const resp = await fetch(url, initGet);
 		const json = await resp.json();
 
-		if (resp.ok)
+		if (resp.ok){
 			return json;
+		}
 		else {
 			throw { ...json, code:resp.status };
 		}

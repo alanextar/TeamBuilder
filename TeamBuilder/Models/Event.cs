@@ -9,7 +9,7 @@ using TeamBuilder.Controllers.Paging;
 
 namespace TeamBuilder.Models
 {
-	public class Event: IDbItem
+	public class Event: IHasId
 	{
 		public long Id { get; set; }
 		public string Name { get; set; }
