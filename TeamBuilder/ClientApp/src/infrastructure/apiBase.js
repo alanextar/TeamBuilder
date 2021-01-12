@@ -1,5 +1,4 @@
-﻿// import * as secrets from './secret.js';
-import React from 'react';
+﻿import React from 'react';
 import { store } from "../index";
 import { setError, setSnackbar } from "../store/formData/actions";
 import { Snackbar, Avatar } from "@vkontakte/vkui";
@@ -7,12 +6,12 @@ import Icon20CancelCircleFillRed from '@vkontakte/icons/dist/20/cancel_circle_fi
 import * as Alerts from "../panels/components/Alerts.js";
 
 const getVkId = () => {
-	const params = new URLSearchParams(window.location.search)
+	const params = new URLSearchParams(window.location.search);
 	return params.get("vk_user_id");
 }
 
 const commonHeaders = {
-	'Launch-Params': window.location.search,// === "" ? secrets.launchParams : window.location.search
+	'Launch-Params': window.location.search,
 	'X-ClientId': getVkId()
 }
 
