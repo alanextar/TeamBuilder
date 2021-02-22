@@ -7,11 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using TeamBuilder.Extensions;
 using TeamBuilder.Models.Enums;
 using System;
-using System.Collections.Generic;
 using TeamBuilder.Services;
 using TeamBuilder.Helpers;
 using System.Net;
-using TeamBuilder.Controllers.Paging;
 using TeamBuilder.ViewModels;
 
 namespace TeamBuilder.Controllers
@@ -33,6 +31,40 @@ namespace TeamBuilder.Controllers
 			this.accessChecker = accessChecker;
 			this.notificationSender = notificationSender;
 			this.logger = logger;
+		}
+
+		public IActionResult PagingSearch(string search, int pageSize = 20, int page = 0, bool prev = false)
+		{
+			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
+
+			if (pageSize == 0)
+				throw new HttpStatusException(HttpStatusCode.NoContent, "");
+
+			var searchLower = search?.ToLower() ?? string.Empty;
+
+			var result = context.Users
+				.Where(user => EF.Functions.ILike(user.FirstName, $"%{searchLower}%") ||
+				               EF.Functions.ILike(user.SecondName, $"%{searchLower}%") ||
+				               EF.Functions.ILike(user.LastName, $"%{searchLower}%"))
+				.Select(u => new UserPagingViewModel
+				{
+					Id = u.Id,
+					IsSearchable = u.IsSearchable,
+					FirstName = u.FirstName,
+					LastName = u.LastName,
+					FullName = u.FullName,
+					Photo200 = u.Photo200,
+					City = u.City,
+					About = u.About,
+					Skills = u.UserSkills.Select(us => us.Skill.Name),
+					IsTeamMember = u.UserTeams.Any(ut => ut.UserAction == UserActionEnum.JoinedTeam)
+				})
+				.GetPage(pageSize, HttpContext.Request.Headers[":path"], page, prev);
+
+			logger.LogInformation($"Response UsersCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
+								  $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
+
+			return Json(result);
 		}
 
 		//Команды других могут просматривать все
@@ -80,6 +112,7 @@ namespace TeamBuilder.Controllers
 		}
 
 		// Принимает приглашение (из профиля)
+
 		public async Task<IActionResult> JoinTeam(long teamId)
 		{
 			logger.LogInformation($"GET Request {HttpContext.Request.Headers[":path"]}");
@@ -119,6 +152,7 @@ namespace TeamBuilder.Controllers
 		}
 
 		//Пользователь выходит из команды / отказывается от приглашения (из профиля)
+
 		public async Task<IActionResult> QuitOrDeclineTeam(long teamId)
 		{
 			logger.LogInformation($"GET Request {HttpContext.Request.Headers[":path"]}");
@@ -162,6 +196,7 @@ namespace TeamBuilder.Controllers
 		}
 
 		//Пользователь сам отменяет заявку в команду (из профиля)
+
 		public async Task<IActionResult> CancelRequestTeam(long teamId)
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");
@@ -207,6 +242,7 @@ namespace TeamBuilder.Controllers
 		}
 
 		//Пользователь отправляет запрос в команду из меню команды / Пользователя приглашает команда по кнопке "Завербовать"
+
 		[HttpGet]
 		public async Task<IActionResult> SetTeam(long id, long teamId, bool isTeamOffer = true)
 		{
@@ -255,67 +291,5 @@ namespace TeamBuilder.Controllers
 
 			return Json(dbTeam);
 		}
-
-		#region List
-
-		public IActionResult GetAll()
-		{
-			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
-
-			var users = context.Users.ToList();
-
-			logger.LogInformation($"Response UsersCount:{users.Count}");
-
-			return Json(users);
-		}
-
-		public IActionResult PagingSearch(string search, int pageSize = 20, int page = 0, bool prev = false)
-		{
-			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
-
-			if (pageSize == 0)
-				throw new HttpStatusException(HttpStatusCode.NoContent, "");
-
-			var searchLower = search?.ToLower();
-			bool Filter(IHasFullName user) 
-				=> string.IsNullOrEmpty(searchLower) || user.FullName.ToLower().Contains(searchLower);
-
-			var result = context.Users
-				.Select(u => new UserPagingSearchDto
-				{
-					Id = u.Id,
-					IsSearchable = u.IsSearchable,
-					FirstName = u.FirstName,
-					LastName = u.LastName,
-					FullName = u.FullName,
-					Photo200 = u.Photo200,
-					City = u.City,
-					About = u.About,
-					Skills = u.UserSkills.Select(us => us.Skill.Name),
-					IsTeamMember = u.UserTeams.Count(ut => ut.UserAction == UserActionEnum.JoinedTeam) > 0
-				})
-				.GetPage(pageSize, HttpContext.Request.Headers[":path"], page, prev, Filter);
-
-			logger.LogInformation($"Response UsersCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
-								  $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
-
-			return Json(result);
-		}
-
-		#endregion
-	}
-
-	public class UserPagingSearchDto : IHasId, IHasFullName
-	{
-		public long Id { get; set; }
-		public bool IsSearchable { get; set; }
-		public string FirstName { get; set; }
-		public string LastName { get; set; }
-		public string Photo200 { get; set; }
-		public IEnumerable<string> Skills { get; set; }
-		public bool IsTeamMember { get; set; }
-		public string City { get; set; }
-		public string About { get; set; }
-		public string FullName { get; set; }
 	}
 }

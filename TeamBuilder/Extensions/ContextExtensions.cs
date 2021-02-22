@@ -45,7 +45,7 @@ namespace TeamBuilder.Extensions
 			var countSkip = prev ? 0 : page * pageSize;
 
 			string nextHref = null;
-			var items = set.Where(filter).OrderBy(s => s.Id).Skip(countSkip).Take(++countTake).ToList();
+			var items = set.OrderBy(s => s.Id).Skip(countSkip).Take(++countTake).ToList();
 			if (items.Count == countTake)
 			{
 				nextHref = request.SetQueryParams(new { pageSize = pageSize, page = ++page });

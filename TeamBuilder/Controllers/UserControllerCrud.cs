@@ -93,6 +93,17 @@ namespace TeamBuilder.Controllers
 			return Json(user);
 		}
 
+		public IActionResult GetAll()
+		{
+			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
+
+			var users = context.Users.ToList();
+
+			logger.LogInformation($"Response UsersCount:{users.Count}");
+
+			return Json(users);
+		}
+
 		[HttpPost]
 		public async Task<IActionResult> Edit([FromBody] EditUserViewModel editUserModel)
 		{

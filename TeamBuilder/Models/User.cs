@@ -4,7 +4,7 @@ using TeamBuilder.Controllers.Paging;
 
 namespace TeamBuilder.Models
 {
-	public class User : IHasId, IHasFullName
+	public class User : IHasId
 	{
 		public long Id { get; set; }
 		public string FirstName { get; set; }

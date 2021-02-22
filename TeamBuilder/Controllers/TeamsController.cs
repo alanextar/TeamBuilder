@@ -50,22 +50,23 @@ namespace TeamBuilder.Controllers
 			if (pageSize == 0)
 				throw new HttpStatusException(HttpStatusCode.NoContent, "");
 
-			bool Filter(Team team)
-			{
-				var isEqual = team.Name.ToLowerInvariant().Contains(search?.ToLowerInvariant() ?? string.Empty);
-				if (eventId != null)
+			var searchLower = search?.ToLower();
+
+			var result = context.Teams
+				.Where(team => team.Name.ToLower().Contains(searchLower ?? string.Empty) || 
+				               team.EventId == eventId)
+				.Select(team => new TeamPagingViewModel
 				{
-					isEqual = team.EventId == eventId && isEqual;
-				}
-				return isEqual;
-			}
-			var result = context.Teams.Include(x => x.Image)
-				.Include(x => x.Event)
-				.Include(x => x.UserTeams)
-				.GetPage(pageSize, HttpContext.Request.Headers[":path"], page, prev, Filter);
-			//result.NextHref = result.NextHref == null ? null : $"{result.NextHref}&search={search}&eventId={eventId}";
-
-
+					Id = team.Id,
+					ImageDataUrl = team.Image.DataURL,
+					Description = team.Description,
+					FullName = team.Name,
+					EventName = team.Event.Name,
+					CountConfirmedUser = team.UserTeams.Count(u => u.UserAction == UserActionEnum.JoinedTeam || u.IsOwner),
+					NumberRequiredMembers = team.NumberRequiredMembers
+				})
+				.GetPage(pageSize, HttpContext.Request.Headers[":path"], page, prev);
+			
 			logger.LogInformation($"Response TeamsCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
 								  $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
 
