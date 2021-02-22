@@ -60,7 +60,7 @@ namespace TeamBuilder.Controllers
 					Id = team.Id,
 					ImageDataUrl = team.Image.DataURL,
 					Description = team.Description,
-					FullName = team.Name,
+					Title = team.Name,
 					EventName = team.Event.Name,
 					CountConfirmedUser = team.UserTeams.Count(u => u.UserAction == UserActionEnum.JoinedTeam || u.IsOwner),
 					NumberRequiredMembers = team.NumberRequiredMembers
