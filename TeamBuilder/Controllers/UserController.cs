@@ -59,7 +59,7 @@ namespace TeamBuilder.Controllers
 					Skills = u.UserSkills.Select(us => us.Skill.Name),
 					IsTeamMember = u.UserTeams.Any(ut => ut.UserAction == UserActionEnum.JoinedTeam)
 				})
-				.GetPage(pageSize, HttpContext.Request.Headers[":path"], page, prev);
+				.GetPage(pageSize, HttpContext.Request.Path, page, prev);
 
 			logger.LogInformation($"Response UsersCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
 								  $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");

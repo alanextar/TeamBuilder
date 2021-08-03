@@ -65,7 +65,7 @@ namespace TeamBuilder.Controllers
 					CountConfirmedUser = team.UserTeams.Count(u => u.UserAction == UserActionEnum.JoinedTeam || u.IsOwner),
 					NumberRequiredMembers = team.NumberRequiredMembers
 				})
-				.GetPage(pageSize, HttpContext.Request.Headers[":path"], page, prev);
+				.GetPage(pageSize, HttpContext.Request.Path, page, prev);
 			
 			logger.LogInformation($"Response TeamsCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
 								  $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
