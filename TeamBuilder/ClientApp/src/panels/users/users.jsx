@@ -26,7 +26,7 @@ const Users = props => {
 					<Card size="l" mode="shadow" key={user.id}>
 						{user.isSearchable &&
 							<RichCell
-								before={<Avatar size={48} src={user.photo100} />}
+								before={<Avatar size={64} src={user.photo200} />}
 								after={user.isTeamMember && <Icon24Work  />}
 								caption={user.city && user.city}
 								bottom={stringfySkills(user.skills)}
@@ -42,7 +42,7 @@ const Users = props => {
 	}
 
 	const stringfySkills = (skills) => {
-		var joined = skills && skills.map(s => s.name).join(", ");
+		var joined = skills && [...skills].join(", ");
 		var max = 20;
 		var result = joined.length > max ? `${joined.substring(0, max)}...` : joined;
 		return result;

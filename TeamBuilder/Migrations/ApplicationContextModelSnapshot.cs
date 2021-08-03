@@ -15,9 +15,9 @@ namespace TeamBuilder.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
-                .HasAnnotation("ProductVersion", "3.1.3")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63)
+                .HasAnnotation("ProductVersion", "5.0.3")
+                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
 
             modelBuilder.Entity("TeamBuilder.Models.Connection", b =>
                 {
@@ -267,6 +267,8 @@ namespace TeamBuilder.Migrations
                     b.HasOne("TeamBuilder.Models.User", "Owner")
                         .WithMany("OwnEvents")
                         .HasForeignKey("OwnerId");
+
+                    b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("TeamBuilder.Models.Team", b =>
@@ -278,6 +280,10 @@ namespace TeamBuilder.Migrations
                     b.HasOne("TeamBuilder.Models.Image", "Image")
                         .WithMany()
                         .HasForeignKey("ImageId");
+
+                    b.Navigation("Event");
+
+                    b.Navigation("Image");
                 });
 
             modelBuilder.Entity("TeamBuilder.Models.UserSkill", b =>
@@ -293,6 +299,10 @@ namespace TeamBuilder.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Skill");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TeamBuilder.Models.UserTeam", b =>
@@ -308,6 +318,34 @@ namespace TeamBuilder.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Team");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TeamBuilder.Models.Event", b =>
+                {
+                    b.Navigation("Teams");
+                });
+
+            modelBuilder.Entity("TeamBuilder.Models.Skill", b =>
+                {
+                    b.Navigation("UserSkills");
+                });
+
+            modelBuilder.Entity("TeamBuilder.Models.Team", b =>
+                {
+                    b.Navigation("UserTeams");
+                });
+
+            modelBuilder.Entity("TeamBuilder.Models.User", b =>
+                {
+                    b.Navigation("OwnEvents");
+
+                    b.Navigation("UserSkills");
+
+                    b.Navigation("UserTeams");
                 });
 #pragma warning restore 612, 618
         }

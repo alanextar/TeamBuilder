@@ -43,7 +43,7 @@ namespace TeamBuilder.Controllers
 				var dbUserSkills = user.UserSkills ?? new List<UserSkill> ();
 				var userSkillsDto = profileViewModel.SkillsIds
 					?.Select(s => new UserSkill { UserId = user.Id, SkillId = s })?.ToList();
-				userSkillsDto = userSkillsDto ?? new List<UserSkill>();
+				userSkillsDto ??= new List<UserSkill>();
 
 				context.TryUpdateManyToMany(dbUserSkills, userSkillsDto, x => x.SkillId);
 			}
@@ -91,6 +91,17 @@ namespace TeamBuilder.Controllers
 			}
 
 			return Json(user);
+		}
+
+		public IActionResult GetAll()
+		{
+			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
+
+			var users = context.Users.ToList();
+
+			logger.LogInformation($"Response UsersCount:{users.Count}");
+
+			return Json(users);
 		}
 
 		[HttpPost]

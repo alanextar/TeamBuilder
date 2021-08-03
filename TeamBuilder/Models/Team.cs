@@ -6,7 +6,7 @@ using TeamBuilder.Models.Enums;
 
 namespace TeamBuilder.Models
 {
-	public class Team : IDbItem
+	public class Team : IHasId
 	{
 		public long Id { get; set; }
 		public string Name { get; set; }
@@ -25,7 +25,7 @@ namespace TeamBuilder.Models
 		public List<UserTeam> UserTeams { get; set; }
 	}
 
-	public class UserTeamDto : IDbItem
+	public class UserTeamDto : IHasId
 	{
 		public long Id { get; set; }
 		public string Name { get; set; }
