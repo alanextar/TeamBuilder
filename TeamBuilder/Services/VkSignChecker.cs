@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -34,10 +35,10 @@ namespace TeamBuilder.Services
 				? LaunchParams.Parse(query).ParsedQuery
 				: null;
 
-			return parsed != null && Verify(parsed);
+			return Verify(parsed);
 		}
 
-		public bool Verify(IReadOnlyDictionary<string, string> launchParams)
+		public bool Verify([AllowNull]IReadOnlyDictionary<string, string> launchParams)
 		{
 			if (launchParams == null)
 				return false;

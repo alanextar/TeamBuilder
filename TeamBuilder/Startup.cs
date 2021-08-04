@@ -1,5 +1,6 @@
 using System;
 using AspNetCoreRateLimit;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -19,17 +20,23 @@ namespace TeamBuilder
 {
 	public class Startup
 	{
-		public Startup(IConfiguration configuration)
-		{
-			Configuration = configuration;
-		}
+		private readonly IConfiguration configuration;
+		private readonly IWebHostEnvironment webHostEnvironment;
 
-		public IConfiguration Configuration { get; }
+		public string DatabaseConnectionString => webHostEnvironment.IsDevelopment()
+			? configuration.GetConnectionString("DefaultConnection")
+			: GetHerokuConnectionString();
+
+		public Startup(IConfiguration configuration, IWebHostEnvironment webHostEnvironment)
+		{
+			this.webHostEnvironment = webHostEnvironment;
+			this.configuration = configuration;
+		}
 
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
-			//services.AddHttpContextAccessor();
+			services.AddHttpContextAccessor();
 			#region Rate Limiting
 			// needed to load configuration from appsettings.json
 			services.AddOptions();
@@ -42,19 +49,22 @@ namespace TeamBuilder
 			services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
 
 			// configure client rate limiting middleware
-			services.Configure<ClientRateLimitOptions>(Configuration.GetSection("ClientRateLimiting"));
+			services.Configure<ClientRateLimitOptions>(configuration.GetSection("ClientRateLimiting"));
 			services.AddSingleton<IClientPolicyStore, MemoryCacheClientPolicyStore>();
+
+			services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 			#endregion
 
-			services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(GetConnectionString()));
+			services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(DatabaseConnectionString));
 
 			services.AddAuthentication("Vk")
-				.AddScheme<VkAuthenticationOptions, VkAuthenticationHandler>("Vk", null);
+				.AddScheme<AuthenticationSchemeOptions, VkAuthenticationHandler>("Vk", null);
 
 			services.AddSignalR();
 
 			services.AddTransient<UserAccessChecker>();
 			services.AddTransient<NotificationSender>();
+			services.AddSingleton<IUserIdProvider, UserIdProvider>();
 			services.AddSingleton<IVkSignChecker, VkSignChecker>();
 			services.AddReact();
 
@@ -68,17 +78,11 @@ namespace TeamBuilder
 
 			);
 
-			services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-			services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
-
 			// In production, the React files will be served from this directory
-			services.AddSpaStaticFiles(configuration =>
+			services.AddSpaStaticFiles(conf =>
 			{
-				configuration.RootPath = "ClientApp/build";
+				conf.RootPath = "ClientApp/build";
 			});
-
-
-			services.AddSingleton<IUserIdProvider, UserIdProvider>();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -138,11 +142,11 @@ namespace TeamBuilder
 			});
 		}
 
-		private string GetConnectionString()
+		private static string GetHerokuConnectionString()
 		{
 			var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
 			if (databaseUrl is null)
-				return Configuration.GetConnectionString("DefaultConnection");
+				throw new Exception("Environment variable 'DATABASE_URL' == null");
 
 			var databaseUri = new Uri(databaseUrl);
 			var userInfo = databaseUri.UserInfo.Split(':');

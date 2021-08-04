@@ -10,15 +10,12 @@ using TeamBuilder.Services;
 
 namespace TeamBuilder
 {
-	public class VkAuthenticationOptions : AuthenticationSchemeOptions
-	{ }
-
-	public class VkAuthenticationHandler : AuthenticationHandler<VkAuthenticationOptions>
+	public class VkAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 	{
 		private readonly IVkSignChecker vkSignChecker;
 
 		public VkAuthenticationHandler(
-			IOptionsMonitor<VkAuthenticationOptions> options,
+			IOptionsMonitor<AuthenticationSchemeOptions> options,
 			ILoggerFactory logger,
 			UrlEncoder encoder,
 			ISystemClock clock,
@@ -43,8 +40,8 @@ namespace TeamBuilder
 
 			var claims = new List<Claim>
 			{
-				new Claim(ClaimTypes.Name, parsedLaunchParams.VkUserId.ToString()),
-				new Claim(ClaimTypes.Role, "VkUser")
+				new(ClaimTypes.Name, parsedLaunchParams.VkUserId.ToString()),
+				new(ClaimTypes.Role, "VkUser")
 			};
 
 			var identity = new ClaimsIdentity(claims, Scheme.Name);
