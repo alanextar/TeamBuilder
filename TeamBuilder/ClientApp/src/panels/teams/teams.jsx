@@ -3,13 +3,14 @@ import { connect } from 'react-redux';
 import { goToPage, goBack } from '../../store/router/actions';
 import {
 	Panel, PanelHeader, Avatar, RichCell,
-	PanelHeaderButton, CardGrid, Card
+	PanelHeaderButton, CardGrid, Card, Placeholder
 } from '@vkontakte/vkui';
 
+import Icon56UsersOutline from '@vkontakte/icons/dist/56/users_outline';
 import SearchWithInfiniteScroll from '../components/SearchWithInfiniteScroll';
 
 import { Api, Urls } from '../../infrastructure/api';
-import { countConfirmed } from "../../infrastructure/utils";
+import { countConfirmed, isNoContentResponse } from "../../infrastructure/utils";
 
 const Teams = props => {
 	const { goToPage } = props;
@@ -27,7 +28,7 @@ const Teams = props => {
 	const renderHeader = (
 		props.profileUser ?
 			<PanelHeader separator={false}
-				left={<PanelHeaderButton onClick={() => goToPage('teamCreate')}>Создать</PanelHeaderButton>}>
+				left={<PanelHeaderButton className="pointer" onClick={() => goToPage('teamCreate')}>Создать</PanelHeaderButton>}>
 				Команды
 	            </PanelHeader> :
 			<PanelHeader separator={false}>
@@ -42,14 +43,14 @@ const Teams = props => {
 				{items?.map(team => (
 					<Card size="l" mode="shadow" key={team.id}>
 						<RichCell
-							before={<Avatar size={64} src={team.image?.dataURL} />}
+							before={<Avatar size={64} src={team.imageDataUrl} />}
 							text={team.description}
-							caption={team.event?.name}
-							after={countConfirmed(team.userTeams) +
+							caption={team.eventName}
+							after={team.countConfirmedUser +
 								'/' + team.numberRequiredMembers}
 							onClick={() => goToPage('teamInfo', team.id)}
 						>
-							{team.name}
+							{team.title}
 						</RichCell>
 					</Card>
 				))}
@@ -68,6 +69,13 @@ const Teams = props => {
 				header={renderHeader}>
 				{renderItems}
 			</SearchWithInfiniteScroll>
+			{
+				isNoContentResponse(props.error) &&
+				<Placeholder icon={<Icon56UsersOutline />} header="Список команд пуст">
+					Создавайте команду. Вступайте в существующие мероприятия <br />
+					или создайте своё и пригласите туда участников
+				</Placeholder>
+			}
 		</Panel>
 	);
 };
@@ -75,7 +83,8 @@ const Teams = props => {
 const mapStateToProps = (state) => {
 	return {
 		teamsEventFilter: state.event.teamsEventFilter,
-		profileUser: state.user.profileUser
+		profileUser: state.user.profileUser,
+		error: state.formData.error
 	}
 };
 

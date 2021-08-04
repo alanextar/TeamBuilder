@@ -1,19 +1,18 @@
 using System;
-using System.Diagnostics;
-using System.Globalization;
+using AspNetCoreRateLimit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Npgsql;
 using React.AspNet;
-using Newtonsoft.Json;
+using TeamBuilder.Hubs;
 using TeamBuilder.Services;
 
 namespace TeamBuilder
@@ -30,58 +29,101 @@ namespace TeamBuilder
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
+			//services.AddHttpContextAccessor();
+			#region Rate Limiting
+			// needed to load configuration from appsettings.json
+			services.AddOptions();
+
+			// needed to store rate limit counters and ip rules
+			services.AddMemoryCache();
+
+			// configure ip rate limiting middleware
+			services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+			services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+
+			// configure client rate limiting middleware
+			services.Configure<ClientRateLimitOptions>(Configuration.GetSection("ClientRateLimiting"));
+			services.AddSingleton<IClientPolicyStore, MemoryCacheClientPolicyStore>();
+			#endregion
+
 			services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(GetConnectionString()));
 
-			services.AddHttpContextAccessor();
+			services.AddAuthentication("Vk")
+				.AddScheme<VkAuthenticationOptions, VkAuthenticationHandler>("Vk", null);
+
+			services.AddSignalR();
+
 			services.AddTransient<UserAccessChecker>();
+			services.AddTransient<NotificationSender>();
+			services.AddSingleton<IVkSignChecker, VkSignChecker>();
 			services.AddReact();
 
 			services.AddControllersWithViews()
 				.AddNewtonsoftJson(options =>
 				{
-					options.SerializerSettings.DateTimeZoneHandling = Newtonsoft.Json.DateTimeZoneHandling.Utc;
+					options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
 					options.SerializerSettings.DateFormatString = "dd'.'MM'.'yyyy";
 					options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
 				}
 
 			);
 
+			services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+			services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+
 			// In production, the React files will be served from this directory
 			services.AddSpaStaticFiles(configuration =>
 			{
 				configuration.RootPath = "ClientApp/build";
 			});
+
+
+			services.AddSingleton<IUserIdProvider, UserIdProvider>();
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{
+			app.UseMiddleware<MyClientRateLimitMiddleware>();
+
+			app.UseHttpsRedirection();
+			app.UseStaticFiles();
+			app.UseSpaStaticFiles();
+
 			if (env.IsDevelopment())
 			{
 				app.UseDeveloperExceptionPage();
 			}
 			else
 			{
-				app.UseExceptionHandler("/Error");
+				app.UseExceptionHandler("/api/error");
 				// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 				app.UseHsts();
 			}
 
-			app.UseHttpsRedirection();
-			app.UseStaticFiles();
-			app.UseSpaStaticFiles();
+			app.MapWhen(
+				context => context.Request.Path.StartsWithSegments("/hub"),
+				appBuilder =>
+				{
+					appBuilder.UseRouting();
+					appBuilder.UseAuthentication();
+					appBuilder.UseAuthorization();
+					appBuilder.UseEndpoints(endpoints => endpoints.MapHub<NotificationHub>("/hub/notifications"));
+				});
 
 			app.MapWhen(
 				context => context.Request.Path.StartsWithSegments("/api"),
 				appBuilder =>
 				{
 					appBuilder.UseRouting();
-					appBuilder.UserSignCheck();
+					appBuilder.UseAuthentication();
+					appBuilder.UseAuthorization();
 					appBuilder.UseEndpoints(endpoints =>
 					{
 						endpoints.MapControllerRoute(
 							name: "api",
 							pattern: "/api/{controller}/{action=Index}/{id?}");
+						endpoints.MapHub<NotificationHub>("/api/notifications");
 					});
 				});
 
@@ -111,8 +153,11 @@ namespace TeamBuilder
 				Port = databaseUri.Port,
 				Username = userInfo[0],
 				Password = userInfo[1],
-				Database = databaseUri.LocalPath.TrimStart('/')
+				Database = databaseUri.LocalPath.TrimStart('/'),
+				SslMode = SslMode.Require,
+				TrustServerCertificate = true
 			};
+
 			return builder.ToString();
 		}
 	}

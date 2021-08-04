@@ -21,3 +21,7 @@ a, div, img, p, button {
 	vertical-align: middle;
 	display: table-cell;
 }
+
+.pointer {
+	cursor: pointer;
+}

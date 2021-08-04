@@ -9,6 +9,8 @@ import { Api } from '../../infrastructure/api';
 import { countMyActiveTeams, countForeignActiveTeams } from '../../infrastructure/utils';
 import { longOperationWrapper } from "../../services/_functions";
 import { goToPage } from '../../store/router/actions';
+import Icon56UsersOutline from '@vkontakte/icons/dist/56/users_outline';
+import { isNoContentResponse } from "../../infrastructure/utils";
 
 class UserTeams extends React.Component {
 	constructor(props) {
@@ -108,33 +110,34 @@ class UserTeams extends React.Component {
 			this.props.loading ? loader :
 				<Group>
 					{!isTeamsExistsForProfile && !this.props.readOnlyMode &&
-						<Placeholder header="Вступайте в команду">
-							Или создайте свою и пригласите других участников. Здесь можно будет принять
-							приглашение от команд или отозвать заявку.
-							</Placeholder>}
+						<Placeholder icon={<Icon56UsersOutline />} header="Вступайте в команду">
+							Или создайте свою и пригласите других участников. <br />
+							Здесь можно будет принять приглашение или отозвать заявку
+						</Placeholder>}
 					{!isTeamsExistsForUser && this.props.readOnlyMode &&
-						<Placeholder header="Нет команд">
-							Пользователь пока не состоит ни в одной из команд. Вы можете отправить ему приглашение, чтобы он присоединился к вам.
-							</Placeholder>}
+						<Placeholder icon={<Icon56UsersOutline />} header="Нет команд">
+							Пользователь пока не состоит ни в одной из команд. <br />
+							Если у вас есть своя команда, Вы можете отправить ему приглашение
+						</Placeholder>}
 					<List>
 						<CardGrid style={{ marginTop: 10, marginBottom: 10 }}>
-							{this.state.userTeams?.map(userTeam => {
+							{this.state.userTeams && this.state.userTeams?.map(userTeam => {
 								if (this.props.readOnlyMode && userTeam.userAction !== 2 && !userTeam.isOwner)
 									return;
 								return (
-									<Card key={userTeam.teamId} size="l" mode="shadow">
-										<RichCell key={userTeam.teamId}
-											text={userTeam?.team?.description}
-											caption={userTeam.team.event?.name}
-											after={userTeam.userAction === 2 ? < Icon28CheckCircleOutline /> :
-												(userTeam.userAction === 1 && <Icon28InfoOutline />)}
-											onClick={(e) => this.goToTeam(e, userTeam.teamId)}
-											actions={this.buildTeamAction(userTeam)}>
-											{userTeam.team.name}
-										</RichCell>
-									</Card>
-								)
-							})
+										<Card key={userTeam.teamId} size="l" mode="shadow">
+											<RichCell key={userTeam.teamId}
+												text={userTeam?.team?.description}
+												caption={userTeam.team.event?.name}
+												after={userTeam.userAction === 2 ? < Icon28CheckCircleOutline /> :
+													(userTeam.userAction === 1 && <Icon28InfoOutline />)}
+												onClick={(e) => this.goToTeam(e, userTeam.teamId)}
+												actions={this.buildTeamAction(userTeam)}>
+												{userTeam.team.name}
+											</RichCell>
+										</Card>
+									)
+								})
 							}
 						</CardGrid>
 					</List>
@@ -144,8 +147,17 @@ class UserTeams extends React.Component {
 
 }
 
+const mapStateToProps = (state) => {
+	return {
+		activeView: state.router.activeView,
+		inputData: state.formData.forms,
+		snackbar: state.formData.snackbar,
+		error: state.formData.error
+	}
+};
+
 const mapDispatchToProps = {
 	goToPage
 }
 
-export default connect(null, mapDispatchToProps)(UserTeams);
+export default connect(mapStateToProps, mapDispatchToProps)(UserTeams);

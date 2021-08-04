@@ -8,7 +8,7 @@ import { setActiveTab } from "../../store/vk/actions";
 import {
 	Panel, PanelHeader, PanelHeaderBack, Tabs, TabsItem, Group, InfoRow,
 	SimpleCell, Avatar, PullToRefresh, PanelHeaderContent, Separator,
-	withPlatform, ANDROID
+	withPlatform, ANDROID, Placeholder
 } from '@vkontakte/vkui';
 
 import TeamMenu from './teamMenu';
@@ -16,9 +16,10 @@ import TeamManagment from './teamManagment';
 
 import Icon24Chevron from '@vkontakte/icons/dist/24/chevron';
 import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
+import Icon56UsersOutline from '@vkontakte/icons/dist/56/users_outline';
 
 import { getActivePanel } from "../../services/_functions";
-import { countConfirmed } from "../../infrastructure/utils";
+import { countConfirmed, isNoContentResponse } from "../../infrastructure/utils";
 
 class TeamInfo extends React.Component {
 	constructor(props) {
@@ -69,11 +70,13 @@ class TeamInfo extends React.Component {
 
 		const userInActiveTeam =
 			this.state.team.userTeams?.find((user) => user.userId === this.props.profile?.id);
+		const activeTeamMembers = this.state.team && this.state.team.userTeams;
 
 		const isUserInActiveTeam = userInActiveTeam != null;
 		const isOwner = isUserInActiveTeam && userInActiveTeam?.isOwner;
 		const isModerator = this.props.profileUser?.isModerator;
 		const canEdit = isOwner || isModerator;
+		let isEmptyTeam = !canEdit && activeTeamMembers?.filter(x => x.userAction === 2).length == 0; 
 
 		return (
 			<Panel id={this.props.id}>
@@ -88,6 +91,7 @@ class TeamInfo extends React.Component {
 						</PanelHeaderContent> :
 						`Команда`}
 				</PanelHeader>
+				<Separator style={{ margin: '12px 0' }} />
 				<TeamMenu
 					team={this.state.team}
 					updateTeam={this.updateTeam}
@@ -140,40 +144,38 @@ class TeamInfo extends React.Component {
 									</SimpleCell>
 								</Group>
 								:
-								(!canEdit ?
-									<Group>
-										{teamCap &&
-											<SimpleCell key={teamCap.id}
-												onClick={() => goToPage('user', teamCap.id)}
-												before={<Avatar size={48} src={teamCap.photo100} />}
-												description="Капитан"
-												expandable
-												after={platform === ANDROID && <Icon24Chevron />}>
-												{teamCap.fullName}
-											</SimpleCell>}
-										<Separator style={{ margin: '12px 0' }} />
-										{this.state.team.userTeams?.map(userTeam => {
-											return (
-												userTeam.userAction === 2 &&
-												<SimpleCell key={userTeam.userId}
-													onClick={() => goToPage('user', userTeam.userId)}
-													before={<Avatar size={48} src={userTeam.user?.photo100} />}
-													description={null}
-													expandable
-													after={platform === ANDROID && <Icon24Chevron />}>
-													{userTeam.user?.fullName}
-												</SimpleCell>
-											)
-										}
-										)}
+								(<Group>
+									{isEmptyTeam &&
+										<Placeholder icon={<Icon56UsersOutline />} header="Нет участников">
+											Список участников пуст<br />
+											Вы можете подать заявку и<br />
+											капитан команды рассмотрит её
+										</Placeholder>}
+									{
+										!canEdit ?
+											<Group>
+												{activeTeamMembers && activeTeamMembers.map(userTeam => {
+													return (
+														userTeam.userAction === 2 &&
+														<SimpleCell key={userTeam.userId}
+															onClick={() => goToPage('user', userTeam.userId)}
+															before={<Avatar size={48} src={userTeam.user?.photo100} />}
+															description={userTeam.isOwner ? 'Капитан' : 'Состоит в команде'}
+															expandable
+															after={platform === ANDROID && <Icon24Chevron />}>
+															{userTeam.user?.fullName}
+														</SimpleCell>
+													)
+												})}
+											</Group> :
+											<TeamManagment isModerator={isModerator} userTeams={this.state.team.userTeams} updateTeam={this.updateTeam} />
+									}
 									</Group>
-									:
-									<TeamManagment
-										userTeams={this.state.team.userTeams}
-										updateTeam={this.updateTeam} />)
+								)
 						)}
 					</Group>
 				</PullToRefresh>
+				{this.props.snackbar}
 			</Panel>
 		);
 	}
@@ -187,7 +189,8 @@ const mapStateToProps = (state) => {
 		activeView: state.router.activeView,
 		profile: state.user.profile,
 		profileUser: state.user.profileUser,
-		activeTab: state.vkui.activeTab
+		activeTab: state.vkui.activeTab,
+		snackbar: state.formData.snackbar
 	};
 };
 

@@ -15,9 +15,27 @@ namespace TeamBuilder.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
-                .HasAnnotation("ProductVersion", "3.1.3")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63)
+                .HasAnnotation("ProductVersion", "5.0.3")
+                .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+            modelBuilder.Entity("TeamBuilder.Models.Connection", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<int>("ConnectStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Connections");
+                });
 
             modelBuilder.Entity("TeamBuilder.Models.Event", b =>
                 {
@@ -67,6 +85,42 @@ namespace TeamBuilder.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Images");
+                });
+
+            modelBuilder.Entity("TeamBuilder.Models.Notification", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<DateTime>("DateTimeNotify")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsNew")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Items")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Message")
+                        .HasColumnType("text");
+
+                    b.Property<int>("NotifyType")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("Ttl")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("TeamBuilder.Models.Skill", b =>
@@ -213,6 +267,8 @@ namespace TeamBuilder.Migrations
                     b.HasOne("TeamBuilder.Models.User", "Owner")
                         .WithMany("OwnEvents")
                         .HasForeignKey("OwnerId");
+
+                    b.Navigation("Owner");
                 });
 
             modelBuilder.Entity("TeamBuilder.Models.Team", b =>
@@ -224,6 +280,10 @@ namespace TeamBuilder.Migrations
                     b.HasOne("TeamBuilder.Models.Image", "Image")
                         .WithMany()
                         .HasForeignKey("ImageId");
+
+                    b.Navigation("Event");
+
+                    b.Navigation("Image");
                 });
 
             modelBuilder.Entity("TeamBuilder.Models.UserSkill", b =>
@@ -239,6 +299,10 @@ namespace TeamBuilder.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Skill");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TeamBuilder.Models.UserTeam", b =>
@@ -254,6 +318,34 @@ namespace TeamBuilder.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Team");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TeamBuilder.Models.Event", b =>
+                {
+                    b.Navigation("Teams");
+                });
+
+            modelBuilder.Entity("TeamBuilder.Models.Skill", b =>
+                {
+                    b.Navigation("UserSkills");
+                });
+
+            modelBuilder.Entity("TeamBuilder.Models.Team", b =>
+                {
+                    b.Navigation("UserTeams");
+                });
+
+            modelBuilder.Entity("TeamBuilder.Models.User", b =>
+                {
+                    b.Navigation("OwnEvents");
+
+                    b.Navigation("UserSkills");
+
+                    b.Navigation("UserTeams");
                 });
 #pragma warning restore 612, 618
         }

@@ -5,7 +5,7 @@ import { goBack, goToPage } from "../../store/router/actions";
 
 import {
 	Panel, PanelHeader, Group, SimpleCell, InfoRow, Header, Avatar, PullToRefresh,
-	PanelHeaderBack, Cell, List, PanelHeaderContent, PanelHeaderContext
+	PanelHeaderBack, Cell, List, PanelHeaderContent, PanelHeaderContext, Placeholder
 } from '@vkontakte/vkui';
 import Icon16Dropdown from '@vkontakte/icons/dist/16/dropdown';
 
@@ -14,6 +14,7 @@ import * as Alerts from "../components/Alerts.js";
 import { countConfirmed } from "../../infrastructure/utils";
 import { getActivePanel, longOperationWrapper } from "../../services/_functions";
 import { Api } from '../../infrastructure/api';
+import Icon56UsersOutline from '@vkontakte/icons/dist/56/users_outline';
 
 const EventInfo = props => {
 	const { goBack, goToPage } = props;
@@ -107,21 +108,26 @@ const EventInfo = props => {
 				</Group>
 				<Group>
 					<Header mode="secondary">Участвующие команды</Header>
-					{event?.teams?.map(team => {
-						return (
-							<Cell
-								key={team.id}
-								expandable
-								indicator={countConfirmed(team.userTeams) + '/' + team.numberRequiredMembers}
-								onClick={() => goToPage('teamInfo', team.id)}
-								before={<Avatar size={48} src={team.image?.dataURL} />}>
-								{team.name}
-							</Cell>
-						)
+					{event && event.teams && event.teams.length ? event.teams.map(team => {
+							return (
+								<Cell
+									key={team.id}
+									expandable
+									indicator={countConfirmed(team.userTeams) + '/' + team.numberRequiredMembers}
+									onClick={() => goToPage('teamInfo', team.id)}
+									before={<Avatar size={48} src={team.image?.dataURL} />}>
+									{team.name}
+								</Cell>
+							)
+						})
+					:
+						<Placeholder icon={<Icon56UsersOutline />} header="Нет заявок от команд">
+							Мероприятие создано, но ни одна из команд пока не вступила в него
+						</Placeholder>
 					}
-					)}
 				</Group>
 			</PullToRefresh>
+			{props.snackbar}
 		</Panel>
 	);
 }
@@ -130,7 +136,9 @@ const mapStateToProps = (state) => {
 	return {
 		profile: state.user.profile,
 		profileUser: state.user.profileUser,
-		activeView: state.router.activeView
+		activeView: state.router.activeView,
+		snackbar: state.formData.snackbar,
+		error: state.formData.error
 	};
 };
 

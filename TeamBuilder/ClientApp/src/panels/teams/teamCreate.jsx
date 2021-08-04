@@ -98,7 +98,8 @@ class TeamCreate extends React.Component {
 
 	async getAllEvents() {
 		Api.Events.getAll()
-			.then(result => this.setState({ events: result }));
+			.then(result => this.setState({ events: result }))
+			.catch(error => { });
 	}
 
 	async postCreate() {
@@ -150,7 +151,7 @@ class TeamCreate extends React.Component {
 							{
 								<div>
 									<p style={{ float: 'left', margin: 0 }}>
-										<Link style={{ color: '#99334b' }} onClick={this.clearEvent}>Отчистить</Link>
+										<Link style={{ color: '#99334b' }} onClick={this.clearEvent}>Очистить</Link>
 									</p>
 									<p style={{ float: 'right', margin: 0 }}>
 										<Link style={{ color: 'rebeccapurple' }} onClick={() => goToPage('eventCreate')}>Создать событие</Link>
@@ -178,6 +179,7 @@ class TeamCreate extends React.Component {
 						</Button>
 					</Div>
 				</Group>
+				{this.props.snackbar}
 			</Panel>
 		);
 	}
@@ -188,7 +190,8 @@ class TeamCreate extends React.Component {
 const mapStateToProps = (state) => {
 	return {
 		inputData: state.formData.forms,
-		profileUser: state.user.profileUser
+		profileUser: state.user.profileUser,
+		snackbar: state.formData.snackbar
 	};
 };
 

@@ -7,27 +7,31 @@ import '@vkontakte/vkui/dist/vkui.css';
 import { bindActionCreators } from 'redux'
 import { goBack, closeModal, setStory } from "./store/router/actions";
 import { getActivePanel } from "./services/_functions";
+import { initHubConnection } from "./services/notificationHub";
 
 import Icon24Done from '@vkontakte/icons/dist/24/done';
-import Icon28Users from '@vkontakte/icons/dist/28/users';
+import Icon28UsersOutline from '@vkontakte/icons/dist/28/users_outline';
 import Icon28Profile from '@vkontakte/icons/dist/28/profile';
 import Icon28Users3Outline from '@vkontakte/icons/dist/28/users_3_outline';
 import Icon28FavoriteOutline from '@vkontakte/icons/dist/28/favorite_outline';
 import Icon24Cancel from '@vkontakte/icons/dist/24/cancel';
 
-import Events from './panels/events/events'
-import Teams from './panels/teams/teams'
-import TeamsFilters from './panels/teams/teamsFilters'
-import Users from './panels/users/users'
+import Events from './panels/events/events';
+import Teams from './panels/teams/teams';
+import TeamsFilters from './panels/teams/teamsFilters';
+import Users from './panels/users/users';
 
-import CommonView from './CommonView'
+import IconIndicator from './panels/components/IconIndicator';
+import { CommonError } from './panels/components/commonError';
+
+import CommonView from './CommonView';
 
 const App = (props) => {
 	const [lastAndroidBackAction, setLastAndroidBackButton] = useState(0);
 	const [history, setHistory] = useState(null);
 	const [popout, setPopout] = useState(null);
 
-	const { setStory, activeView, activeStory, profileUser, colorScheme } = props;
+	const { setStory, activeView, activeStory, profileUser, colorScheme, notifications } = props;
 
 	const [activeModal, setActiveModal] = useState(null);
 
@@ -44,7 +48,15 @@ const App = (props) => {
 				window.history.pushState(null, null);
 			}
 		};
+
 	}, []);
+
+	useEffect(() => {
+		if (profileUser?.id) {
+			initHubConnection();
+		}
+
+	}, [profileUser?.id]);
 
 	useEffect(() => {
 		const { activeView, panelsHistory, activeModals, popouts } = props;
@@ -57,31 +69,43 @@ const App = (props) => {
 		setPopout(popout);
 	});
 
+
+	const isNewNotice = () => {
+		return notifications.filter(n => n.isNew === true).length !== 0;
+	}
+
 	return (
 		<ConfigProvider isWebView={true} scheme={colorScheme}>
 			<Epic activeStory={activeStory} tabbar={
 				<Tabbar>
 					<TabbarItem
+						className="pointer"
 						onClick={() => setStory('teams', 'teams')}
 						selected={activeStory === 'teams'}
 						text="Команды"
 					><Icon28Users3Outline /></TabbarItem>
 					<TabbarItem
+						className="pointer"
 						onClick={() => setStory('users', 'users')}
 						selected={activeStory === 'users'}
 						text="Участники"
-					><Icon28Users /></TabbarItem>
+					><Icon28UsersOutline /></TabbarItem>
 					<TabbarItem
+						className="pointer"
 						onClick={() => setStory('events', 'events')}
 						selected={activeStory === 'events'}
 						text="События"
 					><Icon28FavoriteOutline /></TabbarItem>
 					<TabbarItem
+						className="pointer"
 						onClick={() => setStory('profile', 'user')}
 						selected={activeStory === 'profile'}
 						text="Профиль"
-						style={{ color: profileUser === null ? "red" : "" }}
-					><Icon28Profile /></TabbarItem>
+						style={{ color: profileUser === null ? "red" : "" }}>
+						<IconIndicator isShow={isNewNotice()} style={{ height: "7px", width: "7px" }}>
+							<Icon28Profile />
+						</IconIndicator>
+					</TabbarItem>
 				</Tabbar>
 			}>
 				<Root id="teams" activeView={activeView} popout={popout}>
@@ -108,8 +132,8 @@ const App = (props) => {
 				</Root>
 				<Root id="profile" activeView={activeView} popout={popout}>
 					<CommonView id='profile' activePanel={getActivePanel('profile').panel}
-						history={history} 
-						setActiveModal={setActiveModal}/>
+						history={history}
+						setActiveModal={setActiveModal} />
 				</Root>
 			</Epic>
 		</ConfigProvider>
@@ -125,7 +149,8 @@ const mapStateToProps = (state) => {
 		activeModals: state.router.activeModals,
 		colorScheme: state.vkui.colorScheme,
 		profile: state.user.profile,
-		profileUser: state.user.profileUser
+		profileUser: state.user.profileUser,
+		notifications: state.notice.notifications
 	};
 };
 

@@ -4,12 +4,14 @@ import { connect } from 'react-redux';
 import { goToPage } from '../../store/router/actions';
 
 import {
-	Panel, PanelHeader, RichCell,
+	Panel, PanelHeader, RichCell, Placeholder,
 	PanelHeaderButton, CardGrid, Card
 } from '@vkontakte/vkui';
 
+import Icon56UsersOutline from '@vkontakte/icons/dist/56/users_outline';
+
 import { Api, Urls } from '../../infrastructure/api';
-import { renderEventDate } from "../../infrastructure/utils";
+import { renderEventDate, isNoContentResponse } from "../../infrastructure/utils";
 
 import SearchWithInfiniteScroll from '../components/SearchWithInfiniteScroll';
 
@@ -21,7 +23,7 @@ const Events = props => {
 			?
 			<PanelHeader
 				separator={false}
-				left={<PanelHeaderButton onClick={() => goToPage('eventCreate')}>Создать</PanelHeaderButton>}>
+				left={<PanelHeaderButton className="pointer" onClick={() => goToPage('eventCreate')}>Создать</PanelHeaderButton>}>
 				События
 					</PanelHeader>
 			:
@@ -56,13 +58,23 @@ const Events = props => {
 				header={renderHeader}>
 				{renderItems}
 			</SearchWithInfiniteScroll>
+			{
+				isNoContentResponse(props.error) &&
+				<Placeholder icon={<Icon56UsersOutline />} header="Список мероприятий пуст">
+					Вы можете создать своё мероприятие и<br /> 
+					добавить в него свою команду
+				</Placeholder>
+			}
+			{props.snackbar}
 		</Panel>
 	);
 };
 
 const mapStateToProps = (state) => {
 	return {
-		profileUser: state.user.profileUser
+		profileUser: state.user.profileUser,
+		error: state.formData.error,
+		snackbar: state.formData.snackbar
 	}
 };
 
