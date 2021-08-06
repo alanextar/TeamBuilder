@@ -29,7 +29,7 @@ namespace TeamBuilder
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
-			//services.AddHttpContextAccessor();
+			services.AddHttpContextAccessor();
 			#region Rate Limiting
 			// needed to load configuration from appsettings.json
 			services.AddOptions();
@@ -37,13 +37,11 @@ namespace TeamBuilder
 			// needed to store rate limit counters and ip rules
 			services.AddMemoryCache();
 
-			// configure ip rate limiting middleware
-			services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
-			services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
-
 			// configure client rate limiting middleware
 			services.Configure<ClientRateLimitOptions>(Configuration.GetSection("ClientRateLimiting"));
-			services.AddSingleton<IClientPolicyStore, MemoryCacheClientPolicyStore>();
+			services.AddInMemoryRateLimiting();
+			services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+
 			#endregion
 
 			services.AddDbContext<ApplicationContext>(options => options.UseNpgsql(GetConnectionString()));
@@ -67,9 +65,6 @@ namespace TeamBuilder
 				}
 
 			);
-
-			services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-			services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 
 			// In production, the React files will be served from this directory
 			services.AddSpaStaticFiles(configuration =>

@@ -22,12 +22,13 @@ namespace TeamBuilder
 		private readonly ILogger<ClientRateLimitMiddleware> _logger;
 
 		public MyClientRateLimitMiddleware(RequestDelegate next,
+			IProcessingStrategy processingStrategy,
 			IOptions<ClientRateLimitOptions> options,
 			IRateLimitCounterStore counterStore,
 			IClientPolicyStore policyStore,
 			IRateLimitConfiguration config,
 			ILogger<ClientRateLimitMiddleware> logger)
-		: base(next, options, counterStore, policyStore, config, logger)
+		: base(next, processingStrategy, options, counterStore, policyStore, config, logger)
 		{
 			_logger = logger;
 		}
