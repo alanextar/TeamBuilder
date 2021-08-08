@@ -1,7 +1,8 @@
 import {SET_FORM_DATA, SET_ERROR, SET_SNACKBAR} from './actionTypes';
 
 const initialState = {
-    forms: []
+	forms: [],
+	validationErrors: []
 };
 
 export const formDataReducer = (state = initialState, action) => {
@@ -21,6 +22,12 @@ export const formDataReducer = (state = initialState, action) => {
             return {
                 ...state,
 				error: action.payload.error
+            };
+        }
+		case SET_VALIDATION_ERROR: {
+            return {
+				...state,
+				validationErrors: [ ...state.validationErrors, action.payload.error ]
             };
         }
 		case SET_SNACKBAR: {

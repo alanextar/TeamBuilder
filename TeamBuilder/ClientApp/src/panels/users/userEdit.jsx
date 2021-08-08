@@ -17,6 +17,7 @@ import '@vkontakte/vkui/dist/vkui.css';
 import { Api } from '../../infrastructure/api';
 import * as Utils from '../../infrastructure/utils';
 import { longOperationWrapper } from "../../services/_functions";
+import { InputField } from '../components/InputField';
 
 class UserEdit extends React.Component {
 	constructor(props) {
@@ -147,7 +148,8 @@ class UserEdit extends React.Component {
 					<FormLayoutGroup>
 						<Input name="mobile" value={this.getOrEmpty('mobile')} onChange={this.handleInput} type="text" placeholder="Телефон" />
 						<Input name="telegram" value={this.getOrEmpty('telegram')} onChange={this.handleInput} type="text" placeholder="Telegram" />
-						<Input name="email" value={this.getOrEmpty('email')} onChange={this.handleInput} type="text" placeholder="Email" />
+						{/*<Input name="email" value={this.getOrEmpty('email')} onChange={this.handleInput} type="text" placeholder="Email" />*/}
+						<InputField name="email" maxLength="100" isRequired={false} placeholder="Email" />
 						<Textarea name="about" value={this.getOrEmpty('about')} onChange={this.handleInput} placeholder="Дополнительно" />
 						<div style={{ margin: "12px", display: "flex", justifyContent: "end", fontSize: "11px", color: "var(--text_secondary)" }}>
 							<span weight="regular">осталось {500 - this.getOrEmpty('about').length} символов</span>
