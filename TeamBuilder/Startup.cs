@@ -1,8 +1,5 @@
 using System;
-using System.Text;
-using System.Threading.Tasks;
 using AspNetCoreRateLimit;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -12,10 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
 using Npgsql;
 using React.AspNet;
 using TeamBuilder.Hubs;
@@ -159,8 +153,11 @@ namespace TeamBuilder
 				Port = databaseUri.Port,
 				Username = userInfo[0],
 				Password = userInfo[1],
-				Database = databaseUri.LocalPath.TrimStart('/')
+				Database = databaseUri.LocalPath.TrimStart('/'),
+				SslMode = SslMode.Require,
+				TrustServerCertificate = true
 			};
+
 			return builder.ToString();
 		}
 	}

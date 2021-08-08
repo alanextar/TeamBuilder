@@ -43,14 +43,14 @@ const Teams = props => {
 				{items?.map(team => (
 					<Card size="l" mode="shadow" key={team.id}>
 						<RichCell
-							before={<Avatar size={64} src={team.image?.dataURL} />}
+							before={<Avatar size={64} src={team.imageDataUrl} />}
 							text={team.description}
-							caption={team.event?.name}
-							after={countConfirmed(team.userTeams) +
+							caption={team.eventName}
+							after={team.countConfirmedUser +
 								'/' + team.numberRequiredMembers}
 							onClick={() => goToPage('teamInfo', team.id)}
 						>
-							{team.name}
+							{team.title}
 						</RichCell>
 					</Card>
 				))}

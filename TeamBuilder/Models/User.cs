@@ -4,7 +4,7 @@ using TeamBuilder.Controllers.Paging;
 
 namespace TeamBuilder.Models
 {
-	public class User : IDbItem
+	public class User : IHasId
 	{
 		public long Id { get; set; }
 		public string FirstName { get; set; }
@@ -31,7 +31,7 @@ namespace TeamBuilder.Models
 		public bool AnyTeamOwner { get; set; }
 	}
 
-	public class UserDto : IDbItem
+	public class UserDto : IHasId
 	{
 		public long Id { get; set; }
 		public string FirstName { get; set; }
@@ -54,7 +54,7 @@ namespace TeamBuilder.Models
 		public bool AnyTeamOwner { get; set; }
 	}
 
-	public class UserDtoForList : IDbItem
+	public class UserDtoForList : IHasId
 	{
 		public long Id { get; set; }
 		public string FirstName { get; set; }

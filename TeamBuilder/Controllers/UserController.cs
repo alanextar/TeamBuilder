@@ -33,6 +33,40 @@ namespace TeamBuilder.Controllers
 			this.logger = logger;
 		}
 
+		public IActionResult PagingSearch(string search, int pageSize = 20, int page = 0, bool prev = false)
+		{
+			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
+
+			if (pageSize == 0)
+				throw new HttpStatusException(HttpStatusCode.NoContent, "");
+
+			var searchLower = search?.ToLower() ?? string.Empty;
+
+			var result = context.Users
+				.Where(user => EF.Functions.ILike(user.FirstName, $"%{searchLower}%") ||
+				               EF.Functions.ILike(user.SecondName, $"%{searchLower}%") ||
+				               EF.Functions.ILike(user.LastName, $"%{searchLower}%"))
+				.Select(u => new UserPagingViewModel
+				{
+					Id = u.Id,
+					IsSearchable = u.IsSearchable,
+					FirstName = u.FirstName,
+					LastName = u.LastName,
+					FullName = u.FullName,
+					Photo200 = u.Photo200,
+					City = u.City,
+					About = u.About,
+					Skills = u.UserSkills.Select(us => us.Skill.Name),
+					IsTeamMember = u.UserTeams.Any(ut => ut.UserAction == UserActionEnum.JoinedTeam)
+				})
+				.GetPage(pageSize, HttpContext.Request.Path, page, prev);
+
+			logger.LogInformation($"Response UsersCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
+								  $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
+
+			return Json(result);
+		}
+
 		//Команды других могут просматривать все
 		public User GetTeams(long id)
 		{
@@ -78,6 +112,7 @@ namespace TeamBuilder.Controllers
 		}
 
 		// Принимает приглашение (из профиля)
+
 		public async Task<IActionResult> JoinTeam(long teamId)
 		{
 			logger.LogInformation($"GET Request {HttpContext.Request.Headers[":path"]}");
@@ -117,6 +152,7 @@ namespace TeamBuilder.Controllers
 		}
 
 		//Пользователь выходит из команды / отказывается от приглашения (из профиля)
+
 		public async Task<IActionResult> QuitOrDeclineTeam(long teamId)
 		{
 			logger.LogInformation($"GET Request {HttpContext.Request.Headers[":path"]}");
@@ -160,6 +196,7 @@ namespace TeamBuilder.Controllers
 		}
 
 		//Пользователь сам отменяет заявку в команду (из профиля)
+
 		public async Task<IActionResult> CancelRequestTeam(long teamId)
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");
@@ -205,6 +242,7 @@ namespace TeamBuilder.Controllers
 		}
 
 		//Пользователь отправляет запрос в команду из меню команды / Пользователя приглашает команда по кнопке "Завербовать"
+
 		[HttpGet]
 		public async Task<IActionResult> SetTeam(long id, long teamId, bool isTeamOffer = true)
 		{
@@ -253,43 +291,5 @@ namespace TeamBuilder.Controllers
 
 			return Json(dbTeam);
 		}
-
-		#region List
-
-		public IActionResult GetAll()
-		{
-			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
-
-			var users = context.Users.ToList();
-
-			logger.LogInformation($"Response UsersCount:{users.Count}");
-
-			return Json(users);
-		}
-
-		public IActionResult PagingSearch(string search, int pageSize = 20, int page = 0, bool prev = false)
-		{
-			logger.LogInformation($"Request {HttpContext.Request.Headers[":path"]}");
-
-			if (pageSize == 0)
-				throw new HttpStatusException(HttpStatusCode.NoContent, "");
-
-			bool Filter(User user) => user.FullName.ToLowerInvariant().Contains(search?.ToLowerInvariant() ?? string.Empty);
-			var result = context.Users
-				.Include(u => u.UserSkills)
-				.ThenInclude(us => us.Skill)
-				.Include(u => u.UserTeams)
-				.GetPage(pageSize, HttpContext.Request, page, prev, Filter)
-				.HackForReferenceLoop();
-
-			result.NextHref = result.NextHref == null ? null : $"{result.NextHref}&search={search}";
-
-			logger.LogInformation($"Response UsersCount:{result.Collection.Count()} / from:{result.Collection.FirstOrDefault()?.Id} / " +
-								  $"to:{result.Collection.LastOrDefault()?.Id} / NextHref:{result.NextHref}");
-
-			return Json(result);
-		}
-
-		#endregion
 	}
 }
