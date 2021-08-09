@@ -1,6 +1,5 @@
 import {
 	GO_TO_PAGE,
-	SET_PAGE,
 	GO_BACK,
 	OPEN_POPOUT,
 	CLOSE_POPOUT,
@@ -45,7 +44,7 @@ export const routerReducer = (state = initialState, action) => {
 			panelsHistory = [...panelsHistory, Panel];
 
 			if (panelsHistory.length > 1) {
-				VK.swipeBackOn();
+				VK.swipeBackOff();
 			}
 
 			return {
@@ -57,50 +56,6 @@ export const routerReducer = (state = initialState, action) => {
 					[View]: panelsHistory,
 				},
 
-				scrollPosition: {
-					...state.scrollPosition,
-					[state.activeStory + "_" + state.activeView + "_" + state.activePanel]: window.pageYOffset
-				}
-			};
-		}
-
-		//TODO Obsolete
-		case SET_PAGE: {
-			let View = action.payload.view;
-			let Panel = action.payload.panel;
-
-			window.history.pushState(null, null);
-
-			let panelsHistory = state.panelsHistory[View] || [];
-			let viewsHistory = state.viewsHistory[state.activeStory] || [];
-
-			const viewIndexInHistory = viewsHistory.indexOf(View);
-
-			if (viewIndexInHistory !== -1) {
-				viewsHistory.splice(viewIndexInHistory, 1);
-			}
-
-			if (panelsHistory.indexOf(Panel) === -1) {
-				panelsHistory = [...panelsHistory, Panel];
-			}
-
-			if (panelsHistory.length > 1) {
-				VK.swipeBackOn();
-			}
-
-			return {
-				...state,
-				activeView: View,
-				activePanel: Panel,
-
-				panelsHistory: {
-					...state.panelsHistory,
-					[View]: panelsHistory,
-				},
-				viewsHistory: {
-					...state.viewsHistory,
-					[state.activeStory]: [...viewsHistory, View]
-				},
 				scrollPosition: {
 					...state.scrollPosition,
 					[state.activeStory + "_" + state.activeView + "_" + state.activePanel]: window.pageYOffset
@@ -246,7 +201,7 @@ export const routerReducer = (state = initialState, action) => {
 			}
 
 			if (panelsHistory.length === 1) {
-				VK.swipeBackOff();
+				VK.swipeBackOn();
 			}
 
 			return {

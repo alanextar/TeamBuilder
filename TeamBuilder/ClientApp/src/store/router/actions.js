@@ -1,4 +1,4 @@
-import { GO_TO_PAGE, SET_PAGE, SET_STORY, GO_BACK, OPEN_POPOUT, CLOSE_POPOUT, OPEN_MODAL, CLOSE_MODAL } from './actionTypes';
+import { GO_TO_PAGE, SET_STORY, GO_BACK, OPEN_POPOUT, CLOSE_POPOUT, OPEN_MODAL, CLOSE_MODAL } from './actionTypes';
 
 export const goToPage = (panel, itemId = null, rmPrevPageFromHistory = false) => (
 	{
@@ -20,17 +20,6 @@ export const setStory = (story, initial_panel) => (
 		}
 	}
 );
-
-//TODO Obsolete
-export const setPage = (view, panel) => {
-	return {
-		type: SET_PAGE,
-		payload: {
-			view: view,
-			panel: panel,
-		}
-	}
-};
 
 export const goBack = () => (
 	{
