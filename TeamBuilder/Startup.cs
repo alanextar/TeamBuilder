@@ -1,4 +1,6 @@
 using System;
+using System.Text;
+using System.Threading.Tasks;
 using AspNetCoreRateLimit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -126,6 +128,22 @@ namespace TeamBuilder
 						endpoints.MapHub<NotificationHub>("/api/notifications");
 					});
 				});
+
+			//для отладки роутинга, middleware который пропускает через себя все запросы
+			if (env.IsDevelopment())
+			{
+				app.Use(next => context =>
+				{
+					var routePattern = (context.GetEndpoint() as Microsoft.AspNetCore.Routing.RouteEndpoint)?.RoutePattern?.RawText;
+					if (routePattern == null)
+					{
+						var request = context.Request.Method + ":" + context.Request.Path + context.Request.QueryString;
+						var endpoint = context.GetEndpoint()?.DisplayName;
+					}
+
+					return next(context);
+				});
+			}
 
 			app.UseSpa(spa =>
 			{

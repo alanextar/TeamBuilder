@@ -31,6 +31,10 @@ const EventCreate = props => {
 		if (e.currentTarget.type === 'checkbox') {
 			value = e.currentTarget.checked;
 		}
+		if (e.currentTarget.name == "description") {
+			if (5000 - value.length < 0)
+				return;
+		}
 
 		setInputData({
 			...inputData,
@@ -55,6 +59,10 @@ const EventCreate = props => {
 		await longOperationWrapper({ action });
 	}
 
+	const getOrEmpty = (name) => {
+		return inputData && inputData[name] ? inputData[name] : '';
+	}
+
 	useEffect(() => {
 		inputDataRef.current = inputData
 	}, [inputData]);
@@ -74,9 +82,13 @@ const EventCreate = props => {
 		<Panel id={props.id}>
 			<PanelHeader left={<PanelHeaderBack onClick={cancelForm} />}>Создание</PanelHeader>
 			<FormLayout>
-				<Input top="Название события" type="text" onChange={handleInput} name="name" value={inputData.name} placeholder="Введите название события" status={inputData.name ? 'valid' : 'error'} />
+				<Input maxLength="1000" top="Название события" type="text" onChange={handleInput} name="name" value={inputData.name}
+					placeholder="Введите название события" status={inputData.name ? 'valid' : 'error'} />
 				<Textarea top="Описание события" onChange={handleInput} name="description" value={inputData.description} />
-				<Input top="Ссылка на событие" type="text" onChange={handleInput} name="link" value={inputData.link} />
+				<div style={{ margin: "12px", display: "flex", justifyContent: "end", fontSize: "11px", color: "var(--text_secondary)" }}>
+					<span weight="regular">осталось {5000 - getOrEmpty('description').length} символов</span>
+				</div>
+				<Input maxLength="2048" top="Ссылка на событие" type="text" onChange={handleInput} name="link" value={inputData.link} />
 				<Input top="Дата начала события" type="date" onChange={handleInput} name="startDate" value={inputData.startDate} />
 				<Input top="Дата завершения события" type="date" onChange={handleInput} name="finishDate" value={inputData.finishDate} />
 				<Button

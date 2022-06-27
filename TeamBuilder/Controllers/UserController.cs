@@ -195,8 +195,11 @@ namespace TeamBuilder.Controllers
 			return Json(user.GetActiveUserTeams());
 		}
 
-		//Пользователь сам отменяет заявку в команду (из профиля)
-
+		/// <summary>
+		/// Пользователь сам отменяет заявку в команду (из профиля)
+		/// </summary>
+		/// <param name="teamId"></param>
+		/// <returns></returns>
 		public async Task<IActionResult> CancelRequestTeam(long teamId)
 		{
 			logger.LogInformation($"POST Request {HttpContext.Request.Headers[":path"]}");

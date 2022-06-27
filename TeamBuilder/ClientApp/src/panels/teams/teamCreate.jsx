@@ -10,8 +10,9 @@ import {
 } from '@vkontakte/vkui';
 
 import { Api } from '../../infrastructure/api';
-import { GetRandomPicUrl as GetRandomPic } from '../../infrastructure/utils';
+import { GetRandomPicUrl as GetRandomPic, isEmpty } from '../../infrastructure/utils';
 import { longOperationWrapper } from "../../services/_functions";
+import * as Validation from "../../helpers/validation";
 
 class TeamCreate extends React.Component {
 	constructor(props) {
@@ -30,14 +31,33 @@ class TeamCreate extends React.Component {
 		this.state = {
 			events: [],
 			id: props.id,
-			inputData: props.inputData[this.bindingId] || this.defaultInputData
+			inputData: props.inputData[this.bindingId] || this.defaultInputData,
+			errors: {}
 		};
 
 		this.handleInput = (e) => {
 			let value = e.currentTarget.value;
+			let name = e.currentTarget.name;
+			let type = e.currentTarget.type;
 
-			if (e.currentTarget.type === 'checkbox') {
+			if (type === 'checkbox') {
 				value = e.currentTarget.checked;
+			}
+			//else if (type === 'number') {
+			//	console.log("isNumberKey");
+			//	if (!Validation.isNumberKey(e)) {
+			//		console.log("isNumberKey!!");
+			//		return;
+			//	}
+			//}
+
+			if (name == "description") {
+				if (1000 - value.length < 0)
+					return;
+			}
+			if (name == "descriptionRequiredMembers") {
+				if (5000 - value.length < 0)
+					return;
 			}
 
 			this.setState({
@@ -103,6 +123,10 @@ class TeamCreate extends React.Component {
 	}
 
 	async postCreate() {
+		if (!this.validateForm()) {
+			return;
+		}
+
 		if (!this.state.inputData?.name)
 			return;
 
@@ -119,6 +143,22 @@ class TeamCreate extends React.Component {
 		await longOperationWrapper({action});
 	}
 
+	validateForm() {
+		this.setState({ errors: null });
+		let errors = {};
+		errors = {
+			...Validation.validateNumberTypeInput(this.state.inputData["numberRequiredMembers"], "numberRequiredMembers")
+		};
+
+		this.setState({ errors: errors });
+
+		return isEmpty(errors);
+	}
+
+	getOrEmpty = (name) => {
+		return this.state.inputData && this.state.inputData[name] ? this.state.inputData[name] : '';
+	}
+
 	render() {
 		const { goToPage } = this.props;
 		var inputData = this.state.inputData;
@@ -130,7 +170,7 @@ class TeamCreate extends React.Component {
 				</PanelHeader>
 				<Group>
 					<FormLayout>
-						<Input top="Название команды" type="text" placeholder="Введите название команды"
+						<Input maxLength="255" top="Название команды" type="text" placeholder="Введите название команды"
 							onChange={this.handleInput}
 							name="name"
 							value={inputData?.name}
@@ -139,6 +179,9 @@ class TeamCreate extends React.Component {
 							onChange={this.handleInput}
 							name="description"
 							value={inputData?.description} />
+						<div style={{ margin: "12px", display: "flex", justifyContent: "end", fontSize: "11px", color: "var(--text_secondary)" }}>
+							<span weight="regular">осталось {1000 - this.getOrEmpty('description').length} символов</span>
+						</div>
 						<SelectMimicry
 							top="Событие"
 							placeholder="Не выбрано"
@@ -161,14 +204,19 @@ class TeamCreate extends React.Component {
 							}>
 							{inputData.event?.name}
 						</SelectMimicry>
-						<Input top="Количество участников" type="number" placeholder="Введите количество участников"
+						<Input maxLength="1000" top="Количество участников" type="number" placeholder="Введите количество участников"
 							onChange={this.handleInput}
-							name="numberRequiredMembers"
+							name={Validation.TEAM_CREATE.MEMBERS_COUNT}
 							value={inputData?.numberRequiredMembers} />
+						{this.state.errors[Validation.TEAM_CREATE.MEMBERS_COUNT] &&
+							<Div className="error" style={{ color: 'red' }}>{this.state.errors[Validation.TEAM_CREATE.MEMBERS_COUNT]}</Div>}
 						<Textarea top="Описание участников и их задач" type="text" placeholder="Опишите какие роли в команде вам нужны"
 							onChange={this.handleInput}
 							name="descriptionRequiredMembers"
 							value={inputData?.descriptionRequiredMembers} />
+						<div style={{ margin: "12px", display: "flex", justifyContent: "end", fontSize: "11px", color: "var(--text_secondary)" }}>
+							<span weight="regular">осталось {5000 - this.getOrEmpty('descriptionRequiredMembers').length} символов</span>
+						</div>
 					</FormLayout>
 					<Div>
 						<Button

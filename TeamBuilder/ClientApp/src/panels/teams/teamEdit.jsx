@@ -13,6 +13,8 @@ import {
 import { getActivePanel, longOperationWrapper } from "../../services/_functions";
 import Icon56UsersOutline from '@vkontakte/icons/dist/56/users_outline';
 import { isNoContentResponse } from "../../infrastructure/utils";
+import * as Validation from "../../helpers/validation";
+import * as Utils from '../../infrastructure/utils';
 
 class TeamEdit extends React.Component {
 	constructor(props) {
@@ -26,7 +28,8 @@ class TeamEdit extends React.Component {
 			itemId: itemIdInitial,
 
 			inputData: props.inputData[this.bindingId],
-			events: []
+			events: [],
+			errors: {}
 		};
 
 		this.handleInput = (e) => {
@@ -106,6 +109,23 @@ class TeamEdit extends React.Component {
 		await longOperationWrapper({ action, postAction });
 	};
 
+	validateForms() {
+		this.setState({ errors: null });
+		let errors = {};
+		errors = {
+			...Validation.validateNumberTypeInput(this.state.inputData[Validation.TEAM_CREATE.MEMBERS_COUNT]),
+			...Validation.validateNotEmptyString(this.state.inputData[Validation.TEAM_CREATE.NAME])
+		};
+
+		this.setState({ errors: errors });
+
+		return Utils.isEmpty(errors);
+	}
+
+	getOrEmpty = (name) => {
+		return this.state.inputData && this.state.inputData[name] ? this.state.inputData[name] : '';
+	}
+
 	render() {
 		const { goToPage } = this.props;
 		var inputData = this.state.inputData;
@@ -117,43 +137,51 @@ class TeamEdit extends React.Component {
                 </PanelHeader>
 				<Group>
 					{inputData &&
-						<FormLayout >
-							<Input name="name" top="Название команды" type="text" value={inputData.name}
-								onChange={this.handleInput} status={inputData.name ? 'valid' : 'error'} placeholder='Введите название команды' />
-							<Textarea top="Описание команды" name="description" value={inputData.description} onChange={this.handleInput} />
-							<SelectMimicry
-								top="Событие"
-								placeholder="Не выбрано"
-								onClick={() => goToPage(this.eventsPage, this.bindingId)}
-								onChange={this.handleInput}
-								name="event"
-								value={inputData.event || ''}
-								defaultValue
-								bottom=
-								{
-									<div>
-										<p style={{ float: 'left', margin: 0 }}>
-											<Link style={{ color: '#99334b' }} onClick={this.clearEvent}>Очистить</Link>
-										</p>
-										<p style={{ float: 'right', margin: 0 }}>
-											<Link style={{ color: 'rebeccapurple' }} onClick={() => goToPage('eventCreate')}>Создать событие</Link>
-										</p>
-										<div style={{ clear: 'both' }}></div>
-									</div>
-								}>
-								{inputData.event?.name}
-							</SelectMimicry>
-							<Input top="Количество требуемых участников"
-								name="numberRequiredMembers"
-								value={String(inputData.numberRequiredMembers)}
-								onChange={this.handleInput}
-								type="number" />
-							<Textarea
-								top="Описание участников и их задач"
-								name="descriptionRequiredMembers"
-								value={inputData.descriptionRequiredMembers}
-								onChange={this.handleInput} />
-						</FormLayout>}
+						<FormLayout>
+							<Input name={Validation.TEAM_CREATE.NAME} top="Название команды" type="text" value={inputData.name}
+							onChange={this.handleInput} status={inputData.name ? 'valid' : 'error'} placeholder='Введите название команды' />
+						{this.state.errors[Validation.TEAM_CREATE.NAME] && <Div className="error" style={{ color: 'red' }}>{this.state.errors[Validation.TEAM_CREATE.MEMBERS_COUNT]}</Div>}
+						<Textarea top="Описание команды" name="description" value={inputData.description} onChange={this.handleInput} />
+						<div style={{ margin: "12px", display: "flex", justifyContent: "end", fontSize: "11px", color: "var(--text_secondary)" }}>
+							<span weight="regular">осталось {500 - this.getOrEmpty('description').length} символов</span>
+						</div>
+						<SelectMimicry
+							top="Событие"
+							placeholder="Не выбрано"
+							onClick={() => goToPage(this.eventsPage, this.bindingId)}
+							onChange={this.handleInput}
+							name="event"
+							value={inputData.event || ''}
+							defaultValue
+							bottom=
+							{
+								<div>
+									<p style={{ float: 'left', margin: 0 }}>
+										<Link style={{ color: '#99334b' }} onClick={this.clearEvent}>Очистить</Link>
+									</p>
+									<p style={{ float: 'right', margin: 0 }}>
+										<Link style={{ color: 'rebeccapurple' }} onClick={() => goToPage('eventCreate')}>Создать событие</Link>
+									</p>
+									<div style={{ clear: 'both' }}></div>
+								</div>
+							}>
+							{inputData.event?.name}
+						</SelectMimicry>
+						<Input top="Количество требуемых участников"
+							name={Validation.TEAM_CREATE.MEMBERS_COUNT}
+							value={String(inputData[Validation.TEAM_CREATE.MEMBERS_COUNT])}
+							onChange={this.handleInput}
+							type="number" />
+						{this.state.errors[Validation.TEAM_CREATE.MEMBERS_COUNT] && <Div className="error" style={{ color: 'red' }}>{this.state.errors[Validation.TEAM_CREATE.MEMBERS_COUNT]}</Div>}
+						<Textarea
+							top="Описание участников и их задач"
+							name="descriptionRequiredMembers"
+							value={inputData.descriptionRequiredMembers}
+							onChange={this.handleInput} />
+						<div style={{ margin: "12px", display: "flex", justifyContent: "end", fontSize: "11px", color: "var(--text_secondary)" }}>
+							<span weight="regular">осталось {500 - this.getOrEmpty('descriptionRequiredMembers').length} символов</span>
+						</div>
+					</FormLayout>}
 					<Div>
 						<Button
 							size="xl"
