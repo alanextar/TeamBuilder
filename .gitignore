@@ -354,3 +354,4 @@ bin
 obj
 *.exe
 secret.js
+TeamBuilder/appsettings.Development.json
